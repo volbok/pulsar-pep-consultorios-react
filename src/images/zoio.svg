@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="52.439911mm"
+   height="35.841747mm"
+   viewBox="0 0 52.439911 35.841747"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="zoio.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm" />
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Camada 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(-78.780044,-130.57913)">
+    <g
+       id="g3">
+      <g
+         id="g2"
+         transform="matrix(0.98929689,0,0,1.4325114,3.8820456,-56.377532)">
+        <path
+           style="fill:none;fill-opacity:1;stroke:#008080;stroke-width:2.82223;stroke-linecap:round;stroke-linejoin:round;paint-order:fill markers stroke"
+           d="m 77.119428,142.97224 c 17.567335,-15.24172 34.239422,-14.21988 50.185022,0"
+           id="path1"
+           sodipodi:nodetypes="cc" />
+        <path
+           style="fill:none;fill-opacity:1;stroke:#008080;stroke-width:2.82223;stroke-linecap:round;stroke-linejoin:round;paint-order:fill markers stroke"
+           d="m 77.153438,143.06742 c 17.567335,15.24172 34.239422,14.21988 50.185022,0"
+           id="path1-7"
+           sodipodi:nodetypes="cc" />
+      </g>
+      <circle
+         style="fill:#008080;fill-opacity:1;stroke:#008080;stroke-width:3.2511;stroke-linecap:round;stroke-linejoin:round;paint-order:fill markers stroke"
+         id="path2"
+         cx="105"
+         cy="148.5"
+         r="9.5184183" />
+      <circle
+         style="fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:2.82223;stroke-linecap:round;stroke-linejoin:round;stroke-opacity:1;paint-order:fill markers stroke"
+         id="path3"
+         cx="112.35033"
+         cy="142.41463"
+         r="3.1935923" />
+    </g>
+  </g>
+</svg>

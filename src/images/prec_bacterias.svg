@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created using Krita: http://krita.org -->
+
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="120pt"
+   height="120pt"
+   viewBox="0 0 120 120"
+   version="1.1"
+   id="svg61"
+   sodipodi:docname="bacterias.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <metadata
+     id="metadata65">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1366"
+     inkscape:window-height="697"
+     id="namedview63"
+     showgrid="false"
+     inkscape:zoom="2.6684744"
+     inkscape:cx="100.49139"
+     inkscape:cy="90.38977"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg61" />
+  <defs
+     id="defs56">
+    <linearGradient
+       id="green-button"
+       osb:paint="solid">
+      <stop
+         style="stop-color:#52be80;stop-opacity:1;"
+         offset="0"
+         id="stop886" />
+    </linearGradient>
+  </defs>
+  <rect
+     style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:16.36505127;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="rect947"
+     width="25.519682"
+     height="65.958374"
+     x="97.912605"
+     y="-45.87088"
+     ry="12.027712"
+     rx="12.673249"
+     transform="matrix(0.70104302,0.71311899,-0.68568921,0.72789444,0,0)" />
+  <rect
+     style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:none;stroke-width:16.26249313;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     id="rect947-7"
+     width="25.359751"
+     height="65.545013"
+     x="-3.9110737"
+     y="24.296532"
+     ry="11.952335"
+     rx="12.593826"
+     transform="matrix(0.79815804,-0.60244812,0.63263576,0.77444948,0,0)" />
+  <path
+     style="fill:none;stroke:#ffffff;stroke-width:5.66929134;stroke-linecap:round;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+     d="m 64.643678,92.456175 c -2.068909,3.187467 1.78756,11.222975 -7.588605,8.431775 -6.293545,-6.223537 -6.889078,-0.969452 -10.680261,1.96743 -9.437321,4.46059 -8.126635,-3.062374 -9.556021,-8.993908 -2.074891,-8.416584 -7.085542,-3.622243 -12.085558,1.124236"
+     id="path981"
+     inkscape:connector-curvature="0"
+     sodipodi:nodetypes="ccccc" />
+</svg>

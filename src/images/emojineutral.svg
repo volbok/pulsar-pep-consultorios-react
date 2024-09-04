@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created using Krita: http://krita.org -->
+
+<svg
+   xmlns:osb="http://www.openswatchbook.org/uri/2009/osb"
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="120pt"
+   height="120pt"
+   viewBox="0 0 120 120"
+   version="1.1"
+   id="svg61"
+   sodipodi:docname="emojineutral.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <metadata
+     id="metadata65">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1366"
+     inkscape:window-height="697"
+     id="namedview63"
+     showgrid="false"
+     inkscape:zoom="2.3246135"
+     inkscape:cx="-19.041597"
+     inkscape:cy="97.488208"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg61"
+     inkscape:snap-others="true"
+     inkscape:snap-to-guides="true" />
+  <defs
+     id="defs56">
+    <linearGradient
+       id="linearGradient878"
+       osb:paint="solid">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop876" />
+    </linearGradient>
+    <linearGradient
+       id="linearGradient872"
+       osb:paint="solid">
+      <stop
+         style="stop-color:#000000;stop-opacity:1;"
+         offset="0"
+         id="stop870" />
+    </linearGradient>
+    <linearGradient
+       id="green-button"
+       osb:paint="solid"
+       gradientTransform="matrix(0.3156838,0,0,0.3156838,53.251537,-23.081531)">
+      <stop
+         style="stop-color:#52be80;stop-opacity:1;"
+         offset="0"
+         id="stop886" />
+    </linearGradient>
+  </defs>
+  <path
+     style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:2.85311818;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+     id="path828"
+     sodipodi:type="arc"
+     sodipodi:cx="41.065491"
+     sodipodi:cy="44.819885"
+     sodipodi:rx="9.2051373"
+     sodipodi:ry="8.8369322"
+     sodipodi:start="0"
+     sodipodi:end="6.2789267"
+     d="m 50.270628,44.819885 a 9.2051373,8.8369322 0 0 1 -9.195337,8.836927 9.2051373,8.8369322 0 0 1 -9.214917,-8.81811 9.2051373,8.8369322 0 0 1 9.175716,-8.855704 9.2051373,8.8369322 0 0 1 9.234455,8.799254 l -9.205054,0.03763 z" />
+  <path
+     style="opacity:1;fill:#ffffff;fill-opacity:1;stroke:#ffffff;stroke-width:2.92747092;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke fill markers"
+     id="path828-2"
+     sodipodi:type="arc"
+     sodipodi:cx="78.657448"
+     sodipodi:cy="44.819885"
+     sodipodi:rx="9.4450245"
+     sodipodi:ry="9.0672235"
+     sodipodi:start="0"
+     sodipodi:end="6.2789267"
+     d="m 88.102472,44.819885 a 9.4450245,9.0672235 0 0 1 -9.434969,9.067219 9.4450245,9.0672235 0 0 1 -9.455058,-9.047912 9.4450245,9.0672235 0 0 1 9.414836,-9.086484 9.4450245,9.0672235 0 0 1 9.475106,9.028564 l -9.444939,0.03861 z" />
+  <path
+     style="fill:#ff0000;stroke:#ffffff;stroke-width:7.5;stroke-linecap:round;stroke-linejoin:miter;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
+     d="M 35.620559,68.186509 H 84.338333"
+     id="path23"
+     inkscape:connector-curvature="0" />
+</svg>

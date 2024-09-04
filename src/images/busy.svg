@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created using Krita: http://krita.org -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="120pt"
+   height="120pt"
+   viewBox="0 0 120 120"
+   version="1.1"
+   id="svg865"
+   sodipodi:docname="busy.svg"
+   inkscape:version="0.92.3 (2405546, 2018-03-11)">
+  <metadata
+     id="metadata869">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="1366"
+     inkscape:window-height="697"
+     id="namedview867"
+     showgrid="false"
+     inkscape:zoom="3.3125"
+     inkscape:cx="80"
+     inkscape:cy="80"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg865" />
+  <defs
+     id="defs847" />
+  <ellipse
+     id="shape0"
+     transform="matrix(0.72656683127 0.3214323726 -0.3214323726 0.72656683127 28.299004238 36.796709543)"
+     rx="48.36"
+     ry="11.451282028"
+     cx="48.36"
+     cy="11.451282028"
+     fill="#bfdbf7"
+     fill-rule="evenodd"
+     stroke="#000000"
+     stroke-opacity="0"
+     stroke-width="12"
+     stroke-linecap="square"
+     stroke-linejoin="bevel"
+     style="fill:#ffffff" />
+  <ellipse
+     id="shape1"
+     transform="matrix(0.79449237282 0 0 0.79449237282 36.587565855 37.398564103)"
+     rx="29.16"
+     ry="29.28"
+     cx="29.16"
+     cy="29.28"
+     fill="#bfdbf7"
+     fill-rule="evenodd"
+     style="fill:#ffffff;stroke:#ffffff" />
+  <circle
+     id="shape2"
+     transform="matrix(0.79449237282 0 0 0.79449237282 40.401129245 41.307466577)"
+     r="24.36"
+     cx="24.36"
+     cy="24.36"
+     fill="#1f7a8c"
+     fill-rule="evenodd"
+     stroke="#000000"
+     stroke-opacity="0"
+     stroke-width="1"
+     stroke-linecap="square"
+     stroke-linejoin="bevel"
+     style="fill:#ffff00" />
+  <ellipse
+     id="shape01"
+     transform="matrix(0.79449234037 0 0 0.79449238363 54.652142389 43.484010531)"
+     rx="6.4227441827"
+     ry="6.4491752287"
+     cx="6.4227441827"
+     cy="6.4491752287"
+     fill="#bfdbf7"
+     fill-rule="evenodd"
+     style="fill:#ffffff" />
+  <path
+     id="path853"
+     transform="matrix(0.79449237282 0 0 0.79449237282 33.608876903 42.266329347)"
+     fill="none"
+     stroke="#bfdbf7"
+     stroke-width="3.6"
+     stroke-linecap="square"
+     stroke-linejoin="miter"
+     stroke-miterlimit="2"
+     d="M0 3.49115C7.94694 4.08134 13.6394 3.22745 19.1081 0"
+     style="stroke:#ffffff" />
+  <path
+     id="shape02"
+     transform="matrix(-0.51588279795 -0.60422102952 -0.60422102021 0.51588278999 90.537253856 67.459783031)"
+     fill="none"
+     stroke="#bfdbf7"
+     stroke-width="3.6"
+     stroke-linecap="square"
+     stroke-linejoin="miter"
+     stroke-miterlimit="2"
+     d="M0 3.49115C7.72409 4.08134 13.2569 3.22745 18.5723 0"
+     style="stroke:#ffffff" />
+  <path
+     id="shape3"
+     transform="matrix(0.79449237282 0 0 0.79449237282 32.474787086 49.029987281)"
+     fill="none"
+     stroke="#bfdbf7"
+     stroke-width="9.6"
+     stroke-linecap="square"
+     stroke-linejoin="miter"
+     stroke-miterlimit="2"
+     d="M0 0C18.1533 18.6631 41.2464 29.3397 69.6045 31.5046"
+     style="stroke:#ffffff" />
+  <circle
+     id="circle857"
+     transform="matrix(0.99999996874 0 0 1.0000000063 68.898716641 25.199603917)"
+     r="5.4929930051"
+     cx="5.4929930051"
+     cy="5.4929930051"
+     fill="#bfdbf7"
+     fill-rule="evenodd"
+     style="fill:#ffffff" />
+  <circle
+     id="shape03"
+     transform="matrix(1.0000000018 0 0 0.99999997869 76.160943368 14.804086097)"
+     r="3.8334923875"
+     cx="3.8334923875"
+     cy="3.8334923875"
+     fill="#bfdbf7"
+     fill-rule="evenodd"
+     style="fill:#ffffff" />
+  <circle
+     id="shape011"
+     transform="matrix(0.99999999174 0 0 0.99999996044 81.249818599 6.2150180329)"
+     r="3.0600958199"
+     cx="3.0600958199"
+     cy="3.0600958199"
+     fill="#bfdbf7"
+     fill-rule="evenodd"
+     style="fill:#ffffff" />
+  <circle
+     id="shape021"
+     transform="matrix(-0.99999993748 0 0 -0.99999999864 50.456656057 96.933052427)"
+     r="5.4929930051"
+     cx="5.4929930051"
+     cy="5.4929930051"
+     fill="#bfdbf7"
+     fill-rule="evenodd"
+     style="fill:#ffffff" />
+  <circle
+     id="circle862"
+     transform="matrix(-0.99999997054 0 0 -0.99999997104 43.194429557 107.32857017)"
+     r="3.8334923875"
+     cx="3.8334923875"
+     cy="3.8334923875"
+     fill="#bfdbf7"
+     fill-rule="evenodd"
+     style="fill:#ffffff" />
+  <circle
+     id="shape012"
+     transform="matrix(-0.99999996048 0 0 -0.99999995279 38.105554485 115.91763817)"
+     r="3.0600958199"
+     cx="3.0600958199"
+     cy="3.0600958199"
+     fill="#bfdbf7"
+     fill-rule="evenodd"
+     style="fill:#ffffff" />
+</svg>

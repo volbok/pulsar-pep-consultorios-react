@@ -1,0 +1,25 @@
+<?xml version="1.0" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 20010904//EN" "http://www.w3.org/TR/2001/REC-SVG-20010904/DTD/svg10.dtd">
+<!-- Created using Krita: https://krita.org -->
+<svg xmlns="http://www.w3.org/2000/svg" 
+    xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:krita="http://krita.org/namespaces/svg/krita"
+    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+    width="120.24pt"
+    height="120.24pt"
+    viewBox="0 0 120.24 120.24">
+<defs/>
+<g id="group0" transform="translate(7.83725557461407, 6.09971901383167)" fill="none">
+  <ellipse id="shape0" transform="matrix(1.00000001776639 0 0 1.00000001776639 23.9242538593482 24.3130795423654)" rx="29.0723155457119" ry="29.6822242634541" cx="29.0723155457119" cy="29.6822242634541" fill="none" stroke="#ffffff" stroke-width="21.6" stroke-linecap="square" stroke-linejoin="bevel"/>
+  <path id="shape0" transform="translate(0, 39.6863530273347)" fill="#ffffff" fill-rule="evenodd" stroke="#000000" stroke-opacity="0" stroke-width="0" stroke-linecap="square" stroke-linejoin="bevel" d="M0.206244 6.39355L19.7994 0L19.3869 26.1929L0 20.0056Z"/>
+  <path id="shape01" transform="matrix(0.70710675814971 0.707106758149709 -0.707106758149709 0.70710675814971 24.0899286472144 5.57381275279932)" fill="#ffffff" fill-rule="evenodd" stroke="#000000" stroke-opacity="0" stroke-width="0" stroke-linecap="square" stroke-linejoin="bevel" d="M0.206244 6.39355L19.7994 0L19.3869 26.1929L0 20.0056Z"/>
+  <path id="shape02" transform="matrix(0.00620390339446866 0.999980746708862 -0.999980746708862 0.00620390339446866 66.9403585689665 8.88178419700125e-16)" fill="#ffffff" fill-rule="evenodd" stroke="#000000" stroke-opacity="0" stroke-width="0" stroke-linecap="square" stroke-linejoin="bevel" d="M0.206244 6.39355L19.7994 0L19.3869 26.1929L0 20.0056Z"/>
+  <path id="shape03" transform="matrix(0.707106732307782 -0.707106732307783 0.707106732307783 0.707106732307782 5.83317935177288 82.4306395025018)" fill="#ffffff" fill-rule="evenodd" stroke="#000000" stroke-opacity="0" stroke-width="0" stroke-linecap="square" stroke-linejoin="bevel" d="M0.206244 6.39355L19.7994 0L19.3869 26.1929L0 20.0056Z"/>
+  <path id="shape04" transform="matrix(-0.0145094989548404 -0.999894746089405 0.999894746089405 -0.0145094989548404 41.1107472543328 106.965282931643)" fill="#ffffff" fill-rule="evenodd" stroke="#000000" stroke-opacity="0" stroke-width="0" stroke-linecap="square" stroke-linejoin="bevel" d="M0.206244 6.39355L19.7994 0L19.3869 26.1929L0 20.0056Z"/>
+  <g id="group1" transform="matrix(-0.999729499735936 -0.0232578450794732 0.0232578450794732 -0.999729499735936 105.630014934545 101.435532747668)" fill="none">
+   <path id="shape05" transform="matrix(0.999999981755362 0 0 0.999999981755362 0 34.1125396521645)" fill="#ffffff" fill-rule="evenodd" stroke="#000000" stroke-opacity="0" stroke-width="0" stroke-linecap="square" stroke-linejoin="bevel" d="M0.206244 6.39355L19.7994 0L19.3869 26.1929L0 20.0056Z"/>
+   <path id="shape06" transform="matrix(0.707106745248803 0.707106745248802 -0.707106745248802 0.707106745248803 24.0899282077023 -7.105427357601e-15)" fill="#ffffff" fill-rule="evenodd" stroke="#000000" stroke-opacity="0" stroke-width="0" stroke-linecap="square" stroke-linejoin="bevel" d="M0.206244 6.39355L19.7994 0L19.3869 26.1929L0 20.0056Z"/>
+   <path id="shape01" transform="matrix(0.707106719406876 -0.707106719406877 0.707106719406877 0.707106719406876 5.83317924534863 76.8568253474775)" fill="#ffffff" fill-rule="evenodd" stroke="#000000" stroke-opacity="0" stroke-width="0" stroke-linecap="square" stroke-linejoin="bevel" d="M0.206244 6.39355L19.7994 0L19.3869 26.1929L0 20.0056Z"/>
+  </g>
+ </g>
+</svg>
