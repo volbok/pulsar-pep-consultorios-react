@@ -127,7 +127,13 @@ function Prontuario() {
         var pacientes = [];
         pacientes = response.data.rows;
         setpacientes(pacientes);
-        pacientes.filter(item => item.status.includes('REAVALIAÇÃO') || item.status == 'AIH').map(paciente => {
+        // inativando atendimentos cujo paciente já não se encontra na lista de pacientes.
+        // pacientes.filter(item => item.nome_paciente != null).map(paciente => atendimentos.filter(atendimento => atendimento.nome_paciente != paciente.nome_paciente).map(atendimento => updateAtendimento(atendimento, atendimento.id_cliente, atendimento.id_unidade, atendimento.leito, 0)));
+        // inativando pacientes já liberados ou transferidos.
+        pacientes.filter(item => item.nome_paciente != null && !item.status.includes('REAVALIAÇÃO') && item.status != 'AIH').map(paciente =>
+          updateAtendimento(atendimentos.filter(atendimento => atendimento.nome_paciente == paciente.nome_paciente), paciente.unidade_origem, paciente.setor_origem, paciente.passometro_leito, 0));
+        // trabalhando com os pacientes ativos.
+        pacientes.filter(item => item.nome_paciente != null && (item.status.includes('REAVALIAÇÃO') || item.status == 'AIH')).map(paciente => {
           if (atendimentos.filter(atendimento => atendimento.nome_paciente == paciente.nome_paciente).length == 1) {
             console.log('ATUALIZAR O ATENDIMENTO');
             if (paciente.nome_paciente.includes('RODRIGO')) {
@@ -136,8 +142,7 @@ function Prontuario() {
               console.log('OBJETO ATENDIMENTO:');
               console.log(atendimentos.filter(atendimento => atendimento.nome_paciente == paciente.nome_paciente).pop());
             }
-            // console.log(paciente);
-            updateAtendimento(atendimentos.filter(atendimento => atendimento.nome_paciente == paciente.nome_paciente), paciente.unidade_origem, paciente.setor_origem, paciente.passometro_leito);
+            updateAtendimento(atendimentos.filter(atendimento => atendimento.nome_paciente == paciente.nome_paciente), paciente.unidade_origem, paciente.setor_origem, paciente.passometro_leito, 1);
           } else {
             // inserir registros de pacientes no NIRVANA PEP, se inexistentes.
             console.log('INSERIR ATENDIMENTO');
@@ -202,7 +207,7 @@ function Prontuario() {
       .post(html + "insert_atendimento", obj);
   }
 
-  const updateAtendimento = (atendimento, hospital, unidade, leito) => {
+  const updateAtendimento = (atendimento, hospital, unidade, leito, situacao) => {
     let id = atendimento.map(item => item.id_atendimento).pop()
     console.log(id);
     var obj = {
@@ -213,7 +218,7 @@ function Prontuario() {
       id_unidade: unidade,
       nome_paciente: atendimento.map(item => item.nome_paciente).pop(),
       leito: leito,
-      situacao: atendimento.map(item => item.situacao).pop(),
+      situacao: situacao,
       id_cliente: hospital,
       classificacao: null,
       id_profissional: null,
