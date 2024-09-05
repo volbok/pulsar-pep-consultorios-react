@@ -119,22 +119,48 @@ function Prontuario() {
   window.addEventListener("load", refreshApp);
 
   // carregar lista de pacientes.
-  const loadPacientes = () => {
+  const loadPacientes = (atendimentos) => {
     axios
+      // obtendo registros de pacientes cadastrados no NIRVANA PASSÔMETRO.
       .get(htmlnirvana + "list_pacientes")
       .then((response) => {
-        var x = [];
-        x = response.data.rows;
-        console.log(x);
-        setpacientes(x);
-        updatedAtendimentos(x.filter(item => item.nome_paciente != null && item.nome_paciente != '' && (item.status.includes('REAVALIAÇÃO') || item.status == 'AIH')));
-        console.log("LISTA DE PACIENTES CARREGADA.");
+        var pacientes = [];
+        pacientes = response.data.rows;
+        setpacientes(pacientes);
+        pacientes.filter(item => item.status.includes('REAVALIAÇÃO') || item.status == 'AIH').map(paciente => {
+          if (atendimentos.filter(atendimento => atendimento.nome_paciente == paciente.nome_paciente).length == 1) {
+            console.log('ATUALIZAR O ATENDIMENTO');
+            if (paciente.nome_paciente.includes('RODRIGO')) {
+              console.log('OBJETO PACIENTE:');
+              console.log(paciente);
+              console.log('OBJETO ATENDIMENTO:');
+              console.log(atendimentos.filter(atendimento => atendimento.nome_paciente == paciente.nome_paciente).pop());
+            }
+            // console.log(paciente);
+            updateAtendimento(atendimentos.filter(atendimento => atendimento.nome_paciente == paciente.nome_paciente), paciente.unidade_origem, paciente.setor_origem, paciente.passometro_leito);
+          } else {
+            // inserir registros de pacientes no NIRVANA PEP, se inexistentes.
+            console.log('INSERIR ATENDIMENTO');
+            insertAtendimento(paciente.id, paciente.nome_paciente, paciente.unidade_origem, paciente.setor_origem, paciente.passometro_leito);
+          }
+          return null;
+        })
+        setTimeout(() => {
+          axios
+            .get(html + "all_atendimentos")
+            .then((response) => {
+              var x = [];
+              x = response.data.rows;
+              setatendimentos(x.filter(item => item.situacao == 1));
+              setarrayatendimentos(x.filter(item => item.situacao == 1));
+            });
+        }, 2000);
       })
       .catch(function (error) {
         if (error.response == undefined) {
           toast(
             settoast,
-            "ERRO DE CONEXÃO, REINICIANDO APLICAÇÃO.",
+            "ERRO DE CONEXÃO, REINICIANDO APLICAÇÃO: " + error,
             "black",
             3000
           );
@@ -171,52 +197,31 @@ function Prontuario() {
       classificacao: null,
       id_profissional: null,
     };
+    // console.log(obj);
     axios
       .post(html + "insert_atendimento", obj);
   }
 
-  const updateAtendimento = (item) => {
+  const updateAtendimento = (atendimento, hospital, unidade, leito) => {
+    let id = atendimento.map(item => item.id_atendimento).pop()
+    console.log(id);
     var obj = {
-      data_inicio: item.data_inicio,
-      data_termino: moment(),
-      problemas: item.problemas,
-      id_paciente: item.id,
-      id_unidade: item.unidade,
-      nome_paciente: item.nome_paciente,
-      leito: item.leito,
-      situacao: 0, // 1 = atendimento ativo; 0 = atendimento encerrado.
-      id_cliente: item.id_cliente,
+      data_inicio: atendimento.map(item => item.data_inicio).pop(),
+      data_termino: atendimento.map(item => item.data_termino).pop(),
+      problemas: atendimento.map(item => item.problemas).pop(),
+      id_paciente: atendimento.map(item => item.id_paciente).pop(),
+      id_unidade: unidade,
+      nome_paciente: atendimento.map(item => item.nome_paciente).pop(),
+      leito: leito,
+      situacao: atendimento.map(item => item.situacao).pop(),
+      id_cliente: hospital,
       classificacao: null,
       id_profissional: null,
     };
-    axios.post(html + "update_atendimento/" + item.id_atendimento, obj);
-    console.log('INATIVOU ATENDIMENTO ENCERRADO NO NIRVANA!');
-  }
-
-  // carregar lista de atendimentos ativos para a unidade selecionada.
-  const [arrayatendimentos, setarrayatendimentos] = useState([]);
-  const updatedAtendimentos = (pacientes) => {
-    console.log('PACIENTES: ' + pacientes.length);
-    let x = [];
-    axios
-      .get(html + "all_atendimentos")
-      .then((response) => {
-        x = response.data.rows;
-        console.log('ATENDIMENTOS: ' + x.length);
-        pacientes.map(item => {
-          // checando se um paciente da lista de pacientes NIRVANA já tem atendimento:
-          if (x.filter(valor => valor.nome_paciente == item.nome_paciente && (item.status.includes('REAVALIAÇÃO') || item.status == 'AIH')).length == 0) {
-            insertAtendimento(item.id, item.nome_paciente, item.unidade_origem, item.setor_origem, item.passometro_leito);
-          };
-          // desativando atendimentos de pacientes registrados no PEP que não se encontram mais ativos no passômetro nirvana:
-          if (x.filter(valor => valor.nome_paciente != item.nome_paciente).length == 1) {
-            updateAtendimento(x.filter(valor => valor.nome_paciente != item.nome_paciente));
-          }
-          return null;
-        });
-        loadAtendimentos()
-      })
-
+    if (atendimento.map(item => item.nome_paciente).includes('RODRIGO')) {
+      console.log(obj);
+    }
+    axios.post(html + "update_atendimento/" + id, obj)
       .catch(function (error) {
         if (error.response == undefined) {
           toast(
@@ -242,7 +247,11 @@ function Prontuario() {
           }, 3000);
         }
       });
-  };
+    ;
+  }
+
+  // carregar lista de atendimentos ativos para a unidade selecionada.
+  const [arrayatendimentos, setarrayatendimentos] = useState([]);
 
   const loadAtendimentos = () => {
     axios
@@ -254,6 +263,7 @@ function Prontuario() {
         setarrayatendimentos(x.filter(item => item.situacao == 1));
         loadAllInterconsultas();
         loadAllPrecaucoes();
+        loadPacientes(x);
       });
   }
 
@@ -277,17 +287,17 @@ function Prontuario() {
     axios.get(html + 'list_itens_prescricoes/' + atendimento).then((response) => {
       let x = response.data.rows;
       setprescricao(x);
-      console.log(x.filter(item => item.categoria == '1. ANTIMICROBIANOS'))
+      // console.log(x.filter(item => item.categoria == '1. ANTIMICROBIANOS'))
     });
   }
 
   var timeout = null;
   useEffect(() => {
     if (pagina == -1) {
+      loadAtendimentos();
       getCliente();
       setpaciente([]);
       setatendimento(null);
-      loadPacientes();
       if (consultorio == null) {
         setviewsalaselector(1);
       }
@@ -351,8 +361,8 @@ function Prontuario() {
         }, 100);
       } else {
         setfilterpaciente(document.getElementById("inputPaciente").value.toUpperCase());
-        if (atendimentos.filter((item) => item.nome_paciente.includes(searchpaciente)).length > 0) {
-          setarrayatendimentos(atendimentos.filter((item) => item.nome_paciente.includes(searchpaciente)));
+        if (atendimentos.filter((item) => item.nome_paciente != null && item.nome_paciente.includes(searchpaciente)).length > 0) {
+          setarrayatendimentos(atendimentos.filter((item) => item.nome_paciente != null && item.nome_paciente.includes(searchpaciente)));
           setTimeout(() => {
             document.getElementById("inputPaciente").value = searchpaciente;
             document.getElementById("inputPaciente").focus()
@@ -398,7 +408,7 @@ function Prontuario() {
             opacity: 1,
             alignSelf: "center",
           }}
-          onClick={() => { loadPacientes(); setatendimento(null); }}
+          onClick={() => { loadAtendimentos(); setatendimento(null); }}
         >
           <img
             alt="" src={refresh}

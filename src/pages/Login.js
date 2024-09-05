@@ -268,7 +268,8 @@ function Login() {
   };
 
   // recuperando registros de acessos do usuário logado.
-  const [setacessos] = useState([]);
+  // eslint-disable-next-line
+  const [acessos, setacessos] = useState([]);
   const loadAcessos = (id_usuario) => {
     var obj = {
       id_usuario: id_usuario,
