@@ -44,7 +44,6 @@ function Prontuario() {
   // context.
   const {
     html,
-    htmlnirvana,
 
     cliente,
 
@@ -122,34 +121,11 @@ function Prontuario() {
   const loadPacientes = (atendimentos) => {
     axios
       // obtendo registros de pacientes cadastrados no NIRVANA PASSÔMETRO.
-      .get(htmlnirvana + "list_pacientes")
+      .get(html + "list_pacientes")
       .then((response) => {
         var pacientes = [];
         pacientes = response.data.rows;
         setpacientes(pacientes);
-        // inativando atendimentos cujo paciente já não se encontra na lista de pacientes.
-        // pacientes.filter(item => item.nome_paciente != null).map(paciente => atendimentos.filter(atendimento => atendimento.nome_paciente != paciente.nome_paciente).map(atendimento => updateAtendimento(atendimento, atendimento.id_cliente, atendimento.id_unidade, atendimento.leito, 0)));
-        // inativando pacientes já liberados ou transferidos.
-        pacientes.filter(item => item.nome_paciente != null && !item.status.includes('REAVALIAÇÃO') && item.status != 'AIH').map(paciente =>
-          updateAtendimento(atendimentos.filter(atendimento => atendimento.nome_paciente == paciente.nome_paciente), paciente.unidade_origem, paciente.setor_origem, paciente.passometro_leito, 0));
-        // trabalhando com os pacientes ativos.
-        pacientes.filter(item => item.nome_paciente != null && (item.status.includes('REAVALIAÇÃO') || item.status == 'AIH')).map(paciente => {
-          if (atendimentos.filter(atendimento => atendimento.nome_paciente == paciente.nome_paciente).length == 1) {
-            console.log('ATUALIZAR O ATENDIMENTO');
-            if (paciente.nome_paciente.includes('RODRIGO')) {
-              console.log('OBJETO PACIENTE:');
-              console.log(paciente);
-              console.log('OBJETO ATENDIMENTO:');
-              console.log(atendimentos.filter(atendimento => atendimento.nome_paciente == paciente.nome_paciente).pop());
-            }
-            updateAtendimento(atendimentos.filter(atendimento => atendimento.nome_paciente == paciente.nome_paciente), paciente.unidade_origem, paciente.setor_origem, paciente.passometro_leito, 1);
-          } else {
-            // inserir registros de pacientes no NIRVANA PEP, se inexistentes.
-            console.log('INSERIR ATENDIMENTO');
-            insertAtendimento(paciente.id, paciente.nome_paciente, paciente.unidade_origem, paciente.setor_origem, paciente.passometro_leito);
-          }
-          return null;
-        })
         setTimeout(() => {
           axios
             .get(html + "all_atendimentos")
@@ -187,73 +163,6 @@ function Prontuario() {
         }
       });
   };
-
-  const insertAtendimento = (id, nome, hospital, unidade, leito) => {
-    var obj = {
-      data_inicio: moment(),
-      data_termino: null,
-      problemas: null,
-      id_paciente: id,
-      id_unidade: unidade,
-      nome_paciente: nome,
-      leito: leito,
-      situacao: 1, // 1 = atendimento ativo; 0 = atendimento encerrado.
-      id_cliente: hospital,
-      classificacao: null,
-      id_profissional: null,
-    };
-    // console.log(obj);
-    axios
-      .post(html + "insert_atendimento", obj);
-  }
-
-  const updateAtendimento = (atendimento, hospital, unidade, leito, situacao) => {
-    let id = atendimento.map(item => item.id_atendimento).pop()
-    console.log(id);
-    var obj = {
-      data_inicio: atendimento.map(item => item.data_inicio).pop(),
-      data_termino: atendimento.map(item => item.data_termino).pop(),
-      problemas: atendimento.map(item => item.problemas).pop(),
-      id_paciente: atendimento.map(item => item.id_paciente).pop(),
-      id_unidade: unidade,
-      nome_paciente: atendimento.map(item => item.nome_paciente).pop(),
-      leito: leito,
-      situacao: situacao,
-      id_cliente: hospital,
-      classificacao: null,
-      id_profissional: null,
-    };
-    if (atendimento.map(item => item.nome_paciente).includes('RODRIGO')) {
-      console.log(obj);
-    }
-    axios.post(html + "update_atendimento/" + id, obj)
-      .catch(function (error) {
-        if (error.response == undefined) {
-          toast(
-            settoast,
-            "ERRO DE CONEXÃO, REINICIANDO APLICAÇÃO.",
-            "black",
-            3000
-          );
-          setTimeout(() => {
-            setpagina(0);
-            history.push("/");
-          }, 3000);
-        } else {
-          toast(
-            settoast,
-            error.response.data.message + " REINICIANDO APLICAÇÃO.",
-            "black",
-            3000
-          );
-          setTimeout(() => {
-            setpagina(0);
-            history.push("/");
-          }, 3000);
-        }
-      });
-    ;
-  }
 
   // carregar lista de atendimentos ativos para a unidade selecionada.
   const [arrayatendimentos, setarrayatendimentos] = useState([]);
@@ -493,34 +402,6 @@ function Prontuario() {
     console.log(arrayunidades);
   }
 
-  const [setor, setsetor] = useState();
-  function FilterSetor() {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
-        <div
-          className="button"
-          onClick={() => setsetor(null)}
-          style={{
-            width: 100, height: 20, maxHeight: 20, minHeight: 20,
-            backgroundColor: 'grey'
-          }}>
-          {'TODOS'}
-        </div>
-        {arrayunidades.map(item => (
-          <div
-            onClick={() => setsetor(item.valor)}
-            className="button"
-            style={{
-              width: 100, height: 20, maxHeight: 20, minHeight: 20,
-              backgroundColor: item.cor
-            }}>
-            {item.valor}
-          </div>
-        ))}
-      </div>
-    )
-  }
-
   // lista de atendimentos.
   const ListaDeAtendimentos = useCallback(() => {
     return (
@@ -532,7 +413,6 @@ function Prontuario() {
           height: '100%',
         }}
       >
-        <FilterSetor></FilterSetor>
         <div id="scroll atendimentos com pacientes"
           className="scroll"
           style={{
@@ -542,11 +422,10 @@ function Prontuario() {
             width: 'calc(100% - 20px)',
           }}
         >
-          <div id="lista com setor filtrado" style={{ display: setor != null ? 'flex' : 'none', flexDirection: 'column' }}>
+          <div id="lista com setor filtrado" style={{ display: 'flex', flexDirection: 'column' }}>
             {
               arrayatendimentos
-                .filter(item => item.id_unidade == setor)
-                .sort((a, b) => (a.nome_paciente > b.nome_paciente ? 1 : -1))
+                .sort((a, b) => (a.leito > b.leito ? 1 : -1))
                 .map((item) => (
                   <div key={"pacientes" + item.id_atendimento} style={{ width: '100%' }}>
                     <div
@@ -568,7 +447,7 @@ function Prontuario() {
                           minHeight: 100,
                           height: 100,
                           width: 80, minWidth: 80, maxWidth: 80,
-                          backgroundColor: arrayunidades.filter(valor => valor.valor == setor).map(item => item.cor),
+                          backgroundColor: 'white',
                         }}
                       >
                         <div
@@ -647,113 +526,6 @@ function Prontuario() {
                 ))
             }
           </div>
-          <div id="lista sem setor filtrado" style={{ display: setor == null ? 'flex' : 'none', flexDirection: 'column' }}>
-            {
-              arrayunidades.map(valor =>
-                arrayatendimentos
-                  .filter(item => item.id_unidade == valor.valor)
-                  .sort((a, b) => (a.nome_paciente > b.nome_paciente ? 1 : -1))
-                  .map((item) => (
-                    <div key={"pacientes" + item.id_atendimento} style={{ width: '100%' }}>
-                      <div
-                        className="row"
-                        style={{
-                          position: "relative",
-                          margin: 2.5, padding: 0,
-                        }}
-                      >
-                        <div
-                          className="button"
-                          style={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            justifyContent: 'center',
-                            marginRight: 0,
-                            borderTopRightRadius: 0,
-                            borderBottomRightRadius: 0,
-                            minHeight: 100,
-                            height: 100,
-                            width: 80, minWidth: 80, maxWidth: 80,
-                            backgroundColor: valor.cor
-                          }}
-                        >
-                          <div
-                            style={{ margin: 5, padding: 0, fontSize: 14 }}
-                          >
-                            {item.id_unidade}
-                          </div>
-                          <div
-                            style={{ margin: 5, padding: 0, fontSize: 14 }}
-                          >
-                            {item.leito}
-                          </div>
-                        </div>
-                        <div
-                          id={"atendimento " + item.id_atendimento}
-                          className="button"
-                          style={{
-                            flex: 3,
-                            marginLeft: 0,
-                            borderTopLeftRadius: 0,
-                            borderBottomLeftRadius: 0,
-                            minHeight: 100,
-                            height: 100,
-                            width: '100%',
-                          }}
-                          onClick={() => {
-                            setviewlista(0);
-                            setunidade(parseInt(item.id_unidade));
-                            setatendimento(item.id_atendimento);
-                            setobjatendimento(item);
-                            setpaciente(parseInt(item.id_paciente));
-                            getAllData(item.id_paciente, item.id_atendimento);
-                            setidprescricao(0);
-                            if (pagina == -1) {
-                              selector("scroll atendimentos com pacientes", "atendimento " + item.id_atendimento, 100);
-                            }
-                          }}
-                        >
-                          <div
-                            style={{
-                              display: "flex",
-                              flexDirection: "column",
-                              justifyContent: "flex-start",
-                              padding: 5
-                            }}
-                          >
-                            {item.nome_paciente}
-                          </div>
-                        </div>
-                        <div
-                          id="informações do paciente"
-                          style={{
-                            position: "absolute",
-                            right: -5,
-                            bottom: -5,
-                            display: "flex",
-                            flexDirection: "row",
-                            justifyContent: "center",
-                          }}
-                        >
-                          {tagsDosPacientes(
-                            "INTERCONSULTAS",
-                            item,
-                            allinterconsultas,
-                            esteto
-                          )}
-                          {tagsDosPacientes(
-                            "PRECAUÇÕES",
-                            item,
-                            allprecaucoes,
-                            prec_padrao
-                          )}
-                        </div>
-                      </div>
-                    </div>
-                  ))
-              )
-            }
-          </div>
         </div>
         <div id="scroll atendimento vazio"
           className="scroll"
@@ -771,7 +543,7 @@ function Prontuario() {
       </div >
     );
     // eslint-disable-next-line
-  }, [arrayatendimentos, allinterconsultas, allprecaucoes, consultorio, setarrayitensprescricao, setor, arrayunidades]);
+  }, [arrayatendimentos, allinterconsultas, allprecaucoes, consultorio, setarrayitensprescricao, arrayunidades]);
 
   const tagsDosPacientes = (titulo, item, lista, imagem) => {
     return (

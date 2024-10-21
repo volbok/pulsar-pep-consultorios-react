@@ -93,8 +93,10 @@ function DatePicker() {
   const selectDate = (value) => {
     if (viewdatepicker == 1) {
       setpickdate1(value);
+      localStorage.setItem('data1', value);
     } else if (viewdatepicker == 2) {
       setpickdate2(value);
+      localStorage.setItem('data2', value);
     } else {
       setviewdatepicker(0);
     }
@@ -211,7 +213,8 @@ function DatePicker() {
   if (viewdatepicker != 0) {
     return (
       <div className="fundo"
-        onClick={(e) => { setviewdatepicker(0); e.stopPropagation() }}
+      id="datepicker"  
+      onClick={(e) => { setviewdatepicker(0); e.stopPropagation() }}
         style={{
           zIndex: 900, display: 'flex', flexDirection: 'column',
           justifyContent: 'center', alignItems: 'center',

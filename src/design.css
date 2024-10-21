@@ -87,7 +87,28 @@
   touch-action: manipulation;
 }
 
-/* JANELAS */
+/* PULSANTE */
+.pulsante {
+  animation-name: pulsante;
+  animation-duration: 1s;
+  animation-iteration-count: infinite;
+}
+
+@keyframes pulsante {
+  0% {
+    background-color: '';
+  }
+
+  50% {
+    background-color: white;
+    color: black;
+  }
+
+  100% {
+    background-color: '';
+  }
+}
+
 .fadein {
   animation-name: fadein;
   animation-duration: 1s;

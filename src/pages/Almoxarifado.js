@@ -151,7 +151,7 @@ function Almoxarifado() {
                   justifyContent: 'flex-start', textAlign: 'left',
                   alignItems: 'flex-start', padding: 10,
                   width: '100%',
-                  height: 75,
+                  height: 120,
                 }}
               >
                 <div>
@@ -590,7 +590,7 @@ function Almoxarifado() {
         }}>
         <div
           style={{
-            position: 'sticky', top: 0,
+            // position: 'sticky', top: 0,
             display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
             height: 'calc(100vh - 20px)',
           }}>

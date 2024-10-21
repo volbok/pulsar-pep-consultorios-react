@@ -76,6 +76,9 @@ function Documentos() {
     } else if (card == 'card-documento-alta') {
       settipodocumento('ALTA HOSPITALAR');
       preparaDocumentos();
+    } else if (card == 'card-documento-exame') {
+      settipodocumento('EXAME');
+      preparaDocumentos();
     }
     console.log(tipodocumento);
 
@@ -457,6 +460,10 @@ function Documentos() {
         'INFORME ABAIXO OS DIAS E O CID DO ATESTADO.';
       insertDocumento(texto);
       // document.getElementById("gadgets_atestado").style.display = 'flex';
+    } else if (tipodocumento == 'EXAME') {
+      let texto =
+        'HEMOGRAMA...';
+      insertDocumento(texto);
     } else if (tipodocumento == 'ALTA HOSPITALAR') {
       let anamnese = documentos.filter(item => item.tipo_documento == 'ADMISSÃO').sort((a, b) => moment(a.data) > moment(b.data) ? 1 : -1).slice(-1).map(item => item.texto).pop();
       let evolucao = documentos.filter(item => item.tipo_documento == 'EVOLUÇÃO').sort((a, b) => moment(a.data) > moment(b.data) ? 1 : -1).slice(-1).map(item => item.texto).pop();
@@ -996,7 +1003,7 @@ function Documentos() {
         display: card.toString().substring(0, 14) == 'card-documento' ? 'flex' : 'none',
         flexDirection: 'row',
         justifyContent: 'center',
-        height: '90vh',
+        height: '80vh',
         position: 'relative',
         alignSelf: 'center',
       }}

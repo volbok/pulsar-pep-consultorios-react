@@ -51,15 +51,7 @@ function Header() {
           <div>
             {moment(selecteddocumento.data).format('DD/MM/YY - HH:mm')}
           </div>
-          <div style={{
-            display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
-            fontSize: 20,
-            marginBottom: 10,
-          }}>
-            {'LEITO: ' + objatendimento.leito}
-          </div>
           <div>{'UNIDADE: ' + objatendimento.id_cliente}</div>
-          <div>{'SETOR: ' + objatendimento.id_unidade}</div>
           <div>{'ATENDIMENTO: ' + atendimento}</div>
         </div>
       </div>

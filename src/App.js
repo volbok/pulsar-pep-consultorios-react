@@ -17,6 +17,7 @@ import Agendamento from "./pages/Agendamento";
 import Farmacia from "./pages/Farmacia";
 import Almoxarifado from "./pages/Almoxarifado";
 import Faturamento from "./pages/Faturamento";
+import Financeiro from "./pages/Financeiro";
 import Resultados from "./pages/Resultados";
 // componentes.
 import Toast from "./components/Toast";
@@ -172,7 +173,7 @@ function App() {
       value={{
         html,
         htmlnirvana,
-        
+
         toast,
         settoast,
         dialogo,
@@ -352,6 +353,9 @@ function App() {
             </Route>
             <Route path="/faturamento">
               <Faturamento></Faturamento>
+            </Route>
+            <Route path="/financeiro">
+              <Financeiro></Financeiro>
             </Route>
             <Route path="/resultados">
               <Resultados></Resultados>

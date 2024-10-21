@@ -472,8 +472,88 @@ function Login() {
     // eslint-disable-next-line
   }, [viewlistaunidades, viewalterarsenha]);
 
-  // lista de unidades disponiveis para o usuário logado.
+  // lista de unidades de apoio.
+  const montaModuloDeApoio = (titulo, acesso, rota, pagina) => {
+    return (
+      <div
+        className="button"
+        style={{
+          display: acesso != 0 || acesso != null ? "flex" : "none",
+          minWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+          maxWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+          height: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+          minHeight: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+          maxHeight: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+          margin: 5,
+          padding: 10,
+        }}
+        onClick={() => {
+          history.push(rota);
+          setpagina(pagina);
+          localStorage.setItem("viewlistaunidades", 1);
+          localStorage.setItem("viewlistamodulos", 1);
+        }}
+      >
+        {titulo}
+      </div>
+    );
+  };
+  function ListaDeUnidadesDeApoio() {
+    return (
+      <div
+        style={{
+          display: viewlistaunidades == 1 && window.innerWidth > mobilewidth ? "flex" : "none",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignSelf: "center",
+          marginTop: 20,
+        }}
+      >
+        <div className="text2"
+          style={{
+            fontSize: 16,
+            display: usuario.paciente == 1 || usuario.laboratorio == 1 || usuario.farmacia == 1 || usuario.faturamento == 1 || usuario.usuarios == 1 ? 'flex' : 'none',
+          }}>
+          MÓDULOS ADMINISTRATIVOS
+        </div>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+            flexWrap: "wrap",
+          }}
+        >
+          {montaModuloDeApoio(
+            "CADASTRO E MOVIMENTAÇÃO DE PACIENTES",
+            usuario.paciente,
+            "/cadastro",
+            2
+          )}
+          {montaModuloDeApoio(
+            "CADASTRO DE USUÁRIOS",
+            usuario.usuarios,
+            "/usuarios",
+            5
+          )}
+          {montaModuloDeApoio(
+            "FATURAMENTO",
+            usuario.faturamento,
+            "/faturamento",
+            "FATURAMENTO"
+          )}
+          {montaModuloDeApoio(
+            "FINANCEIRO",
+            usuario.faturamento,
+            "/financeiro",
+            "FINANCEIRO"
+          )}
+        </div>
+      </div>
+    );
+  }
 
+  // lista de unidades disponiveis para o usuário logado.
   function ListaDeUnidadesAssistenciais() {
     return (
       <div
@@ -485,7 +565,7 @@ function Login() {
         }}
       >
         <div className="text2" style={{ fontSize: 16, display: usuario.prontuario == 1 ? 'flex' : 'none' }}>
-          UNIDADES ASSISTENCIAIS
+          MÓDULOS DE ATENDIMENTO
         </div>
         <div
           style={{
@@ -510,12 +590,12 @@ function Login() {
               color: 'white',
             }}
             onClick={() => {
-              setpagina(-1);
-              history.push("/prontuario_todos_pacientes");
+              setpagina(-2);
+              history.push("/consultas");
               console.log(usuario);
             }}
           >
-            TODOS OS PACIENTES
+            CONSULTAS
           </div>
         </div>
       </div>
@@ -623,22 +703,7 @@ function Login() {
         </div>
         <Inputs></Inputs>
         <ListaDeUnidadesAssistenciais></ListaDeUnidadesAssistenciais>
-        <div
-          className="text1"
-          style={{
-            display: "flex",
-            textDecoration: "underline",
-            color: "white",
-            marginTop:
-              window.innerWidth < mobilewidth && viewalterarsenha == 1 ? 20 : 0,
-          }}
-          onClick={() => {
-            setpagina('RESULTADOS');
-            history.push("/resultados");
-          }}
-        >
-          RESULTADOS DE EXAMES
-        </div>
+        <ListaDeUnidadesDeApoio></ListaDeUnidadesDeApoio>
       </div>
     </div >
   );

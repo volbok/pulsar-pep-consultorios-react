@@ -6,15 +6,11 @@ import moment from "moment";
 // imagens.
 import power from "../images/power.svg";
 import back from "../images/back.svg";
-import body from "../images/body.svg";
 import refresh from "../images/refresh.svg";
 import flag from "../images/white_flag.svg";
 import deletar from "../images/deletar.svg";
 import prec_padrao from "../images/prec_padrao.svg";
-import prec_contato from "../images/prec_contato.svg";
-import prec_respiratorio from "../images/prec_respiratorio.svg";
 import lupa from '../images/lupa.svg';
-import lupa_cinza from '../images/lupa_cinza.svg';
 import esteto from "../images/esteto.svg";
 import call from "../images/call.svg";
 import clock from "../images/clock.svg";
@@ -23,25 +19,10 @@ import toast from "../functions/toast";
 import modal from "../functions/modal";
 // router.
 import { useHistory } from "react-router-dom";
-// componentes.
-import Logo from "../components/Logo";
 // cards.
 import Alergias from "../cards/Alergias";
 import Documentos from "../cards/Documentos";
-import DocumentoEstruturado from "../cards/DocumentoEstruturado";
-import Boneco from "../cards/Boneco";
-import Infusoes from "../cards/Infusoes";
-import Propostas from "../cards/Propostas";
-import SinaisVitais from "../cards/SinaisVitais";
-import Culturas from "../cards/Culturas";
-import VentilacaoMecanica from "../cards/VentilacaoMecanica";
-import Dieta from "../cards/Dieta";
-import Precaucoes from "../cards/Precaucoes";
-import Riscos from "../cards/Riscos";
-import Alertas from "../cards/Alertas";
-import Interconsultas from "../cards/Interconsultas";
 import Exames from "../cards/Exames";
-import Prescricao from "./Prescricao";
 import Laboratorio from "../cards/Laboratorio";
 import selector from "../functions/selector";
 
@@ -67,34 +48,15 @@ function Consultas() {
     setatendimentos,
     setatendimento,
     atendimento,
+    setobjatendimento,
 
     // estados utilizados pela função getAllData (necessária para alimentar os card fechados).
     setalergias,
     alergias,
-    setinvasoes,
-    setlesoes,
-    setprecaucoes,
-    precaucoes,
-    setriscos,
-    riscos,
-    setculturas,
-    culturas,
-    setdietas,
-    dietas,
     setevolucoes,
     setarrayevolucoes,
-    setinfusoes,
-    infusoes,
-    setpropostas,
-    propostas,
-    setsinaisvitais,
-    sinaisvitais,
-    setvm,
-    vm,
-    setinterconsultas,
-    interconsultas,
     card, setcard,
-    prescricao, setprescricao,
+    setprescricao,
     consultorio, setconsultorio,
     setlaboratorio,
 
@@ -640,6 +602,7 @@ function Consultas() {
                         setatendimento(item.id_atendimento);
                         setpaciente(parseInt(item.id_paciente));
                         setobjpaciente(item);
+                        setobjatendimento(item);
                         getAllData(item.id_paciente, item.id_atendimento);
                         setidprescricao(0);
                         if (pagina == -2) {
@@ -960,8 +923,6 @@ function Consultas() {
     );
   }
 
-  // estado para retorno do balanço hídrico acumulado.
-  const [balancoacumulado, setbalancoacumulado] = useState(0);
   // carregando todas as informações do atendimento.
   const getAllData = (paciente, atendimento) => {
     // Dados relacionados ao paciente.
@@ -998,61 +959,9 @@ function Consultas() {
           }, 3000);
         }
       });
-    // lesões.
-    axios
-      .get(html + "paciente_lesoes/" + paciente)
-      .then((response) => {
-        setlesoes(response.data.rows);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-    // precauções.
-    axios
-      .get(html + "paciente_precaucoes/" + paciente)
-      .then((response) => {
-        setprecaucoes(response.data.rows);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-
-    // riscos.
-    setbusyriscos(1);
-    axios
-      .get(html + "paciente_riscos/" + paciente)
-      .then((response) => {
-        setriscos(response.data.rows);
-        setbusyriscos(0);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
     // Dados relacionados ao atendimento.
     // antibióticos.
     loadItensPrescricao(atendimento);
-    // culturas.
-    setbusyculturas(1);
-    axios
-      .get(html + "list_culturas/" + atendimento)
-      .then((response) => {
-        setculturas(response.data.rows);
-        setbusyculturas(0);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-    // dietas.
-    setbusydieta(1);
-    axios
-      .get(html + "list_dietas/" + atendimento)
-      .then((response) => {
-        setdietas(response.data.rows);
-        setbusydieta(0);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
     // evoluções.
     axios
       .get(html + "list_evolucoes/" + atendimento)
@@ -1063,78 +972,6 @@ function Consultas() {
       .catch(function (error) {
         console.log(error);
       });
-    // infusões.
-    setbusyinfusoes(1);
-    axios
-      .get(html + "list_infusoes/" + atendimento)
-      .then((response) => {
-        setinfusoes(response.data.rows);
-        setbusyinfusoes(0);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-    // invasões.
-    axios
-      .get(html + "list_invasoes/" + atendimento)
-      .then((response) => {
-        setinvasoes(response.data.rows);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-    // propostas.
-    setbusypropostas(1);
-    axios
-      .get(html + "list_propostas/" + atendimento)
-      .then((response) => {
-        setpropostas(response.data.rows);
-        setbusypropostas(0);
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-    // sinais vitais.
-    setbusysinaisvitais(0);
-    axios
-      .get(html + "list_sinais_vitais/" + atendimento)
-      .then((response) => {
-        var x = response.data.rows;
-        var arraybalancos = [];
-        setbusysinaisvitais(0);
-        setsinaisvitais(response.data.rows);
-        // cálculo do balanço acumulado.
-        x.map((item) => {
-          if (isNaN(parseFloat(item.balanco.replace(" ", ""))) == true) {
-            console.log(
-              "VALOR INVÁLIDO PARA CÁLCULO DO BALANÇO ACUMULADO: " +
-              item.balanco
-            );
-          } else {
-            arraybalancos.push(parseFloat(item.balanco.replace(" ", "")));
-          }
-          return null;
-        });
-        function soma(total, num) {
-          return total + num;
-        }
-        setbalancoacumulado(arraybalancos.reduce(soma, 0));
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-    // vm.
-    setbusyvm(1);
-    axios.get(html + "list_vm/" + atendimento).then((response) => {
-      setbusyvm(0);
-      setvm(response.data.rows);
-    })
-    // interconsultas.
-    setbusyinterconsultas(1);
-    axios.get(html + "list_interconsultas/" + atendimento).then((response) => {
-      setinterconsultas(response.data.rows);
-      setbusyinterconsultas(0);
-    })
     // laboratorio.
     axios.get(html + 'atendimento_laboratorio/' + atendimento).then((response) => {
       setlaboratorio(response.data.rows);
@@ -1146,735 +983,35 @@ function Consultas() {
 
   // função busy.
   const [busyalergias, setbusyalergias] = useState(0);
-  const [busypropostas, setbusypropostas] = useState(0);
-  const [busyriscos, setbusyriscos] = useState(0);
-  const [busysinaisvitais, setbusysinaisvitais] = useState(0);
-  const [busyvm, setbusyvm] = useState(0);
-  const [busyinfusoes, setbusyinfusoes] = useState(0);
-  const [busydieta, setbusydieta] = useState(0);
-  const [busyculturas, setbusyculturas] = useState(0);
-  const [busyinterconsultas, setbusyinterconsultas] = useState(0);
-
-  const loading = () => {
-    return (
-      <div
-        className="destaque"
-        style={{ marginTop: 20 }}
-      >
-        <Logo height={20} width={20}></Logo>
-      </div>
-    );
-  };
 
   // função para renderização dos cards fechados.
   let yellow = "#F9E79F";
-  const cartao = (sinal, titulo, opcao, busy, oculto) => {
+  const cartao = (sinal, titulo, opcao) => {
     return (
-      <div style={{ display: window.innerWidth < mobilewidth && oculto == 1 ? 'none' : 'flex' }}>
+      <div style={{ display: 'flex' }}>
         <div
-          className="card-fechado cor3"
+          className={card == opcao ? "button red" : "button"}
           style={{
             display:
-              titulo.includes(filtercartoes) == true &&
-                card == "" &&
-                atendimento != null
-                ? "flex"
-                : "none",
+              "flex",
             pointerEvents: opcao == null ? 'none' : 'auto',
             backgroundColor: sinal != null && sinal.length > 0 ? yellow : "",
             borderColor: "transparent",
             margin: 5,
-            height: window.innerWidth < mobilewidth ? '35vw' : '15vw',
-            minHeight: window.innerWidth < mobilewidth ? '32vw' : '15vw',
-            minWidth: window.innerWidth < mobilewidth ? '32vw' : cartoes.length == arraycartoes.length ? '' : '15vw',
-            maxWidth: window.innerWidth < mobilewidth ? '' : '15vw',
+            width: 150,
             alignSelf: 'center',
           }}
           onClick={() => {
-            if (card == opcao) {
-              setcard("");
-            } else {
-              setcard(opcao);
-            }
+            setcard(opcao);
           }}
         >
-          <div className="text3">{titulo}</div>
-          <div
-            style={{
-              display: busy == 1 ? "none" : "flex",
-              flexDirection: "row",
-              justifyContent: "center",
-              flexWrap: "wrap",
-            }}
-          >
-            <div id="RESUMO PRECAUÇÕES"
-              style={{ display: opcao == "card-precaucoes" ? "flex" : "none" }}
-            >
-              <img
-                alt=""
-                src={prec_padrao}
-                style={{
-                  display:
-                    precaucoes.filter((item) => item.precaucao == "PADRÃO")
-                      .length > 0
-                      ? "flex"
-                      : "none",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  height: window.innerWidth < mobilewidth ? 20 : 40,
-                  width: window.innerWidth < mobilewidth ? 20 : 40,
-                  padding: 5,
-                }}
-              ></img>
-              <img
-                alt=""
-                src={prec_contato}
-                style={{
-                  display:
-                    precaucoes.filter((item) => item.precaucao == "CONTATO")
-                      .length > 0
-                      ? "flex"
-                      : "none",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  height: window.innerWidth < mobilewidth ? 30 : 50,
-                  width: window.innerWidth < mobilewidth ? 30 : 50,
-                }}
-              ></img>
-              <img
-                alt=""
-                src={prec_respiratorio}
-                style={{
-                  display:
-                    precaucoes.filter(
-                      (item) =>
-                        item.precaucao == "AEROSSOL" ||
-                        item.precaucao == "GOTÍCULA"
-                    ).length > 0
-                      ? "flex"
-                      : "none",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  height: window.innerWidth < mobilewidth ? 30 : 50,
-                  width: window.innerWidth < mobilewidth ? 30 : 50,
-                }}
-              ></img>
-            </div>
-            <div id="RESUMO DIETA"
-              style={{
-                display: opcao == "card-dietas" ? "flex" : "none",
-                flexDirection: "column",
-                justifyContent: "center",
-              }}
-            >
-              <div className="textcard" style={{ margin: 0, padding: 0 }}>
-                {dietas.map((item) => item.tipo)}
-              </div>
-              <div
-                className="textcard"
-                style={{
-                  display:
-                    dietas.filter(
-                      (item) => item.tipo != "ORAL" && item.tipo != "NÃO DEFINIDA"
-                    ).length > 0
-                      ? "flex"
-                      : "none",
-                  margin: 0,
-                  padding: 0,
-                }}
-              >
-                {dietas.map((item) => item.infusao + " ml/h")}
-              </div>
-            </div>
-            <div id="RESUMO VM"
-              style={{
-                display: opcao == "card-vm" && vm.length > 0 ? "flex" : "none",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignSelf: "center",
-              }}
-            >
-              <div
-                id="na vm"
-                style={{
-                  display:
-                    vm
-                      .sort((a, b) =>
-                        moment(a.data_vm) < moment(b.data_vm) ? -1 : 1
-                      )
-                      .slice(-1)
-                      .map((item) => item.modo) == "OFF"
-                      ? "none"
-                      : "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                }}
-              >
-                <div className="textcard" style={{ margin: 0, padding: 0 }}>
-                  {vm
-                    .sort((a, b) =>
-                      moment(a.data_vm) < moment(b.data_vm) ? -1 : 1
-                    )
-                    .slice(-1)
-                    .map((item) => item.modo)}
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "row",
-                    justifyContent: "center",
-                    alignSelf: "center",
-                    flexWrap: "wrap",
-                  }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "center",
-                      margin: 5,
-                    }}
-                  >
-                    <div
-                      className="textcard"
-                      style={{ margin: 0, padding: 0, opacity: 0.5 }}
-                    >
-                      {"PI"}
-                    </div>
-                    <div className="textcard" style={{ margin: 0, padding: 0 }}>
-                      {vm
-                        .sort((a, b) =>
-                          moment(a.data_vm) < moment(b.data_vm) ? -1 : 1
-                        )
-                        .slice(-1)
-                        .map((item) => item.pressao)}
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      display: window.innerWidth < mobilewidth ? "none" : "flex",
-                      flexDirection: "column",
-                      justifyContent: "center",
-                      margin: 5,
-                    }}
-                  >
-                    <div
-                      className="textcard"
-                      style={{ margin: 0, padding: 0, opacity: 0.5 }}
-                    >
-                      {"VC"}
-                    </div>
-                    <div className="textcard" style={{ margin: 0, padding: 0 }}>
-                      {vm
-                        .sort((a, b) =>
-                          moment(a.data_vm) < moment(b.data_vm) ? -1 : 1
-                        )
-                        .slice(-1)
-                        .map((item) => item.volume)}
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "center",
-                      margin: 5,
-                    }}
-                  >
-                    <div
-                      className="textcard"
-                      style={{ margin: 0, padding: 0, opacity: 0.5 }}
-                    >
-                      {"PEEP"}
-                    </div>
-                    <div className="textcard" style={{ margin: 0, padding: 0 }}>
-                      {vm
-                        .sort((a, b) =>
-                          moment(a.data_vm) < moment(b.data_vm) ? -1 : 1
-                        )
-                        .slice(-1)
-                        .map((item) => item.peep)}
-                    </div>
-                  </div>
-                  <div
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      justifyContent: "center",
-                      margin: 5,
-                    }}
-                  >
-                    <div
-                      className="textcard"
-                      style={{ margin: 0, padding: 0, opacity: 0.5 }}
-                    >
-                      {"FI"}
-                    </div>
-                    <div className="textcard" style={{ margin: 0, padding: 0 }}>
-                      {vm
-                        .sort((a, b) =>
-                          moment(a.data_vm) < moment(b.data_vm) ? -1 : 1
-                        )
-                        .slice(-1)
-                        .map((item) => item.fio2)}
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div
-                id="fora da vm"
-                className="textcard"
-                style={{
-                  display:
-                    vm
-                      .sort((a, b) =>
-                        moment(a.data_vm) < moment(b.data_vm) ? -1 : 1
-                      )
-                      .slice(-1)
-                      .map((item) => item.modo) != "OFF"
-                      ? "none"
-                      : "flex",
-                }}
-              >
-                {"PACIENTE FORA DA VM"}
-              </div>
-            </div>
-            <div id="RESUMO ANTIBIÓTICOS"
-              style={{
-                display: titulo == "ANTIBIÓTICOS" ? 'flex' : 'none',
-                flexDirection: "column",
-                justifyContent: "center",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                }}
-              >
-                {prescricao
-                  .filter((item) => item.categoria == '1. ANTIMICROBIANOS')
-                  .slice(-2)
-                  .sort((a, b) => moment(a.data) < moment(b.data) ? 1 : -1)
-                  .map((item) => (
-                    <div
-                      key={"atb resumo " + item.id}
-                      className="textcard"
-                      style={{ margin: 0, padding: 0 }}
-                    >
-                      <div>
-                        {item.nome_item}
-                      </div>
-                      <div>
-                        {moment(item.data).format('DD/MM/YY')}
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            </div>
-            <div id="RESUMO CULTURAS"
-              style={{
-                display: opcao == "card-culturas" ? "flex" : "none",
-                flexDirection: "column",
-                justifyContent: "center",
-              }}
-            >
-              <div className="textcard" style={{ margin: 0, padding: 0 }}>
-                {"PENDENTES: " +
-                  culturas.filter((item) => item.data_resultado == null).length}
-              </div>
-            </div>
-            <div id="RESUMO INFUSÕES"
-              style={{
-                display: opcao == "card-infusoes" ? "flex" : "none",
-                flexDirection: "column",
-                justifyContent: "center",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                }}
-              >
-                {infusoes
-                  .filter((item) => item.data_termino == null)
-                  .slice(-2)
-                  .map((item) => (
-                    <div
-                      key={"infusão " + item.id_infusao}
-                      className="textcard"
-                      style={{ margin: 0, padding: 0 }}
-                    >
-                      {item.droga + " - " + item.velocidade + "ml/h"}
-                    </div>
-                  ))}
-                <div
-                  style={{
-                    display:
-                      infusoes.filter((item) => item.data_termino == null)
-                        .length > 2
-                        ? "flex"
-                        : "none",
-                    alignSelf: "center",
-                  }}
-                >
-                  ...
-                </div>
-              </div>
-            </div>
-            <div id="RESUMO PROPOSTAS"
-              style={{
-                display: opcao == "card-propostas" ? "flex" : "none",
-                flexDirection: "column",
-                justifyContent: "center",
-              }}
-            >
-              <div
-                className="textcard"
-                style={{ display: "flex", margin: 0, padding: 0 }}
-              >
-                {"PENDENTES: " +
-                  propostas.filter((item) => item.data_conclusao == null).length}
-              </div>
-            </div>
-            <div id="RESUMO SINAIS VITAIS"
-              style={{
-                display:
-                  opcao == "card-sinaisvitais" && sinaisvitais.length > 0
-                    ? "flex"
-                    : "none",
-                flexDirection: "column",
-                justifyContent: "center",
-                alignSelf: "center",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "row",
-                  justifyContent: "center",
-                  alignSelf: "center",
-                  flexWrap: "wrap",
-                }}
-              >
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    margin: 5,
-                  }}
-                >
-                  <div
-                    className="textcard"
-                    style={{ margin: 0, padding: 0, opacity: 0.5 }}
-                  >
-                    {"PAM"}
-                  </div>
-                  <div className="textcard" style={{ margin: 0, padding: 0 }}>
-                    {sinaisvitais.length > 0
-                      ? Math.ceil(
-                        (2 *
-                          parseInt(
-                            sinaisvitais.slice(-1).map((item) => item.pad)
-                          ) +
-                          parseInt(
-                            sinaisvitais.slice(-1).map((item) => item.pas)
-                          )) /
-                        3
-                      )
-                      : null}
-                  </div>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    margin: 5,
-                  }}
-                >
-                  <div
-                    className="textcard"
-                    style={{ margin: 0, padding: 0, opacity: 0.5 }}
-                  >
-                    {"FC"}
-                  </div>
-                  <div className="textcard" style={{ margin: 0, padding: 0 }}>
-                    {sinaisvitais.slice(-1).map((item) => item.fc)}
-                  </div>
-                </div>
-                <div
-                  style={{
-                    display: "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    margin: 5,
-                  }}
-                >
-                  <div
-                    className="textcard"
-                    style={{ margin: 0, padding: 0, opacity: 0.5 }}
-                  >
-                    {"TAX"}
-                  </div>
-                  <div className="textcard" style={{ margin: 0, padding: 0 }}>
-                    {sinaisvitais.slice(-1).map((item) => item.tax)}
-                  </div>
-                </div>
-                <div
-                  style={{
-                    display: window.innerWidth < mobilewidth ? "none" : "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    margin: 5,
-                  }}
-                >
-                  <div
-                    className="textcard"
-                    style={{ margin: 0, padding: 0, opacity: 0.5 }}
-                  >
-                    {"DIURESE"}
-                  </div>
-                  <div className="textcard" style={{ margin: 0, padding: 0 }}>
-                    {sinaisvitais.slice(-1).map((item) => item.diurese)}
-                  </div>
-                </div>
-                <div
-                  style={{
-                    display: window.innerWidth < mobilewidth ? "none" : "flex",
-                    flexDirection: "column",
-                    justifyContent: "center",
-                    margin: 5,
-                  }}
-                >
-                  <div
-                    className="textcard"
-                    style={{ margin: 0, padding: 0, opacity: 0.5 }}
-                  >
-                    {"BALANÇO ACUMULADO"}
-                  </div>
-                  <div className="textcard" style={{ margin: 0, padding: 0 }}>
-                    {balancoacumulado}
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div id="RESUMO ALERGIA"
-              style={{
-                display: opcao == "card-alergias" ? "flex" : "none",
-                flexDirection: "column",
-                justifyContent: "center",
-              }}
-            >
-              <div
-                className="textcard"
-                style={{
-                  display: "flex",
-                  flexDirection: 'column',
-                  margin: 0,
-                  padding: 0,
-                  fontSize: 16,
-                }}
-              >
-                {alergias.slice(-3).map(item => (<div className="textcard" style={{ margin: 0, padding: 0 }}>{item.alergia}</div>))}
-              </div>
-            </div>
-            <div id="RESUMO RISCOS"
-              style={{ display: opcao == "card-riscos" ? "flex" : "none" }}
-            >
-              <div>
-                {riscos.slice(-3).map((item) => (
-                  <div
-                    key={"atb " + item.id_risco}
-                    className="textcard"
-                    style={{ margin: 0, padding: 0 }}
-                  >
-                    {item.risco}
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div id="RESUMO INTERCONSULTAS"
-              style={{
-                display: opcao == "card-interconsultas" ? "flex" : "none",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                }}
-              >
-                {interconsultas.map((item) => (
-                  <div
-                    key={"interconsultas " + item.id_interconsulta}
-                    className="textcard"
-                    style={{ margin: 0, padding: 0 }}
-                  >
-                    {item.especialidade}
-                  </div>
-                ))}
-                <div
-                  className="textcard"
-                  style={{
-                    display: interconsultas.length > 3 ? "flex" : "none",
-                    alignSelf: "center",
-                  }}
-                >
-                  ...
-                </div>
-              </div>
-            </div>
-            <div id="RESUMO BONECO"
-              style={{
-                display: opcao == "card-boneco" ? "flex" : "none",
-              }}
-            >
-              <img
-                id="corpo"
-                alt=""
-                src={body}
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                  height: window.innerWidth < mobilewidth ? "20vw" : "8vw",
-                }}
-              ></img>
-            </div>
-          </div>
-          <div
-            style={{
-              display: busy == 1 ? "flex" : "none",
-              flexDirection: "column",
-              justifyContent: "center",
-              alignContent: "center",
-              alignItems: "center",
-              alignSelf: "center",
-            }}
-          >
-            {loading()}
-          </div>
+          <div style={{ margin: 0, padding: 10 }}>{titulo}</div>
         </div>
       </div>
     );
   };
 
-  const [cartoes] = useState([
-    "DIAS DE INTERNAÇÃO",
-    "ALERGIAS",
-    "PRECAUÇÕES",
-    "ADMISSÃO",
-    "EVOLUÇÃO",
-    "RECEITA",
-    "ATESTADO MÉDICO",
-    "RISCOS",
-    "PROPOSTAS",
-    "SINAIS VITAIS",
-    "VENTILAÇÃO MECÂNICA",
-    "INFUSÕES",
-    "DIETA",
-    "CULTURAS",
-    "ANTIBIÓTICOS",
-    "INTERCONSULTAS",
-    "LABORATÓRIO E RX",
-    "EXAMES DE IMAGEM",
-    "PRESCRIÇÃO",
-    "INVASÕES",
-    "LESÕES",
-    "BONECO",
-  ]);
-  const [arraycartoes, setarraycartoes] = useState([
-    "DIAS DE INTERNAÇÃO",
-    "ALERGIAS",
-    "PRECAUÇÕES",
-    "ADMISSÃO",
-    "EVOLUÇÃO",
-    "RECEITA",
-    "ATESTADO MÉDICO",
-    "RISCOS",
-    "PROPOSTAS",
-    "SINAIS VITAIS",
-    "VENTILAÇÃO MECÂNICA",
-    "INFUSÕES",
-    "DIETA",
-    "CULTURAS",
-    "ANTIBIÓTICOS",
-    "INTERCONSULTAS",
-    "LABORATÓRIO E RX",
-    "EXAMES DE IMAGEM",
-    "PRESCRIÇÃO",
-    "INVASÕES",
-    "LESÕES",
-    "BONECO",
-  ]);
-
-  const [filtercartoes, setfiltercartoes] = useState("");
-  var searchcartoes = "";
-  const filterCartoes = () => {
-    clearTimeout(timeout);
-    document.getElementById("inputCartao").focus();
-    searchcartoes = document.getElementById("inputCartao").value.toUpperCase();
-    console.log(searchcartoes);
-
-    timeout = setTimeout(() => {
-      if (searchcartoes == "") {
-        setfiltercartoes("");
-        setarraycartoes(cartoes);
-        document.getElementById("inputCartao").value = "";
-        setTimeout(() => {
-          document.getElementById("inputCartao").focus();
-        }, 100);
-        console.log(cartoes);
-        console.log(arraycartoes);
-      } else {
-        setfiltercartoes(
-          document.getElementById("inputCartao").value.toUpperCase()
-        );
-        setarraycartoes(cartoes.filter((item) => item.includes(searchcartoes)));
-        console.log(arraycartoes);
-        document.getElementById("inputCartao").value = searchcartoes;
-        setTimeout(() => {
-          document.getElementById("inputCartao").focus();
-          console.log(arraycartoes.pop());
-        }, 100);
-      }
-    }, 1000);
-  };
-  // filtro de paciente por nome.
-  function FilterCartoes() {
-    return (
-      <input
-        className="input"
-        autoComplete="off"
-        placeholder={window.innerWidth < mobilewidth ? "BUSCAR ATIVIDADE..." : "BUSCAR..."}
-        onFocus={(e) => (e.target.placeholder = "")}
-        onBlur={(e) =>
-          window.innerWidth < mobilewidth
-            ? (e.target.placeholder = "BUSCAR TAREFA...")
-            : "BUSCAR..."
-        }
-        onKeyUp={() => filterCartoes()}
-        type="text"
-        id="inputCartao"
-        defaultValue={filtercartoes}
-        maxLength={100}
-        style={{
-          width: window.innerWidth < mobilewidth ? '70vw' : 500,
-          margin: 10, display: card == '' ? 'flex' : 'none',
-          alignSelf: 'center'
-        }}
-      ></input>
-    );
-  }
-
   // AGENDAMENTO DE CONSULTA PELO PROFISSIONAL.
-
   // DATEPICKER (CALENDÁRIO);
   // preparando a array com as datas.
   var arraydate = [];
@@ -2302,85 +1439,6 @@ function Consultas() {
     )
   }
 
-  const [viewinterconsultas, setviewinterconsultas] = useState(0);
-  function TelaInterconsultas() {
-    return (
-      <div className="fundo"
-        onClick={() => setviewinterconsultas(0)}
-        style={{
-          display: viewinterconsultas == 1 ? 'flex' : 'none',
-          flexDirection: 'column', justifyContent: 'center'
-        }}>
-        <div
-          className="janela scroll"
-          style={{
-            display: allinterconsultas.filter(item => item.especialidade == usuario.tipo_usuario).length > 0 ? 'flex' : 'none',
-            height: '60vh',
-          }}>
-          {allinterconsultas.filter(item => item.especialidade == usuario.tipo_usuario).map(item => (
-            <div
-              style={{
-                display: 'flex',
-                flexDirection: 'row', justifyContent: 'center', width: 'calc(100% - 5px)'
-              }}>
-              {atendimentos.filter(valor => valor.id_atendimento == item.id_atendimento && valor.situacao == 1).map(valor => (
-                <div
-                  id={'interconsulta' + item.id_atendimento}
-                  style={{
-                    display: 'flex', flexDirection: 'row', justifyItems: 'center',
-                    width: '40vw'
-                  }}
-                  onClick={() => {
-                    setviewlista(0);
-                    setatendimento(valor.id_atendimento);
-                    setpaciente(valor.id_paciente);
-                    getAllData(valor.id_paciente, valor.id_atendimento);
-                    setidprescricao(0);
-                    if (pagina == -2) {
-                      selector("scroll atendimentos com pacientes", "atendimento " + item.id_atendimento, 100);
-                    }
-                  }}
-                >
-                  <div className='button-grey'
-                    style={{
-                      width: 100,
-                      marginLeft: 2.5, marginRight: 0,
-                      paddingLeft: 10, paddingRight: 10,
-                      borderTopRightRadius: 0, borderBottomRightRadius: 0,
-                    }}>
-                    {unidades.filter(item => item.id_unidade == valor.id_unidade).map(item => item.nome_unidade + ' - LEITO ' + valor.leito)}
-                  </div>
-                  <div className='button-yellow'
-                    onClick={() => setcard('card-interconsultas')}
-                    style={{ width: '100%', marginLeft: 0, marginRight: 2.5, borderTopLeftRadius: 0, borderBottomLeftRadius: 0 }}>
-                    {valor.nome_paciente}
-                  </div>
-                </div>
-              ))}
-            </div>
-          ))}
-        </div>
-        <div className="janela scroll"
-          style={{
-            display: allinterconsultas.filter(item => item.especialidade == usuario.tipo_usuario).length == 0 ? 'flex' : 'none',
-            height: '60vh',
-          }}>
-          <img
-            alt=""
-            src={lupa_cinza}
-            style={{
-              margin: 10,
-              height: 150,
-              width: 150,
-              opacity: 0.1,
-              alignSelf: 'center'
-            }}
-          ></img>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div
       className="main"
@@ -2401,172 +1459,78 @@ function Consultas() {
             alignSelf: 'center',
           }}
         >
-          <div id='botão de interconsultas'
-            style={{
-              display: allinterconsultas.filter(item => item.especialidade == usuario.tipo_usuario).length == 0 || window.innerWidth < mobilewidth ? 'none' : 'flex',
-              position: 'absolute', top: 80, right: 80,
-              borderRadius: 50,
-              width: 50, height: 50,
-              backgroundColor: '#EC7063',
-              borderColor: '#66b2b2',
-              borderWidth: 5,
-              borderStyle: 'solid',
-              justifyContent: 'center',
-            }}
-            onClick={() => setviewinterconsultas(1)}
-            title={'INTERCONSULTAS PARA ' + usuario.tipo_usuario + '.'}
-          >
-            <div className="text2" style={{ margin: 0, padding: 0, marginBottom: 2.5 }}>{allinterconsultas.filter(item => item.especialidade == usuario.tipo_usuario).length}</div>
-          </div>
           <Usuario></Usuario>
           <ListaDeAtendimentos></ListaDeAtendimentos>
         </div>
-        <div id="conteúdo cheio (cards)"
-          style={{
-            display: atendimento != null && card == 0 && viewlista == 0 ? 'flex' : 'none',
-            flexDirection: "row",
-            justifyContent: 'center',
-            alignContent: 'flex-start',
-            flexWrap: "wrap",
-            width: window.innerWidth < mobilewidth ? '90vw' : '65vw',
-          }}
-        >
-          <CabecalhoPacienteMobile></CabecalhoPacienteMobile>
-          <FilterCartoes></FilterCartoes>
-          <div id="cards (cartões) visão desktop"
-            className={arraycartoes.length == cartoes.length ? "grid" : "grid1"}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <div id="cards (cartões) fixos"
+            className="scroll"
             style={{
-              display: window.innerWidth < mobilewidth ? 'none' : '',
-              width: '100%', alignSelf: 'center',
-            }}>
-            {cartao(null, "DIAS DE INTERNAÇÃO: " +
-              atendimentos
-                .filter((item) => item.id_atendimento == atendimento)
-                .map((item) => moment().diff(item.data_inicio, "days")),
-              null,
-              0, 0
-            )}
-            {cartao(alergias, "ALERGIAS", "card-alergias", busyalergias, 0)}
-            {cartao(null, "ADMISSÃO", "card-documento-admissao", null, 1)}
-            {cartao(null, "EVOLUÇÃO", "card-documento-evolucao", null, 1)}
-            {cartao(null, "RECEITA MÉDICA", "card-documento-receita", null, 1)}
-            {cartao(null, "ATESTADO", "card-documento-atestado", null, 1)}
-            {cartao(null, "SUMÁRIO DE ALTA", "card-documento-alta", null, 1)}
-            {cartao(null, "AIH", "card-doc-estruturado-aih", null, 1)}
-            {cartao(propostas.filter((item) => item.status == 0), "PROPOSTAS", "card-propostas", busypropostas, 0)}
-            {cartao(precaucoes, "PRECAUÇÕES", "card-precaucoes", null, 0)}
-            {cartao(riscos, "RISCOS", "card-riscos", busyriscos, 0)}
-            {cartao(null, "ALERTAS", "card-alertas", null, 0)}
-            {cartao(null, "SINAIS VITAIS", "card-sinaisvitais", busysinaisvitais, 0)}
-            {cartao(null, 'INVASÕES E LESÕES', "card-boneco", null, 0)}
-            {cartao(null, "VENTILAÇÃO MECÂNICA", "card-vm", busyvm, 0)}
-            {cartao(null, "INFUSÕES", "card-infusoes", busyinfusoes, 0)}
-            {cartao(null, "DIETA", "card-dietas", busydieta, 0)}
-            {cartao(
-              culturas.filter((item) => item.data_resultado == null),
-              "CULTURAS",
-              "card-culturas",
-              busyculturas
-            )}
-            {cartao(prescricao.filter(item => item.categoria == '1. ANTIMICROBIANOS'), "ANTIBIÓTICOS", null, null, 0)}
-            {cartao(interconsultas, "INTERCONSULTAS", "card-interconsultas", busyinterconsultas, 0)}
-            {cartao(null, 'PRESCRIÇÃO', "card-prescricao", null, 1)}
-            {cartao(null, 'EXAMES DE IMAGEM', 'card-exames', null, 1)}
-            {cartao(null, 'LABORATÓRIO E RX', 'card-laboratorio', null, 1)}
-          </div>
-          <div id="cards (cartões) visão mobile"
-            className={arraycartoes.length == cartoes.length ? "grid2" : "grid1"}
-            style={{
-              display: window.innerWidth < mobilewidth ? 'grid' : 'none',
-              width: '100%',
-            }}>
-            {cartao(null, "DIAS DE INTERNAÇÃO: " +
-              atendimentos
-                .filter((item) => item.id_atendimento == atendimento)
-                .map((item) => moment().diff(item.data_inicio, "days")),
-              null,
-              0, 0
-            )}
-            {cartao(alergias, "ALERGIAS", "card-alergias", busyalergias, 0)}
-            {cartao(null, "ADMISSÃO", "card-documento-admissao", null, 1)}
-            {cartao(null, "EVOLUÇÃO", "card-documento-evolucao", null, 1)}
-            {cartao(null, "RECEITA MÉDICA", "card-documento-receita", null, 1)}
-            {cartao(null, "ATESTADO", "card-documento-atestado", null, 1)}
-            {cartao(null, "SUMÁRIO DE ALTA", "card-documento-alta", null, 1)}
-            {cartao(null, "AIH", "card-doc-estruturado-aih", null, 1)}
-            {cartao(propostas.filter((item) => item.status == 0), "PROPOSTAS", "card-propostas", busypropostas, 0)}
-            {cartao(precaucoes, "PRECAUÇÕES", "card-precaucoes", null, 0)}
-            {cartao(riscos, "RISCOS", "card-riscos", busyriscos, 0)}
-            {cartao(null, "ALERTAS", "card-alertas", null, 0)}
-            {cartao(null, "SINAIS VITAIS", "card-sinaisvitais", busysinaisvitais, 0)}
-            {cartao(null, 'INVASÕES E LESÕES', "card-boneco", null, 0)}
-            {cartao(null, "VENTILAÇÃO MECÂNICA", "card-vm", busyvm, 0)}
-            {cartao(null, "INFUSÕES", "card-infusoes", busyinfusoes, 0)}
-            {cartao(null, "DIETA", "card-dietas", busydieta, 0)}
-            {cartao(
-              culturas.filter((item) => item.data_resultado == null),
-              "CULTURAS",
-              "card-culturas",
-              busyculturas
-            )}
-            {cartao(prescricao.filter(item => item.categoria == '1. ANTIMICROBIANOS'), "ANTIBIÓTICOS", null, null, 0)}
-            {cartao(interconsultas, "INTERCONSULTAS", "card-interconsultas", busyinterconsultas, 0)}
-            {cartao(null, 'PRESCRIÇÃO', "card-prescricao", null, 1)}
-            {cartao(null, 'EXAMES DE IMAGEM', 'card-exames', null, 1)}
-            {cartao(null, 'LABORATÓRIO E RX', 'card-laboratorio', null, 1)}
-          </div>
-        </div>
-        <div id="conteúdo cheio (componentes)"
-          style={{
-            display: atendimento != null && viewlista == 0 && card != 0 ? 'flex' : 'none',
-            flexDirection: "row",
-            justifyContent: 'center',
-            alignContent: 'center',
-            flexWrap: "wrap",
-            width: window.innerWidth < mobilewidth ? '90vw' : '65vw',
-          }}
-        >
-          <Alergias></Alergias>
-          <Documentos></Documentos>
-          <DocumentoEstruturado></DocumentoEstruturado>
-          <Boneco></Boneco>
-          <Propostas></Propostas>
-          <SinaisVitais></SinaisVitais>
-          <Infusoes></Infusoes>
-          <Culturas></Culturas>
-          <VentilacaoMecanica></VentilacaoMecanica>
-          <Dieta></Dieta>
-          <Precaucoes></Precaucoes>
-          <Riscos></Riscos>
-          <Alertas></Alertas>
-          <Interconsultas></Interconsultas>
-          <Exames></Exames>
-          <Prescricao></Prescricao>
-          <Laboratorio></Laboratorio>
-        </div>
-        <div id="conteúdo vazio"
-          style={{
-            display: window.innerWidth < mobilewidth ? "none" : atendimento == null ? "flex" : "none",
-            flexDirection: "row",
-            justifyContent: 'center',
-            flexWrap: "wrap",
-            width: '65vw',
-          }}
-        >
-          <img
-            alt=""
-            src={lupa}
-            style={{
+              display: 'flex',
+              flexDirection: 'row',
+              justifyContent: 'flex-start',
+              width: '60vw', alignSelf: 'center',
+              overflowX: 'scroll',
+              overflowY: 'hidden',
               margin: 10,
-              height: 150,
-              width: 150,
-              opacity: 0.1,
-              alignSelf: 'center'
+              minHeight: 80,
+            }}>
+            {cartao(alergias, "ALERGIAS", "card-alergias", busyalergias, 0)}
+            {cartao(null, "EVOLUÇÃO", "card-documento-evolucao", null, 1)}
+            {cartao(null, "RECEITA MÉDICA", "card-documento-receita", null, 1)}
+            {cartao(null, "ATESTADO", "card-documento-atestado", null, 1)}
+            {cartao(null, 'EXAMES', 'card-documento-exame', null, 1)}
+          </div>
+          <div id="conteúdo cheio (cards)"
+            style={{
+              display: atendimento != null && card != 0 && viewlista == 0 ? 'flex' : 'none',
+              flexDirection: "row",
+              justifyContent: 'center',
+              alignContent: 'flex-start',
+              flexWrap: "wrap",
+              width: window.innerWidth < mobilewidth ? '90vw' : '65vw',
             }}
-          ></img>
+          >
+            <CabecalhoPacienteMobile></CabecalhoPacienteMobile>
+          </div>
+          <div id="conteúdo cheio (componentes)"
+            style={{
+              display: 'flex',
+              flexDirection: "row",
+              justifyContent: 'center',
+              alignContent: 'center',
+              flexWrap: "wrap",
+              width: window.innerWidth < mobilewidth ? '90vw' : '65vw',
+            }}
+          >
+            <Alergias></Alergias>
+            <Documentos></Documentos>
+            <Exames></Exames>
+            <Laboratorio></Laboratorio>
+          </div>
+          <div id="conteúdo vazio"
+            style={{
+              display: window.innerWidth < mobilewidth ? "none" : atendimento == null ? "flex" : "none",
+              flexDirection: "row",
+              justifyContent: 'center',
+              flexWrap: "wrap",
+              width: '65vw',
+            }}
+          >
+            <img
+              alt=""
+              src={lupa}
+              style={{
+                margin: 10,
+                height: 150,
+                width: 150,
+                opacity: 0.1,
+                alignSelf: 'center'
+              }}
+            ></img>
+          </div>
         </div>
         <SalaSelector></SalaSelector>
-        <TelaInterconsultas></TelaInterconsultas>
         <MinhasConsultas></MinhasConsultas>
       </div>
     </div>
