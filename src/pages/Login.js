@@ -21,12 +21,11 @@ function Login() {
     pagina,
     setpagina,
     settoast,
-    sethospital,
     setunidades,
     setusuario,
     usuario,
     setusuarios,
-    cliente,
+    setcliente,
     mobilewidth,
   } = useContext(Context);
 
@@ -35,7 +34,7 @@ function Login() {
 
   useEffect(() => {
     if (pagina == 0) {
-      sethospital(cliente.id_cliente);
+      // sethospital(cliente.id_cliente);
       loadUnidades();
       loadUsuarios();
 
@@ -43,7 +42,6 @@ function Login() {
         // setusuario(JSON.parse(localStorage.getItem('obj_usuario')));
         loadAcessos(usuario.id);
         loadUnidades();
-        setviewlistaunidades(1);
       } else {
         setviewlistaunidades(0);
         loadUnidades();
@@ -289,7 +287,7 @@ function Login() {
       )
       .then((response) => {
         setacessos(response.data.rows);
-        setviewlistaunidades(1);
+        loadClientes();
         setviewalterarsenha(0);
       })
       .catch(function (error) {
@@ -330,7 +328,6 @@ function Login() {
               */
 
               // eslint-disable-next-line
-              setviewlistaunidades(1);
               loadAcessos(x.id.usuario);
               loadSettings(x.id.usuario);
             } else {
@@ -553,6 +550,31 @@ function Login() {
     );
   }
 
+  const [clientes, setclientes] = useState([]);
+  const loadClientes = () => {
+    axios.get(html + 'list_hospitais').then((response) => {
+      setclientes(response.data.rows);
+    })
+  }
+
+  function ClienteSelector() {
+    return (
+      <div style={{ display: usuario != {} && viewlistaunidades == 0 ? 'flex' : 'none', alignSelf: 'center' }}>
+        {acessos.map(item => (
+          <div className="button" style={{ width: 200, height: 200 }}
+            onClick={() => {
+              setcliente(clientes.filter(valor => valor.id_cliente == item.id_cliente).pop());
+              console.log(clientes.filter(valor => valor.id_cliente == item.id_cliente).pop());
+              setviewlistaunidades(1);
+            }}
+          >
+            {clientes.filter(valor => valor.id_cliente == item.id_cliente).map(item => item.nome_cliente)}
+          </div>
+        ))}
+      </div>
+    )
+  }
+
   // lista de unidades disponiveis para o usuário logado.
   function ListaDeUnidadesAssistenciais() {
     return (
@@ -608,36 +630,9 @@ function Login() {
       style={{ display: pagina == 0 ? "flex" : "none" }}
     >
       <div
-        className="chassi"
+        className="chassi" style={{ overflowY: 'scroll', width: 'calc(100% - 10px)' }}
         id="conteúdo do login"
       >
-        <div
-          className="button-red"
-          style={{
-            display: "flex",
-            position: "sticky",
-            top: 10,
-            right: 10,
-            alignSelf: 'flex-end'
-          }}
-          title="FAZER LOGOFF."
-          onClick={() => {
-            setusuario({});
-            setacessos([]);
-            setviewlistaunidades(0);
-            setviewalterarsenha(0);
-          }}
-        >
-          <img
-            alt=""
-            src={power}
-            style={{
-              margin: 0,
-              height: 30,
-              width: 30,
-            }}
-          ></img>
-        </div>
         <div
           className="text2 popin"
           style={{
@@ -702,8 +697,37 @@ function Login() {
           ALTERAR SENHA
         </div>
         <Inputs></Inputs>
+        <ClienteSelector></ClienteSelector>
         <ListaDeUnidadesAssistenciais></ListaDeUnidadesAssistenciais>
         <ListaDeUnidadesDeApoio></ListaDeUnidadesDeApoio>
+        <div
+          className="button-red"
+          style={{
+            display: "flex",
+            position: "sticky",
+            top: 10,
+            right: 10,
+            alignSelf: 'center',
+            marginBottom: 20
+          }}
+          title="FAZER LOGOFF."
+          onClick={() => {
+            setusuario({});
+            setacessos([]);
+            setviewlistaunidades(0);
+            setviewalterarsenha(0);
+          }}
+        >
+          <img
+            alt=""
+            src={power}
+            style={{
+              margin: 0,
+              height: 30,
+              width: 30,
+            }}
+          ></img>
+        </div>
       </div>
     </div >
   );

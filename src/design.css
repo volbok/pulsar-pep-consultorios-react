@@ -163,11 +163,10 @@ body {
   flex-direction: column;
   justify-content: flex-start;
   align-self: center !important;
-  width: calc(100vw - 10px);
   height: calc(100vh - 10px);
   background-color: transparent !important;
   border-color: transparent !important;
-  overflow-y: scroll;
+  overflow-y: hidden;
   overflow-x: hidden;
 }
 
@@ -899,6 +898,31 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   height: 100px;
   min-height: 100px;
   cursor: default;
+}
+
+.tiss_textarea {
+  font-family: inherit;
+  font-size: inherit;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  resize: none;
+  padding: 0px;
+  text-align: left;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: var(--texto1);
+  background-color: var(--cor2);
+  border-width: 5px;
+  border-color: transparent;
+  border-radius: 5px;
+  outline: 0px;
+  margin-top: 2.5px;
+  height: 20px;
+  min-height: 20px;
+  cursor: default;
+  
 }
 
 .nocaps {

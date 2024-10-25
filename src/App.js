@@ -12,7 +12,6 @@ import Consultas from "./pages/Consultas";
 import Usuarios from "./pages/Usuarios";
 import Triagem from "./pages/Triagem";
 import Painel from "./pages/Painel";
-import Laboratorio from "./pages/Laboratorio";
 import Agendamento from "./pages/Agendamento";
 import Farmacia from "./pages/Farmacia";
 import Almoxarifado from "./pages/Almoxarifado";
@@ -34,7 +33,6 @@ import {
 
 function App() {
   var html = "https://lepton-server.up.railway.app/";
-  var htmlnirvana = 'https://nirvana-api.up.railway.app/';
 
   // estados do context.
   const [toast, settoast] = useState({
@@ -49,14 +47,7 @@ function App() {
   const [pickdate2, setpickdate2] = useState();
 
   // DEVE SER CONFIGURADO PARA CADA CLIENTE.
-  const [cliente, setcliente] = useState({
-    id_cliente: 1,
-    razao_social: "UPA - VENDA NOVA",
-    cnes: "1234287",
-    cnpj: "CNPJ: 1001/001",
-    texto1: 'ENDEREÇO: RUA PADRE PEDRO PINTO, 175, VENDA NOVA - BH/MG',
-    texto2: 'TELEFONE: (31) 3277-8909'
-  });
+  const [cliente, setcliente] = useState({});
 
   const [unidades, setunidades] = useState([]);
   const [hospital, sethospital] = useState([]);
@@ -94,10 +85,11 @@ function App() {
 
   const [pacientes, setpacientes] = useState([]);
   const [paciente, setpaciente] = useState([]);
+  const [objpaciente, setobjpaciente] = useState(null);
   const [atendimentos, setatendimentos] = useState([]);
 
   const [atendimento, setatendimento] = useState(null); // usado para identificar o id_atendimento.
-  const [objatendimento, setobjatendimento] = useState(''); // usado para recuperar todos os dados do objeto atendimento.
+  const [objatendimento, setobjatendimento] = useState([]); // usado para identificar o objeto de atendimento.
 
   const [alergias, setalergias] = useState([]);
   const [lesoes, setlesoes] = useState([]);
@@ -151,6 +143,12 @@ function App() {
 
   // faturamento.
   const [aih, setaih] = useState([]);
+  const [operadoras, setoperadoras] = useState([]);
+  const [selectedoperadora, setselectedoperadora] = useState([]);
+  const [procedimentos, setprocedimentos] = useState([]);
+  const [selectedprocedimento, setselectedprocedimento] = useState(0);
+  const [guiasconsulta, setguiasconsulta] = useState([]);
+  const [selectedguiaconsulta, setselectedguiaconsulta] = useState([]);
 
   // resolvendo a responsividade para o innerHeight nos celulares.
   const [altura, setaltura] = useState(`${window.innerHeight}px`);
@@ -172,7 +170,6 @@ function App() {
     <Context.Provider
       value={{
         html,
-        htmlnirvana,
 
         toast,
         settoast,
@@ -250,6 +247,8 @@ function App() {
         setpacientes,
         paciente,
         setpaciente,
+        objpaciente,
+        setobjpaciente,
         atendimentos,
         setatendimentos,
         atendimento,
@@ -313,6 +312,12 @@ function App() {
         idprescricao, setidprescricao,
         almoxarifado, setalmoxarifado,
         aih, setaih,
+        operadoras, setoperadoras,
+        selectedoperadora, setselectedoperadora,
+        procedimentos, setprocedimentos,
+        selectedprocedimento, setselectedprocedimento,
+        guiasconsulta, setguiasconsulta,
+        selectedguiaconsulta, setselectedguiaconsulta,
       }}
     >
       <div>
@@ -341,9 +346,6 @@ function App() {
             </Route>
             <Route path="/painel">
               <Painel></Painel>
-            </Route>
-            <Route path="/laboratorio">
-              <Laboratorio></Laboratorio>
             </Route>
             <Route path="/farmacia">
               <Farmacia></Farmacia>

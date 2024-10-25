@@ -1,146 +1,413 @@
 /* eslint eqeqeq: "off" */
-import React, { useContext, useEffect } from 'react';
+import React, { useContext, useEffect, useState, useCallback } from 'react';
 import Context from '../pages/Context';
 import axios from 'axios';
-// router.
-import { useHistory } from 'react-router-dom';
-// funções.
-import toast from '../functions/toast';
+import moment from "moment";
+import GuiaSadt from './GuiaSadt';
 // imagens.
-import back from '../images/back.svg';
+import salvar from '../images/salvar.svg';
+import novo from '../images/novo.svg';
+import deletar from '../images/deletar.svg';
+import print from '../images/imprimir.svg';
+import selector from '../functions/selector';
+// router.
+import Filter from '../components/Filter';
+// funções.
 
 function Exames() {
-
-  // history (router).
-  let history = useHistory();
 
   // context.
   const {
     html,
-    settoast,
-    setpagina,
     card, setcard,
-    pacientes, setpacientes,
+    usuario,
     paciente,
-    mobilewidth,
+    atendimento,
+    setlaboratorio,
+    laboratorio,
+    setdono_documento,
+    objpaciente,
   } = useContext(Context);
 
+
   useEffect(() => {
-    if (card == 'card-exames') {
-      // console.log(paciente);
-      document.getElementById("inputExamesAtuaisCard").value = pacientes.filter(item => item.id_paciente == paciente).map(item => item.exames_atuais);
+    if (card == 'exames') {
+      console.log('PÁGINA EXAMES COMPLEMENTARES + GUIA SADT');
+      loadTuss();
+      loadListaLaboratorio();
+      localStorage.setItem('random', 0);
     }
     // eslint-disable-next-line
-  }, [card, paciente]);
+  }, [card]);
 
-
-  // carregando os registros de pacientes.
-  const loadPacientes = () => {
-    axios.get(html + 'list_pacientes').then((response) => {
-      setpacientes(response.data.rows);
+  // carregar procedimentos e exames da tabela TUSS.
+  const [procedimentos_tuss, setprocedimentos_tuss] = useState([]);
+  const [arrayprocedimentos_tuss, setarrayprocedimentos_tuss] = useState([]);
+  const loadTuss = () => {
+    axios.get(html + 'all_tabela_tuss').then((response) => {
+      var x = response.data.rows;
+      setprocedimentos_tuss(x);
+      setarrayprocedimentos_tuss(x);
+      console.log('LISTA TUSS CARREGADA... ' + x.length);
+    }).catch(error => {
+      console.log(error);
     })
-      .catch(function (error) {
-        if (error.response == undefined) {
-          toast(settoast, 'ERRO DE CONEXÃO, REINICIANDO APLICAÇÃO.', 'black', 3000);
-          setTimeout(() => {
-            setpagina(0);
-            history.push('/');
-          }, 3000);
-        } else {
-          toast(settoast, error.response.data.message + ' REINICIANDO APLICAÇÃO.', 'black', 3000);
-          setTimeout(() => {
-            setpagina(0);
-            history.push('/');
-          }, 3000);
-        }
-      });
   }
 
-  // atualizando exames atuais (tabela pacientes).
-  const updatePaciente = () => {
+  // LISTA LABORATÓRIO.
+  // carregar lista de pedidos de exames laboratoriais para o atendimento.
+  const [listalaboratorio, setlistalaboratorio] = useState([]);
+  const loadListaLaboratorio = () => {
+    console.log(atendimento);
+    axios.get(html + 'lista_laboratorio/' + atendimento).then((response) => {
+      setlistalaboratorio(response.data.rows);
+    });
+  }
+
+  // inserir pedido de laboratório.
+  const insertListaLaboratorio = () => {
+    let random = Math.random();
     var obj = {
-      nome_paciente: pacientes.filter(item => item.id_paciente == paciente).map(item => item.nome_paciente).pop(),
-      nome_mae_paciente: pacientes.filter(item => item.id_paciente == paciente).map(item => item.nome_mae_paciente).pop(),
-      dn_paciente: pacientes.filter(item => item.id_paciente == paciente).map(item => item.dn_paciente).pop(),
-      antecedentes_pessoais: pacientes.filter(item => item.id_paciente == paciente).map(item => item.antecedentes_pessoais).pop(),
-      medicacoes_previas: pacientes.filter(item => item.id_paciente == paciente).map(item => item.medicacoes_previas).pop(),
-      exames_previos: pacientes.filter(item => item.id_paciente == paciente).map(item => item.exames_previos).pop(),
-      exames_atuais: document.getElementById("inputExamesAtuaisCard").value.toUpperCase(),
+      id_paciente: paciente,
+      id_atendimento: atendimento,
+      data: moment(),
+      status: 0, // 0 = não salva; 1 = salva (não pode excluir).
+      id_profissional: usuario.id,
+      nome_profissional: usuario.nome_usuario,
+      registro_profissional: usuario.n_conselho,
+      random: random,
+      urgente: 0,
     }
-    // console.log(JSON.stringify(obj));
-    axios.post(html + 'update_paciente/' + paciente, obj).then(() => {
-      loadPacientes();
-    })
-      .catch(function () {
-        toast(settoast, 'ERRO DE CONEXÃO, REINICIANDO APLICAÇÃO.', 'black', 5000);
-        setTimeout(() => {
-          setpagina(0);
-          history.push('/');
-        }, 5000);
-      });
+    axios.post(html + 'insert_lista_laboratorio', obj).then(() => {
+      console.log(obj);
+      localStorage.setItem('random', random);
+      loadListaLaboratorio();
+    });
   }
 
-  function Botoes() {
+  // atualizar pedido de exame laboratorial.
+  const updateListaLaboratorio = (item, status) => {
+    var obj = {
+      id_paciente: paciente,
+      id_atendimento: atendimento,
+      data: item.data,
+      status: status, // 0 = não salva; 1 = salva (não pode excluir).
+      id_profissional: usuario.id,
+      nome_profissional: usuario.nome_usuario,
+      registro_profissional: usuario.n_conselho,
+      random: item.random,
+      urgente: null,
+    }
+    axios.post(html + 'update_lista_laboratorio/' + item.id, obj).then(() => {
+      loadListaLaboratorio();
+    });
+  }
+
+  // deletar pedido de exame laboratorial.
+  const deleteListaLaboratorio = (id) => {
+    axios.get(html + 'delete_lista_laboratorio/' + id).then(() => {
+      loadListaLaboratorio();
+    });
+  }
+
+  // deletar itens de laboratório relacionados a um pedido de exames laboratoriais deletado.
+  const deleteMassaItensLaboratorio = (random) => {
+    axios.get(html + 'atendimento_laboratorio/' + atendimento).then((response) => {
+      var x = response.data.rows;
+      x.filter(item => item.random == random).map(item => axios.get(html + 'delete_laboratorio/' + item.id));
+      localStorage.setItem('random', null);
+      localStorage.setItem('status', null);
+      loadListaLaboratorio();
+    });
+  }
+
+  // ITENS DE LABORATÓRIO.
+  // carregar itens de exames laboratoriais para o atendimento.
+  const loadLaboratorio = (random) => {
+    axios.get(html + 'atendimento_laboratorio/' + atendimento).then((response) => {
+      var x = response.data.rows;
+      setlaboratorio(x.filter(item => item.random == random));
+      selector("scroll lista de pedidos de exames laboratoriais", "pedido de laboratorio " + random, 200);
+    });
+  }
+
+  // inserir item de exame laboratorial.
+  const insertLaboratorio = (item, random) => {
+    var obj = {
+      id_paciente: paciente,
+      id_atendimento: atendimento,
+      data_pedido: moment(),
+      data_resultado: null,
+      codigo_exame: item.codigo,
+      nome_exame: item.terminologia,
+      material: null,
+      resultado: null,
+      status: null,
+      profissional: usuario.id,
+      unidade_medida: null,
+      vref_min: null,
+      vref_max: null,
+      obs: null,
+      random: random,
+      array_campos: null,
+      metodo: null,
+    }
+    console.log(obj);
+    axios.post(html + 'insert_laboratorio', obj).then(() => {
+      let random = localStorage.getItem('random');
+      loadLaboratorio(random);
+    });
+  }
+
+  // deletar item de exame laboratorial.
+  const deleteLaboratorio = (id) => {
+    axios.get(html + 'delete_laboratorio/' + id).then(() => {
+      let random = localStorage.getItem('random');
+      loadLaboratorio(random);
+    });
+  }
+
+  const PackExames = useCallback(() => {
     return (
-      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-        <div id="botão de retorno"
-          className="button-yellow"
-          style={{
-            display: 'flex',
-            alignSelf: 'center',
-          }}
-          onClick={() => setcard('')}>
+      <div id="scroll lista de pedidos de exames laboratoriais"
+        className='scroll'
+        style={{
+          width: '15vw', minWidth: '15vw', maxWidth: '15vw',
+          height: '75vh',
+          backgroundColor: 'white',
+          borderColor: 'white',
+          alignSelf: 'flex-start',
+        }}>
+        <div className='button-green'
+          onClick={() => { insertListaLaboratorio() }}
+        >
           <img
             alt=""
-            src={back}
+            src={novo}
             style={{ width: 30, height: 30 }}
           ></img>
         </div>
+        {listalaboratorio.sort((a, b) => moment(a.data) > moment(b.data) ? -1 : 1).map((item) => (
+          <div id={"pedido de laboratorio " + item.random}
+            className='button'
+            style={{
+              display: 'flex', flexDirection: 'column', justifyContent: 'center',
+              minHeight: 200,
+            }}
+            onClick={() => {
+              setdono_documento({
+                id: item.id_profissional,
+                conselho: 'CRM: ' + item.registro_profissional,
+                nome: item.nome_profissional,
+              })
+              console.log(item.random);
+              localStorage.setItem('random', item.random); // valor randômico chave para relacionar documento de laboratório aos respectivos itens de exames laboratoriais.
+              localStorage.setItem('status', item.status); // status 1 == pedido assinado. status 0 == pedido aberto.
+              loadLaboratorio(item.random);
+            }}
+          >
+            <div id="conjunto de botoes do item de laboratório"
+              style={{
+                display: 'flex',
+                flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center',
+              }}>
+              <div id="botão para excluir pedido de exame laboratorial e seus respectivos itens de exames laboratoriais."
+                className='button-yellow'
+                style={{
+                  display: item.status == 0 ? 'flex' : 'none',
+                  maxWidth: 30, width: 30, minWidth: 30,
+                  maxHeight: 30, height: 30, minHeight: 30
+                }}
+                onClick={(e) => {
+                  console.log(item.random);
+                  deleteListaLaboratorio(item.id);
+                  deleteMassaItensLaboratorio(item.random);
+                  e.stopPropagation();
+                }}
+              >
+                <img
+                  alt=""
+                  src={deletar}
+                  style={{ width: 25, height: 25 }}
+                ></img>
+              </div>
+              <div id="botão para imprimir guia SADT com pack de exames."
+                title={'IMPRIMIR GUIA TISS SADT'}
+                style={{
+                  // display: item.status == 0 ? 'flex' : 'none',
+                  display: 'flex',
+                  maxWidth: 30, width: 30, minWidth: 30,
+                  maxHeight: 30, height: 30, minHeight: 30
+                }}
+                className='button-green'
+                onClick={(e) => {
+                  updateListaLaboratorio(item, 1);
+                  localStorage.setItem('random', item.random);
+                  document.getElementById("guia-sadt").style.display = 'flex';
+                  document.getElementById("guia-sadt").style.visibility = 'visible';
+                  setcard('guia-sadt');
+                  e.stopPropagation();
+                }}
+              >
+                <img
+                  alt=""
+                  src={print}
+                  style={{ width: 20, height: 20 }}
+                ></img>
+              </div>
+            </div>
+            <div style={{ padding: 10, display: 'flex', flexDirection: 'column' }}>
+              <div style={{ fontSize: 10 }}>
+                {item.nome_profissional}
+              </div>
+              <div style={{ fontSize: 10, marginBottom: 5 }}>
+                {item.registro_profissional}
+              </div>
+              <div>
+                {moment(item.data).format('DD/MM/YY')}
+              </div>
+              <div>
+                {moment(item.data).format('HH:mm')}
+              </div>
+            </div>
+          </div>
+        ))
+        }
+      </div >
+    )
+    // eslint-disable-next-line
+  }, [atendimento, listalaboratorio]);
+
+  function ListaDeExames() {
+    return (
+      <div
+        className='scroll'
+        style={{
+          display: 'flex',
+          height: '75vh', width: '45vw',
+          backgroundColor: 'white',
+          borderColor: 'white',
+          borderRadius: 5,
+          marginRight: 10
+        }}>
+        {laboratorio.filter(item => item.random == localStorage.getItem('random')).map(item => (
+          <div style={{
+            display: 'flex', flexDirection: 'row',
+            justifyContent: 'space-between',
+            borderRadius: 5,
+            margin: 2.5,
+          }}>
+            <div className='text1'
+              style={{ flex: 4, textAlign: 'left' }}>
+              {item.nome_exame != null ? item.nome_exame.toUpperCase() : ''}
+            </div>
+            <div className='button-red' style={{ flex: 1, paddingLeft: 15, paddingRight: 15 }}>{item.codigo_exame}</div>
+            <div id="botão para excluir exame laboratorial"
+              className='button-red'
+              style={{
+                display: 'flex',
+                // maxWidth: 30, width: 30, minWidth: 30,
+                // maxHeight: 30, height: 30, minHeight: 30
+              }}
+              onClick={(e) => {
+                deleteLaboratorio(item.id);
+                e.stopPropagation();
+              }}
+            >
+              <img
+                alt=""
+                src={deletar}
+                style={{ width: 25, height: 25 }}
+              ></img>
+            </div>
+          </div>
+        ))}
+        <div id="botão inserir exame."
+          style={{
+            // display: localStorage.getItem('status') == 0 ? 'flex' : 'none',
+            display: 'flex',
+            maxWidth: 30, width: 30, minWidth: 30,
+            maxHeight: 30, height: 30, minHeight: 30,
+            alignSelf: 'center',
+          }}
+          className='button-green'
+          onClick={(e) => {
+            setforminsertexame(1);
+            e.stopPropagation();
+          }}
+        >
+          <img
+            alt=""
+            src={novo}
+            style={{ width: 20, height: 20 }}
+          ></img>
+        </div>
       </div>
-    );
+    )
   }
 
-  var timeout = null;
-  return (
-    <div id="scroll-evolucoes"
-      className='card-aberto'
-      style={{ display: card == 'card-exames' ? 'flex' : 'none' }}
-    >
-      <div className="text3">
-        EXAMES RELEVANTES
+  const [forminsertexame, setforminsertexame] = useState(0);
+  function FormInsertExame() {
+    return (
+      <div className="fundo"
+        onClick={() => setforminsertexame(0)}
+        style={{
+          display: forminsertexame == 1 ? 'flex' : 'none', flexDirection: 'column', justifyContent: 'center'
+        }}>
+        <div className="janela scroll"
+          onClick={(e) => e.stopPropagation()}
+          style={{
+            display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
+            width: '80vw', height: '80vh',
+            backgroundColor: '#e5e7e9',
+            borderColor: '#e5e7e9'
+          }}>
+          {Filter(setarrayprocedimentos_tuss, procedimentos_tuss, 'item.terminologia')}
+          {arrayprocedimentos_tuss.map(item => (
+            <div
+              className='button'
+              style={{
+                width: 'calc (100% - 20px)', minWidth: 'calc(100% - 20px)',
+                justifyContent: 'space-between',
+                padding: 10, paddingRight: 0,
+              }}
+              onClick={() => {
+                insertLaboratorio(item, localStorage.getItem('random'));
+                setforminsertexame(0);
+              }}
+            >
+              <div className='text2' style={{ textAlign: 'left' }}>
+                {item.terminologia.toUpperCase()}
+              </div>
+              <div className='button red'
+                style={{ marign: 5, paddingLeft: 10, paddingRight: 10 }}>
+                {item.codigo}
+              </div>
+            </div>
+          ))}
+        </div>
       </div>
+    )
+  }
+
+  return (
+    <div id="tela para solicitação de exames complementares e liberação de guia TISS SADT."
+      style={{
+        display: card == 'exames' || card == 'guia-sadt' ? 'flex' : 'none',
+        flexDirection: 'column',
+        justifyContent: 'center'
+      }}
+    >
       <div
         style={{
-          position: 'relative', display: 'flex', flexDirection: 'column',
-          justifyContent: 'flex-start',
-          flex: 1
+          display: 'flex', flexDirection: 'row', justifyContent: 'center',
         }}>
-        <textarea
-          className="textarea"
-          placeholder='EXAMES ATUAIS'
-          onFocus={(e) => (e.target.placeholder = '')}
-          onBlur={(e) => (e.target.placeholder = 'EXAMES ATUAIS')}
-          defaultValue={pacientes.filter(item => item.id_paciente == paciente).map(item => item.exames_atuais)}
-          onKeyUp={() => {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
-              updatePaciente();
-            }, 3000);
-          }}
-          style={{
-            display: 'flex',
-            flexDirection: 'center', justifyContent: 'center', alignSelf: 'center',
-            width: window.innerWidth < mobilewidth ? '70vw' : '50vw',
-            height: 300,
-            whiteSpace: 'pre-wrap'
-          }}
-          id={"inputExamesAtuaisCard"}
-          title="EXAMES ATUAIS."
-        >
-        </textarea>
-        <Botoes></Botoes>
+        <ListaDeExames></ListaDeExames>
+        <PackExames></PackExames>
+        <FormInsertExame></FormInsertExame>
+        <GuiaSadt></GuiaSadt>
       </div>
-    </div >
+    </div>
   )
 }
 

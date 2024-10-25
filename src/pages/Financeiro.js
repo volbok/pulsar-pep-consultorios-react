@@ -610,7 +610,6 @@ function Financeiro() {
                   style={{ width: 30, height: 30 }}
                 ></img>
               </div>
-
             </div>
           ))
           }

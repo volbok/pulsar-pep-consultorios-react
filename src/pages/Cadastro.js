@@ -37,6 +37,8 @@ function Cadastro() {
     setpaciente,
     atendimentos,
     setatendimentos,
+    setoperadoras, operadoras,
+    setprocedimentos, procedimentos,
   } = useContext(Context);
 
   // history (router).
@@ -56,15 +58,84 @@ function Cadastro() {
   window.addEventListener("load", refreshApp);
 
   const [atendimento, setatendimento] = useState([]);
+  const [viewopcoesconvenio, setviewopcoesconvenio] = useState(0);
+  const [viewtipoconsulta, setviewtipoconsulta] = useState(0);
   useEffect(() => {
     if (pagina == 2) {
       setpaciente([]);
       setatendimento([]);
       loadPacientes();
+      loadOperadoras();
+      loadProcedimentos();
       loadAtendimentos();
     }
     // eslint-disable-next-line
   }, [pagina]);
+
+  // carregando operadoras de saúde.
+  const loadOperadoras = () => {
+    axios.get(html + 'all_operadoras').then((response) => {
+      setoperadoras(response.data.rows);
+
+    })
+  };
+
+  const loadProcedimentos = () => {
+    axios.get(html + 'all_procedimentos').then((response) => {
+      setprocedimentos(response.data.rows);
+      console.log(response.data.rows)
+    })
+  };
+
+  const [viewoperadoraselector, setviewoperadoraselector] = useState(0);
+  function FormOperadoraSelector() {
+    return (
+      <div className="fundo"
+        style={{
+          display: viewoperadoraselector == 1 ? 'flex' : 'none',
+          flexDirection: 'column', justifyContent: 'center'
+        }}
+        onClick={() => setviewoperadoraselector(0)}
+      >
+        <div className="janela scroll"
+          style={{ height: '90vh', width: '40vw' }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <input
+            className="input"
+            autoComplete="off"
+            placeholder={
+              "BUSCAR..."
+            }
+            onFocus={(e) => (e.target.placeholder = "")}
+            onBlur={(e) =>
+              "BUSCAR..."
+            }
+            // onKeyUp={() => filterProcedimento()}
+            type="text"
+            id="filtrarProcedimento"
+            // defaultValue={filterprocedimento}
+            maxLength={100}
+            style={{ width: 'calc(100% - 20px)', backgroundColor: 'white' }}
+          ></input>
+          {operadoras.map(item => (
+            <div
+              className="button"
+              style={{ width: 'calc(100% - 20px)', padding: 10, display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}
+              onClick={() => {
+                setviewoperadoraselector(0);
+                setTimeout(() => {
+                  document.getElementById("inputConvenioNome").value = item.nome_operadora;
+                  document.getElementById("inputConvenioCodigo").value = item.id; // id do convênio no banco de dados Pulsar (não é o registr ANS).
+                }, 1000);
+              }}>
+              <div>{item.nome_operadora}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
 
   // recuperando registros de pacientes cadastrados na aplicação.
   const [arraypacientes, setarraypacientes] = useState([]);
@@ -201,6 +272,23 @@ function Cadastro() {
       endereco_complemento: document
         .getElementById("inputEditEnderecoComplemento")
         .value.toUpperCase(),
+
+      // CONVÊNIO.
+      convenio_nome: document
+        .getElementById("inputConvenioNome")
+        .value.toUpperCase(),
+      convenio_codigo: document
+        .getElementById("inputConvenioCodigo")
+        .value.toUpperCase(),
+      convenio_carteira: document
+        .getElementById("inputConvenioCarteira")
+        .value.toUpperCase(),
+      validade_carteira: document
+        .getElementById("inputValidadeCarteira")
+        .value.toUpperCase(),
+      nome_social: document
+        .getElementById("inputNomeSocial")
+        .value.toUpperCase(),
     };
     axios
       .post(html + "insert_paciente", obj)
@@ -280,6 +368,10 @@ function Cadastro() {
       situacao: 1, // 1 = atendimento ativo; 0 = atendimento encerrado.
       id_cliente: hospital,
       classificacao: null,
+      id_profissional: null,
+      convenio_id: null,
+      convenio_carteira: null,
+      faturamento_codigo_procedimento: null,
     };
     axios
       .post(html + "insert_atendimento", obj)
@@ -345,6 +437,10 @@ function Cadastro() {
               situacao: 1,
               id_cliente: hospital,
               classificacao: item.classificacao,
+              id_profissional: item.id_profissional,
+              convenio_id: item.convenio_id,
+              convenio_carteira: item.convenio_carteira,
+              faturamento_codigo_procedimento: item.faturamento_codigo_procedimento,
             };
             axios
               .post(html + "update_atendimento/" + item.id_atendimento, obj)
@@ -378,6 +474,10 @@ function Cadastro() {
         situacao: 0, // 1 = atendimento ativo; 0 = atendimento encerrado.
         id_cliente: hospital,
         classificacao: item.classificacao,
+        id_profissional: item.id_profissional,
+        convenio_id: item.convenio_id,
+        convenio_carteira: item.convenio_carteira,
+        faturamento_codigo_procedimento: item.faturamento_codigo_procedimento,
       };
       axios
         .post(html + "update_atendimento/" + item.id_atendimento, obj)
@@ -696,6 +796,35 @@ function Cadastro() {
                 onFocus={(e) => (e.target.placeholder = "")}
                 onBlur={(e) => (e.target.placeholder = "NOME DO PACIENTE")}
                 defaultValue={vieweditpaciente == 1 ? paciente.nome_paciente : ''}
+                style={{
+                  flexDirection: "center",
+                  justifyContent: "center",
+                  alignSelf: "center",
+                  width: 400,
+                  padding: 15,
+                  height: 20,
+                  minHeight: 20,
+                  maxHeight: 20,
+                }}
+              ></textarea>
+            </div>
+            <div id="nome do paciente"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+              }}
+            >
+              <div className="text1">NOME SOCIAL</div>
+              <textarea
+                autoComplete="off"
+                placeholder="NOME SOCIAL"
+                className="textarea"
+                type="text"
+                id="inputNomeSocial"
+                onFocus={(e) => (e.target.placeholder = "")}
+                onBlur={(e) => (e.target.placeholder = "NOME SOCIAL")}
+                defaultValue={vieweditpaciente == 1 ? paciente.nome_social : ''}
                 style={{
                   flexDirection: "center",
                   justifyContent: "center",
@@ -1254,7 +1383,130 @@ function Cadastro() {
                 ></textarea>
               </div>
             </div>
-
+            <div className="button"
+              onClick={() => {
+                if (viewoperadoraselector == 1) {
+                  setviewoperadoraselector(0);
+                } else {
+                  setviewoperadoraselector(1);
+                }
+              }}
+            >
+              SELECIONAR OPERADORA
+            </div>
+            <FormOperadoraSelector></FormOperadoraSelector>
+            <div id="convenio - nome"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+              }}
+            >
+              <div className="text1">NOME DO CONVÊNIO</div>
+              <textarea
+                className="textarea"
+                type="text"
+                id="inputConvenioNome"
+                placeholder="NOME DO CONVÊNIO"
+                onFocus={(e) => (e.target.placeholder = "")}
+                onBlur={(e) => (e.target.placeholder = "NOME DO CONVÊNIO")}
+                defaultValue={vieweditpaciente == 1 ? paciente.convenio_nome : ''}
+                style={{
+                  flexDirection: "center",
+                  justifyContent: "center",
+                  alignSelf: "center",
+                  width: 200,
+                  padding: 15,
+                  height: 20,
+                  minHeight: 20,
+                  maxHeight: 20,
+                }}
+              ></textarea>
+            </div>
+            <div id="convenio - codigo"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+              }}
+            >
+              <div className="text1">CÓDIGO DO CONVÊNIO</div>
+              <textarea
+                className="textarea"
+                type="text"
+                id="inputConvenioCodigo"
+                placeholder="CÓDIGO DO CONVÊNIO"
+                onFocus={(e) => (e.target.placeholder = "")}
+                onBlur={(e) => (e.target.placeholder = "CÓDIGO DO CONVÊNIO")}
+                defaultValue={vieweditpaciente == 1 ? paciente.convenio_codigo : ''}
+                style={{
+                  flexDirection: "center",
+                  justifyContent: "center",
+                  alignSelf: "center",
+                  width: 200,
+                  padding: 15,
+                  height: 20,
+                  minHeight: 20,
+                  maxHeight: 20,
+                }}
+              ></textarea>
+            </div>
+            <div id="convenio - carteira"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+              }}
+            >
+              <div className="text1">NÚMERO DA CARTEIRA DO BENEFICIÁRIO</div>
+              <textarea
+                className="textarea"
+                type="text"
+                id="inputConvenioCarteira"
+                placeholder="NÚMERO DA CARTEIRA"
+                onFocus={(e) => (e.target.placeholder = "")}
+                onBlur={(e) => (e.target.placeholder = "NÚMERO DA CARTEIRA")}
+                defaultValue={vieweditpaciente == 1 ? paciente.convenio_carteira : ''}
+                style={{
+                  flexDirection: "center",
+                  justifyContent: "center",
+                  alignSelf: "center",
+                  width: 200,
+                  padding: 15,
+                  height: 20,
+                  minHeight: 20,
+                  maxHeight: 20,
+                }}
+              ></textarea>
+            </div>
+            <div id="convenio - validade carteira"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+              }}
+            >
+              <div className="text1">VALIDADE DA CARTEIRA DO BENEFICIÁRIO</div>
+              <textarea
+                className="textarea"
+                type="text"
+                id="inputValidadeCarteira"
+                placeholder="VALIDADE DA CARTEIRA"
+                onFocus={(e) => (e.target.placeholder = "")}
+                onBlur={(e) => (e.target.placeholder = "VALIDADE DA CARTEIRA")}
+                defaultValue={vieweditpaciente == 1 ? paciente.validade_carteira : ''}
+                style={{
+                  flexDirection: "center",
+                  justifyContent: "center",
+                  alignSelf: "center",
+                  width: 200,
+                  padding: 15,
+                  height: 20,
+                  minHeight: 20,
+                  maxHeight: 20,
+                }}
+              ></textarea>
+            </div>
             <div id="telefone"
               style={{
                 display: "flex",
@@ -1386,6 +1638,8 @@ function Cadastro() {
               </div>
             </div>
           </div>
+          <SelecionaConvenioPaciente></SelecionaConvenioPaciente>
+          <ViewTipoConsulta></ViewTipoConsulta>
           <div id="card status de atendimento"
             className="card cor7"
             style={{
@@ -1419,9 +1673,6 @@ function Cadastro() {
                 {
                   "PACIENTE NÃO ESTÁ EM ATENDIMENTO NOS HOSPITAIS CADASTRADOS EM NOSSA BASE."
                 }
-              </div>
-              <div className="button" onClick={() => { setviewseletorunidades(1) }}>
-                INICIAR ATENDIMENTO
               </div>
               <div
                 style={{
@@ -1536,8 +1787,11 @@ function Cadastro() {
               className="button"
               style={{ width: 100, height: 100, alignSelf: 'center' }}
               onClick={() => {
-                setpagina(20);
-                history.push("/agendamento");
+                // identificando o procedimento com o código TUSS para consulta médica.
+                localStorage.setItem('codigo_procedimento', '10101012');
+                setviewopcoesconvenio(1);
+                // setpagina(20);
+                // history.push("/agendamento");
               }}
             >
               AGENDAR CONSULTA
@@ -1547,7 +1801,117 @@ function Cadastro() {
       </div>
     );
     // eslint-disable-next-line
-  }, [paciente, hospital, unidades, unidade, atendimento, atendimentos, vieweditpaciente]);
+  }, [paciente, hospital, unidades, unidade, atendimento, atendimentos, vieweditpaciente, viewoperadoraselector, viewopcoesconvenio, viewtipoconsulta]);
+
+  // janela para selecionar se o atendimento será feito por convênio do paciente ou particular.
+  function SelecionaConvenioPaciente() {
+    return (
+      <div
+        className="fundo"
+        style={{ display: viewopcoesconvenio == 1 ? "flex" : "none" }}
+        onClick={() => {
+          setviewopcoesconvenio(0);
+        }}
+      >
+        <div className="janela" onClick={(e) => e.stopPropagation()}>
+          <div className="button" style={{ width: 200, minWidth: 200 }}
+            onClick={() => convenioselector('PARTICULAR')}
+          >
+            {'PARTICULAR'}
+          </div>
+          <div className="button"
+            style={{
+              display: procedimentos.filter(item => item.id_operadora == paciente.convenio_codigo && item.tuss_codigo == localStorage.getItem('codigo_procedimento')),
+              width: 200, minWidth: 200,
+            }}
+            onClick={() => convenioselector('CONVENIO')}
+          >
+            {paciente.convenio_nome}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  /*
+  TIPO DE CONSULTA:
+  1 = primeira consulta.
+  2 = retorno.
+  3 = pré-natal.
+  4 = por encaminhamento.
+  */
+  function ViewTipoConsulta() {
+    return (
+      <div
+        className="fundo"
+        style={{ display: viewtipoconsulta == 1 ? "flex" : "none" }}
+        onClick={() => {
+          setviewtipoconsulta(0);
+        }}
+      >
+        <div className="janela scroll"
+          style={{ height: '80vh' }}
+          onClick={(e) => e.stopPropagation()}>
+          <div className="button" style={{ width: 200, minWidth: 200 }}
+            onClick={() => {
+              localStorage.setItem("tipo_consulta", 1);
+              setviewtipoconsulta(0);
+              disparaconsulta();
+            }}
+          >
+            PRIMEIRA CONSULTA
+          </div>
+          <div className="button" style={{ width: 200, minWidth: 200 }}
+            onClick={() => {
+              localStorage.setItem("tipo_consulta", 2);
+              setviewtipoconsulta(0);
+              disparaconsulta();
+            }}
+          >
+            RETORNO
+          </div>
+          <div className="button" style={{ width: 200, minWidth: 200 }}
+            onClick={() => {
+              localStorage.setItem("tipo_consulta", 3);
+              setviewtipoconsulta(0);
+              disparaconsulta();
+            }}
+          >
+            CONSULTA NORMAL
+          </div>
+          <div className="button" style={{ width: 200, minWidth: 200 }}
+            onClick={() => {
+              localStorage.setItem("tipo_consulta", 4);
+              setviewtipoconsulta(0);
+              disparaconsulta();
+            }}
+          >
+            PRÉ-NATAL
+          </div>
+          <div className="button" style={{ width: 200, minWidth: 200 }}
+            onClick={() => {
+              localStorage.setItem("tipo_consulta", 5);
+              setviewtipoconsulta(0);
+              disparaconsulta();
+            }}
+          >
+            POR ENCAMINHAMENTO
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  const convenioselector = (valor) => {
+    localStorage.setItem("tipo_atendimento", valor);
+    setviewtipoconsulta(1);
+    // history.push("/agendamento");
+  }
+
+  const disparaconsulta = () => {
+    setpagina(20);
+    history.push("/agendamento");
+  }
 
   // atualizando um novo paciente.
   const updatePaciente = () => {
@@ -1582,6 +1946,13 @@ function Cadastro() {
       orgao_emissor: document.getElementById("inputEditOrgaoEmissor").value.toUpperCase(),
       endereco_numero: document.getElementById("inputEditEnderecoNumero").value.toUpperCase(),
       endereco_complemento: document.getElementById("inputEditEnderecoComplemento").value.toUpperCase(),
+
+      // CONVÊNIO.
+      convenio_nome: document.getElementById("inputConvenioNome").value.toUpperCase(),
+      convenio_codigo: document.getElementById("inputConvenioCodigo").value.toUpperCase(),
+      convenio_carteira: document.getElementById("inputConvenioCarteira").value.toUpperCase(),
+      validade_carteira: document.getElementById("inputValidadeCarteira").value.toUpperCase(),
+      nome_social: document.getElementById("inputNomeSocial").value.toUpperCase(),
 
     };
     axios
@@ -1663,6 +2034,10 @@ function Cadastro() {
                         situacao: 1, // 1 = atendimento ativo; 0 = atendimento encerrado.
                         id_cliente: hospital,
                         classificacao: null,
+                        id_profissional: item.id_profissional,
+                        convenio_id: paciente.convenio_codigo,
+                        convenio_carteira: paciente.convenio_carteira,
+                        faturamento_codigo_procedimento: null,
                       };
                       axios
                         .post(html + "insert_atendimento", obj)

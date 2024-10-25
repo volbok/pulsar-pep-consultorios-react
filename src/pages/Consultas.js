@@ -44,6 +44,8 @@ function Consultas() {
     setpacientes,
     pacientes,
     setpaciente,
+    setobjpaciente,
+    objpaciente,
     atendimentos,
     setatendimentos,
     setatendimento,
@@ -186,7 +188,6 @@ function Consultas() {
   }
 
   var timeout = null;
-  const [objpaciente, setobjpaciente] = useState(null);
   useEffect(() => {
     if (pagina == -2) {
       console.log(usuario);
@@ -482,7 +483,7 @@ function Consultas() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-between",
-          height: '100%',
+          height: '75vh',
         }}
       >
         <div id="scroll atendimentos com pacientes"
@@ -601,7 +602,8 @@ function Consultas() {
                         setunidade(parseInt(item.id_unidade));
                         setatendimento(item.id_atendimento);
                         setpaciente(parseInt(item.id_paciente));
-                        setobjpaciente(item);
+                        setobjpaciente(pacientes.filter(valor => valor.id_paciente == item.id_paciente).pop());
+                        console.log(pacientes.filter(valor => valor.id_paciente == item.id_paciente));
                         setobjatendimento(item);
                         getAllData(item.id_paciente, item.id_atendimento);
                         setidprescricao(0);
@@ -985,26 +987,38 @@ function Consultas() {
   const [busyalergias, setbusyalergias] = useState(0);
 
   // função para renderização dos cards fechados.
-  let yellow = "#F9E79F";
   const cartao = (sinal, titulo, opcao) => {
     return (
       <div style={{ display: 'flex' }}>
         <div
           className={card == opcao ? "button red" : "button"}
           style={{
-            display:
-              "flex",
-            pointerEvents: opcao == null ? 'none' : 'auto',
-            backgroundColor: sinal != null && sinal.length > 0 ? yellow : "",
+            display: "flex",
+            pointerEvents: opcao == null || atendimento == null ? 'none' : 'auto',
             borderColor: "transparent",
             margin: 5,
             width: 150,
             alignSelf: 'center',
+            position: 'relative',
           }}
           onClick={() => {
             setcard(opcao);
+            console.log(opcao);
           }}
         >
+          <div id="sinalizador de alerta."
+            className="button"
+            style={{
+              display: sinal != null && sinal.length > 0 ? 'flex' : 'none',
+              position: 'absolute', bottom: -15, right: -15,
+              borderRadius: 50,
+              backgroundColor: '#EC7063',
+              borderStyle: 'solid',
+              borderWidth: 5,
+              borderColor: 'white',
+              width: 20, minWidth: 20, maxWidth: 20,
+              height: 20, minHeight: 20, maxHeight: 20,
+            }}>!</div>
           <div style={{ margin: 0, padding: 10 }}>{titulo}</div>
         </div>
       </div>
@@ -1474,12 +1488,16 @@ function Consultas() {
               overflowY: 'hidden',
               margin: 10,
               minHeight: 80,
+              opacity: atendimento == null ? 0.5 : 1,
             }}>
             {cartao(alergias, "ALERGIAS", "card-alergias", busyalergias, 0)}
             {cartao(null, "EVOLUÇÃO", "card-documento-evolucao", null, 1)}
             {cartao(null, "RECEITA MÉDICA", "card-documento-receita", null, 1)}
             {cartao(null, "ATESTADO", "card-documento-atestado", null, 1)}
-            {cartao(null, 'EXAMES', 'card-documento-exame', null, 1)}
+            {
+              // cartao(null, 'EXAMES', 'card-documento-exame', null, 1)
+            }
+            {cartao(null, 'EXAMES', 'exames')}
           </div>
           <div id="conteúdo cheio (cards)"
             style={{
@@ -1509,12 +1527,15 @@ function Consultas() {
             <Laboratorio></Laboratorio>
           </div>
           <div id="conteúdo vazio"
+            className="lupa"
             style={{
               display: window.innerWidth < mobilewidth ? "none" : atendimento == null ? "flex" : "none",
               flexDirection: "row",
               justifyContent: 'center',
+              alignSelf: 'center',
               flexWrap: "wrap",
               width: '65vw',
+              height: '80vh',
             }}
           >
             <img

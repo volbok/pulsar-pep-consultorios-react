@@ -161,7 +161,7 @@ function Agendamento() {
     var obj = {
       data_inicio: moment(inicio, 'DD/MM/YYYY - HH:mm'),
       data_termino: moment(inicio, 'DD/MM/YYYY - HH:mm').add(30, 'minutes'),
-      historia_atual: null,
+      problemas: null,
       id_paciente: paciente.id_paciente,
       id_unidade: 5, // ATENÇÃO: 5 é o ID da unidade ambulatorial.
       nome_paciente: paciente.nome_paciente,
@@ -170,6 +170,9 @@ function Agendamento() {
       id_cliente: hospital,
       classificacao: null,
       id_profissional: selectedespecialista.id_usuario,
+      convenio_id: paciente.convenio_codigo,
+      convenio_carteira: paciente.convenio_carteira,
+      faturamento_codigo_procedimento: null,
     };
     console.log(obj);
     axios
