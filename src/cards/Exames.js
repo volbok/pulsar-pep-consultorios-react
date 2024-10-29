@@ -5,7 +5,6 @@ import axios from 'axios';
 import moment from "moment";
 import GuiaSadt from './GuiaSadt';
 // imagens.
-import salvar from '../images/salvar.svg';
 import novo from '../images/novo.svg';
 import deletar from '../images/deletar.svg';
 import print from '../images/imprimir.svg';
@@ -26,7 +25,6 @@ function Exames() {
     setlaboratorio,
     laboratorio,
     setdono_documento,
-    objpaciente,
   } = useContext(Context);
 
 

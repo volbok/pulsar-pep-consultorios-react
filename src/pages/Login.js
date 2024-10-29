@@ -245,20 +245,6 @@ function Login() {
       .get(html + "list_usuarios")
       .then((response) => {
         setusuarios(response.data.rows);
-        /*
-        ACESSOS AOS MÓDULOS DE USUÁRIO (tabela usuarios):
-        10 - MÉDICO(A)
-        11 - ENFERMEIRO(A)
-        12 - TÉCNICO(A) DE ENFERMAGEM
-        13 - FISIOTERAPEUTA
-        14 - FONOAUDIOLOGO(A)
-        15 - TERAPEUTA OCUPACIONAL
-        16 - ASSISTENTE SOCIAL
-        17 - PSICOLOGO(A)
-        18 - RADIOLOGIA
-        20 - GERENTE
-        21 - ADMINISTRATIVO
-        */
       })
       .catch(function (error) {
         console.log(error);

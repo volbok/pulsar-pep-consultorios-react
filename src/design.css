@@ -42,11 +42,13 @@
 }
 
 .print {
-  display: none !important
+  display: none !important;
+  visibility: hidden !important;
 }
 
 .noprint {
-  display: flex !important
+  display: flex !important;
+  visibility: visible !important;
 }
 
 .printable {
@@ -63,6 +65,38 @@
   flex-grow: 'inherit',
 }
 
+/* GUIAS TISS */
+.grupo {
+  font-size: 8px;
+  background-color: #b2babb;
+  margin: 5px;
+  border-radius: 2.5px;
+  padding: 2.5px;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.fonte_titulo {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  font-size: 9px;
+  margin: 0px;
+  align-self: center;
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.fonte_titulo_header {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  font-size: 8px;
+  margin: 0px;
+  align-self: center;
+  text-align: center;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
 /* OCULTANDO CABEÇALHO E RODAPÉ PARA IMPRESSÃO */
 @media print {
 
@@ -72,15 +106,39 @@
   }
 
   .print {
-    display: flex !important
+    display: flex !important;
+    visibility: visible !important;
   }
 
   .noprint {
-    display: none !important
+    display: none !important;
+    visibility: hidden !important;
   }
 
+  .tiss_textarea {
+    font-family: 'Helvetica';
+    font-size: inherit;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    resize: none;
+    padding: 0px;
+    text-align: left;
+    font-weight: bold;
+    text-transform: uppercase;
+    color: var(--texto1);
+    background-color: white;
+    border-style: hidden;
+    border-width: 0px;
+    border-color: transparent;
+    border-radius: 0px;
+    outline: 0px;
+    margin-top: 5px;
+    height: 20px;
+    min-height: 20px;
+    cursor: default;
+  }
 }
-
 
 /* DESABILITANDO ZOOM AO CLICAR DUAS VEZES NA TELA (VERSÃO MOBILE) */
 .disable-dbl-tap-zoom {
@@ -903,7 +961,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 .tiss_textarea {
   font-family: inherit;
   font-size: inherit;
-  display: flex;
   flex-direction: column;
   justify-content: flex-start;
   align-items: center;
@@ -913,7 +970,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   font-weight: bold;
   text-transform: uppercase;
   color: var(--texto1);
-  background-color: var(--cor2);
+  background-color: white;
   border-width: 5px;
   border-color: transparent;
   border-radius: 5px;
@@ -922,7 +979,6 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   height: 20px;
   min-height: 20px;
   cursor: default;
-  
 }
 
 .nocaps {

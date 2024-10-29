@@ -1877,20 +1877,11 @@ function Cadastro() {
               disparaconsulta();
             }}
           >
-            CONSULTA NORMAL
-          </div>
-          <div className="button" style={{ width: 200, minWidth: 200 }}
-            onClick={() => {
-              localStorage.setItem("tipo_consulta", 4);
-              setviewtipoconsulta(0);
-              disparaconsulta();
-            }}
-          >
             PRÉ-NATAL
           </div>
           <div className="button" style={{ width: 200, minWidth: 200 }}
             onClick={() => {
-              localStorage.setItem("tipo_consulta", 5);
+              localStorage.setItem("tipo_consulta", 4);
               setviewtipoconsulta(0);
               disparaconsulta();
             }}

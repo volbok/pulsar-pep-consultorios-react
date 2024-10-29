@@ -9,9 +9,7 @@ import back from "../images/back.svg";
 import refresh from "../images/refresh.svg";
 import flag from "../images/white_flag.svg";
 import deletar from "../images/deletar.svg";
-import prec_padrao from "../images/prec_padrao.svg";
 import lupa from '../images/lupa.svg';
-import esteto from "../images/esteto.svg";
 import call from "../images/call.svg";
 import clock from "../images/clock.svg";
 // funções.
@@ -133,8 +131,6 @@ function Consultas() {
         let x = response.data.rows;
         setatendimentos(x.filter(item => item.situacao == 1));
         setarrayatendimentos(x.filter(item => item.situacao == 3)); // situação 3 = consulta ambulatorial ativa. situação 4 == consulta ambulatorial encerrada.
-        loadAllInterconsultas();
-        loadAllPrecaucoes();
       })
       .catch(function (error) {
         if (error.response == undefined) {
@@ -161,21 +157,6 @@ function Consultas() {
           }, 3000);
         }
       });
-  };
-
-  // registros para exibição em destaque na lista de pacientes).
-  const [allinterconsultas, setallinterconsultas] = useState([]);
-  const loadAllInterconsultas = () => {
-    axios.get(html + "all_interconsultas").then((response) => {
-      setallinterconsultas(response.data.rows);
-    });
-  };
-
-  const [allprecaucoes, setallprecaucoes] = useState([]);
-  const loadAllPrecaucoes = () => {
-    axios.get(html + "paciente_all_precaucoes").then((response) => {
-      setallprecaucoes(response.data.rows);
-    });
   };
 
   // recuperando lista de prescrições.
@@ -725,18 +706,6 @@ function Consultas() {
                           <img alt="" src={clock} style={{ width: 30, height: 30 }}></img>
                         </div>
                       </div>
-                      {tagsDosPacientes(
-                        "INTERCONSULTAS",
-                        item,
-                        allinterconsultas,
-                        esteto
-                      )}
-                      {tagsDosPacientes(
-                        "PRECAUÇÕES",
-                        item,
-                        allprecaucoes,
-                        prec_padrao
-                      )}
                     </div>
                   </div>
                 </div>
@@ -759,86 +728,7 @@ function Consultas() {
       </div >
     );
     // eslint-disable-next-line
-  }, [arrayatendimentos, allinterconsultas, allprecaucoes, consultorio, setarrayitensprescricao]);
-
-  const tagsDosPacientes = (titulo, item, lista, imagem) => {
-    return (
-      <div
-        style={{
-          position: "relative",
-          display:
-            lista.filter((valor) => valor.id_paciente == item.id_paciente)
-              .length > 0
-              ? "flex"
-              : "none",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            alignContent: "center",
-            backgroundColor: "rgba(242, 242, 242)",
-            borderColor: "rgba(242, 242, 242)",
-            borderRadius: 5,
-            borderStyle: 'solid',
-            borderWidth: 3,
-            padding: 2,
-            margin: 2,
-          }}
-        >
-          <div
-            id={"botão" + titulo + item.id_paciente}
-            className="button"
-            style={{
-              display: "flex",
-              borderColor: "#f2f2f2",
-              width: 20,
-              minWidth: 20,
-              height: 20,
-              minHeight: 20,
-              margin: 0,
-              padding: 7.5,
-              backgroundColor: '#EC7063',
-            }}
-          >
-            <img alt="" src={imagem} style={{ width: 30, height: 30 }}></img>
-          </div>
-        </div>
-        <div
-          id={"lista" + titulo + item.id_paciente}
-          className="pop_tag_atendimento"
-          style={{
-            display: "flex",
-            position: "absolute",
-            zIndex: 20,
-            borderRadius: 5,
-            flexDirection: "column",
-            justifyContent: "center",
-            borderColor: "white",
-            borderStyle: "dashed",
-            borderWidth: 1,
-            backgroundColor: "#006666",
-            textAlign: "center",
-            color: "white",
-            fontSize: 14,
-            fontWeight: "bold",
-          }}
-        >
-          {lista
-            .filter((valor) => valor.id_paciente == item.id_paciente)
-            .map((item) => {
-              if (titulo == "INTERCONSULTAS") {
-                return <div>{item.especialidade}</div>;
-              } else if (titulo == "PRECAUÇÕES") {
-                return <div>{item.precaucao}</div>;
-              }
-              return null;
-            })}
-        </div>
-      </div>
-    );
-  };
+  }, [arrayatendimentos, consultorio, setarrayitensprescricao]);
 
   // identificação do paciente na versão mobile, na view dos cards.
   function CabecalhoPacienteMobile() {
