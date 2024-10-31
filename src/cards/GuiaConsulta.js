@@ -11,10 +11,10 @@ function GuiaConsulta() {
   // context.
   const {
     card,
-    usuario,
     cliente,
     objpaciente,
     operadoras,
+    dono_documento,
   } = useContext(Context);
 
   let operadora = [];
@@ -36,15 +36,15 @@ function GuiaConsulta() {
       setregistro_ans(operadora.registro_ans);
       setcodigo_prestador(operadora.codigo_prestador);
 
-      setnome_contratado(cliente.nome_cliente);
-      setnome_solicitante(usuario.nome_usuario);
-      setconselho_solicitante(usuario.conselho);
-      setn_conselho_solicitante(usuario.n_conselho);
+      setnome_contratado(dono_documento.nome_cliente);
+      setnome_solicitante(dono_documento.nome_usuario);
+      setconselho_solicitante(dono_documento.conselho);
+      setn_conselho_solicitante(dono_documento.n_conselho);
       setuf_solicitante('MG');
-      setcodigo_cbo(usuario.codigo_cbo);
+      setcodigo_cbo(dono_documento.codigo_cbo);
 
       settipoconsulta(localStorage.getItem('tipo_consulta'));
-      console.log(usuario);
+      console.log(dono_documento);
       console.log(cliente);
     }
     // eslint-disable-next-line
@@ -212,7 +212,7 @@ function GuiaConsulta() {
     return (
       <div id="guia-consulta"
         className='card-aberto'
-        style={{ display: 'flex', visibility: 'visible' }}
+        style={{ display: 'none', visibility: 'hidden' }}
       >
         <div className="text3">GUIA CONSULTA</div>
         < div className="fundo"
@@ -364,7 +364,7 @@ function GuiaConsulta() {
             </div>
 
             <div id="GUIA CONSULTA PRINT"
-              className='noprint'
+              className='print'
               style={{
                 display: 'flex', flexDirection: 'column', width: 'calc(100% - 20px)',
                 justifyContent: 'flex-start', marginTop: 25

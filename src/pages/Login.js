@@ -29,6 +29,7 @@ function Login() {
     sethospital,
     mobilewidth,
     setoperadoras,
+    setpaciente,
   } = useContext(Context);
 
   // history (router).
@@ -617,6 +618,27 @@ function Login() {
             }}
           >
             CONSULTAS
+          </div>
+          <div
+            className="button"
+            style={{
+              display: "flex",
+              padding: 10,
+              margin: 5,
+              minWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+              maxWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+              height: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+              minHeight: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+              maxHeight: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+              color: 'white',
+            }}
+            onClick={() => {
+              setpaciente(null);
+              setpagina(20);
+              history.push("/agendamento");
+            }}
+          >
+            AGENDAMENTOS
           </div>
         </div>
       </div>
