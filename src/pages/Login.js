@@ -26,7 +26,9 @@ function Login() {
     usuario,
     setusuarios,
     setcliente,
+    sethospital,
     mobilewidth,
+    setoperadoras,
   } = useContext(Context);
 
   // history (router).
@@ -34,9 +36,10 @@ function Login() {
 
   useEffect(() => {
     if (pagina == 0) {
-      // sethospital(cliente.id_cliente);
+      sethospital(0);
       loadUnidades();
       loadUsuarios();
+      loadOperadoras();
 
       if (usuario.id != undefined) {
         // setusuario(JSON.parse(localStorage.getItem('obj_usuario')));
@@ -368,6 +371,7 @@ function Login() {
           login: x.login,
           conselho: x.conselho,
           n_conselho: x.n_conselho,
+          codigo_cbo: x.codigo_cbo,
           tipo_usuario: x.tipo_usuario,
           paciente: x.paciente,
           prontuario: x.prontuario,
@@ -481,6 +485,13 @@ function Login() {
       </div>
     );
   };
+
+  const loadOperadoras = () => {
+    axios.get(html + 'all_operadoras').then((response) => {
+      setoperadoras(response.data.rows);
+    })
+  };
+
   function ListaDeUnidadesDeApoio() {
     return (
       <div
@@ -550,6 +561,8 @@ function Login() {
           <div className="button" style={{ width: 200, height: 200 }}
             onClick={() => {
               setcliente(clientes.filter(valor => valor.id_cliente == item.id_cliente).pop());
+              sethospital(clientes.filter(valor => valor.id_cliente == item.id_cliente).map(item => item.id_cliente));
+              console.log(clientes.filter(valor => valor.id_cliente == item.id_cliente).map(item => item.id_cliente));
               console.log(clientes.filter(valor => valor.id_cliente == item.id_cliente).pop());
               setviewlistaunidades(1);
             }}

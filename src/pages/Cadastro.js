@@ -33,8 +33,8 @@ function Cadastro() {
     unidades,
     pacientes,
     setpacientes,
-    paciente,
-    setpaciente,
+    paciente, setpaciente,
+    setobjpaciente,
     atendimentos,
     setatendimentos,
     setoperadoras, operadoras,
@@ -76,7 +76,6 @@ function Cadastro() {
   const loadOperadoras = () => {
     axios.get(html + 'all_operadoras').then((response) => {
       setoperadoras(response.data.rows);
-
     })
   };
 
@@ -631,6 +630,8 @@ function Cadastro() {
                 }}
                 onClick={() => {
                   setpaciente(item);
+                  setobjpaciente(item);
+                  console.log(item);
                   setatendimento(
                     atendimentos.filter(
                       (valor) =>

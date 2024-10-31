@@ -7,9 +7,11 @@ import deletar from '../images/deletar.svg';
 import back from '../images/back.svg';
 import moment from "moment";
 import lupa from '../images/lupa_cinza.svg';
+import imprimir from '../images/imprimir.svg';
 // router.
 import { useHistory } from "react-router-dom";
 import modal from '../functions/modal';
+import GuiaConsulta from '../cards/GuiaConsulta';
 
 function Agendamento() {
 
@@ -20,13 +22,14 @@ function Agendamento() {
     hospital,
     pacientes, setpacientes,
     paciente,
+    setobjpaciente,
     setdialogo,
+    setcard,
   } = useContext(Context);
 
   useEffect(() => {
     // eslint-disable-next-line
     if (pagina == 20) {
-      console.log('AGENDAMENTO');
       loadUsuarios();
       loadPacientes();
       loadAtendimentos();
@@ -116,12 +119,12 @@ function Agendamento() {
         var x = response.data.rows;
         var y = x.filter(item => item.id_unidade == 5);
         // item.id_paciente == paciente.id_paciente
-        console.log(y);
         setarrayatendimentos(y);
       })
   };
 
   // ENVIO DE MENSAGENS DE AGENDAMENTO DA CONSULTA PELO WHATSAPP.
+  /*
   function geraWhatsapp(inicio) {
 
     const gzappy_url_envia_mensagem = "https://api.gzappy.com/v1/message/send-message/";
@@ -156,6 +159,7 @@ function Agendamento() {
       })
     })
   }
+  */
 
   const insertAtendimento = (inicio) => {
     var obj = {
@@ -174,19 +178,24 @@ function Agendamento() {
       convenio_carteira: paciente.convenio_carteira,
       faturamento_codigo_procedimento: null,
     };
-    console.log(obj);
     axios
       .post(html + "insert_consulta", obj)
       .then(() => {
         console.log('AGENDAMENTO DE CONSULTA INSERIDO COM SUCESSO')
         loadAtendimentos();
-        geraWhatsapp(inicio);
+        geraGuiaConsulta();
+        // geraWhatsapp(inicio);
       });
   };
 
+  const geraGuiaConsulta = () => {
+    setcard('guia-consulta');
+    document.getElementById("guia-consulta").style.display = 'flex';
+    document.getElementById("guia-consulta").style.visibility = 'visible';
+  }
+
   // excluir um atendimento.
   const deleteAtendimento = (id) => {
-    console.log(parseInt(id));
     axios.get(html + "delete_atendimento/" + id).then(() => {
       console.log('DELETANDO AGENDAMENTO DE CONSULTA');
       loadAtendimentos();
@@ -291,14 +300,12 @@ function Agendamento() {
     firstSunday(x, y);
     setArrayDate(x, y);
     setarraylist(arraydate);
-    console.log(arraydate);
   }
   // percorrendo datas do mês anterior.
   const previousMonth = () => {
     startdate.subtract(1, 'month');
     var x = moment(startdate);
     var y = moment(startdate).add(42, 'days');
-    console.log(y);
     firstSunday(x, y);
     setArrayDate(x, y);
     setarraylist(arraydate);
@@ -310,11 +317,9 @@ function Agendamento() {
     var year = moment(startdate).format('YYYY');
     var x = moment('01/' + month + '/' + year, 'DD/MM/YYYY');
     var y = moment('01/' + month + '/' + year, 'DD/MM/YYYY').add(42, 'days');
-    console.log(y);
     firstSunday(x, y);
     setArrayDate(x, y);
     setarraylist(arraydate);
-    console.log(arraydate);
   }
 
   const [selectdate, setselectdate] = useState(null);
@@ -538,6 +543,26 @@ function Agendamento() {
                         </div>
                       </div>
                       <div id="btn deletar agendamento de consulta"
+                        title="IMPRIMIR GUIA TISS"
+                        className="button-yellow"
+                        onClick={() => {
+                          setobjpaciente(pacientes.filter(valor => valor.id_paciente == item.id_paciente).pop());
+                          console.log(pacientes.filter(valor => valor.id_paciente == item.id_paciente).pop());
+                          geraGuiaConsulta();
+                        }}
+                        style={{ width: 50, height: 50, alignSelf: 'flex-end' }}
+                      >
+                        <img
+                          alt=""
+                          src={imprimir}
+                          style={{
+                            margin: 10,
+                            height: 30,
+                            width: 30,
+                          }}
+                        ></img>
+                      </div>
+                      <div id="btn deletar agendamento de consulta"
                         title="DESMARCAR CONSULTA"
                         className="button-yellow"
                         onClick={() => {
@@ -749,7 +774,6 @@ function Agendamento() {
     for (var i = 0; i < 24; i++) {
       array.push(inicio.add(30, 'minutes').format('DD/MM/YYYY - HH:mm'));
     }
-    console.log(array);
     setarrayhorarios(array);
   }
 
@@ -913,6 +937,7 @@ function Agendamento() {
           </div>
           <ViewOpcoesHorarios></ViewOpcoesHorarios>
         </div>
+        <GuiaConsulta></GuiaConsulta>
       </div>
     </div>
   )

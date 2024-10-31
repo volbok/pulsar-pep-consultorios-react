@@ -33,6 +33,10 @@ function GuiaSadt() {
       setcns(objpaciente.cns);
       setnome_contratado(cliente.nome_cliente);
       setnome_solicitante(usuario.nome_usuario);
+      setconselho_solicitante(usuario.conselho);
+      setn_conselho_solicitante(usuario.n_conselho);
+      setuf_solicitante('MG');
+      setcodigo_cbo(usuario.codigo_cbo);
       console.log(usuario);
     }
     // eslint-disable-next-line
@@ -346,14 +350,15 @@ function GuiaSadt() {
       <div style={{ display: 'flex', flexDirection: 'row' }}>
         <div className='fonte_titulo' style={{
           minWidth: 150, maxWidth: 150, fontFamily: 'Helvetica', fontSize: 10,
-          // backgroundColor: 'red'
+          // backgroundColor: 'red',
+          marginRight: 2.5,
         }}>
           {numero + ' |__|__|/|__|__|/|__|__|__|__|'}
         </div>
         <div className='fonte_titulo' style={{
-          minWidth: 80, maxWidth: 80, fontFamily: 'Helvetica', fontSize: 10,
+          minWidth: 90, maxWidth: 90, fontFamily: 'Helvetica', fontSize: 10, marginLeft: 0, marginRight: 5,
         }}>
-          {'___________________'}
+          {'________________'}
         </div>
       </div>
     )
@@ -370,10 +375,15 @@ function GuiaSadt() {
           style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <div className="janela scroll"
             style={{
-              width: '80vw', height: '70vh',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'flex-start',
+              alignContent: 'flex-start',
+              alignItems: 'flex-start',
+              width: '80vw',
+              height: '70vh',
               padding: 20, paddinRight: 30,
               backgroundColor: 'white', borderColor: 'white',
-              flexDirection: 'column', justifyContent: 'flex-start',
               overflowX: 'scroll', overflowY: 'scroll',
             }}>
             <div id="botões da guia"
@@ -419,12 +429,14 @@ function GuiaSadt() {
             <div id="GUIA SADT EDIT"
               className='noprint'
               style={{
-                display: 'flex', flexDirection: 'column', width: 'calc(100% - 20px)',
-                justifyContent: 'flex-start', marginTop: 25
+                display: 'flex', flexDirection: 'column',
+                justifyContent: 'flex-start', marginTop: 25,
+                width: '200%',
               }}>
               <div id="cabeçalho" style={{
                 display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
-                height: 100, alignContent: 'center',
+                height: 100,
+                alignContent: 'center',
                 alignItems: 'center',
               }}>
                 <img alt="" src={logo} style={{ width: 100, height: 100 }}></img>
@@ -1091,7 +1103,7 @@ function GuiaSadt() {
                     {'67 - ASSINATURA DO BENEFICIÁRIO OU RESPONSÁVEL'}
                   </div>
                   <div className='fonte_titulo_header' style={{ minWidth: 200, maxWidth: 200, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'68 - ASSIANTURA DO CONTRATADO'}
+                    {'68 - ASSINATURA DO CONTRATADO'}
                   </div>
                 </div>
                 <div
