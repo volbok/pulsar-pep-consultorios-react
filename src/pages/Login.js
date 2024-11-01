@@ -6,12 +6,17 @@ import Context from "./Context";
 import toast from "../functions/toast";
 // imagens.
 import power from "../images/power.svg";
+import salvar from "../images/salvar.svg";
+import back from "../images/back.svg";
+
 // componentes.
 import Logo from "../components/Logo";
 // router.
 import { useHistory } from "react-router-dom";
 
 var bcrypt = require('bcryptjs');
+var salt = bcrypt.genSaltSync(5);
+
 
 function Login() {
   // context.
@@ -645,6 +650,171 @@ function Login() {
     );
   }
 
+  // ## TROCA DE SENHA ## //
+  // atualizar usuário.
+  const updateUsuario = () => {
+    let novasenha = document.getElementById("inputNovaSenha").value;
+    let repetesenha = document.getElementById("inputConfirmaSenha").value;
+
+    // gerando senha criptografada com o bcrypt.
+    var password = document.getElementById("inputNovaSenha").value;
+    var hash = bcrypt.hashSync(password, salt);
+
+    if (novasenha == repetesenha) {
+      var obj = {
+        nome_usuario: usuario.nome_usuario,
+        dn_usuario: usuario.dn_usuario,
+        cpf_usuario: usuario.cpf_usuario,
+        email_usuario: usuario.email_usuario,
+        senha: hash,
+        login: usuario.cpf_usuario,
+        conselho: usuario.conselho,
+        n_conselho: usuario.n_conselho,
+        tipo_usuario: usuario.tipo_usuario,
+        paciente: usuario.paciente,
+        prontuario: usuario.prontuario,
+        laboratorio: usuario.laboratorio,
+        farmacia: usuario.farmacia,
+        faturamento: usuario.faturamento,
+        usuarios: usuario.usuarios,
+        primeiro_acesso: usuario.primeiro_acesso,
+        almoxarifado: usuario.almoxarifado,
+      };
+      axios
+        .post(html + "update_usuario/" + usuario.id, obj)
+        .then(() => {
+          setviewalterarsenha(0);
+          toast(
+            settoast,
+            "SENHA ATUALIZADA COM SUCESSO NA BASE PULSAR",
+            "rgb(82, 190, 128, 1)",
+            3000
+          );
+        })
+        .catch(function () {
+          toast(
+            settoast,
+            "ERRO DE CONEXÃO, REINICIANDO APLICAÇÃO.",
+            "black",
+            5000
+          );
+          setTimeout(() => {
+            setpagina(0);
+            history.push("/");
+          }, 5000);
+        });
+    } else {
+      document.getElementById("inputNovaSenha").value = "";
+      document.getElementById("inputConfirmaSenha").value = "";
+      document.getElementById("inputNovaSenha").focus();
+      toast(
+        settoast,
+        "SENHA REPETIDA NÃO CONFERE",
+        "rgb(231, 76, 60, 1)",
+        3000
+      );
+    }
+  };
+  function AlterarSenha() {
+    return (
+      <div
+        style={{
+          display: viewalterarsenha == 1 ? "flex" : "none",
+          flexDirection: "column",
+          justifyContent: "center",
+          alignSelf: "center",
+        }}
+      >
+        <div className="text3" style={{ color: "white", fontSize: 16 }}>
+          {usuario.nome_usuario}
+        </div>
+        <div className="text1" style={{ color: "white" }}>
+          DIGITE A NOVA SENHA
+        </div>
+        <input
+          autoComplete="off"
+          placeholder="NOVA SENHA"
+          className="input"
+          type="password"
+          id="inputNovaSenha"
+          onFocus={(e) => (e.target.placeholder = "")}
+          onBlur={(e) => (e.target.placeholder = "NOVA SENHA")}
+          style={{
+            marginTop: 10,
+            marginBottom: 10,
+            width: 200,
+            height: 50,
+            alignSelf: "center",
+          }}
+        ></input>
+        <div className="text1" style={{ color: "white" }}>
+          CONFIRME A NOVA SENHA
+        </div>
+        <input
+          autoComplete="off"
+          placeholder="REPITA SENHA"
+          className="input"
+          type="password"
+          id="inputConfirmaSenha"
+          onFocus={(e) => (e.target.placeholder = "")}
+          onBlur={(e) => (e.target.placeholder = "REPITA SENHA")}
+          style={{
+            marginTop: 10,
+            marginBottom: 10,
+            width: 200,
+            height: 50,
+            alignSelf: "center",
+          }}
+        ></input>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "center",
+          }}
+        >
+          <div
+            id="btnTrocarSenha"
+            title="ALTERAR SENHA"
+            className="button-green"
+            onClick={() => updateUsuario()}
+            style={{ width: 50, height: 50, alignSelf: "center" }}
+          >
+            <img
+              alt=""
+              src={salvar}
+              style={{
+                margin: 10,
+                height: 30,
+                width: 30,
+              }}
+            ></img>
+          </div>
+          <div
+            id="btnCancelaTrocarSenha"
+            title="CANCELAR ALTERAÇÃO DA SENHA"
+            className="button-red"
+            onClick={() => {
+              setviewalterarsenha(0);
+              setviewlistaunidades(1);
+            }}
+            style={{ width: 50, height: 50, alignSelf: "center" }}
+          >
+            <img
+              alt=""
+              src={back}
+              style={{
+                margin: 10,
+                height: 30,
+                width: 30,
+              }}
+            ></img>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div
       className="main"
@@ -699,7 +869,7 @@ function Login() {
         <div
           className="text1"
           style={{
-            display: "none",
+            display: viewlistaunidades == 1 || viewalterarsenha == 1 ? 'flex' : 'none',
             textDecoration: "underline",
             color: "white",
             marginTop:
@@ -718,6 +888,7 @@ function Login() {
           ALTERAR SENHA
         </div>
         <Inputs></Inputs>
+        <AlterarSenha></AlterarSenha>
         <ClienteSelector></ClienteSelector>
         <ListaDeUnidadesAssistenciais></ListaDeUnidadesAssistenciais>
         <ListaDeUnidadesDeApoio></ListaDeUnidadesDeApoio>
