@@ -14,7 +14,7 @@ function GuiaSadt() {
     html,
     atendimento,
     objatendimento,
-    card,
+    card, setcard,
     laboratorio,
     setlaboratorio,
     usuario,
@@ -40,7 +40,7 @@ function GuiaSadt() {
       console.log(usuario);
     }
     // eslint-disable-next-line
-  }, [card]);
+  }, [card, atendimento]);
 
   const [logo, setlogo] = useState();
   const [operadora, setoperadora] = useState(null);
@@ -85,7 +85,10 @@ function GuiaSadt() {
   const loadExames = () => {
     axios.get(html + 'atendimento_laboratorio/' + atendimento).then((response) => {
       var x = response.data.rows;
+      var y = []
       setlaboratorio(x.filter(item => item.random == localStorage.getItem('random')));
+      y = x.filter(item => item.random == localStorage.getItem('random'));
+      console.log(y);
     });
   }
 
@@ -163,7 +166,7 @@ function GuiaSadt() {
           placeholder={titulo}
           onFocus={(e) => (e.target.placeholder = "")}
           onBlur={(e) => (e.target.placeholder = { titulo })}
-          defaultValue={valor != null && valor.length > 55 ? valor.toUpperCase().slice(0, 55) + '...' : ''}
+          defaultValue={valor != null && valor.length > 50 ? valor.toUpperCase().slice(0, 55) + '...' : valor != null && valor.length < 51 ? valor.toUpperCase() : ''}
           style={{ backgroundColor: 'transparent', margin: 0, marginTop: 2, marginLeft: -2.5, padding: 0 }}
         >
         </input>
@@ -200,7 +203,7 @@ function GuiaSadt() {
           paddingTop: 5,
           fontFamily: 'Helvetica'
         }}>
-          {valor.length > 55 ? valor.toUpperCase().slice(0, 55) + '...' : valor.toUpperCase()}
+          {valor != null && valor.length > 50 ? valor.toUpperCase().slice(0, 55) + '...' : valor != null && valor.length < 51 ? valor.toUpperCase() : ''}
         </div>
       </div>
     )
@@ -367,10 +370,8 @@ function GuiaSadt() {
   if (operadora != null) {
     return (
       <div id="guia-sadt"
-        className='card-aberto'
         style={{ display: 'none', visibility: 'hidden' }}
       >
-        <div className="text3">GUIA SADT</div>
         < div className="fundo"
           style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <div className="janela scroll"
@@ -406,6 +407,7 @@ function GuiaSadt() {
                 onClick={() => {
                   document.getElementById("guia-sadt").style.display = 'none';
                   document.getElementById("guia-sadt").style.visibility = 'hidden';
+                  setcard('exames');
                 }}
               >
                 <img alt="" src={back} style={{ width: 30, height: 30 }}></img>
@@ -497,8 +499,7 @@ function GuiaSadt() {
                     {editcampovalor('24 - TABELA', '21', 50, 0)}
                     {editcampovalor('25 - CÓDIGO DO PROCEDIMENTO OU ITEM ASSISTENCIAL', item.codigo_exame, 130, 0)}
                     {editcampovalor('26 - DESCRIÇÃO', item.nome_exame, '', 1)}
-                    {editcampovalor('27 - QTDE SOLIC.', '01', 50, 0)}
-                    {editcampovalor('28 - QTDE AUT.', '01', 50, 0)}
+                    
                   </div>
                 ))}
               </div>
@@ -1125,7 +1126,6 @@ function GuiaSadt() {
   } else {
     return (
       <div id="guia-sadt"
-        className='card-aberto'
         style={{ display: 'none', visibility: 'hidden' }}
       >
         < div className="fundo"

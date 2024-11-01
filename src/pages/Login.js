@@ -467,11 +467,11 @@ function Login() {
         className="button"
         style={{
           display: acesso != 0 || acesso != null ? "flex" : "none",
-          minWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
-          maxWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
-          height: window.innerWidth < mobilewidth ? "30vw" : "15vw",
-          minHeight: window.innerWidth < mobilewidth ? "30vw" : "15vw",
-          maxHeight: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+          minWidth: window.innerWidth < mobilewidth ? "30vw" : "10vw",
+          maxWidth: window.innerWidth < mobilewidth ? "30vw" : "10vw",
+          height: window.innerWidth < mobilewidth ? "30vw" : "10vw",
+          minHeight: window.innerWidth < mobilewidth ? "30vw" : "10vw",
+          maxHeight: window.innerWidth < mobilewidth ? "30vw" : "10vw",
           margin: 5,
           padding: 10,
         }}
@@ -520,7 +520,7 @@ function Login() {
           }}
         >
           {montaModuloDeApoio(
-            "CADASTRO E MOVIMENTAÇÃO DE PACIENTES",
+            "CADASTRO DE PACIENTES E MARCAÇÃO DE CONSULTAS",
             usuario.paciente,
             "/cadastro",
             2
@@ -562,9 +562,9 @@ function Login() {
           <div className="button" style={{ width: 200, height: 200 }}
             onClick={() => {
               setcliente(clientes.filter(valor => valor.id_cliente == item.id_cliente).pop());
-              sethospital(clientes.filter(valor => valor.id_cliente == item.id_cliente).map(item => item.id_cliente));
-              console.log(clientes.filter(valor => valor.id_cliente == item.id_cliente).map(item => item.id_cliente));
-              console.log(clientes.filter(valor => valor.id_cliente == item.id_cliente).pop());
+              sethospital(clientes.filter(valor => valor.id_cliente == item.id_cliente).map(item => item.id_cliente).pop());
+              // console.log(clientes.filter(valor => valor.id_cliente == item.id_cliente).map(item => item.id_cliente));
+              // console.log(clientes.filter(valor => valor.id_cliente == item.id_cliente).pop());
               setviewlistaunidades(1);
             }}
           >
@@ -663,7 +663,7 @@ function Login() {
                 : "flex",
           }}
         >
-          <Logo href="/site/index.html" target="_blank" rel="noreferrer" height={200} width={200}></Logo>
+          <Logo href="/site/index.html" target="_blank" rel="noreferrer" height={150} width={150}></Logo>
         </div>
         <div
           className="text2"

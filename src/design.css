@@ -495,18 +495,18 @@ body {
 .popin {
   animation-name: popin;
   animation-iteration-count: unset;
-  animation-duration: 200ms;
+  animation-duration: 600ms;
 }
 
 @keyframes popin {
   0% {
     opacity: 0.1;
-    transform: scale(1, 1);
+    transform: scale(1, 1)
   }
 
   50% {
     opacity: 1;
-    transform: scale(1.5, 1.5);
+    transform: scale(3, 3);
   }
 
   100% {

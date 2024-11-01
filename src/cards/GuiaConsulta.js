@@ -25,18 +25,18 @@ function GuiaConsulta() {
       setvalidade_carteira(objpaciente.validade_carteira);
       setnome(objpaciente.nome_paciente);
       setcns(objpaciente.cns);
-    
+
       console.log(operadoras);
       // eslint-disable-next-line
       operadora = operadoras.filter(valor => valor.id == objpaciente.convenio_codigo).pop();
       console.log(objpaciente.convenio_codigo);
       console.log(operadoras);
-  
+
       setlogo(operadora.logo_operadora);
       setregistro_ans(operadora.registro_ans);
       setcodigo_prestador(operadora.codigo_prestador);
 
-      setnome_contratado(dono_documento.nome_cliente);
+      setnome_contratado(cliente.nome_cliente);
       setnome_solicitante(dono_documento.nome_usuario);
       setconselho_solicitante(dono_documento.conselho);
       setn_conselho_solicitante(dono_documento.n_conselho);
@@ -110,7 +110,7 @@ function GuiaConsulta() {
           onFocus={(e) => (e.target.placeholder = "")}
           onBlur={(e) => (e.target.placeholder = { titulo })}
           // defaultValue={valor.length > 55 ? valor.toUpperCase().slice(0, 55) + '...' : valor.toUpperCase()}
-          defaultValue={valor}
+          defaultValue={valor != null && valor.length > 50 ? valor.toUpperCase().slice(0, 55) + '...' : valor != null && valor.length < 51 ? valor.toUpperCase() : ''}
           style={{ backgroundColor: 'transparent', margin: 0, marginTop: 2, marginLeft: -2.5, padding: 0 }}
           onKeyUp={() => {
             clearTimeout(timeout);
@@ -153,8 +153,7 @@ function GuiaConsulta() {
           placeholder={titulo}
           onFocus={(e) => (e.target.placeholder = "")}
           onBlur={(e) => (e.target.placeholder = { titulo })}
-          // defaultValue={valor.length > 55 ? valor.toUpperCase().slice(0, 55) + '...' : valor.toUpperCase()}
-          defaultValue={valor}
+          defaultValue={valor != null && valor.length > 55 ? valor.toUpperCase().slice(0, 55) + '...' : valor}
           style={{ backgroundColor: 'transparent', margin: 0, marginTop: 2, marginLeft: -2.5, padding: 0 }}
         >
         </input>
@@ -191,7 +190,7 @@ function GuiaConsulta() {
           paddingTop: 5,
           fontFamily: 'Helvetica'
         }}>
-          {valor}
+          {valor != null && valor.length > 50 ? valor.toUpperCase().slice(0, 55) + '...' : valor != null && valor.length < 51 ? valor.toUpperCase() : ''}
         </div>
       </div>
     )

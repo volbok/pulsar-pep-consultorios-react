@@ -37,6 +37,7 @@ function Laboratorio() {
 
   useEffect(() => {
     if (card == 'card-laboratorio') {
+      console.log('VAI');
       loadOpcoesLaboratorio();
       loadListaLaboratorio();
       localStorage.setItem('random', null);

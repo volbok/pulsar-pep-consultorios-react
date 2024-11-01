@@ -174,10 +174,12 @@ function Cadastro() {
 
   // recuperando registros de pacientes cadastrados na aplicação.
   const loadAtendimentos = () => {
+    console.log(hospital);
     axios
       .get(html + "allatendimentos/" + hospital)
       .then((response) => {
         setatendimentos(response.data.rows);
+        console.log(response.data.rows);
       })
       .catch(function () {
         toast(
@@ -459,6 +461,7 @@ function Cadastro() {
     });
   };
 
+  /*
   // encerrando um atendimento.
   const closeAtendimento = (atendimento) => {
     atendimento.map((item) => {
@@ -515,6 +518,7 @@ function Cadastro() {
       return null;
     });
   };
+  */
 
   // excluir um atendimento.
   const deleteAtendimento = (id) => {
@@ -609,7 +613,7 @@ function Cadastro() {
 
   function ListaDePacientes() {
     return (
-      <div style={{ position: 'relative' }}>
+      <div style={{ position: 'relative', width: 'calc(100vw - 20px)' }}>
         <BuscaPaciente></BuscaPaciente>
         <div className="grid"
           style={{
@@ -680,7 +684,7 @@ function Cadastro() {
                       valor.data_termino == null
                   ).length > 0
                     ? "EM ATENDIMENTO"
-                    : "INICIAR ATENDIMENTO"}
+                    : "AGENDAR CONSULTA"}
                 </div>
               </div>
             ))}
@@ -1641,162 +1645,18 @@ function Cadastro() {
           </div>
           <SelecionaConvenioPaciente></SelecionaConvenioPaciente>
           <ViewTipoConsulta></ViewTipoConsulta>
-          <div id="card status de atendimento"
-            className="card cor7"
-            style={{
-              position: "sticky",
-              top: 10,
-              display: vieweditpaciente == 1 ? "flex" : "none",
-              flexDirection: "column",
-              justifyContent: "center",
-              marginTop: 0,
-              marginBottom: 20,
-              width: '40vw',
+          <div id="botão para agendar consulta"
+            className="button"
+            style={{ width: 100, height: 100, alignSelf: 'center' }}
+            onClick={() => {
+              // identificando o procedimento com o código TUSS para consulta médica.
+              localStorage.setItem('codigo_procedimento', '10101012');
+              setviewopcoesconvenio(1);
+              // setpagina(20);
+              // history.push("/agendamento");
             }}
           >
-            <div id="paciente sem atendimento ativo"
-              style={{
-                display:
-                  atendimentos.filter(
-                    (item) =>
-                      item.id_paciente == paciente.id_paciente &&
-                      item.data_termino == null
-                  ).length == 0
-                    ? "flex"
-                    : "none",
-                flexDirection: "column",
-                justifyContent: "center",
-                width: window.innerWidth < 426 ? "70vw" : "30vw",
-                alignSelf: "center",
-              }}
-            >
-              <div className="text1" style={{ margin: 15, width: '100%' }}>
-                {
-                  "PACIENTE NÃO ESTÁ EM ATENDIMENTO NOS HOSPITAIS CADASTRADOS EM NOSSA BASE."
-                }
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                }}
-              ></div>
-            </div>
-            <div id="em atendimento na unidade logada"
-              className="card cor5hover"
-              style={{
-                display:
-                  atendimentos.filter(
-                    (item) =>
-                      item.id_paciente == paciente.id_paciente &&
-                      item.data_termino == null
-                  ).length > 0
-                    ? "flex"
-                    : "none",
-                flexDirection: "column",
-                justifyContent: "center",
-                width: window.innerWidth < 426 ? "70vw" : "30vw",
-                alignSelf: "center",
-              }}
-            >
-              <div className="text1"
-                style={{
-                  width: '100%',
-                  display:
-                    atendimentos.filter(
-                      (item) =>
-                        item.id_paciente == paciente.id_paciente &&
-                        item.data_termino == null && item.id_unidade != 4
-                    ).length > 0
-                      ? "flex"
-                      : "none",
-                }}>
-                {"PACIENTE ATUALMENTE EM ATENDIMENTO: UNIDADE " +
-                  unidades
-                    .filter(
-                      (value) =>
-                        value.id_unidade ==
-                        atendimento.map((item) => item.id_unidade)
-                    )
-                    .map((item) => item.nome_unidade) +
-                  " - LEITO " +
-                  atendimento.map((item) => item.leito)}
-              </div>
-              <div className="text1"
-                style={{
-                  width: '100%',
-                  display: atendimento.map(item => item.id_unidade) == 4 ? 'flex' : 'none',
-                }}>
-                {atendimento.id_unidade}
-                {"PACIENTE AGUARDANDO TRIAGEM PARA ATENDIMENTO"}
-              </div>
-              <div className="button" onClick={() => setviewseletorunidades(1)}>
-                ALTERAR LEITO
-              </div>
-              <div
-                className="button-yellow"
-                title="ENCERRAR ATENDIMENTO"
-                onClick={() => {
-                  modal(
-                    setdialogo,
-                    "TEM CERTEZA DE QUE DESEJA ENCERRAR ESTE ATENDIMENTO? ESTA OPERAÇÃO É IRREVERSÍVEL.",
-                    closeAtendimento,
-                    atendimento
-                  );
-                }}
-              >
-                ENCERRAR ATENDIMENTO
-              </div>
-            </div>
-            <div id="em atendimento em outro serviço"
-              className="card cor6hover"
-              style={{
-                display:
-                  atendimentos.filter(
-                    (item) =>
-                      item.id_paciente == paciente.id_paciente &&
-                      item.id_unidade != unidade &&
-                      item.id_cliente != hospital &&
-                      item.data_termino == null
-                  ).length > 0
-                    ? "flex"
-                    : "none",
-                flexDirection: "column",
-                justifyContent: "center",
-                width: window.innerWidth < 426 ? "70vw" : "30vw",
-                alignSelf: "center",
-              }}
-            >
-              <div className="text1" style={{
-                width: '100%',
-              }}>
-                {"PACIENTE COM ATENDIMENTO ATIVO EM OUTRO SERVIÇO"}
-              </div>
-              <div className="button" onClick={() => setviewseletorunidades(1)}>
-                ALTERAR LEITO
-              </div>
-              <div
-                style={{
-                  display: "flex",
-                  flexDirection: "column",
-                  justifyContent: "center",
-                }}
-              ></div>
-            </div>
-            <div id="botão para agendar consulta"
-              className="button"
-              style={{ width: 100, height: 100, alignSelf: 'center' }}
-              onClick={() => {
-                // identificando o procedimento com o código TUSS para consulta médica.
-                localStorage.setItem('codigo_procedimento', '10101012');
-                setviewopcoesconvenio(1);
-                // setpagina(20);
-                // history.push("/agendamento");
-              }}
-            >
-              AGENDAR CONSULTA
-            </div>
+            AGENDAR CONSULTA
           </div>
         </div>
       </div>

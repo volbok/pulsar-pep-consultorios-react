@@ -2,22 +2,22 @@
 import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import Context from "./Context";
-import moment from "moment";
 // imagens.
 import salvar from '../images/salvar.svg';
 import novo from '../images/novo.svg';
 import deletar from '../images/deletar.svg';
 import editar from '../images/editar.svg';
+import back from '../images/back.svg';
 // import salvar from "../images/salvar.svg";
 import "moment/locale/pt-br";
 import modal from "../functions/modal";
-import Filter from "../components/Filter";
+import { useHistory } from "react-router-dom";
 
 function Faturamento() {
 
   // context.
   const {
-    pagina,
+    pagina, setpagina,
     html,
     setatendimentos,
     setpacientes,
@@ -26,10 +26,11 @@ function Faturamento() {
     setselectedoperadora, selectedoperadora,
     procedimentos, setprocedimentos,
     selectedprocedimento, setselectedprocedimento,
-    guiasconsulta, setguiasconsulta,
-    selectedguiaconsulta, setselectedguiaconsulta,
     setdialogo,
   } = useContext(Context);
+
+  // history (router).
+  let history = useHistory();
 
   const loadAtendimentos = () => {
     axios
@@ -60,8 +61,6 @@ function Faturamento() {
       loadOperadoras();
       loadProcedimentos();
       loadTuss();
-      loadGuiasConsultas();
-      setselectedguiaconsulta(null);
     }
     // eslint-disable-next-line
   }, [pagina]);
@@ -127,21 +126,21 @@ function Faturamento() {
   function ListOperadoras() {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '30vh', overflowX: 'hidden' }}>
-        <div id='cabecalho lista de operadoras' style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginBottom: -10 }}>
-          <div className="button" style={{ width: 150, backgroundColor: 'transparent' }}>{'NOME DA OPERADORA'}</div>
+        <div id='cabecalho lista de operadoras' style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: -10 }}>
+          <div className="button" style={{ width: '20vw', backgroundColor: 'transparent' }}>{'NOME DA OPERADORA'}</div>
           <div className="button" style={{ width: 100, backgroundColor: 'transparent' }}>{'REGISTRO ANS'}</div>
-          <div className="button" style={{ width: 100, backgroundColor: 'transparent' }}>{'TELEFONE'}</div>
-          <div className="button" style={{ width: 150, backgroundColor: 'transparent' }}>{'E-MAIL'}</div>
-          <div className="button" style={{ width: 100, backgroundColor: 'transparent' }}>{'CÓDIGO DO PRESTADOR'}</div>
+          <div className="button" style={{ width: 130, backgroundColor: 'transparent' }}>{'TELEFONE'}</div>
+          <div className="button" style={{ width: 200, backgroundColor: 'transparent' }}>{'E-MAIL'}</div>
+          <div className="button" style={{ width: 200, backgroundColor: 'transparent' }}>{'CÓDIGO DO PRESTADOR'}</div>
           <div className="button" style={{ width: 50, backgroundColor: 'transparent' }}>{''}</div>
           <div className="button" style={{ width: 50, backgroundColor: 'transparent' }}>{''}</div>
         </div>
         {operadoras.map(item => (
           <div
             key={Math.random()}
-            className={selectedoperadora == item ? 'button red' : 'button'}
+            className={selectedoperadora == item ? 'button-selected' : 'button'}
             style={{
-              display: 'flex', flexDirection: 'row', justifyContent: 'center',
+              display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
               borderRadius: 5,
             }}
             onClick={() => {
@@ -150,11 +149,17 @@ function Faturamento() {
               console.log(selectedoperadora);
             }}
           >
-            <div className="button" style={{ width: 150 }}>{item.nome_operadora}</div>
-            <div className="button" style={{ width: 100 }}>{item.registro_ans}</div>
-            <div className="button" style={{ width: 100 }}>{item.telefone}</div>
-            <div className="button" style={{ width: 150 }}>{item.email}</div>
-            <div className="button" style={{ width: 100 }}>{item.codigo_prestador}</div>
+            <div className="button"
+              style={{
+                width: '20vw',
+                backgroundColor: '#006666',
+              }}>
+              {item.nome_operadora}
+            </div>
+            <div className="button" style={{ width: 100, backgroundColor: 'transparent' }}>{item.registro_ans}</div>
+            <div className="button" style={{ width: 130, backgroundColor: 'transparent' }}>{item.telefone}</div>
+            <div className="button" style={{ width: 200, backgroundColor: 'transparent' }}>{item.email}</div>
+            <div className="button" style={{ width: 200, backgroundColor: 'transparent' }}>{item.codigo_prestador}</div>
             <div className="button green" style={{ width: 50 }}
               onClick={() => {
                 setselectedoperadora(item);
@@ -210,10 +215,25 @@ function Faturamento() {
     )
   }
 
-  const [viewoperadoras, setviewoperadoras] = useState(0);
   function ViewOperadoras() {
     return (
-      <div style={{ display: viewoperadoras == 1 ? 'flex' : 'none', flexDirection: 'column', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <div id="botão para sair da tela de faturamento"
+            className="button-yellow"
+            style={{ maxHeight: 50, maxWidth: 50, alignSelf: 'center' }}
+            onClick={() => {
+              setpagina(0);
+              history.push("/");
+            }}>
+            <img
+              alt=""
+              src={back}
+              style={{ width: 30, height: 30 }}
+            ></img>
+          </div>
+          <div className="text2" style={{ fontSize: 20 }}>LISTA DE OPERADORAS CADASTRADAS</div>
+        </div>
         <ListOperadoras></ListOperadoras>
         <FormOperadoras></FormOperadoras>
         <div id='btnviewprocedimentos' className="button"
@@ -432,24 +452,24 @@ function Faturamento() {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '30vh', overflowX: 'hidden' }}>
         <div id='cabecalho lista de operadoras' style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginBottom: -10 }}>
-          <div className="button" style={{ width: 150, backgroundColor: 'transparent' }}>{'NOME DA OPERADORA'}</div>
-          <div className="button" style={{ width: 100, backgroundColor: 'transparent' }}>{'CÓDIGO TUSS'}</div>
-          <div className="button" style={{ width: 250, backgroundColor: 'transparent' }}>{'TERMINOLOGIA'}</div>
-          <div className="button" style={{ width: 200, backgroundColor: 'transparent' }}>{'DESCRIÇÃO'}</div>
+          <div className="button" style={{ width: 200, backgroundColor: 'transparent' }}>{'NOME DA OPERADORA'}</div>
+          <div className="button" style={{ width: 150, backgroundColor: 'transparent' }}>{'CÓDIGO TUSS'}</div>
+          <div className="button" style={{ width: '25vw', backgroundColor: 'transparent' }}>{'TERMINOLOGIA'}</div>
+          <div className="button" style={{ width: '25vw', backgroundColor: 'transparent' }}>{'DESCRIÇÃO'}</div>
           <div className="button" style={{ width: 50, backgroundColor: 'transparent' }}>{''}</div>
           <div className="button" style={{ width: 50, backgroundColor: 'transparent' }}>{''}</div>
         </div>
-        {procedimentos.map(item => (
+        {procedimentos.filter(item => item.id_operadora == selectedoperadora.id).map(item => (
           <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}
             onClick={() => {
               setselectedprocedimento(item);
               setformprocedimento(2);
             }}
           >
-            <div className="button" style={{ width: 150 }}>{item.nome_operadora}</div>
-            <div className="button" style={{ width: 100 }}>{item.tuss_codigo}</div>
-            <div className="button" style={{ width: 250 }}>{item.tuss_terminologia.toUpperCase()}</div>
-            <div className="button" style={{ width: 200 }}>{item.rol_ans_descricao}</div>
+            <div className="button" style={{ width: 200 }}>{item.nome_operadora}</div>
+            <div className="button" style={{ width: 150 }}>{item.tuss_codigo}</div>
+            <div className="button" style={{ width: '25vw' }}>{item.tuss_terminologia.toUpperCase()}</div>
+            <div className="button" style={{ width: '25vw' }}>{item.rol_ans_descricao}</div>
             <div className="button green" style={{ width: 50 }}
               onClick={(e) => {
                 setselectedprocedimento(item);
@@ -736,178 +756,6 @@ function Faturamento() {
     )
   }
 
-  const [arrayguiasconsulta, setarrayguiasconsulta] = useState([]);
-  const loadGuiasConsultas = () => {
-    axios.get(html + 'all_guia_consulta').then((response) => {
-      setguiasconsulta(response.data.rows);
-      setarrayguiasconsulta(response.data.rows);
-    })
-  };
-
-  const [viewlistaguiasconsultas, setviewlistaguiasconsultas] = useState(0);
-
-  function ListaGuiasConsultas() {
-    return (
-      <div style={{
-        display: viewlistaguiasconsultas == 1 ? 'flex' : 'none',
-        flexDirection: 'column', justifyContent: 'center'
-      }}
-      >
-        {Filter(setarrayguiasconsulta, guiasconsulta, 'item.campo7_nome_beneficiario')}
-        {arrayguiasconsulta.map(item => (
-          <div className="button"
-            style={{ justifyContent: 'flex-start', width: '60vw' }}
-            onClick={() => {
-              setselectedguiaconsulta(item);
-              console.log(item);
-            }}
-          >
-            <div
-              className="button red"
-              onClick={(e) => {
-                // LOUCURA!!!
-                geraXml();
-                e.stopPropagation();
-              }}
-              style={{ paddingLeft: 20, paddingRight: 20, marginRight: 30 }}>{'GUIA DE CONSULTA - ' + moment(item.data).format('DD/MM/YYYY')}
-            </div>
-            <div>
-              {'BENEFICIÁRIO: ' + item.campo7_nome_beneficiario}
-            </div>
-            <div style={{ marginLeft: 20 }}>
-              {'PROFISSIONAL: ' + item.campo12_nome_profissional_executante}
-            </div>
-          </div>
-        ))}
-      </div>
-    )
-  }
-
-  // CONSTRUIR FORM PARA EDITAR OS CAMPOS DA GUIA DE CONSULTA.
-  const campoguiaTiss = (titulo, valor, tamanho) => {
-    return (
-      <div id={"campo: " + titulo}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-        }}
-      >
-        <div className="text1">{titulo}</div>
-        <textarea
-          autoComplete="off"
-          placeholder={valor}
-          className="textarea"
-          type="text"
-          id={"input " + titulo}
-          onFocus={(e) => (e.target.placeholder = "")}
-          onBlur={(e) => (e.target.placeholder = "DATA")}
-          defaultValue={selectedguiaconsulta != null ? valor : ''}
-          style={{
-            flexDirection: "center",
-            justifyContent: "center",
-            alignSelf: "center",
-            width: tamanho,
-            padding: 15,
-            height: 20,
-            minHeight: 20,
-            maxHeight: 20,
-          }}
-        ></textarea>
-      </div>
-    )
-  }
-  function FormGuiaConsulta() {
-    return (
-      <div className="fundo"
-        style={{ display: selectedguiaconsulta != null ? 'flex' : 'none', flexDirection: 'column', justifyContent: 'center' }}
-        onClick={() => setselectedguiaconsulta(null)}
-      >
-        <div className="janela scroll"
-          style={{
-            height: '90vh', width: '90vw',
-            flexDirection: "row",
-            flexWrap: 'wrap',
-            justifyContent: "center",
-          }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div id="campo: data_guia_consulta"
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              justifyContent: "center",
-            }}
-          >
-            <div className="text1">DATA DE EMISSÃO</div>
-            <textarea
-              autoComplete="off"
-              placeholder="NOME DA MÃE"
-              className="textarea"
-              type="text"
-              id="inputDataGuiaConsulta"
-              onFocus={(e) => (e.target.placeholder = "")}
-              onBlur={(e) => (e.target.placeholder = "DATA")}
-              defaultValue={selectedguiaconsulta != null ? moment(selectedguiaconsulta.data).format('DD/MM/YYYY') : ''}
-              style={{
-                flexDirection: "center",
-                justifyContent: "center",
-                alignSelf: "center",
-                width: 400,
-                padding: 15,
-                height: 20,
-                minHeight: 20,
-                maxHeight: 20,
-              }}
-            ></textarea>
-          </div>
-          {campoguiaTiss('REGISTRO ANS', selectedguiaconsulta != null ? selectedguiaconsulta.campo1_registro_ans : '', 200)}
-          {campoguiaTiss('NÚMERO DA GUIA NO PRESTADOR', selectedguiaconsulta != null ? selectedguiaconsulta.campo2_numero_guia_prestador : '', 200)}
-          {campoguiaTiss('NÚMERO DA GUIA ATRIBUÍDO PELA OPERADORA', selectedguiaconsulta != null ? selectedguiaconsulta.campo3_numero_guia_operadora : '', 200)}
-          {campoguiaTiss('NÚMERO DA CARTEIRA DO BENEFICIÁRIO', selectedguiaconsulta != null ? selectedguiaconsulta.campo4_numero_carteira : '', 300)}
-          {campoguiaTiss('VALIDADE DA CARTEIRA DO BENEFICIÁRIO', selectedguiaconsulta != null ? selectedguiaconsulta.campo5_validade_carteira : '', 100)}
-          {campoguiaTiss('ATENDIMENTO A RN?', selectedguiaconsulta != null ? selectedguiaconsulta.campo6_atendimento_rn : '', 300)}
-          {campoguiaTiss('NOME SOCIAL DO BENEFICIÁRIO', selectedguiaconsulta != null ? selectedguiaconsulta.campo26_nome_social : '', 300)}
-          {campoguiaTiss('NOME DO BENEFICIÁRIO', selectedguiaconsulta != null ? selectedguiaconsulta.campo7_nome_beneficiario : '', 500)}
-          {campoguiaTiss('CÓDIGO DO PRESTADOR', selectedguiaconsulta != null ? selectedguiaconsulta.campo9_codigo_prestador : '', 300)}
-          {campoguiaTiss('NOME DO PRESTADOR', selectedguiaconsulta != null ? selectedguiaconsulta.campo10_nome_prestador : '', 500)}
-          {campoguiaTiss('CÓDIGO CNES DO PRESTADOR', selectedguiaconsulta != null ? selectedguiaconsulta.campo11_codigo_cnes_prestador : '', 300)}
-          {campoguiaTiss('NOME DO PROFISSIONAL EXECUTANTE', selectedguiaconsulta != null ? selectedguiaconsulta.campo12_nome_profissional_executante : '', 500)}
-          {campoguiaTiss('CONSELHO PROFISSIONAL', selectedguiaconsulta != null ? selectedguiaconsulta.campo13_conselho_profissional : '', 100)}
-          {campoguiaTiss('NÚMERO DO CONSELHO PROFISSIONAL', selectedguiaconsulta != null ? selectedguiaconsulta.campo14_numero_conselho : '', 200)}
-          {campoguiaTiss('UF DO CONSELHO PROFISSIONAL', selectedguiaconsulta != null ? selectedguiaconsulta.campo15_uf_conselho : '', 100)}
-          {campoguiaTiss('CÓDIGO CBO', selectedguiaconsulta != null ? selectedguiaconsulta.campo16_codigo_cbo : '', 300)}
-          {campoguiaTiss('INDICAÇÃO DE ACIDENTE', selectedguiaconsulta != null ? selectedguiaconsulta.campo17_indicacao_acidente : '', 300)}
-          {campoguiaTiss('DATA DO ATENDIMENTO', selectedguiaconsulta != null ? selectedguiaconsulta.campo18_data_atendimento : '', 200)}
-          {campoguiaTiss('TIPO DE CONSULTA', selectedguiaconsulta != null ? selectedguiaconsulta.campo19_tipo_consulta : '', 300)}
-          {campoguiaTiss('TABELA', selectedguiaconsulta != null ? selectedguiaconsulta.campo20_tabela : '', 100)}
-          {campoguiaTiss('CÓDIGO DO PROCEDIMENTO', selectedguiaconsulta != null ? selectedguiaconsulta.campo21_codigo_procedimento : '', 300)}
-          {campoguiaTiss('VALOR DO PROCEDIMENTO', selectedguiaconsulta != null ? selectedguiaconsulta.campo22_valor_procedimento : '', 200)}
-          {campoguiaTiss('OBSERVAÇÃO / JUSTIFICATIVA', selectedguiaconsulta != null ? selectedguiaconsulta.campo23_observacao_justificativa : '', 600)}
-        </div>
-      </div>
-    )
-  }
-
-  // PERMITIR IMPRESSÃO DA GUIA NO FORMATO PADRONIZADO TISS.
-
-  // XML
-  // LOUCURA!!!
-  const geraXml = () => {
-    var xmltext = "<dometag></sometag>";
-    var filename = "file.xml";
-    var pom = document.createElement('a');
-    var bb = new Blob([xmltext], { type: 'text/plain' });
-
-    pom.setAttribute('href', window.URL.createObjectURL(bb));
-    pom.setAttribute('download', filename);
-
-    pom.dataset.downloadurl = ['text/plain', pom.download, pom.href].join(':');
-    pom.draggable = true;
-    pom.classList.add('dragout');
-    pom.click();
-  }
-
   return (
     <div id="tela de faturamento"
       className='main'
@@ -915,30 +763,13 @@ function Faturamento() {
         display: pagina == 'FATURAMENTO' ? 'flex' : 'none',
       }}
     >
-      <div className='chassi'
+      <div className='chassi scroll'
         style={{
           display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly',
+          width: 'calc(100vw - 20px)',
         }}>
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <div id='atividades do faturamento' style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap' }}>
-            <div className='button' style={{ width: 150 }}
-              onClick={() => {
-                setviewoperadoras(1)
-                setviewlistaguiasconsultas(0);
-              }}>
-              {'OPERADORAS'}
-            </div>
-            <div className='button' style={{ width: 150 }}
-              onClick={() => {
-                setviewoperadoras(0)
-                setviewlistaguiasconsultas(1);
-              }}>
-              {'GUIAS DE CONSULTAS'}
-            </div>
-          </div>
           <ViewOperadoras></ViewOperadoras>
-          <ListaGuiasConsultas></ListaGuiasConsultas>
-          <FormGuiaConsulta></FormGuiaConsulta>
         </div>
       </div>
     </div>

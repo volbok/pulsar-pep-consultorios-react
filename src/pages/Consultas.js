@@ -21,7 +21,6 @@ import { useHistory } from "react-router-dom";
 import Alergias from "../cards/Alergias";
 import Documentos from "../cards/Documentos";
 import Exames from "../cards/Exames";
-import Laboratorio from "../cards/Laboratorio";
 import selector from "../functions/selector";
 
 function Consultas() {
@@ -1414,7 +1413,6 @@ function Consultas() {
             <Alergias></Alergias>
             <Documentos></Documentos>
             <Exames></Exames>
-            <Laboratorio></Laboratorio>
           </div>
           <div id="conteúdo vazio"
             className="lupa"

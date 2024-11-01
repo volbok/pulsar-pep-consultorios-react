@@ -36,7 +36,7 @@ function Exames() {
       localStorage.setItem('random', 0);
     }
     // eslint-disable-next-line
-  }, [card]);
+  }, [card, atendimento]);
 
   // carregar procedimentos e exames da tabela TUSS.
   const [procedimentos_tuss, setprocedimentos_tuss] = useState([]);
