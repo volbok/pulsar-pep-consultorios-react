@@ -256,7 +256,7 @@ function Exames() {
             </div>
             <div style={{ padding: 10, display: 'flex', flexDirection: 'column' }}>
               <div style={{ fontSize: 10 }}>
-                {item.nome_profissional}
+                {'DR(A) ' + item.nome_profissional}
               </div>
               <div style={{ fontSize: 10, marginBottom: 5 }}>
                 {item.registro_profissional}
@@ -286,7 +286,7 @@ function Exames() {
           backgroundColor: 'white',
           borderColor: 'white',
           borderRadius: 5,
-          marginRight: 10
+          marginRight: 10, marginLeft: 12.5,
         }}>
         {laboratorio.filter(item => item.random == localStorage.getItem('random')).map(item => (
           <div style={{
@@ -296,7 +296,10 @@ function Exames() {
             margin: 2.5,
           }}>
             <div className='text1'
-              style={{ flex: 4, textAlign: 'left' }}>
+              style={{
+                flex: 4, textAlign: 'left', justifyContent: 'flex-start', alignContent: 'flex-start',
+                alignItems: 'flex-start',
+              }}>
               {item.nome_exame != null ? item.nome_exame.toUpperCase() : ''}
             </div>
             <div className='button-red' style={{ flex: 1, paddingLeft: 15, paddingRight: 15 }}>{item.codigo_exame}</div>

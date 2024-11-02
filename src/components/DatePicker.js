@@ -91,12 +91,15 @@ function DatePicker() {
 
   // selecionando uma data no datepicker.
   const selectDate = (value) => {
+    console.log(value);
     if (viewdatepicker == 1) {
       setpickdate1(value);
       localStorage.setItem('data1', value);
+      console.log(value);
     } else if (viewdatepicker == 2) {
       setpickdate2(value);
       localStorage.setItem('data2', value);
+      console.log(value);
     } else {
       setviewdatepicker(0);
     }

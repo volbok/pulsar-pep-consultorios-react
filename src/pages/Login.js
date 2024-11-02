@@ -42,14 +42,16 @@ function Login() {
 
   useEffect(() => {
     if (pagina == 0) {
-      sethospital(0);
-      loadUnidades();
-      loadUsuarios();
+      setviewalterarsenha(0);
+      setviewlistaunidades(0);
       loadOperadoras();
-
       if (usuario.id != undefined) {
-        // setusuario(JSON.parse(localStorage.getItem('obj_usuario')));
-        loadAcessos(usuario.id);
+        setviewinputs(0);
+        document.getElementById("login").className = "main login_color_2"
+        document.getElementById("conteudo_login").className = "chassi login_align_2 login_color_2"
+
+        setviewlistaunidades(1);
+
         loadUnidades();
       } else {
         setviewlistaunidades(0);
@@ -325,6 +327,9 @@ function Login() {
               // eslint-disable-next-line
               loadAcessos(x.id.usuario);
               loadSettings(x.id.usuario);
+              setviewinputs(0);
+              document.getElementById("login").className = "main login_color_2"
+              document.getElementById("conteudo_login").className = "chassi login_align_2 login_color_2"
             } else {
               toast(
                 settoast,
@@ -392,8 +397,7 @@ function Login() {
         localStorage.setItem('obj_usuario', JSON.stringify(obj));
         localStorage.setItem('usuario', x.id);
         localStorage.setItem('senha', x.senha);
-        if (x.id != undefined && x.primeiro_acesso != 1) {
-        } else if (x.id == undefined) {
+        if (x.id == undefined) {
           document.getElementById("inputSenha").style.opacity = 0.3;
           document.getElementById("inputSenha").style.pointerEvents = 'none';
           toast(settoast, 'USUÁRIO INEXISTENTE', 'red', 1000);
@@ -407,13 +411,13 @@ function Login() {
   // inputs para login e senha.
   const [viewlistaunidades, setviewlistaunidades] = useState(0);
   const [viewalterarsenha, setviewalterarsenha] = useState(0);
+  const [viewinputs, setviewinputs] = useState(1);
   const Inputs = useCallback(() => {
     var timeout = null;
     return (
-      <div
+      <div id="inputs"
         style={{
-          display:
-            viewlistaunidades == 1 || viewalterarsenha == 1 ? "none" : "flex",
+          display: viewinputs == 1 ? "flex" : 'none',
           flexDirection: "column",
           justifyContent: "center",
           alignSelf: "center",
@@ -463,7 +467,7 @@ function Login() {
       </div>
     );
     // eslint-disable-next-line
-  }, [viewlistaunidades, viewalterarsenha]);
+  }, [viewinputs]);
 
   // lista de unidades de apoio.
   const montaModuloDeApoio = (titulo, acesso, rota, pagina) => {
@@ -472,11 +476,11 @@ function Login() {
         className="button"
         style={{
           display: acesso != 0 || acesso != null ? "flex" : "none",
-          minWidth: window.innerWidth < mobilewidth ? "30vw" : "10vw",
-          maxWidth: window.innerWidth < mobilewidth ? "30vw" : "10vw",
-          height: window.innerWidth < mobilewidth ? "30vw" : "10vw",
-          minHeight: window.innerWidth < mobilewidth ? "30vw" : "10vw",
-          maxHeight: window.innerWidth < mobilewidth ? "30vw" : "10vw",
+          minWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+          maxWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+          height: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+          minHeight: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+          maxHeight: window.innerWidth < mobilewidth ? "30vw" : "15vw",
           margin: 5,
           padding: 10,
         }}
@@ -562,14 +566,12 @@ function Login() {
 
   function ClienteSelector() {
     return (
-      <div style={{ display: usuario != {} && viewlistaunidades == 0 ? 'flex' : 'none', alignSelf: 'center' }}>
+      <div style={{ display: acessos.length > 0 && usuario != {} && viewlistaunidades == 0 ? 'flex' : 'none', alignSelf: 'center' }}>
         {acessos.map(item => (
           <div className="button" style={{ width: 200, height: 200 }}
             onClick={() => {
               setcliente(clientes.filter(valor => valor.id_cliente == item.id_cliente).pop());
               sethospital(clientes.filter(valor => valor.id_cliente == item.id_cliente).map(item => item.id_cliente).pop());
-              // console.log(clientes.filter(valor => valor.id_cliente == item.id_cliente).map(item => item.id_cliente));
-              // console.log(clientes.filter(valor => valor.id_cliente == item.id_cliente).pop());
               setviewlistaunidades(1);
             }}
           >
@@ -619,7 +621,6 @@ function Login() {
             onClick={() => {
               setpagina(-2);
               history.push("/consultas");
-              console.log(usuario);
             }}
           >
             CONSULTAS
@@ -817,23 +818,28 @@ function Login() {
 
   return (
     <div
-      className="main"
+      id="login"
+      className="main login_color_1"
       style={{ display: pagina == 0 ? "flex" : "none" }}
     >
       <div
-        className="chassi" style={{ overflowY: 'scroll', width: 'calc(100% - 10px)' }}
-        id="conteúdo do login"
+        className="chassi login_color_1 login_align_1"
+        style={{
+          overflowY: 'scroll', width: 'calc(100% - 10px)',
+        }}
+        id="conteudo_login"
       >
         <div
           className="text2 popin"
           style={{
+            marginTop: 20,
             display:
               window.innerWidth < mobilewidth && viewalterarsenha == 1
                 ? "none"
                 : "flex",
           }}
         >
-          <Logo href="/site/index.html" target="_blank" rel="noreferrer" height={150} width={150}></Logo>
+          <Logo href="/site/index.html" target="_blank" rel="noreferrer" height={100} width={100}></Logo>
         </div>
         <div
           className="text2"
@@ -842,8 +848,8 @@ function Login() {
               window.innerWidth < mobilewidth && viewalterarsenha == 1
                 ? "none"
                 : "flex",
-            margin: 20, marginTop: 10,
-            fontSize: 28,
+            margin: 20, marginTop: 0,
+            fontSize: 20,
 
           }}
         >
@@ -908,6 +914,12 @@ function Login() {
             setacessos([]);
             setviewlistaunidades(0);
             setviewalterarsenha(0);
+            setviewinputs(1);
+            document.getElementById("login").className = "main login_color_1"
+            document.getElementById("conteudo_login").className = "chassi login_color1 login_align_1"
+            document.getElementById("inputUsuario").value = '';
+            document.getElementById("inputSenha").value = '';
+            document.getElementById("inputUsuario").focus();
           }}
         >
           <img
@@ -920,8 +932,10 @@ function Login() {
             }}
           ></img>
         </div>
+        <div className="text2" style={{ fontSize: 10 }}>{'CONTATO DO DESENVOLVEDOR'}</div>
+        <div className="text2" style={{ fontSize: 10, marginTop: -5 }}>{'(31) 99226-6268'}</div>
       </div>
-    </div >
+    </div>
   );
 }
 

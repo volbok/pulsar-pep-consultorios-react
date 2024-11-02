@@ -163,14 +163,12 @@ function Consultas() {
     axios.get(html + 'list_itens_prescricoes/' + atendimento).then((response) => {
       let x = response.data.rows;
       setprescricao(x);
-      console.log(x.filter(item => item.categoria == '1. ANTIMICROBIANOS'))
     });
   }
 
   var timeout = null;
   useEffect(() => {
     if (pagina == -2) {
-      console.log(usuario);
       setpaciente([]);
       setatendimento(null);
       loadPacientes();
@@ -330,7 +328,6 @@ function Consultas() {
   // CHAMADA DE PACIENTES NA TELA DA RECEPÇÃO.
   // inserindo registro de chamada para triagem.
   const callPaciente = (item) => {
-    console.log(localStorage.getItem("sala"));
     if (consultorio != 'SELECIONAR SALA') {
       var obj = {
         id_unidade: unidade,
@@ -340,7 +337,6 @@ function Consultas() {
         id_sala: consultorio,
         data: moment()
       }
-      console.log(obj);
       axios.post(html + 'insert_chamada/', obj).then(() => {
         axios.get(html + 'list_chamada/' + unidade).then((response) => {
           let x = response.data.rows;
@@ -362,8 +358,6 @@ function Consultas() {
   }
 
   const updateConsulta = ([item, status]) => {
-    console.log(item);
-    console.log(status);
     var obj = {
       data_inicio: item.data_inicio,
       data_termino: moment(),
@@ -387,7 +381,6 @@ function Consultas() {
 
   // excluir um agendamento de consulta.
   const deleteAtendimento = (id) => {
-    console.log(parseInt(id));
     axios.get(html + "delete_atendimento/" + id).then(() => {
       console.log('DELETANDO AGENDAMENTO DE CONSULTA');
       loadAtendimentos();
@@ -409,7 +402,6 @@ function Consultas() {
       classificacao: null,
       id_profissional: usuario.id,
     };
-    console.log(obj);
     axios
       .post(html + "insert_consulta", obj)
       .then(() => {
@@ -432,14 +424,12 @@ function Consultas() {
       'para o dia ' + inicio + ', na CLÍNICA POMERODE.'
 
     const rawphone = pacientes.filter(valor => valor.id_paciente == objpaciente.id_paciente).map(item => item.telefone).pop();
-    console.log(rawphone);
     let cleanphone = rawphone.replace("(", "");
     cleanphone = cleanphone.replace(")", "");
     cleanphone = cleanphone.replace("-", "");
     cleanphone = cleanphone.replace(" ", "");
     cleanphone = "55" + cleanphone;
-    console.log(cleanphone);
-
+    
     fetch(gzappy_url_envia_mensagem, {
       method: 'POST',
       headers: {
@@ -583,7 +573,6 @@ function Consultas() {
                         setatendimento(item.id_atendimento);
                         setpaciente(parseInt(item.id_paciente));
                         setobjpaciente(pacientes.filter(valor => valor.id_paciente == item.id_paciente).pop());
-                        console.log(pacientes.filter(valor => valor.id_paciente == item.id_paciente));
                         setobjatendimento(item);
                         getAllData(item.id_paciente, item.id_atendimento);
                         setidprescricao(0);
@@ -892,7 +881,6 @@ function Consultas() {
           }}
           onClick={() => {
             setcard(opcao);
-            console.log(opcao);
           }}
         >
           <div id="sinalizador de alerta."
@@ -948,14 +936,12 @@ function Consultas() {
     firstSunday(x, y);
     setArrayDate(x, y);
     setarraylist(arraydate);
-    console.log(arraydate);
   }
   // percorrendo datas do mês anterior.
   const previousMonth = () => {
     startdate.subtract(1, 'month');
     var x = moment(startdate);
     var y = moment(startdate).add(42, 'days');
-    console.log(y);
     firstSunday(x, y);
     setArrayDate(x, y);
     setarraylist(arraydate);
@@ -967,11 +953,9 @@ function Consultas() {
     var year = moment(startdate).format('YYYY');
     var x = moment('01/' + month + '/' + year, 'DD/MM/YYYY');
     var y = moment('01/' + month + '/' + year, 'DD/MM/YYYY').add(42, 'days');
-    console.log(y);
     firstSunday(x, y);
     setArrayDate(x, y);
     setarraylist(arraydate);
-    console.log(arraydate);
   }
   const [selectdate, setselectdate] = useState(null);
   function DatePicker() {
@@ -1132,7 +1116,7 @@ function Consultas() {
             justifyContent: "flex-start",
             height: "calc(100vh - 200px)",
             width: '60vw',
-            margin: 5,
+            margin: 5, marginLeft: 10
           }}
         >
           {arrayatendimentos
@@ -1237,6 +1221,18 @@ function Consultas() {
             margin: 5,
           }}
         >
+          <img
+            className="lupa"
+            alt=""
+            src={lupa}
+            style={{
+              margin: 10,
+              height: 150,
+              width: 150,
+              opacity: 0.1,
+              alignSelf: 'center'
+            }}
+          ></img>
           <div className="text3" style={{ opacity: 0.5 }}>
             SELECIONE UMA DATA
           </div>
@@ -1253,7 +1249,6 @@ function Consultas() {
     for (var i = 0; i < 24; i++) {
       array.push(inicio.add(30, 'minutes').format('DD/MM/YYYY - HH:mm'));
     }
-    console.log(array);
     setarrayhorarios(array);
   }
   const [viewopcoeshorarios, setviewopcoeshorarios] = useState(0);
@@ -1316,9 +1311,8 @@ function Consultas() {
       <div className="fundo"
         onClick={() => setviewagendamento(0)}
         style={{ display: objpaciente != null && viewagendamento == 1 ? 'flex' : 'none', flexDirection: 'row', justifyContent: 'center' }}>
-        <div className="janela" style={{ display: 'flex', flexDirection: 'column' }}>
-          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-            <div className="text1" style={{ fontSize: 16 }}>{objpaciente != null ? 'AGENDAR CONSULTA PARA ' + objpaciente.nome_paciente + '.' : ''}</div>
+        <div className="janela" style={{ display: 'flex', flexDirection: 'column', width: '100vw', height: '100vh', borderRadius: 0 }}>
+          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginBottom: 10 }}>
             <div
               id="botão de retorno"
               className="button-yellow"
@@ -1331,6 +1325,7 @@ function Consultas() {
             >
               <img alt="" src={back} style={{ width: 30, height: 30 }}></img>
             </div>
+            <div className="text1" style={{ fontSize: 16 }}>{objpaciente != null ? 'AGENDAR CONSULTA PARA ' + objpaciente.nome_paciente + '.' : ''}</div>
           </div>
           <div style={{ display: 'flex', flexDirection: 'row' }}>
             <DatePicker></DatePicker>
@@ -1365,7 +1360,11 @@ function Consultas() {
           <Usuario></Usuario>
           <ListaDeAtendimentos></ListaDeAtendimentos>
         </div>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div style={{
+          display: 'flex', flexDirection: 'column',
+          height: 'calc(100vh - 20px)',
+          marginRight: -10,
+        }}>
           <div id="cards (cartões) fixos"
             className="scroll"
             style={{
@@ -1383,9 +1382,6 @@ function Consultas() {
             {cartao(null, "EVOLUÇÃO", "card-documento-evolucao", null, 1)}
             {cartao(null, "RECEITA MÉDICA", "card-documento-receita", null, 1)}
             {cartao(null, "ATESTADO", "card-documento-atestado", null, 1)}
-            {
-              // cartao(null, 'EXAMES', 'card-documento-exame', null, 1)
-            }
             {cartao(null, 'EXAMES', 'exames')}
           </div>
           <div id="conteúdo cheio (cards)"
@@ -1404,8 +1400,6 @@ function Consultas() {
             style={{
               display: 'flex',
               flexDirection: "row",
-              justifyContent: 'center',
-              alignContent: 'center',
               flexWrap: "wrap",
               width: window.innerWidth < mobilewidth ? '90vw' : '65vw',
             }}

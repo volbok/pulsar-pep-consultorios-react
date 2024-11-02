@@ -114,11 +114,9 @@ function Usuarios() {
       tipo_usuario: localStorage.getItem('especialidade'),
       paciente: 0,
       prontuario: 0,
-      laboratorio: 0,
-      farmacia: 0,
-      faturamento: 0,
-      usuarios: 0,
       primeiro_acesso: 0,
+      uf_conselho: document.getElementById("inputUf").value.toUpperCase(),
+      codigo_cbo: document.getElementById("inputCodigoCbo").value.toUpperCase(),
     };
     axios
       .post(html + "inserir_usuario", obj)
@@ -152,10 +150,8 @@ function Usuarios() {
       tipo_usuario: localStorage.getItem('especialidade'),
       paciente: localStorage.getItem('paciente'),
       prontuario: localStorage.getItem('prontuario'),
-      laboratorio: localStorage.getItem('laboratorio'),
-      farmacia: localStorage.getItem('farmacia'),
-      faturamento: localStorage.getItem('faturamento'),
-      usuarios: localStorage.getItem('usuarios'),
+      uf_conselho: document.getElementById("inputUf").value,
+      codigo_cbo: document.getElementById("inputCodigoCbo").value,
     };
     console.log(obj);
     console.log(selectedusuario.id_usuario);
@@ -291,11 +287,11 @@ function Usuarios() {
               flexWrap: 'wrap',
               justifyContent: 'space-evenly',
               marginRight: 10,
-              alignItems: "center",
-              alignContent: 'center',
+              alignItems: "flex-start",
+              alignContent: 'flex-start',
             }}
           >
-            <div id='coluna1' style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flex: 1 }}>
+            <div id='coluna1' style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', flex: 1 }}>
               <div id="nome do usuário"
                 style={{
                   display: "flex",
@@ -462,6 +458,47 @@ function Usuarios() {
                   width: "30vw",
                 }}
               ></input>
+
+              <div className="text1">UF DO CONSELHO</div>
+              <input
+                autoComplete="off"
+                placeholder="UF DO CONSELHO"
+                className="input"
+                type="text"
+                id="inputUf"
+                onFocus={(e) => (e.target.placeholder = "")}
+                onBlur={(e) => (e.target.placeholder = "UF DO CONSELHO")}
+                defaultValue={localStorage.getItem('uf_conselho')}
+                style={{
+                  flexDirection: "center",
+                  justifyContent: "center",
+                  alignSelf: "center",
+                  width: 200,
+                }}
+              ></input>
+
+              <div className="text1">CÓDIGO CBO</div>
+              <input
+                autoComplete="off"
+                placeholder="CÓDIGO CBO"
+                className="input"
+                type="text"
+                id="inputCodigoCbo"
+                onFocus={(e) => (e.target.placeholder = "")}
+                onBlur={(e) => (e.target.placeholder = "CÓDIGO CBO")}
+                defaultValue={localStorage.getItem('codigo_cbo')}
+                style={{
+                  flexDirection: "center",
+                  justifyContent: "center",
+                  alignSelf: "center",
+                  width: 200,
+                }}
+              ></input>
+
+
+
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', marginTop: 20 }}>
               <div className="text1">{'ESPECIALIDADE: ' + especialidade}</div>
               <div id="scroll das especialidades"
                 className="scroll"
@@ -612,7 +649,7 @@ function Usuarios() {
         style={{
           width: 400,
           maxWidth: 400,
-          height: "calc(100vh - 100px)",
+          height: "60vh",
           marginTop: 10,
         }}
       >
@@ -640,6 +677,8 @@ function Usuarios() {
                   localStorage.setItem('contato', item.contato_usuario);
                   localStorage.setItem('conselho', item.conselho);
                   localStorage.setItem('n_conselho', item.n_conselho);
+                  localStorage.setItem('uf_conselho', item.uf_conselho);
+                  localStorage.setItem('codigo_cbo', item.codigo_cbo);
                   localStorage.setItem('especialidade', item.tipo_usuario);
                   // acessos.
                   localStorage.setItem('farmacia', item.farmacia);
@@ -732,7 +771,7 @@ function Usuarios() {
   }, [usuarios, arrayusuarios]);
 
   // ## ACESSOS ##
-  // recuperando registros de acessos cadastrados na aplicação, para a unidade logada.
+  // eslint-disable-next-line
   const [arrayacessos, setarrayacessos] = useState([]);
 
   // recuperando todos os acessos da base (necessário para gerenciar a exclusão segura de usuários).
@@ -790,27 +829,6 @@ function Usuarios() {
       });
   };
 
-  // excluindo um acesso.
-  const deleteAcesso = (id, id_usuario) => {
-    axios
-      .get(html + "delete_acesso/" + id)
-      .then(() => {
-        loadTodosAcessos(id_usuario);
-      })
-      .catch(function () {
-        toast(
-          settoast,
-          "ERRO DE CONEXÃO, REINICIANDO APLICAÇÃO.",
-          "black",
-          5000
-        );
-        setTimeout(() => {
-          setpagina(0);
-          history.push("/");
-        }, 5000);
-      });
-  };
-
   function Acessos() {
     return (
       <div style={{ display: 'flex', width: '100%' }}>
@@ -822,7 +840,6 @@ function Usuarios() {
             justifyContent: "flex-start",
           }}
         >
-          <ListaDeUnidades></ListaDeUnidades>
           <ListaDeModulos></ListaDeModulos>
         </div>
         <div
@@ -831,10 +848,11 @@ function Usuarios() {
             display: selectedusuario == 0 ? "flex" : "none",
             flexDirection: "column",
             justifyContent: "center",
-            width: '100%',
+            width: '40vw', height: 'calc(100vh - 20px)',
           }}
         >
           <img
+            className="lupa"
             alt=""
             src={lupa}
             style={{
@@ -845,144 +863,6 @@ function Usuarios() {
               alignSelf: 'center'
             }}
           ></img>
-        </div>
-      </div>
-    );
-  }
-
-  const [viewunidades, setviewunidades] = useState(0);
-  function ListaDeUnidades() {
-    return (
-      <div
-        style={{
-          display: selectedusuario.prontuario == 1 || viewunidades == 1 ? "flex" : "none",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignContent: "center",
-          alignSelf: "center",
-          alignItems: "center",
-        }}
-      >
-        <div
-          id="usuário com acesso"
-          className="text3"
-          style={{
-            display: arrayacessos.length > 0 ? "flex" : "none",
-            justifyContent: "center",
-            margin: 5,
-            padding: 5,
-          }}
-        >
-          <div style={{ display: 'flex', marginBottom: 10 }}>UNIDADES DE ATENDIMENTO LIBERADAS:</div>
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "center",
-              flexWrap: "wrap",
-            }}
-          >
-            {arrayacessos.map((item) =>
-              unidades
-                .filter((valor) => valor.id_unidade == item.id_unidade)
-                .map((max) => (
-                  <div className="button" style={{ position: "relative" }}>
-                    <div className="text2" style={{ width: 150, height: 150 }}>
-                      {max.nome_unidade}
-                    </div>
-                    <div
-                      style={{
-                        position: "absolute",
-                        top: 10,
-                        right: 10,
-                        width: 30, minWidth: 30,
-                        height: 30, minHeight: 30,
-                      }}
-                      className="button-yellow"
-                      onClick={() =>
-                        deleteAcesso(
-                          item.id_acesso,
-                          JSON.parse(
-                            window.localStorage.getItem("selecteduser")
-                          ).id_usuario
-                        )
-                      }
-                    >
-                      <img
-                        alt=""
-                        src={deletar}
-                        style={{
-                          margin: 10,
-                          height: 25,
-                          width: 25,
-                        }}
-                      ></img>
-                    </div>
-                  </div>
-                ))
-            )}
-          </div>
-          <div
-            className="button-green"
-            style={{
-              display: todosacessos.filter(valor => valor.id_usuario == selectedusuario.id_usuario).length == unidades.length ? 'none' : 'flex',
-              marginTop: 10,
-            }}
-            onClick={() => {
-              setviewnewacesso(1);
-            }}
-          >
-            <img
-              alt=""
-              src={novo}
-              style={{
-                margin: 10,
-                height: 25,
-                width: 25,
-              }}
-            ></img>
-          </div>
-        </div>
-        <div
-          id="usuário sem acesso"
-          className="text3"
-          style={{
-            display: arrayacessos.length == 0 ? "flex" : "none",
-            justifyContent: "center",
-          }}
-        >
-          {"USUÁRIO SEM ACESSO ÀS UNIDADES DE ATENDIMENTO."}
-          <div
-            className="button-green"
-            style={{
-              marginTop: 10,
-            }}
-            onClick={() => {
-              setviewnewacesso(1);
-            }}
-          >
-            <img
-              alt=""
-              src={novo}
-              style={{
-                margin: 10,
-                height: 25,
-                width: 25,
-              }}
-            ></img>
-          </div>
-        </div>
-        <div
-          id="usuário não selecionado"
-          className="text3"
-          style={{
-            display: selectedusuario == 0 ? "flex" : "none",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignSelf: "center",
-          }}
-        >
-          {"SELECIONE UM USUÁRIO"}
         </div>
       </div>
     );
@@ -1000,11 +880,7 @@ function Usuarios() {
 
   function ListaDeModulos() {
     const [prontuario, setprontuario] = useState(localStorage.getItem("prontuario"));
-    const [farmacia, setfarmacia] = useState(localStorage.getItem("farmacia"));
-    const [laboratorio, setlaboratorio] = useState(localStorage.getItem("laboratorio"));
-    const [faturamento, setfaturamento] = useState(localStorage.getItem("faturamento"));
     const [pacientes, setpacientes] = useState(localStorage.getItem("paciente"));
-    const [usuarios, setusuarios] = useState(localStorage.getItem("usuarios"));
 
     return (
       <div
@@ -1015,6 +891,7 @@ function Usuarios() {
           alignContent: "center",
           alignSelf: "center",
           alignItems: "center",
+          width: '40vw', height: 'calc(100vh - 20px)',
         }}
       >
         <div className="text3" style={{ margin: 5, padding: 5 }}>
@@ -1033,55 +910,22 @@ function Usuarios() {
             style={{ width: 150, height: 150 }}
             onClick={() => {
               mudaModulo('prontuario', setprontuario);
-              if (viewunidades == 1 && arrayacessos.length == 0) {
-                setviewunidades(0);
-              } else {
-                setviewunidades(1);
-              }
             }}
           >
             PRONTUÁRIO
           </div>
-          <div id="btn-farmacia"
-            className={farmacia == 1 ? 'button-selected' : 'button'}
-            style={{ width: 150, height: 150 }}
-            onClick={() => mudaModulo('farmacia', setfarmacia)}
-          >
-            FARMÁCIA
-          </div>
-          <div id="btn-laboratorio"
-            className={laboratorio == 1 ? 'button-selected' : 'button'}
-            style={{ width: 150, height: 150 }}
-            onClick={() => mudaModulo('laboratorio', setlaboratorio)}
-          >
-            LABORATÓRIO
-          </div>
           <div id="btn-faturamento"
-            className={faturamento == 1 ? 'button-selected' : 'button'}
-            style={{ width: 150, height: 150 }}
-            onClick={() => mudaModulo('faturamento', setfaturamento)}
-          >
-            FATURAMENTO
-          </div>
-          <div id="btn-paciente"
             className={pacientes == 1 ? 'button-selected' : 'button'}
             style={{ width: 150, height: 150 }}
             onClick={() => mudaModulo('paciente', setpacientes)}
           >
-            GESTÃO DE PACIENTES E LEITOS
-          </div>
-          <div id="btn-usuarios"
-            className={usuarios == 1 ? 'button-selected' : 'button'}
-            style={{ width: 150, height: 150 }}
-            onClick={() => mudaModulo('usuarios', setusuarios)}
-          >
-            GESTÃO DE USUÁRIOS
+            ADMINISTRATIVO
           </div>
         </div>
         <div
           className="button-green"
           style={{ margin: 5, marginTop: 10, pading: 5, width: 50, height: 50 }}
-          onClick={() => { updateAcessoModulos(); setselectedusuario(0); setviewunidades(0); }}
+          onClick={() => { updateAcessoModulos(); setselectedusuario(0); }}
         >
           <img
             alt=""

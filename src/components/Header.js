@@ -3,7 +3,7 @@
 import React, { useContext } from 'react';
 import Context from '../pages/Context';
 import moment from "moment";
-import logo from '../images/pbh.svg';
+import logo from '../images/logo.svg';
 
 function Header() {
 
@@ -33,7 +33,7 @@ function Header() {
             src={logo}
             style={{
               margin: 0, marginBottom: 10,
-              width: 150,
+              width: 100,
             }}
           ></img>
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', fontSize: 10, marginRight: 10 }}>
@@ -43,19 +43,26 @@ function Header() {
             <div className='text1'>{'TELEFONE: ' + cliente.telefone}</div>
           </div>
         </div>
-        <div style={{
-          display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
-          borderRadius: 5, backgroundColor: 'gray', color: 'white',
-          padding: 10
-        }}>
-          <div>
-            {moment(selecteddocumento.data).format('DD/MM/YY - HH:mm')}
+        <div
+          style={{
+            display: 'flex', flexDirection: 'column', justifyContent: 'center',
+            alignContent: 'center',
+          }}>
+          <div
+            style={{
+              display: 'flex', flexDirection: 'column', justifyContent: 'center',
+              alignContent: 'center',
+              borderRadius: 5, backgroundColor: 'gray', color: 'white',
+              padding: 10,
+            }}
+          >
+            <div>{moment(selecteddocumento.data).format('DD/MM/YY - HH:mm')}</div>
+            <div>{'ATENDIMENTO: ' + atendimento}</div>
           </div>
-          <div>{'ATENDIMENTO: ' + atendimento}</div>
         </div>
       </div>
       <div style={{ fontFamily: 'Helvetica', fontWeight: 'bold', fontSize: 20, marginTop: 10 }}>
-        {objatendimento != undefined ? 'NOME CIVIL: ' + objatendimento.nome_paciente : ''}
+        {objatendimento != undefined ? 'CLIENTE: ' + objatendimento.nome_paciente : ''}
       </div>
       <div
         style={{

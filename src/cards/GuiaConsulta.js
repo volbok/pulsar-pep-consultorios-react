@@ -25,6 +25,7 @@ function GuiaConsulta() {
       setvalidade_carteira(objpaciente.validade_carteira);
       setnome(objpaciente.nome_paciente);
       setcns(objpaciente.cns);
+      console.log(dono_documento);
 
       console.log(operadoras);
       // eslint-disable-next-line
@@ -48,7 +49,7 @@ function GuiaConsulta() {
       console.log(cliente);
     }
     // eslint-disable-next-line
-  }, [card, objpaciente, operadora]);
+  }, [card, objpaciente, operadora, dono_documento]);
 
   const [logo, setlogo] = useState();
 

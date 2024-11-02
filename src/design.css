@@ -257,6 +257,34 @@ body {
   transition: 500ms, 500ms ease-in-out;
 }
 
+.login_align_1 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center !important;
+  transition: 500ms, 500ms ease-in-out;
+}
+
+.login_align_2 {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  transition: 500ms, 500ms ease-in-out;
+}
+
+.login_color_1 {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--cor1opaque) !important;
+  transition: 500ms, 500ms ease-in-out;
+}
+
+.login_color_2 {
+  display: flex;
+  flex-direction: column;
+  background-color: var(--cor1hover) !important;
+  transition: 500ms, 500ms ease-in-out;
+}
+
 .fundo {
   background-color: var(--pallete6);
   border-width: 0px;

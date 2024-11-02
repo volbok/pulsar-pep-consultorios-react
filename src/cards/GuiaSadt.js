@@ -123,7 +123,7 @@ function GuiaSadt() {
           placeholder={titulo}
           onFocus={(e) => (e.target.placeholder = "")}
           onBlur={(e) => (e.target.placeholder = { titulo })}
-          defaultValue={valor.length > 55 ? valor.toUpperCase().slice(0, 55) + '...' : valor.toUpperCase()}
+          defaultValue={valor != null && valor.length > 50 ? valor.toUpperCase().slice(0, 55) + '...' : valor != null && valor.length < 51 ? valor.toUpperCase() : ''}
           style={{ backgroundColor: 'transparent', margin: 0, marginTop: 2, marginLeft: -2.5, padding: 0 }}
           onKeyUp={() => {
             clearTimeout(timeout);
@@ -499,7 +499,7 @@ function GuiaSadt() {
                     {editcampovalor('24 - TABELA', '21', 50, 0)}
                     {editcampovalor('25 - CÓDIGO DO PROCEDIMENTO OU ITEM ASSISTENCIAL', item.codigo_exame, 130, 0)}
                     {editcampovalor('26 - DESCRIÇÃO', item.nome_exame, '', 1)}
-                    
+
                   </div>
                 ))}
               </div>

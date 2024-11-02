@@ -66,7 +66,7 @@ function Financeiro() {
     axios.post(html + 'insert_financeiro/', obj).then(() => {
       console.log('REGISTRO FINANCEIRO INSERIDO');
       setTimeout(() => {
-        loadFinanceiro();
+        // loadFinanceiro();
       }, 3000);
     })
   }
@@ -349,7 +349,7 @@ function Financeiro() {
               }}
               onClick={() => setviewdatepicker(1)}
             >
-              {localStorage.getItem('data1')}
+              {moment(localStorage.getItem('data1'), 'DD/MM/YYYY').format('DD/MM/YYYY')}
             </div>
           </div>
           <div id="data de recebimento ou pagamento">
@@ -360,7 +360,7 @@ function Financeiro() {
               }}
               onClick={() => setviewdatepicker(2)}
             >
-              {localStorage.getItem('data2')}
+              {moment(localStorage.getItem('data2'), 'DD/MM/YYYY').format('DD/MM/YYYY')}
             </div>
           </div>
 
@@ -459,18 +459,55 @@ function Financeiro() {
           }}>
           STATUS
         </div>
-
         <div id="botão para sair da tela de controle financeiro"
           className="button-red" style={{
             maxHeight: 50, maxWidth: 50, alignSelf: 'center',
             backgroundColor: 'transparent'
           }}
         ></div>
-
       </div >
     )
   }
 
+  // balanço financeiro total.
+  function BalancoGeral() {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
+        <div className='button' style={{
+          width: 250, height: 100,
+          display: 'flex', flexDirection: 'column',
+          justifyContent: 'center',
+        }}>
+          <div>TOTAL DE RECEITAS RECEBIDAS</div>
+          <div>{'R$ ' + somavalores(listfinanceiro.filter(item => item.tipo == 'RECEITA' && item.status == 'RECEBIDA'))}</div>
+        </div>
+        <div className='button' style={{
+          width: 250, height: 100,
+          display: 'flex', flexDirection: 'column',
+          justifyContent: 'center',
+        }}>
+          <div>TOTAL DE DESPESAS PAGAS</div>
+          <div>{'R$ ' + somavalores(listfinanceiro.filter(item => item.tipo == 'DESPESA' && item.status == 'PAGA'))}</div>
+        </div>
+        <div className='button' style={{
+          width: 250, height: 100,
+          display: 'flex', flexDirection: 'column',
+          justifyContent: 'center',
+        }}>
+          <div>SALDO</div>
+          <div>
+            {'R$ ' + (
+              somavalores(listfinanceiro.filter(item => item.tipo == 'RECEITA' && item.status == 'RECEBIDA'))
+              -
+              somavalores(listfinanceiro.filter(item => item.tipo == 'DESPESA' && item.status == 'PAGA'))
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  }
+
+  // balanço financeiro filtrado para o mês selecionado.
   function CardsFinanceiros() {
     return (
       <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
@@ -490,6 +527,14 @@ function Financeiro() {
           <div>RECEITAS A RECEBER</div>
           <div>{'R$ ' + somavalores(arraylistfinanceiro.filter(item => item.tipo == 'RECEITA' && item.status == 'PENDENTE'))}</div>
         </div>
+        <div className='button yellow' style={{
+          width: 100, height: 100,
+          display: 'flex', flexDirection: 'column',
+          justifyContent: 'center',
+        }}>
+          <div>DESPESAS A VENCER</div>
+          <div>{'R$ ' + somavalores(arraylistfinanceiro.filter(item => item.tipo == 'DESPESA' && item.status == 'A VENCER'))}</div>
+        </div>
         <div className='button red' style={{
           width: 100, height: 100,
           display: 'flex', flexDirection: 'column',
@@ -497,14 +542,6 @@ function Financeiro() {
         }}>
           <div>DESPESAS PAGAS</div>
           <div>{'R$ ' + somavalores(arraylistfinanceiro.filter(item => item.tipo == 'DESPESA' && item.status == 'PAGA'))}</div>
-        </div>
-        <div className='button red' style={{
-          width: 100, height: 100,
-          display: 'flex', flexDirection: 'column',
-          justifyContent: 'center',
-        }}>
-          <div>DESPESAS A VENCER</div>
-          <div>{'R$ ' + somavalores(arraylistfinanceiro.filter(item => item.tipo == 'DESPESA' && item.status == 'A VENCER'))}</div>
         </div>
         <div className='button grey' style={{
           width: 100, height: 100,
@@ -534,7 +571,7 @@ function Financeiro() {
     return (
       <div style={{
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
-        width: '90vw', alignSelf: 'center',
+        width: '90vw', alignSelf: 'center', marginBottom: 20
       }}>
         <HeaderListaDeRegistrosFinanceiros></HeaderListaDeRegistrosFinanceiros>
         <div style={{
@@ -548,13 +585,8 @@ function Financeiro() {
                 setselectedregistrofinanceiro(item);
                 settipo(item.tipo);
                 localStorage.setItem('status', item.status);
-
-                localStorage.setItem('data1', item.data_vencimento);
-                if (item.data_pagamento == null) {
-                  localStorage.setItem('data2', item.data_recebimento);
-                } else {
-                  localStorage.setItem('data2', item.data_pagamento);
-                }
+                localStorage.setItem('data1', moment(item.data_vencimento).format('DD/MM/YYYY'));
+                localStorage.setItem('data2', moment(item.data_recebimento).format('DD/MM/YYYY'));
                 console.log(item.tipo);
                 setformfinanceiro(2);
               }}
@@ -583,11 +615,11 @@ function Financeiro() {
               </div>
               <div className='text1'
                 style={{ width: 70, minWidth: 70, maxWidth: 70 }}>
-                {item.data_pagamento != null ? moment(item.data_pagamento).format('DD/MM/YY') : '-x-'}
+                {item.tipo == 'DESPESA' ? moment(item.data_pagamento).format('DD/MM/YY') : '-x-'}
               </div>
               <div className='text1'
                 style={{ width: 70, minWidth: 70, maxWidth: 70 }}>
-                {item.data_recebimento != null ? moment(item.data_recebimento).format('DD/MM/YY') : '-x-'}
+                {item.tipo == 'RECEITA' ? moment(item.data_recebimento).format('DD/MM/YY') : '-x-'}
               </div>
               <div className='text1'
                 style={{ width: 70, minWidth: 70, maxWidth: 70 }}>
@@ -626,8 +658,9 @@ function Financeiro() {
       <div
         className="chassi scroll"
         id="conteúdo do controle financeiro"
+        style={{ width: 'calc(100vw - 20px)' }}
       >
-        <div style={{ display: 'flex', flexDirection: 'row' }}>
+        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
           <div id="botão para sair da tela de controle financeiro"
             className="button-yellow" style={{ maxHeight: 50, maxWidth: 50, alignSelf: 'center' }}
             onClick={() => {
@@ -640,14 +673,17 @@ function Financeiro() {
               style={{ width: 30, height: 30 }}
             ></img>
           </div>
+          <div
+            className='text1'
+            style={{ display: 'flex', fontSize: 22 }}
+          >
+            FINANCEIRO
+          </div>
         </div>
-        <div
-          className='text1'
-          style={{ display: 'flex', fontSize: 22 }}
-        >
-          FINANCEIRO
-        </div>
+
         <FormFinanceiro></FormFinanceiro>
+        <BalancoGeral></BalancoGeral>
+        <div className='text2'>{'BALANÇO DO MÊS SELECIONADO'}</div>
         <CardsFinanceiros></CardsFinanceiros>
         <MenuFinanceiro></MenuFinanceiro>
         <Filtros></Filtros>

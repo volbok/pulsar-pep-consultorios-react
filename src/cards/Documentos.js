@@ -234,32 +234,6 @@ function Documentos() {
   }
 
   // GADGETS PARA O PREGUIÇOSO...
-  // EVOLUÇÃO
-  // inserir dados vitais.
-  function GadgetDadosVitais() {
-    return (
-      <div className='gadget'
-        id="GADGET PARA DADOS VITAIS"
-        style={{
-          display: tipodocumento == 'EVOLUÇÃO' && selecteddocumento.id != undefined && selecteddocumento.status == 0 ? 'flex' : 'none',
-          position: 'absolute', bottom: 20, left: 20
-        }}
-        onClick={() => {
-          if (sinaisvitais.length > 0) {
-            let tag_dadosvitais = "DADOS VITAIS:\nPA: " + sinaisvitais.slice(-1).map((item) => item.pas) + 'x' + sinaisvitais.slice(-1).map((item) => item.pad) + 'mmHg, FC: ' + sinaisvitais.slice(-1).map((item) => item.fc) + 'bpm, FR: ' + sinaisvitais.slice(-1).map((item) => item.fr) + 'irom, SAO2: ' + sinaisvitais.slice(-1).map((item) => item.sao2) + '%, TAX: ' + sinaisvitais.slice(-1).map((item) => item.tax) + 'ºC';
-            let fielddocumento = document.getElementById("inputFieldDocumento");
-            let posicao = fielddocumento.selectionStart;
-            let textoanterior = fielddocumento.value.substring(0, posicao);
-            let textoposterior = fielddocumento.value.substring(posicao, fielddocumento.value.length);
-            fielddocumento.value = textoanterior + '\n' + tag_dadosvitais + '\n' + textoposterior;
-          }
-        }}
-      >
-        DADOS VITAIS
-      </div>
-    )
-  }
-
   // ATESTADO
   // função para definir os dias de atestado.
   const DiasAtestado = () => {
@@ -1003,7 +977,7 @@ function Documentos() {
         display: card.toString().substring(0, 14) == 'card-documento' ? 'flex' : 'none',
         flexDirection: 'row',
         justifyContent: 'center',
-        height: '80vh',
+        height: '75vh',
         position: 'relative',
         alignSelf: 'center',
       }}
@@ -1014,7 +988,6 @@ function Documentos() {
       <ViewSelectModelos></ViewSelectModelos>
       <ViewCreateModelo></ViewCreateModelo>
       <SeletorCid10></SeletorCid10>
-      <GadgetDadosVitais></GadgetDadosVitais>
       <GadgetsParaAtestado></GadgetsParaAtestado>
     </div>
   )

@@ -1,5 +1,5 @@
 /* eslint eqeqeq: "off" */
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import Context from "./Context";
 import moment from "moment";
@@ -27,10 +27,7 @@ function Cadastro() {
     setusuario,
     settoast,
     setdialogo,
-    unidade,
-    setunidade,
     hospital,
-    unidades,
     pacientes,
     setpacientes,
     paciente, setpaciente,
@@ -38,7 +35,7 @@ function Cadastro() {
     atendimentos,
     setatendimentos,
     setoperadoras, operadoras,
-    setprocedimentos, procedimentos,
+    setprocedimentos,
   } = useContext(Context);
 
   // history (router).
@@ -58,11 +55,10 @@ function Cadastro() {
   window.addEventListener("load", refreshApp);
 
   const [atendimento, setatendimento] = useState([]);
-  const [viewopcoesconvenio, setviewopcoesconvenio] = useState(0);
   const [viewtipoconsulta, setviewtipoconsulta] = useState(0);
   useEffect(() => {
     if (pagina == 2) {
-      setpaciente([]);
+      console.log('PACIENTE: ' + paciente);
       setatendimento([]);
       loadPacientes();
       loadOperadoras();
@@ -82,59 +78,8 @@ function Cadastro() {
   const loadProcedimentos = () => {
     axios.get(html + 'all_procedimentos').then((response) => {
       setprocedimentos(response.data.rows);
-      console.log(response.data.rows)
     })
   };
-
-  const [viewoperadoraselector, setviewoperadoraselector] = useState(0);
-  function FormOperadoraSelector() {
-    return (
-      <div className="fundo"
-        style={{
-          display: viewoperadoraselector == 1 ? 'flex' : 'none',
-          flexDirection: 'column', justifyContent: 'center'
-        }}
-        onClick={() => setviewoperadoraselector(0)}
-      >
-        <div className="janela scroll"
-          style={{ height: '90vh', width: '40vw' }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <input
-            className="input"
-            autoComplete="off"
-            placeholder={
-              "BUSCAR..."
-            }
-            onFocus={(e) => (e.target.placeholder = "")}
-            onBlur={(e) =>
-              "BUSCAR..."
-            }
-            // onKeyUp={() => filterProcedimento()}
-            type="text"
-            id="filtrarProcedimento"
-            // defaultValue={filterprocedimento}
-            maxLength={100}
-            style={{ width: 'calc(100% - 20px)', backgroundColor: 'white' }}
-          ></input>
-          {operadoras.map(item => (
-            <div
-              className="button"
-              style={{ width: 'calc(100% - 20px)', padding: 10, display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}
-              onClick={() => {
-                setviewoperadoraselector(0);
-                setTimeout(() => {
-                  document.getElementById("inputConvenioNome").value = item.nome_operadora;
-                  document.getElementById("inputConvenioCodigo").value = item.id; // id do convênio no banco de dados Pulsar (não é o registr ANS).
-                }, 1000);
-              }}>
-              <div>{item.nome_operadora}</div>
-            </div>
-          ))}
-        </div>
-      </div>
-    )
-  }
 
   // recuperando registros de pacientes cadastrados na aplicação.
   const [arraypacientes, setarraypacientes] = useState([]);
@@ -174,12 +119,10 @@ function Cadastro() {
 
   // recuperando registros de pacientes cadastrados na aplicação.
   const loadAtendimentos = () => {
-    console.log(hospital);
     axios
       .get(html + "allatendimentos/" + hospital)
       .then((response) => {
         setatendimentos(response.data.rows);
-        console.log(response.data.rows);
       })
       .catch(function () {
         toast(
@@ -356,170 +299,6 @@ function Cadastro() {
       });
   };
 
-  // registrando um novo atendimento.
-  const insertAtendimento = (id, nome, leito) => {
-    var obj = {
-      data_inicio: moment(),
-      data_termino: null,
-      historia_atual: null,
-      id_paciente: id,
-      id_unidade: unidade,
-      nome_paciente: nome,
-      leito: leito,
-      situacao: 1, // 1 = atendimento ativo; 0 = atendimento encerrado.
-      id_cliente: hospital,
-      classificacao: null,
-      id_profissional: null,
-      convenio_id: null,
-      convenio_carteira: null,
-      faturamento_codigo_procedimento: null,
-    };
-    axios
-      .post(html + "insert_atendimento", obj)
-      .then(() => {
-        loadAtendimentos();
-        loadLeitos(unidade);
-        setvieweditpaciente(0);
-        setviewseletorunidades(0);
-        toast(
-          settoast,
-          "ATENDIMENTO INICIADO COM SUCESSO",
-          "rgb(82, 190, 128, 1)",
-          3000
-        );
-      })
-      .catch(function () {
-        toast(
-          settoast,
-          "ERRO DE CONEXÃO, REINICIANDO APLICAÇÃO.",
-          "black",
-          5000
-        );
-        setTimeout(() => {
-          setpagina(0);
-          history.push("/");
-        }, 5000);
-      });
-  };
-
-  // atualizando um atendimento (mudando de leito).
-  const updateAtendimento = (leito, atendimento) => {
-    let leito_atual = null
-    let id_leito_atual = null;
-    let unidade_atual = null;
-    axios.get(html + "allatendimentos/" + hospital).then((response) => {
-      let x = response.data.rows;
-      unidade_atual = x.filter(item => item.id_atendimento == atendimento.map(valor => valor.id_atendimento)).map(item => item.id_unidade).pop();
-      leito_atual = x.filter(item => item.id_atendimento == atendimento.map(valor => valor.id_atendimento)).map(item => item.leito).pop();
-      console.log('LEITO ATUAL DO ATENDIMENTO, A SER LIBERADO: ' + leito_atual);
-      // recuperando a id do leito atual, a ter seu status alterado para livre.
-      axios.get(html + "list_all_leitos").then((response) => {
-        let y = response.data.rows;
-        id_leito_atual = y.filter(valor => valor.leito == leito_atual && valor.id_unidade == unidade_atual).map(item => item.id_leito).pop();
-        console.log('ID LEITO ATUAL A SER LIBERADO: ' + id_leito_atual);
-        // liberando o leito.
-        var obj = {
-          id_unidade: unidade_atual,
-          leito: leito_atual,
-          status: 'LIVRE',
-        };
-        console.log(obj);
-        axios.post(html + "update_leito/" + id_leito_atual, obj).then(() => {
-          // atualizando o atendimento no novo leito.
-          atendimento.map((item) => {
-            var obj = {
-              data_inicio: item.data_inicio,
-              data_termino: null,
-              problemas: item.problemas,
-              id_paciente: item.id_paciente,
-              id_unidade: unidade,
-              nome_paciente: item.nome_paciente,
-              leito: leito,
-              situacao: 1,
-              id_cliente: hospital,
-              classificacao: item.classificacao,
-              id_profissional: item.id_profissional,
-              convenio_id: item.convenio_id,
-              convenio_carteira: item.convenio_carteira,
-              faturamento_codigo_procedimento: item.faturamento_codigo_procedimento,
-            };
-            axios
-              .post(html + "update_atendimento/" + item.id_atendimento, obj)
-              .then(() => {
-                axios
-                  .get(html + "allatendimentos/" + hospital)
-                  .then((response) => {
-                    setatendimentos(response.data.rows);
-                    loadLeitos(unidade);
-                    setvieweditpaciente(0);
-                  })
-              })
-            return null;
-          });
-        });
-      });
-    });
-  };
-
-  /*
-  // encerrando um atendimento.
-  const closeAtendimento = (atendimento) => {
-    atendimento.map((item) => {
-      var obj = {
-        data_inicio: item.data_inicio,
-        data_termino: moment(),
-        historia_atual: item.historia_atual,
-        id_paciente: item.id_paciente,
-        id_unidade: item.id_unidade,
-        nome_paciente: item.nome_paciente,
-        leito: item.leito,
-        situacao: 0, // 1 = atendimento ativo; 0 = atendimento encerrado.
-        id_cliente: hospital,
-        classificacao: item.classificacao,
-        id_profissional: item.id_profissional,
-        convenio_id: item.convenio_id,
-        convenio_carteira: item.convenio_carteira,
-        faturamento_codigo_procedimento: item.faturamento_codigo_procedimento,
-      };
-      axios
-        .post(html + "update_atendimento/" + item.id_atendimento, obj)
-        .then(() => {
-          // rcuperando a id do leito a ter seu status alterado para livre.
-          let id_leito = statusleitos.filter((valor) => valor.leito == item.leito && valor.id_unidade == unidade).map(item => item.id_leito);
-          // liberando o leito.
-          var obj = {
-            id_unidade: unidade,
-            leito: item.leito,
-            status: 'LIVRE',
-          };
-          axios.post(html + "update_leito/" + id_leito, obj);
-          setvieweditpaciente(0);
-          loadLeitos(unidade);
-          loadAtendimentos();
-          toast(
-            settoast,
-            "ATENDIMENTO ENCERRADO COM SUCESSO NA BASE PULSAR",
-            "rgb(82, 190, 128, 1)",
-            3000
-          );
-        })
-        .catch(function () {
-          toast(
-            settoast,
-            "ERRO DE CONEXÃO, REINICIANDO APLICAÇÃO.",
-            "black",
-            5000
-          );
-          setTimeout(() => {
-            setpagina(0);
-            history.push("/");
-          }, 5000);
-        });
-      return null;
-    });
-  };
-  */
-
   // excluir um atendimento.
   const deleteAtendimento = (id) => {
     axios.get(html + "delete_atendimento/" + id).catch(function () {
@@ -635,7 +414,6 @@ function Cadastro() {
                 onClick={() => {
                   setpaciente(item);
                   setobjpaciente(item);
-                  console.log(item);
                   setatendimento(
                     atendimentos.filter(
                       (valor) =>
@@ -712,7 +490,6 @@ function Cadastro() {
       if ((xhr.readyState == 0 || xhr.readyState == 4) && xhr.status == 200) {
         let endereco = JSON.parse(xhr.responseText);
         if (endereco.logradouro != undefined) {
-          console.log("ENDEREÇO: " + endereco.logradouro);
           document.getElementById("inputEditEndereco").value =
             endereco.logradouro +
             ", BAIRRO: " +
@@ -738,12 +515,100 @@ function Cadastro() {
   };
 
   const [vieweditpaciente, setvieweditpaciente] = useState(0);
-  const DadosPacienteAtendimento = useCallback(() => {
+  function DadosPacienteAtendimento() {
+    const [viewoperadoraselector, setviewoperadoraselector] = useState(0);
+    function FormOperadoraSelector() {
+      return (
+        <div className="fundo"
+          style={{
+            display: viewoperadoraselector == 1 ? 'flex' : 'none',
+            flexDirection: 'column', justifyContent: 'center'
+          }}
+          onClick={() => setviewoperadoraselector(0)}
+        >
+          <div className="janela scroll"
+            style={{ height: '90vh', width: '40vw' }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <input
+              className="input"
+              autoComplete="off"
+              placeholder={
+                "BUSCAR..."
+              }
+              onFocus={(e) => (e.target.placeholder = "")}
+              onBlur={(e) =>
+                "BUSCAR..."
+              }
+              // onKeyUp={() => filterProcedimento()}
+              type="text"
+              id="filtrarProcedimento"
+              // defaultValue={filterprocedimento}
+              maxLength={100}
+              style={{ width: 'calc(100% - 20px)', backgroundColor: 'white' }}
+            ></input>
+            {operadoras.map(item => (
+              <div
+                className="button"
+                style={{ width: 'calc(100% - 20px)', padding: 10, display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}
+                onClick={() => {
+                  setviewoperadoraselector(0);
+                  setTimeout(() => {
+                    document.getElementById("inputConvenioNome").value = item.nome_operadora;
+                    document.getElementById("inputConvenioCodigo").value = item.id; // id do convênio no banco de dados Pulsar (não é o registr ANS).
+                  }, 1000);
+                }}>
+                <div>{item.nome_operadora}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )
+    }
+
+    // janela para selecionar se o atendimento será feito por convênio do paciente ou particular.
+    const [viewopcoesconvenio, setviewopcoesconvenio] = useState(0);
+    function SelecionaConvenioPaciente() {
+      if (paciente != null) {
+        return (
+          <div
+            className="fundo"
+            style={{ display: viewopcoesconvenio == 1 ? "flex" : "none" }}
+            onClick={() => {
+              setviewopcoesconvenio(0);
+            }}
+          >
+            <div className="janela" onClick={(e) => e.stopPropagation()}>
+              <div className="button" style={{ width: 200, minWidth: 200 }}
+                onClick={() => convenioselector('PARTICULAR')}
+              >
+                {'PARTICULAR'}
+              </div>
+
+              <div className="button"
+                style={{
+                  display: paciente.convenio_nome != null ? 'flex' : 'none',
+                  width: 200, minWidth: 200,
+                }}
+                onClick={() => convenioselector('CONVENIO')}
+              >
+                {
+                  paciente.convenio_nome != null ? paciente.convenio_nome : ''
+                }
+              </div>
+
+            </div>
+          </div>
+        )
+      } else {
+        return (null);
+      }
+    }
     var timeout = null;
     return (
       <div
         className="fundo"
-        style={{ display: (vieweditpaciente == 1 || vieweditpaciente == 2) && atendimento != null ? "flex" : "none" }}
+        style={{ display: (vieweditpaciente == 1 || vieweditpaciente == 2) && atendimento != null && paciente != null ? "flex" : "none" }}
         onClick={() => setvieweditpaciente(0)}
       >
         <div
@@ -1388,7 +1253,7 @@ function Cadastro() {
                 ></textarea>
               </div>
             </div>
-            <div className="button"
+            <div className="button" style={{ paddingLeft: 15, paddingRight: 15 }}
               onClick={() => {
                 if (viewoperadoraselector == 1) {
                   setviewoperadoraselector(0);
@@ -1652,8 +1517,6 @@ function Cadastro() {
               // identificando o procedimento com o código TUSS para consulta médica.
               localStorage.setItem('codigo_procedimento', '10101012');
               setviewopcoesconvenio(1);
-              // setpagina(20);
-              // history.push("/agendamento");
             }}
           >
             AGENDAR CONSULTA
@@ -1662,37 +1525,7 @@ function Cadastro() {
       </div>
     );
     // eslint-disable-next-line
-  }, [paciente, hospital, unidades, unidade, atendimento, atendimentos, vieweditpaciente, viewoperadoraselector, viewopcoesconvenio, viewtipoconsulta]);
-
-  // janela para selecionar se o atendimento será feito por convênio do paciente ou particular.
-  function SelecionaConvenioPaciente() {
-    return (
-      <div
-        className="fundo"
-        style={{ display: viewopcoesconvenio == 1 ? "flex" : "none" }}
-        onClick={() => {
-          setviewopcoesconvenio(0);
-        }}
-      >
-        <div className="janela" onClick={(e) => e.stopPropagation()}>
-          <div className="button" style={{ width: 200, minWidth: 200 }}
-            onClick={() => convenioselector('PARTICULAR')}
-          >
-            {'PARTICULAR'}
-          </div>
-          <div className="button"
-            style={{
-              display: procedimentos.filter(item => item.id_operadora == paciente.convenio_codigo && item.tuss_codigo == localStorage.getItem('codigo_procedimento')),
-              width: 200, minWidth: 200,
-            }}
-            onClick={() => convenioselector('CONVENIO')}
-          >
-            {paciente.convenio_nome}
-          </div>
-        </div>
-      </div>
-    )
-  }
+  };
 
   /*
   TIPO DE CONSULTA:
@@ -1755,7 +1588,7 @@ function Cadastro() {
   }
 
   const convenioselector = (valor) => {
-    localStorage.setItem("tipo_atendimento", valor);
+    localStorage.setItem("convenio", valor);
     setviewtipoconsulta(1);
     // history.push("/agendamento");
   }
@@ -1833,599 +1666,6 @@ function Cadastro() {
       });
   };
 
-  const [viewseletorunidades, setviewseletorunidades] = useState(0);
-  const [selectedunidade, setselectedunidade] = useState("");
-  function SeletorDeUnidades() {
-    return (
-      <div style={{ width: '80%' }}>
-        <div className="text1" style={{ marginTop: 50 }}>
-          UNIDADES DE INTERNAÇÃO
-        </div>
-        <div
-          id="scroll de unidades"
-          className="grid5"
-          style={{ width: '100%' }}
-        >
-          {unidades
-            .filter((item) => item.id_cliente == hospital)
-            .map((item) => (
-              <div
-                id={"unidade: " + item}
-                className={
-                  selectedunidade == item.id_unidade ? "button-selected" : "button"
-                }
-                style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  height: 150
-                }}
-                onClick={() => {
-                  console.log(item.id_unidade);
-                  if (item.nome_unidade != 'TRIAGEM') {
-                    setselectedunidade(item.id_unidade);
-                    setunidade(item.id_unidade);
-                    geraLeitos(item.total_leitos);
-                    loadAtendimentos();
-                    loadLeitos(item.id_unidade);
-                  } else {
-                    if (atendimentos.filter(valor => valor.id_paciente == paciente.id_paciente && valor.situacao == 1).length > 0) {
-                      toast(settoast, 'PACIENTE JÁ ESTÁ EM ATENDIMENTO', 'red', 2000);
-                    } else {
-                      setselectedunidade(item.id_unidade);
-                      setunidade(item.id_unidade);
-                      var obj = {
-                        data_inicio: moment(),
-                        data_termino: null,
-                        historia_atual: null,
-                        id_paciente: paciente.id_paciente,
-                        id_unidade: item.id_unidade,
-                        nome_paciente: paciente.nome_paciente,
-                        leito: null,
-                        situacao: 1, // 1 = atendimento ativo; 0 = atendimento encerrado.
-                        id_cliente: hospital,
-                        classificacao: null,
-                        id_profissional: item.id_profissional,
-                        convenio_id: paciente.convenio_codigo,
-                        convenio_carteira: paciente.convenio_carteira,
-                        faturamento_codigo_procedimento: null,
-                      };
-                      axios
-                        .post(html + "insert_atendimento", obj)
-                        .then(() => {
-                          loadAtendimentos();
-                          loadLeitos(item.id_unidade);
-                          setviewseletorunidades(0);
-                          setvieweditpaciente(0);
-                        });
-                    }
-                  }
-                }}
-              >
-                <div>{item.nome_unidade}</div>
-                <div style={{
-                  display: item.nome_unidade == 'TRIAGEM' ? 'none' : 'flex'
-                }}>
-                  {parseInt(item.total_leitos) -
-                    parseInt(
-                      atendimentos.filter(
-                        (check) => check.id_unidade == item.id_unidade
-                      ).length +
-                      " / " +
-                      item.total_leitos
-                    )}
-                </div>
-              </div>
-            ))}
-        </div>
-      </div>
-    );
-  }
-
-  const [statusleitos, setstatusleitos] = useState([]);
-  const loadLeitos = (unidade) => {
-    axios
-      .get(html + "list_leitos/" + unidade)
-      .then((response) => {
-        setstatusleitos(response.data.rows);
-      })
-      .catch(function (error) {
-        toast(
-          settoast,
-          "ERRO AO CARREGAR LEITOS, REINICIANDO APLICAÇÃO. " + error,
-          "black",
-          5000
-        );
-        setTimeout(() => {
-          setpagina(0);
-          history.push("/");
-        }, 5000);
-      });
-  };
-
-  const [arrayleitos, setarrayleitos] = useState([]);
-  const geraLeitos = (leitos) => {
-    let arrayleitos = [];
-    let count = 0;
-    while (count < leitos) {
-      count = count + 1;
-      arrayleitos.push(count);
-      console.log(count);
-    }
-    setarrayleitos(arrayleitos);
-  };
-
-  function SeletorDeLeitos() {
-    const insertLeito = (status) => {
-      var obj = {
-        id_unidade: unidade,
-        leito: localStorage.getItem("leito"),
-        status: status,
-      };
-      axios
-        .post(html + "inserir_leito", obj)
-        .then(() => {
-          loadLeitos(unidade);
-        })
-        .catch(function () {
-          toast(
-            settoast,
-            "ERRO DE CONEXÃO, REINICIANDO APLICAÇÃO.",
-            "black",
-            5000
-          );
-          setTimeout(() => {
-            setpagina(0);
-            history.push("/");
-          }, 5000);
-        });
-    };
-
-    const updateLeito = (status) => {
-      console.log(localStorage.getItem("leito"));
-      var id = JSON.parse(localStorage.getItem("leito")).pop().id_leito;
-      var leito = JSON.parse(localStorage.getItem("leito")).pop().leito;
-      console.log(id + " - " + leito);
-      var obj = {
-        id_unidade: unidade,
-        leito: leito,
-        status: status,
-      };
-      console.log(obj);
-      axios
-        .post(html + "update_leito/" + id, obj)
-        .then(() => {
-          loadLeitos(unidade);
-        })
-        .catch(function () {
-          toast(
-            settoast,
-            "ERRO DE CONEXÃO, REINICIANDO APLICAÇÃO.",
-            "black",
-            5000
-          );
-          setTimeout(() => {
-            setpagina(0);
-            history.push("/");
-          }, 5000);
-        });
-    };
-
-    const [viewstatusleito, setviewstatusleito] = useState(0);
-    function ViewStatusLeito() {
-      let arraystatusleitos = [
-        "LIVRE",
-        "LIMPEZA",
-        "MANUTENÇÃO",
-        "DESATIVADO",
-      ];
-      return (
-        <div
-          className="fundo"
-          style={{ display: viewstatusleito == 1 ? "flex" : "none" }}
-          onClick={() => {
-            setviewstatusleito(0);
-          }}
-        >
-          <div className="janela" onClick={(e) => e.stopPropagation()}>
-            {arraystatusleitos.map((item) => (
-              <div
-                className="button"
-                style={{ width: 150 }}
-                onClick={() => {
-                  if (localStorage.getItem("leito").length < 4) {
-                    console.log("INSERINDO STATUS PARA O LEITO...");
-                    insertLeito(item);
-                  } else {
-                    console.log("ATUALIZANDO STATUS PARA O LEITO...");
-                    updateLeito(item);
-                  }
-                }}
-              >
-                {item}
-              </div>
-            ))}
-          </div>
-        </div>
-      );
-    }
-
-    return (
-      <div id="scroll de leitos"
-        style={{
-          display: statusleitos.length > 0 ? "flex" : "none",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignSelf: "center",
-          width: '100%',
-        }}
-      >
-        <div className="text1">LEITOS</div>
-        <div className="grid10">
-          {arrayleitos.map((item) => (
-            <div
-              className="button"
-              style={{
-                position: "relative",
-                flexDirection: 'column',
-                justifyContent: 'flex-start',
-                alignItems: 'flex-start',
-                height: 100,
-                display: "flex",
-                opacity:
-                  atendimentos.filter(
-                    (valor) =>
-                      valor.id_cliente == hospital &&
-                      valor.id_unidade == selectedunidade &&
-                      valor.data_termino == null &&
-                      valor.leito == item
-                  ).length > 0
-                    ? 1
-                    : 1,
-              }}
-              onMouseOver={() => {
-                if (
-                  statusleitos.filter((valor) => valor.leito == item).length > 0
-                ) {
-                  localStorage.setItem(
-                    "leito",
-                    JSON.stringify(
-                      statusleitos.filter((valor) => valor.leito == item)
-                    )
-                  );
-                  console.log(JSON.parse(localStorage.getItem("leito")));
-                } else {
-                  localStorage.setItem("leito", item);
-                  console.log(JSON.parse(localStorage.getItem("leito")));
-                }
-              }}
-              onClick={() => {
-                if (
-                  // o atendimento ativo para o leito selecionado é do paciente selecionado.
-                  atendimentos.filter(
-                    (valor) =>
-                      valor.id_cliente == hospital &&
-                      valor.id_unidade == selectedunidade &&
-                      valor.id_paciente == paciente.id_paciente &&
-                      valor.data_termino == null &&
-                      valor.leito == item
-                  ).length > 0
-                ) {
-                  console.log("NADA A FAZER. O PACIENTE JÁ ESTÁ NESTE LEITO");
-                } else if (
-                  // existe um atendimento alocado no leito selecionado, para outro paciente.
-                  atendimentos.filter(
-                    (valor) =>
-                      valor.id_cliente == hospital &&
-                      valor.id_unidade == selectedunidade &&
-                      valor.id_paciente != paciente.id_paciente &&
-                      valor.data_termino == null &&
-                      valor.leito == item
-                  ).length > 0
-                ) {
-                  console.log(
-                    "NÃO É POSSÍVEL ALOCAR O PACIENTE NESTE LEITO, QUE JÁ ESTÁ OCUPADO POR OUTRO PACIENTE."
-                  );
-                  toast(settoast, "LEITO JÁ OCUPADO POR OUTRO PACIENTE.", 'red', 3000);
-                } else if (
-                  // não existe um atendimento alocado no leito selecionado.
-                  atendimentos.filter(
-                    (valor) =>
-                      valor.id_cliente == hospital &&
-                      valor.id_unidade == selectedunidade &&
-                      valor.data_termino == null &&
-                      valor.leito == item
-                  ).length == 0 &&
-                  // o paciente tem um atendimento ativo em outro leito.
-                  atendimentos.filter(
-                    (valor) =>
-                      valor.id_paciente == paciente.id_paciente &&
-                      valor.data_termino == null
-                  ).length > 0
-                ) {
-                  updateAtendimento(item, atendimento);
-                  // inserindo ou atualizando status do leito selecionado para ocupado.
-                  if (localStorage.getItem("leito").length < 4) {
-                    var obj = {
-                      id_unidade: unidade,
-                      leito: localStorage.getItem("leito"),
-                      status: "OCUPADO",
-                    };
-                    axios
-                      .post(html + "inserir_leito", obj)
-                      .then(() => {
-                        loadLeitos(unidade);
-                      })
-                      .catch(function () {
-                        toast(
-                          settoast,
-                          "ERRO DE CONEXÃO, REINICIANDO APLICAÇÃO.",
-                          "black",
-                          5000
-                        );
-                        setTimeout(() => {
-                          setpagina(0);
-                          history.push("/");
-                        }, 5000);
-                      });
-                  } else {
-                    var id = JSON.parse(localStorage.getItem("leito")).pop()
-                      .id_leito;
-                    var leito = JSON.parse(localStorage.getItem("leito")).pop()
-                      .leito;
-                    obj = {
-                      id_unidade: unidade,
-                      leito: leito,
-                      status: "OCUPADO",
-                    };
-                    console.log(obj);
-                    axios
-                      .post(html + "update_leito/" + id, obj)
-                      .then(() => {
-                        loadLeitos(unidade);
-                      })
-                      .catch(function () {
-                        toast(
-                          settoast,
-                          "ERRO DE CONEXÃO, REINICIANDO APLICAÇÃO.",
-                          "black",
-                          5000
-                        );
-                        setTimeout(() => {
-                          setpagina(0);
-                          history.push("/");
-                        }, 5000);
-                      });
-                  }
-                } else if (
-                  // não existe um atendimento alocado no leito selecionado.
-                  atendimentos.filter(
-                    (valor) =>
-                      valor.id_cliente == hospital &&
-                      valor.id_unidade == unidade &&
-                      valor.data_termino == null &&
-                      valor.leito == item
-                  ).length == 0 &&
-                  // o paciente não tem um atendimento ativo.
-                  atendimentos.filter(
-                    (valor) =>
-                      valor.id_paciente == paciente.id_paciente &&
-                      valor.data_termino == null
-                  ).length == 0
-                ) {
-                  insertAtendimento(
-                    paciente.id_paciente,
-                    paciente.nome_paciente,
-                    item
-                  );
-                  if (localStorage.getItem("leito").length < 4) {
-                    obj = {
-                      id_unidade: unidade,
-                      leito: localStorage.getItem("leito"),
-                      status: "OCUPADO",
-                    };
-                    axios
-                      .post(html + "inserir_leito", obj)
-                      .then(() => {
-                        loadLeitos(unidade);
-                      })
-                      .catch(function () {
-                        toast(
-                          settoast,
-                          "ERRO DE CONEXÃO, REINICIANDO APLICAÇÃO.",
-                          "black",
-                          5000
-                        );
-                        setTimeout(() => {
-                          setpagina(0);
-                          history.push("/");
-                        }, 5000);
-                      });
-                  } else {
-                    id = JSON.parse(localStorage.getItem("leito")).pop()
-                      .id_leito;
-                    leito = JSON.parse(localStorage.getItem("leito")).pop()
-                      .leito;
-                    obj = {
-                      id_unidade: unidade,
-                      leito: leito,
-                      status: "OCUPADO",
-                    };
-                    console.log(obj);
-                    axios
-                      .post(html + "update_leito/" + id, obj)
-                      .then(() => {
-                        loadLeitos(unidade);
-                      })
-                      .catch(function () {
-                        toast(
-                          settoast,
-                          "ERRO DE CONEXÃO, REINICIANDO APLICAÇÃO.",
-                          "black",
-                          5000
-                        );
-                        setTimeout(() => {
-                          setpagina(0);
-                          history.push("/");
-                        }, 5000);
-                      });
-                  }
-                } else {
-                }
-              }}
-            >
-              <div style={{ position: 'absolute', top: 2.5, left: 5, fontSize: 20, margin: 10 }}>{item}</div>
-              <div
-                style={{
-                  display:
-                    atendimentos.filter(
-                      (valor) =>
-                        valor.id_cliente == hospital &&
-                        valor.id_unidade == unidade &&
-                        valor.data_termino == null &&
-                        valor.leito == item,
-                    ).length > 0
-                      ? "flex"
-                      : "none",
-                  fontSize: 12,
-                  position: 'absolute',
-                  top: 50,
-                  padding: 5,
-                  alignContent: 'center',
-                  alignSelf: 'center',
-                }}
-              >
-                {atendimentos
-                  .filter(
-                    (valor) =>
-                      valor.id_cliente == hospital &&
-                      valor.id_unidade == unidade &&
-                      valor.data_termino == null &&
-                      valor.leito == item
-                  )
-                  .map((valor) => valor.nome_paciente.substring(0, 20) + "...")}
-              </div>
-              <div
-                className="button-yellow"
-                style={{
-                  height: 25,
-                  width: 25,
-                  minHeight: 25,
-                  minWidth: 25,
-                  borderRadius: 5,
-                  position: "absolute",
-                  top: 5,
-                  right: 5,
-                  fontSize: 12,
-                  backgroundColor: statusleitos
-                    .filter((valor) => valor.leito == item)
-                    .map((valor) =>
-                      valor.status == "LIVRE"
-                        ? "rgb(82, 190, 128, 1)"
-                        : valor.status == "OCUPADO"
-                          ? "#E59866"
-                          : valor.status == "MANUTENÇÃO"
-                            ? "#CCD1D1 "
-                            : valor.status == "DESATIVADO"
-                              ? "#EC7063"
-                              : valor.status == "LIMPEZA"
-                                ? "#85C1E9 "
-                                : "rgb(0, 0, 0, 0.5)"
-                    ),
-                }}
-                onClick={(e) => {
-                  console.log(statusleitos.filter((valor) => valor.leito == item && valor.id_unidade == unidade).map((valor) => valor.status).pop());
-                  if (statusleitos.filter((valor) => valor.leito == item && valor.id_unidade == unidade).map((valor) => valor.status).pop() == 'OCUPADO') {
-                    toast(settoast, 'NÃO É POSSÍVEL ALTERAR O STATUS DE UM LEITO OCUPADO', 'rgb(231, 76, 60, 1', 3000);
-                  } else {
-                    setviewstatusleito(1);
-                  }
-                  e.stopPropagation();
-                }}
-              >
-                {statusleitos
-                  .filter((valor) => valor.leito == item)
-                  .map((valor) =>
-                    valor.status == "LIVRE"
-                      ? "L"
-                      : valor.status == "OCUPADO"
-                        ? "O"
-                        : valor.status == "MANUTENÇÃO"
-                          ? "M"
-                          : valor.status == "LIMPEZA"
-                            ? "H"
-                            : valor.status == "DESATIVADO"
-                              ? "D"
-                              : ""
-                  )}
-              </div>
-            </div>
-          ))}
-        </div>
-        <ViewStatusLeito></ViewStatusLeito>
-      </div>
-    );
-  }
-
-  function MovimentaPaciente() {
-    return (
-      <div
-        className="fundo"
-        style={{
-          display: viewseletorunidades == 1 ? "flex" : "none",
-        }}
-      >
-        <div
-          className="janela scroll"
-          style={{
-            position: 'relative',
-            width: "90vw",
-            height: "90vh",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "flex-start",
-          }}
-        >
-          <div
-            className="text3"
-            style={{
-              position: "absolute",
-              top: 10,
-              left: 10,
-              margin: 5,
-              padding: 5,
-            }}
-          >
-            {paciente.nome_paciente +
-              ", " +
-              moment().diff(moment(paciente.dn_paciente), "years") +
-              " ANOS."}
-          </div>
-          <div
-            className="button-yellow"
-            style={{ position: "absolute", top: 10, right: 10 }}
-            onClick={() => {
-              setviewseletorunidades(0);
-            }}
-          >
-            <img
-              alt=""
-              src={back}
-              style={{
-                margin: 0,
-                height: 30,
-                width: 30,
-              }}
-            ></img>
-          </div>
-          <SeletorDeUnidades></SeletorDeUnidades>
-          <SeletorDeLeitos></SeletorDeLeitos>
-        </div>
-      </div>
-    );
-  }
-
   function BuscaPaciente() {
     return (
       <div id="cadastro de pacientes e de atendimentos"
@@ -2494,7 +1734,6 @@ function Cadastro() {
       >
         <ListaDePacientes></ListaDePacientes>
         <DadosPacienteAtendimento></DadosPacienteAtendimento>
-        <MovimentaPaciente></MovimentaPaciente>
         <ViewTipoDocumento></ViewTipoDocumento>
       </div>
     </div>

@@ -126,12 +126,18 @@ function Faturamento() {
   function ListOperadoras() {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '30vh', overflowX: 'hidden' }}>
-        <div id='cabecalho lista de operadoras' style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: -10 }}>
+        <div
+          className="button"
+          id='cabecalho lista de operadoras'
+          style={{
+            display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: -20,
+            backgroundColor: 'transparent',
+          }}>
           <div className="button" style={{ width: '20vw', backgroundColor: 'transparent' }}>{'NOME DA OPERADORA'}</div>
-          <div className="button" style={{ width: 100, backgroundColor: 'transparent' }}>{'REGISTRO ANS'}</div>
-          <div className="button" style={{ width: 130, backgroundColor: 'transparent' }}>{'TELEFONE'}</div>
-          <div className="button" style={{ width: 200, backgroundColor: 'transparent' }}>{'E-MAIL'}</div>
-          <div className="button" style={{ width: 200, backgroundColor: 'transparent' }}>{'CÓDIGO DO PRESTADOR'}</div>
+          <div className="button" style={{ width: '10vw', backgroundColor: 'transparent' }}>{'REGISTRO ANS'}</div>
+          <div className="button" style={{ width: '10vw', backgroundColor: 'transparent' }}>{'TELEFONE'}</div>
+          <div className="button" style={{ width: '10vw', backgroundColor: 'transparent' }}>{'E-MAIL'}</div>
+          <div className="button" style={{ width: '10vw', backgroundColor: 'transparent' }}>{'CÓDIGO DO PRESTADOR'}</div>
           <div className="button" style={{ width: 50, backgroundColor: 'transparent' }}>{''}</div>
           <div className="button" style={{ width: 50, backgroundColor: 'transparent' }}>{''}</div>
         </div>
@@ -144,7 +150,6 @@ function Faturamento() {
               borderRadius: 5,
             }}
             onClick={() => {
-              // document.getElementById('btnviewprocedimentos').style.display = 'flex';
               setselectedoperadora(item);
               console.log(selectedoperadora);
             }}
@@ -156,10 +161,10 @@ function Faturamento() {
               }}>
               {item.nome_operadora}
             </div>
-            <div className="button" style={{ width: 100, backgroundColor: 'transparent' }}>{item.registro_ans}</div>
-            <div className="button" style={{ width: 130, backgroundColor: 'transparent' }}>{item.telefone}</div>
-            <div className="button" style={{ width: 200, backgroundColor: 'transparent' }}>{item.email}</div>
-            <div className="button" style={{ width: 200, backgroundColor: 'transparent' }}>{item.codigo_prestador}</div>
+            <div className="button" style={{ width: '10vw', backgroundColor: 'transparent' }}>{item.registro_ans}</div>
+            <div className="button" style={{ width: '10vw', backgroundColor: 'transparent' }}>{item.telefone}</div>
+            <div className="button" style={{ width: '10vw', backgroundColor: 'transparent' }}>{item.email}</div>
+            <div className="button" style={{ width: '10vw', backgroundColor: 'transparent' }}>{item.codigo_prestador}</div>
             <div className="button green" style={{ width: 50 }}
               onClick={() => {
                 setselectedoperadora(item);
@@ -218,7 +223,7 @@ function Faturamento() {
   function ViewOperadoras() {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <div style={{ display: 'flex', flexDirection: 'row' }}>
+        <div style={{ display: 'flex', flexDirection: 'row', alignSelf: 'center' }}>
           <div id="botão para sair da tela de faturamento"
             className="button-yellow"
             style={{ maxHeight: 50, maxWidth: 50, alignSelf: 'center' }}
@@ -232,12 +237,16 @@ function Faturamento() {
               style={{ width: 30, height: 30 }}
             ></img>
           </div>
-          <div className="text2" style={{ fontSize: 20 }}>LISTA DE OPERADORAS CADASTRADAS</div>
+          <div className="text2" style={{ fontSize: 22 }}>LISTA DE OPERADORAS CADASTRADAS</div>
         </div>
         <ListOperadoras></ListOperadoras>
         <FormOperadoras></FormOperadoras>
-        <div id='btnviewprocedimentos' className="button"
-          style={{ display: selectedoperadora.nome_operadora != undefined ? 'flex' : 'none' }}
+        <div id='btnviewprocedimentos'
+          className={viewprocedimentos == 0 ? "button" : "button-selected"}
+          style={{
+            display: selectedoperadora.nome_operadora != undefined ? 'flex' : 'none',
+            width: '30vw', alignSelf: 'center', padding: 20
+          }}
           onClick={() => {
             if (viewprocedimentos == 0) {
               setviewprocedimentos(1)
@@ -245,7 +254,9 @@ function Faturamento() {
               setviewprocedimentos(0);
             }
           }}>
-          {'VER PROCEDIMENTOS CADASTRADOS PARA A OPERADORA ' + selectedoperadora.nome_operadora}
+          {viewprocedimentos == 0 ?
+            'VER PROCEDIMENTOS CADASTRADOS PARA A OPERADORA ' + selectedoperadora.nome_operadora :
+            'OCULTAR PROCEDIMENTOS CADASTRADOS PARA A OPERADORA ' + selectedoperadora.nome_operadora}
         </div>
         <ViewProcedimentos></ViewProcedimentos>
       </div>
@@ -451,25 +462,32 @@ function Faturamento() {
   function ListProcedimentos() {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: '30vh', overflowX: 'hidden' }}>
-        <div id='cabecalho lista de operadoras' style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginBottom: -10 }}>
-          <div className="button" style={{ width: 200, backgroundColor: 'transparent' }}>{'NOME DA OPERADORA'}</div>
-          <div className="button" style={{ width: 150, backgroundColor: 'transparent' }}>{'CÓDIGO TUSS'}</div>
-          <div className="button" style={{ width: '25vw', backgroundColor: 'transparent' }}>{'TERMINOLOGIA'}</div>
-          <div className="button" style={{ width: '25vw', backgroundColor: 'transparent' }}>{'DESCRIÇÃO'}</div>
-          <div className="button" style={{ width: 50, backgroundColor: 'transparent' }}>{''}</div>
-          <div className="button" style={{ width: 50, backgroundColor: 'transparent' }}>{''}</div>
+        <div id='cabecalho lista de procedimentos'
+          className="button"
+          style={{
+            display: 'flex', flexDirection: 'row', justifyContent: 'space-between', marginBottom: -5,
+            backgroundColor: 'transparent'
+          }}>
+          <div className='text2' style={{ width: '10vw' }}>{'NOME DA OPERADORA'}</div>
+          <div className='text2' style={{ width: '10vw' }}>{'CÓDIGO TUSS'}</div>
+          <div className='text2' style={{ width: '25vw' }}>{'TERMINOLOGIA'}</div>
+          <div className='text2' style={{ width: '25vw' }}>{'DESCRIÇÃO'}</div>
+          <div className='text2' style={{ width: 50 }}>{''}</div>
+          <div className='text2' style={{ width: 50 }}>{''}</div>
         </div>
         {procedimentos.filter(item => item.id_operadora == selectedoperadora.id).map(item => (
-          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}
+          <div
+            className="button"
+            style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}
             onClick={() => {
               setselectedprocedimento(item);
               setformprocedimento(2);
             }}
           >
-            <div className="button" style={{ width: 200 }}>{item.nome_operadora}</div>
-            <div className="button" style={{ width: 150 }}>{item.tuss_codigo}</div>
-            <div className="button" style={{ width: '25vw' }}>{item.tuss_terminologia.toUpperCase()}</div>
-            <div className="button" style={{ width: '25vw' }}>{item.rol_ans_descricao}</div>
+            <div className="button" style={{ width: '10vw', backgroundColor: '#006666' }}>{item.nome_operadora}</div>
+            <div className='text2' style={{ width: '10vw' }}>{item.tuss_codigo}</div>
+            <div className='text2' style={{ width: '25vw' }}>{item.tuss_terminologia.toUpperCase()}</div>
+            <div className='text2' style={{ width: '25vw' }}>{item.rol_ans_descricao}</div>
             <div className="button green" style={{ width: 50 }}
               onClick={(e) => {
                 setselectedprocedimento(item);
@@ -765,7 +783,7 @@ function Faturamento() {
     >
       <div className='chassi scroll'
         style={{
-          display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly',
+          display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
           width: 'calc(100vw - 20px)',
         }}>
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>

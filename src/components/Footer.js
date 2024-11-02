@@ -1,8 +1,13 @@
 /* eslint eqeqeq: "off" */
 
-import React from 'react';
+import React, { useContext } from 'react';
+import Context from '../pages/Context';
 
 function Footer() {
+
+  const {
+    usuario,
+  } = useContext(Context);
 
   return (
     <div style={{
@@ -15,7 +20,7 @@ function Footer() {
         _______________________________________________
       </div>
       <div id="identificação - documento" className="text1">
-        {'NOME E CARIMBO DO RESPONSÁVEL PELO DOCUMENTO'}
+        {'DR(A). ' + usuario.nome_usuario + ' - ' + usuario.conselho + ' ' + usuario.n_conselho}
       </div>
     </div>
   )
