@@ -608,7 +608,7 @@ function Login() {
           <div
             className="button"
             style={{
-              display: "flex",
+              display: window.innerWidth < mobilewidth ? "none" : "flex",
               padding: 10,
               margin: 5,
               minWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
