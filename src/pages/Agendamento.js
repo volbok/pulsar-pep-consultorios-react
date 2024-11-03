@@ -26,6 +26,8 @@ function Agendamento() {
     setdialogo,
     setcard,
     setdono_documento,
+    mobilewidth,
+    usuario,
   } = useContext(Context);
 
   useEffect(() => {
@@ -123,7 +125,11 @@ function Agendamento() {
         var x = response.data.rows;
         var y = x.filter(item => item.id_unidade == 5);
         // item.id_paciente == paciente.id_paciente
-        setarrayatendimentos(y);
+        if (window.innerWidth > mobilewidth) {
+          setarrayatendimentos(y);
+        } else {
+          setarrayatendimentos(y.filter(atendimento => atendimento.id_profissional == usuario.id));
+        }
       })
   };
 
@@ -630,15 +636,15 @@ function Agendamento() {
           flexDirection: "column",
         }}
       >
-        <div id="scroll atendimentos com pacientes"
+        <div id="scroll atendimentos com pacientes - desktop"
           className='scroll'
           style={{
             display: selectdate != null && arrayatendimentos.filter(item => item.situacao == 3 && moment(item.data_inicio).format('DD/MM/YYYY') == selectdate).length > 0 ? "flex" : "none",
             flexDirection: 'column',
             justifyContent: "flex-start",
             height: '75vh',
-            width: '50vw',
-            marginLeft: 20
+            width: window.innerWidth < mobilewidth ? '90vw' : '50vw',
+            marginLeft: window.innerWidth < mobilewidth ? 0 : 20,
           }}
         >
           {arrayatendimentos
@@ -690,7 +696,10 @@ function Agendamento() {
                           )
                             .map((valor) => valor.nome_paciente + ', ' + moment().diff(moment(valor.dn_paciente), 'years') + ' ANOS')}
                         </div>
-                        <div style={{ textAlign: 'left' }}>
+                        <div style={{
+                          display: window.innerWidth < mobilewidth ? 'none' : 'flex',
+                          textAlign: 'left'
+                        }}>
                           {especialistas.filter(valor => valor.id_usuario == item.id_profissional).map(item => 'DR(A). ' + item.nome_usuario + ' - ' + item.conselho + ' ' + item.n_conselho)}
                         </div>
                       </div>
@@ -703,7 +712,10 @@ function Agendamento() {
                             setdono_documento(especialistas.filter(valor => valor.id_usuario == item.id_profissional).pop());
                             geraGuiaConsulta();
                           }}
-                          style={{ width: 50, height: 50, alignSelf: 'flex-end' }}
+                          style={{
+                            display: window.innerWidth < mobilewidth ? 'none' : 'flex',
+                            width: 50, height: 50, alignSelf: 'flex-end'
+                          }}
                         >
                           <img
                             alt=""
@@ -726,7 +738,10 @@ function Agendamento() {
                               item.id_atendimento
                             );
                           }}
-                          style={{ width: 50, height: 50, alignSelf: 'flex-end' }}
+                          style={{
+                            width: 50, height: 50, alignSelf: 'flex-end',
+                            display: window.innerWidth < mobilewidth ? 'none' : 'flex',
+                          }}
                         >
                           <img
                             alt=""
@@ -753,7 +768,7 @@ function Agendamento() {
             flexDirection: 'column',
             justifyContent: "center",
             height: '75vh',
-            width: '50vw',
+            width: window.innerWidth < mobilewidth ? '80vw' : '50vw',
             marginLeft: 20
           }}
         >
@@ -957,14 +972,17 @@ function Agendamento() {
     )
   } else {
     return (
-      <div
+      <div className='main'
         style={{
-          display: 'flex', flexDirection: 'column',
-          justifyContent: 'center', alignContent: 'center',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-start',
+          alignContent: 'center',
           alignSelf: 'center',
-          position: 'relative',
-          height: '100vh',
+          backgroundColor: 'white',
+          borderColor: 'white',
         }}>
+
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
           <div id="botão para sair da tela de agendamento"
             className="button-yellow"
@@ -981,21 +999,39 @@ function Agendamento() {
               style={{ width: 30, height: 30 }}
             ></img>
           </div>
-          <div className='text1' style={{ fontSize: 22 }}>
+          <div className='text1'
+            style={{
+              fontSize: window.innerWidth < mobilewidth ? 16 : 22
+            }}
+          >
             {'CONSULTAS AGENDADAS'}
           </div>
         </div>
         <div
           style={{
-            display: 'flex', flexDirection: 'row', justifyContent: 'center',
+            display: 'flex',
+            flexDirection: window.innerWidth < mobilewidth ? 'column' : 'row',
+            justifyContent: window.innerWidth < mobilewidth ? 'flex-start' : 'center',
             marginTop: 20,
             alignContent: 'center',
             alignItems: 'center',
           }}
         >
           <DatePicker></DatePicker>
-          <ListaTodosAtendimentos></ListaTodosAtendimentos>
-          <GuiaConsulta></GuiaConsulta>
+          <div
+            style={{
+              display: 'flex',
+              flexDirection: window.innerWidth < mobilewidth ? 'column' : 'row',
+              backgroundColor: 'white',
+              borderColor: 'white',
+              borderRadius: 5,
+              zIndex: 20
+            }}>
+            <ListaTodosAtendimentos></ListaTodosAtendimentos>
+            <div style={{ display: window.innerWidth < mobilewidth ? 'none' : 'flex' }}>
+              <GuiaConsulta></GuiaConsulta>
+            </div>
+          </div>
         </div>
       </div>
     )
