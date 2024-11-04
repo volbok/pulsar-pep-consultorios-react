@@ -8,7 +8,7 @@ import "moment/locale/pt-br";
 import { useHistory } from "react-router-dom";
 // funções.
 import toast from "../functions/toast";
-import checkinput from "../functions/checkinput";
+// import checkinput from "../functions/checkinput";
 import maskdate from "../functions/maskdate";
 import maskphone from "../functions/maskphone";
 // imagens.
@@ -580,7 +580,10 @@ function Cadastro() {
           >
             <div className="janela" onClick={(e) => e.stopPropagation()}>
               <div className="button" style={{ width: 200, minWidth: 200 }}
-                onClick={() => convenioselector('PARTICULAR')}
+                onClick={() => {
+                  convenioselector('PARTICULAR');
+                  localStorage.setItem('PARTICULAR', 'PARTICULAR');
+                }}
               >
                 {'PARTICULAR'}
               </div>
@@ -1466,9 +1469,11 @@ function Cadastro() {
                 className="button-green"
                 onClick={() => {
                   if (vieweditpaciente == 1) {
-                    checkinput('textarea', settoast, ["inputEditNomePaciente", "inputEditDn", "inputEditNumeroDocumento", "inputEditNomeMae", "inputEditEndereco", "inputEditTelefone", "inputEditEmail"], "btnUpdatePaciente", updatePaciente, [])
+                    // checkinput('textarea', settoast, ["inputEditNomePaciente", "inputEditDn", "inputEditNumeroDocumento", "inputEditNomeMae"], "btnUpdatePaciente", updatePaciente, [])
+                    updatePaciente();
                   } else {
-                    checkinput('textarea', settoast, ["inputEditNomePaciente", "inputEditDn", "inputEditNumeroDocumento", "inputEditNomeMae", "inputEditEndereco", "inputEditTelefone", "inputEditEmail"], "btnUpdatePaciente", insertPaciente, [])
+                    // checkinput('textarea', settoast, ["inputEditNomePaciente", "inputEditDn", "inputEditNumeroDocumento", "inputEditNomeMae"], "btnUpdatePaciente", insertPaciente, [])
+                    insertPaciente();
                   }
                 }}
                 style={{ width: 50, height: 50, alignSelf: "center" }}

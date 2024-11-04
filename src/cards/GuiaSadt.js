@@ -76,9 +76,17 @@ function GuiaSadt() {
       y = x.filter(item => parseInt(item.id) == parseInt(objatendimento.convenio_id));
       let operadora = y.pop();
       setoperadora(operadora);
-      setlogo(operadora.logo_operadora);
-      setregistro_ans(operadora.registro_ans);
-      setcodigo_prestador(operadora.codigo_prestador);
+      console.log(operadora);
+      if (operadora == undefined) {
+        setlogo('');
+        setregistro_ans('');
+        setcodigo_prestador('');
+        setoperadora('PARTICULAR');
+      } else {
+        setlogo(operadora.logo_operadora);
+        setregistro_ans(operadora.registro_ans);
+        setcodigo_prestador(operadora.codigo_prestador);
+      }
     })
   }
 
@@ -441,7 +449,12 @@ function GuiaSadt() {
                 alignContent: 'center',
                 alignItems: 'center',
               }}>
-                <img alt="" src={logo} style={{ width: 100, height: 100 }}></img>
+                <img alt="" src={logo}
+                  style={{
+                    display: logo != '' ? 'flex' : 'none',
+                    width: 100, height: 100
+                  }}>
+                </img>
                 <div style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center', width: 500 }}>
                   {'GUIA DE SERVIÇO PROFISSIONAL / SERVIÇO AUXILIAR DE DIAGNÓSTICO E TERAPIA - SP/SADT'}
                 </div>

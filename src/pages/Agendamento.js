@@ -188,6 +188,7 @@ function Agendamento() {
       convenio_carteira: paciente.convenio_carteira,
       faturamento_codigo_procedimento: null,
     };
+    console.log(obj);
     axios
       .post(html + "insert_consulta", obj)
       .then(() => {
@@ -796,7 +797,11 @@ function Agendamento() {
     let inicio = moment(selectdate, 'DD/MM/YYYY').startOf('day').add(7, 'hours');
     array.push(inicio.format('DD/MM/YYYY - HH:mm'))
     for (var i = 0; i < 24; i++) {
-      array.push(inicio.add(30, 'minutes').format('DD/MM/YYYY - HH:mm'));
+      if (localStorage.getItem('PARTICULAR')) {
+        array.push(inicio.add(45, 'minutes').format('DD/MM/YYYY - HH:mm'));
+      } else {
+        array.push(inicio.add(30, 'minutes').format('DD/MM/YYYY - HH:mm'));
+      }
     }
     setarrayhorarios(array);
   }
