@@ -8,6 +8,7 @@ import toast from "../functions/toast";
 import power from "../images/power.svg";
 import salvar from "../images/salvar.svg";
 import back from "../images/back.svg";
+import logo from "../images/logo.svg";
 
 // componentes.
 import Logo from "../components/Logo";
@@ -31,6 +32,7 @@ function Login() {
     usuario,
     setusuarios,
     setcliente,
+    cliente,
     sethospital,
     mobilewidth,
     setoperadoras,
@@ -60,7 +62,7 @@ function Login() {
       }
     }
     // eslint-disable-next-line
-  }, [pagina]);
+  }, [pagina, cliente]);
 
   // carregar configurações do usuário logado.
   // eslint-disable-next-line
@@ -841,13 +843,28 @@ function Login() {
           className="text2 popin"
           style={{
             marginTop: 20,
-            display:
-              window.innerWidth < mobilewidth && viewalterarsenha == 1
-                ? "none"
-                : "flex",
+            display: cliente.logo == undefined ? "flex" : "none",
           }}
         >
           <Logo href="/site/index.html" target="_blank" rel="noreferrer" height={100} width={100}></Logo>
+        </div>
+        <div style={{
+          display: cliente.logo != undefined ? "flex" : "none",
+          flexDirection: 'column',
+          justifyContent: 'center',
+          backgroundColor: 'white', padding: 10, borderRadius: 5,
+          width: 0.3 * 1074, height: 0.3 * 539,
+          alignSelf: 'center',
+          margin: 20,
+        }}>
+          <img
+            alt=""
+            src={cliente.logo}
+            style={{
+              width: 0.3 * 1074, height: 0.3 * 539,
+              alignSelf: 'center'
+            }}
+          ></img>
         </div>
         <div
           className="text2"
@@ -940,7 +957,17 @@ function Login() {
             }}
           ></img>
         </div>
-        <div className="text2" style={{ fontSize: 10 }}>{'CONTATO DO DESENVOLVEDOR'}</div>
+        <div>{ }</div>
+        <img
+          src={logo}
+          style={{
+            margin: 10,
+            height: 30,
+            width: 30,
+            alignSelf: 'center'
+          }}
+        ></img>
+        <div className="text2" style={{ fontSize: 10, marginTop: 0 }}>{'CONTATO DO DESENVOLVEDOR'}</div>
         <div className="text2" style={{ fontSize: 10, marginTop: -5 }}>{'(31) 99226-6268'}</div>
       </div>
     </div>

@@ -544,7 +544,7 @@ function Agendamento() {
                           )
                             .map((valor) => valor.nome_paciente + ', ' + moment().diff(moment(valor.dn_paciente), 'years') + ' ANOS')}
                         </div>
-                        <div>
+                        <div style={{ textAlign: 'left' }}>
                           {especialistas.filter(valor => valor.id_usuario == item.id_profissional).map(item => 'DR(A). ' + item.nome_usuario + ' - ' + item.conselho + ' ' + item.n_conselho)}
                         </div>
                       </div>

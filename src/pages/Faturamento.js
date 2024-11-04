@@ -94,7 +94,7 @@ function Faturamento() {
     }
     axios.post(html + 'insert_operadora', obj).then(() => {
       console.log('OPERADORA REGISTRADA COM SUCESSO.');
-      loadOperadoras();
+      // loadOperadoras();
       setformoperadora(0);
     })
   }
@@ -110,7 +110,9 @@ function Faturamento() {
     }
     axios.post(html + 'update_operadora/' + item.id, obj).then(() => {
       console.log('OPERADORA ATUALIZADA COM SUCESSO.');
-      loadOperadoras();
+      setTimeout(() => {
+        loadOperadoras();
+      }, 2000);
       setformoperadora(0);
     })
   }
@@ -331,7 +333,7 @@ function Faturamento() {
               id="inputEmail"
               defaultValue={formoperadora == 2 ? selectedoperadora.email : ''}
               maxLength={200}
-              style={{ margin: 5, width: window.innerWidth < 426 ? "100%" : "30vw" }}
+              style={{ margin: 5, width: window.innerWidth < 426 ? "100%" : "30vw", textTransform: 'none' }}
             ></input>
           </div>
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
