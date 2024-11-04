@@ -49,7 +49,7 @@ function GuiaSadt() {
   const [guia_prestador, setguia_prestador] = useState('');
   const [registro_ans, setregistro_ans] = useState('');
   const [n_guia_principal, setn_guia_principal] = useState('');
-  const [data_autorizacao, setdata_autorizacao] = useState(moment().format('DD/MM/YYYY'));
+  const [data_autorizacao, setdata_autorizacao] = useState('');
   const [senha, setsenha] = useState('');
   const [validade_senha, setvalidade_senha] = useState(moment().add(30, 'days').format('DD/MM/YYYY'));
   const [n_guia_operadora, setn_guia_operadora] = useState('');
@@ -837,7 +837,8 @@ function GuiaSadt() {
               </div>
               <div id='linhas dos registros de exames solicitados'
                 style={{
-                  display: 'flex', flexDirection: 'column',
+                  display: 'flex', flexDirection: 'row',
+                  flexWrap: 'wrap',
                   borderStyle: 'solid',
                   borderColor: '#b2babb',
                   borderWidth: 1,
@@ -846,12 +847,8 @@ function GuiaSadt() {
                   margin: 5,
                 }}>
                 {laboratorio.map(item => (
-                  <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', width: '100%' }}>
-                    {pdfcampo('24 - TABELA', '21', 1)}
-                    {pdfcampo('25 - CÓDIGO DO PROCEDIMENTO OU ITEM ASSISTENCIAL', item.codigo_exame, 2)}
-                    {pdfcampo('26 - DESCRIÇÃO', item.nome_exame, 4)}
-                    {pdfcampo('27 - QTDE SOLIC.', '01', 1)}
-                    {pdfcampo('28 - QTDE AUT.', '01', 1)}
+                  <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', fontFamily: 'Helvetica', fontSize: 8, winWidth: 200 }}>
+                    {item.codigo_exame + ' - ' + item.nome_exame.substring(0, 20).toUpperCase() + '..., '}
                   </div>
                 ))}
               </div>

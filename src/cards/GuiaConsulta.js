@@ -21,28 +21,48 @@ function GuiaConsulta() {
   useEffect(() => {
     console.log('GUIA CONSULTA CARREGADA');
     if (card == 'guia-consulta') {
-      setn_carteira(objpaciente.convenio_carteira);
-      setvalidade_carteira(objpaciente.validade_carteira);
-      setnome(objpaciente.nome_paciente);
-      setcns(objpaciente.cns);
-      console.log(dono_documento);
+      if (localStorage.getItem('PARTICULAR') != 'PARTICULAR') {
+        setn_carteira(objpaciente.convenio_carteira);
+        setvalidade_carteira(objpaciente.validade_carteira);
+        setnome(objpaciente.nome_paciente);
+        setcns(objpaciente.cns != undefined ? objpaciente.cns : '');
+        console.log(dono_documento);
+      } else {
+        setn_carteira('');
+        setvalidade_carteira('');
+        setnome(objpaciente.nome_paciente);
+        setcns('');
+      }
 
       console.log(operadoras);
       // eslint-disable-next-line
       operadora = operadoras.filter(valor => valor.id == objpaciente.convenio_codigo).pop();
       console.log(objpaciente.convenio_codigo);
-      console.log(operadoras);
+      console.log('OPERADORA: ' + operadora);
 
-      setlogo(operadora.logo_operadora);
-      setregistro_ans(operadora.registro_ans);
-      setcodigo_prestador(operadora.codigo_prestador);
+      if (localStorage.getItem('PARTICULAR') != 'PARTICULAR') {
+        setlogo(operadora.logo_operadora);
+        setregistro_ans(operadora.registro_ans);
+        setcodigo_prestador(operadora.codigo_prestador);
 
-      setnome_contratado(cliente.nome_cliente);
-      setnome_solicitante(dono_documento.nome_usuario);
-      setconselho_solicitante(dono_documento.conselho);
-      setn_conselho_solicitante(dono_documento.n_conselho);
-      setuf_solicitante('MG');
-      setcodigo_cbo(dono_documento.codigo_cbo);
+        setnome_contratado(cliente.nome_cliente);
+        setnome_solicitante(dono_documento.nome_usuario);
+        setconselho_solicitante(dono_documento.conselho);
+        setn_conselho_solicitante(dono_documento.n_conselho);
+        setuf_solicitante('MG');
+        setcodigo_cbo(dono_documento.codigo_cbo);
+      } else {
+        setlogo('');
+        setregistro_ans('');
+        setcodigo_prestador('');
+
+        setnome_contratado('');
+        setnome_solicitante(dono_documento.nome_usuario);
+        setconselho_solicitante(dono_documento.conselho);
+        setn_conselho_solicitante(dono_documento.n_conselho);
+        setuf_solicitante('MG');
+        setcodigo_cbo('');
+      }
 
       settipoconsulta(localStorage.getItem('tipo_consulta'));
       console.log(dono_documento);
@@ -276,7 +296,12 @@ function GuiaConsulta() {
                 height: 100, alignContent: 'center',
                 alignItems: 'center',
               }}>
-                <img alt="" src={logo} style={{ width: 100, height: 100 }}></img>
+                <img alt="" src={logo}
+                  style={{
+                    display: logo == '' ? 'none' : 'flex',
+                    width: 100, height: 100
+                  }}>
+                </img>
                 <div style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center', width: 500 }}>
                   {'GUIA DE CONSULTA'}
                 </div>
@@ -299,7 +324,7 @@ function GuiaConsulta() {
               <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
                 {editcampo('9 - CÓDIGO NA OPERADORA', codigo_prestador, setcodigo_prestador, 200, 0)}
                 {editcampo('10 - NOME DO CONTRATADO', nome_contratado, setnome_contratado, '', 1)}
-                {editcampo('11 - CÓDIGO CNES', cliente.cnes, setcodigo_cbo, 200, 0)}
+                {editcampo('11 - CÓDIGO CNES', localStorage.getItem('PARTICULAR') == 'PARTICULAR' ? '' : cliente.cnes, setcodigo_cbo, 200, 0)}
               </div>
               <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
                 {editcampo('12 - NOME DO PROFISSIONAL EXECUTANTE', nome_solicitante, setnome_solicitante, '', 1)}
@@ -417,7 +442,7 @@ function GuiaConsulta() {
               <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
                 {pdfcampo('9 - CÓDIGO NA OPERADORA', codigo_prestador, 2)}
                 {pdfcampo('10 - NOME DO CONTRATADO', nome_contratado, 4)}
-                {pdfcampo('11 - CÓDIGO CNES', cliente.cnes, 2)}
+                {pdfcampo('11 - CÓDIGO CNES', localStorage.getItem('PARTICULAR') == 'PARTICULAR' ? '' : cliente.cnes, 2)}
               </div>
               <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
                 {pdfcampo('12 - NOME DO PROFISSIONAL EXECUTANTE', nome_solicitante, 5)}

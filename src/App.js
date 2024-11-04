@@ -130,10 +130,14 @@ function App() {
     'CARDIOLOGIA',
     'CLÍNICA MÉDICA',
     'CIRURGIA GERAL',
-    'CIRURGIA TORÁCICA',
+    'PEDIATRA',
     'UROLOGIA',
     'RADIOLOGIA',
     'MEDICINA INTENSIVA',
+    'FISIOTERAPIA',
+    'FONOAUDIOLOGIA',
+    'TERAPIA OCUPACIONAL',
+    'PSICOLOGIA',
   ]);
 
   // largura do dispositivo (global).

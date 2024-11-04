@@ -453,7 +453,7 @@ function Login() {
           onFocus={(e) => (e.target.placeholder = "")}
           onBlur={(e) => (e.target.placeholder = "SENHA")}
           onChange={() => {
-            checkLogin();
+            // checkLogin();
           }}
           style={{
             marginTop: 10,
@@ -464,6 +464,14 @@ function Login() {
             pointerEvents: 'none'
           }}
         ></input>
+        <div className="button-red"
+          style={{ width: 130, alignSelf: 'center' }}
+          onClick={() => {
+            checkLogin();
+          }}
+        >
+          {'ENTRAR'}
+        </div>
       </div>
     );
     // eslint-disable-next-line
@@ -899,7 +907,7 @@ function Login() {
         <ListaDeUnidadesAssistenciais></ListaDeUnidadesAssistenciais>
         <ListaDeUnidadesDeApoio></ListaDeUnidadesDeApoio>
         <div
-          className="button-red"
+          className="button-yellow"
           style={{
             display: "flex",
             position: "sticky",

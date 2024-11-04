@@ -407,11 +407,12 @@ function Consultas() {
       .then(() => {
         console.log('AGENDAMENTO DE CONSULTA INSERIDO COM SUCESSO')
         loadAtendimentos();
-        geraWhatsapp(inicio);
+        // geraWhatsapp(inicio);
       });
   };
 
   // ENVIO DE MENSAGENS DE AGENDAMENTO DA CONSULTA PELO WHATSAPP.
+  // eslint-disable-next-line
   function geraWhatsapp(inicio) {
 
     const gzappy_url_envia_mensagem = "https://api.gzappy.com/v1/message/send-message/";

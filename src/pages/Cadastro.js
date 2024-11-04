@@ -266,6 +266,7 @@ function Cadastro() {
       .get(html + "delete_paciente/" + paciente)
       .then(() => {
         loadPacientes();
+        setvieweditpaciente(0);
         toast(
           settoast,
           "PACIENTE EXCLUÍDO COM SUCESSO DA BASE PULSAR",
@@ -309,33 +310,6 @@ function Cadastro() {
       }, 5000);
     });
   };
-
-  const [viewtipodocumento, setviewtipodocumento] = useState(0);
-  function ViewTipoDocumento() {
-    let array = ["CPF", "RG", "CERT. NASCTO.", "OUTRO"];
-    return (
-      <div
-        className="fundo"
-        style={{ display: viewtipodocumento == 1 ? "flex" : "none" }}
-        onClick={() => setviewtipodocumento(0)}
-      >
-        <div className="janela scroll" onClick={(e) => e.stopPropagation()}>
-          {array.map((item) => (
-            <div
-              className="button"
-              style={{ width: 100 }}
-              onClick={() => {
-                document.getElementById("inputEditTipoDocumento").value = item;
-                setviewtipodocumento(0);
-              }}
-            >
-              {item}
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
 
   const [filterpaciente, setfilterpaciente] = useState("");
   var timeout = null;
@@ -565,7 +539,32 @@ function Cadastro() {
         </div>
       )
     }
-
+    const [viewtipodocumento, setviewtipodocumento] = useState(0);
+    function ViewTipoDocumento() {
+      let array = ["CPF", "RG", "CERT. NASCTO.", "OUTRO"];
+      return (
+        <div
+          className="fundo"
+          style={{ display: viewtipodocumento == 1 ? "flex" : "none" }}
+          onClick={() => setviewtipodocumento(0)}
+        >
+          <div className="janela scroll" onClick={(e) => e.stopPropagation()}>
+            {array.map((item) => (
+              <div
+                className="button"
+                style={{ width: 100 }}
+                onClick={() => {
+                  document.getElementById("inputEditTipoDocumento").value = item;
+                  setviewtipodocumento(0);
+                }}
+              >
+                {item}
+              </div>
+            ))}
+          </div>
+        </div>
+      );
+    }
     // janela para selecionar se o atendimento será feito por convênio do paciente ou particular.
     const [viewopcoesconvenio, setviewopcoesconvenio] = useState(0);
     function SelecionaConvenioPaciente() {
@@ -590,10 +589,13 @@ function Cadastro() {
 
               <div className="button"
                 style={{
-                  display: paciente.convenio_nome != null ? 'flex' : 'none',
+                  display: paciente.convenio_nome != null && paciente.convenio_nome != '' ? 'flex' : 'none',
                   width: 200, minWidth: 200,
                 }}
-                onClick={() => convenioselector('CONVENIO')}
+                onClick={() => {
+                  convenioselector('CONVENIO');
+                  localStorage.setItem('PARTICULAR', 'CONVENIO');
+                }}
               >
                 {
                   paciente.convenio_nome != null ? paciente.convenio_nome : ''
@@ -628,7 +630,7 @@ function Cadastro() {
             className="button-yellow"
             onClick={() => setvieweditpaciente(0)}
             style={{
-              display: vieweditpaciente == 1 ? "flex" : "none",
+              display: "none",
               position: 'absolute', top: 10, right: 10
             }}
           >
@@ -926,10 +928,10 @@ function Cadastro() {
                     textAlign: "center",
                   }}
                 ></input>
-                <textarea id="inputEditNumeroDocumento"
+                <input id="inputEditNumeroDocumento"
                   autoComplete="off"
                   placeholder="NÚMERO DO DOCUMENTO"
-                  className="textarea"
+                  className="input"
                   type="text"
                   onFocus={(e) => (e.target.placeholder = "")}
                   onBlur={(e) => (e.target.placeholder = "NÚMERO DO DOCUMENTO")}
@@ -939,13 +941,13 @@ function Cadastro() {
                     justifyContent: "center",
                     alignSelf: "center",
                     textAlign: "center",
-                    width: 100,
+                    width: 200,
                     padding: 15,
                     height: 20,
                     minHeight: 20,
                     maxHeight: 20,
                   }}
-                ></textarea>
+                ></input>
               </div>
             </div>
             <div id="orgao emissor"
@@ -1268,6 +1270,7 @@ function Cadastro() {
               SELECIONAR OPERADORA
             </div>
             <FormOperadoraSelector></FormOperadoraSelector>
+            <ViewTipoDocumento></ViewTipoDocumento>
             <div id="convenio - nome"
               style={{
                 display: "flex",
@@ -1367,6 +1370,7 @@ function Cadastro() {
                 placeholder="VALIDADE DA CARTEIRA"
                 onFocus={(e) => (e.target.placeholder = "")}
                 onBlur={(e) => (e.target.placeholder = "VALIDADE DA CARTEIRA")}
+                onKeyUp={() => maskdate(timeout, "inputValidadeCarteira")}
                 defaultValue={vieweditpaciente == 1 ? paciente.validade_carteira : ''}
                 style={{
                   flexDirection: "center",
@@ -1388,10 +1392,10 @@ function Cadastro() {
               }}
             >
               <div className="text1">TELEFONE</div>
-              <textarea
+              <input
                 autoComplete="off"
                 placeholder="TELEFONE"
-                className="textarea"
+                className="input"
                 type="text"
                 id="inputEditTelefone"
                 onFocus={(e) => (e.target.placeholder = "")}
@@ -1404,13 +1408,13 @@ function Cadastro() {
                   flexDirection: "center",
                   justifyContent: "center",
                   alignSelf: "center",
-                  width: 100,
+                  width: 200,
                   padding: 15,
                   height: 20,
                   minHeight: 20,
                   maxHeight: 20,
                 }}
-              ></textarea>
+              ></input>
             </div>
             <div id="email"
               style={{
@@ -1517,7 +1521,10 @@ function Cadastro() {
           <ViewTipoConsulta></ViewTipoConsulta>
           <div id="botão para agendar consulta"
             className="button"
-            style={{ width: 100, height: 100, alignSelf: 'center' }}
+            style={{
+              display: vieweditpaciente == 2 ? 'none' : 'flex',
+              width: 100, height: 100, alignSelf: 'center'
+            }}
             onClick={() => {
               // identificando o procedimento com o código TUSS para consulta médica.
               localStorage.setItem('codigo_procedimento', '10101012');
@@ -1568,6 +1575,33 @@ function Cadastro() {
             }}
           >
             RETORNO
+          </div>
+          <div className="button" style={{ width: 200, minWidth: 200 }}
+            onClick={() => {
+              localStorage.setItem("tipo_consulta", 1);
+              setviewtipoconsulta(0);
+              disparaconsulta();
+            }}
+          >
+            ROTINA
+          </div>
+          <div className="button" style={{ width: 200, minWidth: 200 }}
+            onClick={() => {
+              localStorage.setItem("tipo_consulta", 1);
+              setviewtipoconsulta(0);
+              disparaconsulta();
+            }}
+          >
+            CONSULTA DA GESTANTE
+          </div>
+          <div className="button" style={{ width: 200, minWidth: 200 }}
+            onClick={() => {
+              localStorage.setItem("tipo_consulta", 1);
+              setviewtipoconsulta(0);
+              disparaconsulta();
+            }}
+          >
+            CONSULTA ON-LINE
           </div>
           <div className="button" style={{ width: 200, minWidth: 200 }}
             onClick={() => {
@@ -1739,7 +1773,6 @@ function Cadastro() {
       >
         <ListaDePacientes></ListaDePacientes>
         <DadosPacienteAtendimento></DadosPacienteAtendimento>
-        <ViewTipoDocumento></ViewTipoDocumento>
       </div>
     </div>
   );
