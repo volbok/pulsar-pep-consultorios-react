@@ -24,6 +24,7 @@ function Exames() {
     atendimento,
     setlaboratorio,
     laboratorio,
+    listalaboratorio, setlistalaboratorio,
     setdono_documento,
   } = useContext(Context);
 
@@ -32,6 +33,8 @@ function Exames() {
     if (card == 'exames') {
       console.log('PÁGINA EXAMES COMPLEMENTARES + GUIA SADT');
       loadTuss();
+      // setlistalaboratorio([]);
+      console.log(listalaboratorio);
       loadListaLaboratorio();
       localStorage.setItem('random', 0);
     }
@@ -54,12 +57,14 @@ function Exames() {
 
   // LISTA LABORATÓRIO.
   // carregar lista de pedidos de exames laboratoriais para o atendimento.
-  const [listalaboratorio, setlistalaboratorio] = useState([]);
   const loadListaLaboratorio = () => {
     console.log(atendimento);
-    axios.get(html + 'lista_laboratorio/' + atendimento).then((response) => {
-      setlistalaboratorio(response.data.rows);
-    });
+    console.log(listalaboratorio);
+    if (atendimento != null) {
+      axios.get(html + 'lista_laboratorio/' + atendimento).then((response) => {
+        setlistalaboratorio(response.data.rows);
+      });
+    }
   }
 
   // inserir pedido de laboratório.
@@ -185,92 +190,93 @@ function Exames() {
             style={{ width: 30, height: 30 }}
           ></img>
         </div>
-        {listalaboratorio.sort((a, b) => moment(a.data) > moment(b.data) ? -1 : 1).map((item) => (
-          <div id={"pedido de laboratorio " + item.random}
-            className='button'
-            style={{
-              display: 'flex', flexDirection: 'column', justifyContent: 'center',
-              minHeight: 200,
-            }}
-            onClick={() => {
-              setdono_documento({
-                id: item.id_profissional,
-                conselho: 'CRM: ' + item.registro_profissional,
-                nome: item.nome_profissional,
-              })
-              console.log(item.random);
-              localStorage.setItem('random', item.random); // valor randômico chave para relacionar documento de laboratório aos respectivos itens de exames laboratoriais.
-              localStorage.setItem('status', item.status); // status 1 == pedido assinado. status 0 == pedido aberto.
-              loadLaboratorio(item.random);
-            }}
-          >
-            <div id="conjunto de botoes do item de laboratório"
+        <div style={{ display: listalaboratorio.length > 0 ? 'flex' : 'none', flexDirection: 'column' }}>
+          {listalaboratorio.sort((a, b) => moment(a.data) > moment(b.data) ? -1 : 1).map((item) => (
+            <div id={"pedido de laboratorio " + item.random}
+              className='button'
               style={{
-                display: 'flex',
-                flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center',
-              }}>
-              <div id="botão para excluir pedido de exame laboratorial e seus respectivos itens de exames laboratoriais."
-                className='button-yellow'
+                display: 'flex', flexDirection: 'column', justifyContent: 'center',
+                minHeight: 200,
+              }}
+              onClick={() => {
+                setdono_documento({
+                  id: item.id_profissional,
+                  conselho: 'CRM: ' + item.registro_profissional,
+                  nome: item.nome_profissional,
+                })
+                console.log(item.random);
+                localStorage.setItem('random', item.random); // valor randômico chave para relacionar documento de laboratório aos respectivos itens de exames laboratoriais.
+                localStorage.setItem('status', item.status); // status 1 == pedido assinado. status 0 == pedido aberto.
+                loadLaboratorio(item.random);
+              }}
+            >
+              <div id="conjunto de botoes do item de laboratório"
                 style={{
-                  display: item.status == 0 ? 'flex' : 'none',
-                  maxWidth: 30, width: 30, minWidth: 30,
-                  maxHeight: 30, height: 30, minHeight: 30
-                }}
-                onClick={(e) => {
-                  console.log(item.random);
-                  deleteListaLaboratorio(item.id);
-                  deleteMassaItensLaboratorio(item.random);
-                  e.stopPropagation();
-                }}
-              >
-                <img
-                  alt=""
-                  src={deletar}
-                  style={{ width: 25, height: 25 }}
-                ></img>
-              </div>
-              <div id="botão para imprimir guia SADT com pack de exames."
-                title={'IMPRIMIR GUIA TISS SADT'}
-                style={{
-                  // display: item.status == 0 ? 'flex' : 'none',
                   display: 'flex',
-                  maxWidth: 30, width: 30, minWidth: 30,
-                  maxHeight: 30, height: 30, minHeight: 30
-                }}
-                className='button-green'
-                onClick={(e) => {
-                  updateListaLaboratorio(item, 1);
-                  localStorage.setItem('random', item.random);
-                  document.getElementById("guia-sadt").style.display = 'flex';
-                  document.getElementById("guia-sadt").style.visibility = 'visible';
-                  setcard('guia-sadt');
-                  e.stopPropagation();
-                }}
-              >
-                <img
-                  alt=""
-                  src={print}
-                  style={{ width: 20, height: 20 }}
-                ></img>
+                  flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center',
+                }}>
+                <div id="botão para excluir pedido de exame laboratorial e seus respectivos itens de exames laboratoriais."
+                  className='button-yellow'
+                  style={{
+                    display: item.status == 0 ? 'flex' : 'none',
+                    maxWidth: 30, width: 30, minWidth: 30,
+                    maxHeight: 30, height: 30, minHeight: 30
+                  }}
+                  onClick={(e) => {
+                    console.log(item.random);
+                    deleteListaLaboratorio(item.id);
+                    deleteMassaItensLaboratorio(item.random);
+                    e.stopPropagation();
+                  }}
+                >
+                  <img
+                    alt=""
+                    src={deletar}
+                    style={{ width: 25, height: 25 }}
+                  ></img>
+                </div>
+                <div id="botão para imprimir guia SADT com pack de exames."
+                  title={'IMPRIMIR GUIA TISS SADT'}
+                  style={{
+                    // display: item.status == 0 ? 'flex' : 'none',
+                    display: 'flex',
+                    maxWidth: 30, width: 30, minWidth: 30,
+                    maxHeight: 30, height: 30, minHeight: 30
+                  }}
+                  className='button-green'
+                  onClick={(e) => {
+                    updateListaLaboratorio(item, 1);
+                    localStorage.setItem('random', item.random);
+                    document.getElementById("guia-sadt").style.display = 'flex';
+                    document.getElementById("guia-sadt").style.visibility = 'visible';
+                    setcard('guia-sadt');
+                    e.stopPropagation();
+                  }}
+                >
+                  <img
+                    alt=""
+                    src={print}
+                    style={{ width: 20, height: 20 }}
+                  ></img>
+                </div>
+              </div>
+              <div style={{ padding: 10, display: 'flex', flexDirection: 'column' }}>
+                <div style={{ fontSize: 10 }}>
+                  {'DR(A) ' + item.nome_profissional}
+                </div>
+                <div style={{ fontSize: 10, marginBottom: 5 }}>
+                  {item.registro_profissional}
+                </div>
+                <div>
+                  {moment(item.data).format('DD/MM/YY')}
+                </div>
+                <div>
+                  {moment(item.data).format('HH:mm')}
+                </div>
               </div>
             </div>
-            <div style={{ padding: 10, display: 'flex', flexDirection: 'column' }}>
-              <div style={{ fontSize: 10 }}>
-                {'DR(A) ' + item.nome_profissional}
-              </div>
-              <div style={{ fontSize: 10, marginBottom: 5 }}>
-                {item.registro_profissional}
-              </div>
-              <div>
-                {moment(item.data).format('DD/MM/YY')}
-              </div>
-              <div>
-                {moment(item.data).format('HH:mm')}
-              </div>
-            </div>
-          </div>
-        ))
-        }
+          ))}
+        </div>
       </div >
     )
     // eslint-disable-next-line

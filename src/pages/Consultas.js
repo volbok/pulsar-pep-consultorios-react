@@ -56,6 +56,7 @@ function Consultas() {
     setprescricao,
     consultorio, setconsultorio,
     setlaboratorio,
+    setlistalaboratorio,
 
     mobilewidth,
 
@@ -166,8 +167,10 @@ function Consultas() {
 
   useEffect(() => {
     if (pagina == -2) {
+      setcard('');
       setpaciente([]);
       setatendimento(null);
+      setlistalaboratorio([]);
       loadPacientes();
       loadChamadas();
       if (consultorio == null) {
@@ -196,6 +199,10 @@ function Consultas() {
           <div
             className="button-yellow"
             onClick={() => {
+              setobjatendimento({});
+              setpaciente([]);
+              setatendimento(null);
+              setlistalaboratorio([]);
               setpagina(0);
               history.push("/");
             }}

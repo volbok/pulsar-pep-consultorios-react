@@ -125,6 +125,7 @@ function App() {
   const [selecteddocumentoestruturado, setselecteddocumentoestruturado] = useState([]);
 
   const [laboratorio, setlaboratorio] = useState([]);
+  const [listalaboratorio, setlistalaboratorio] = useState([]);
   const [arrayespecialidades, setarrayespecialidades] = useState([
     'ANESTESIOLOGIA',
     'CARDIOLOGIA',
@@ -314,6 +315,7 @@ function App() {
         selecteddocumento, setselecteddocumento,
         selecteddocumentoestruturado, setselecteddocumentoestruturado,
         laboratorio, setlaboratorio,
+        listalaboratorio, setlistalaboratorio,
         arrayespecialidades, setarrayespecialidades,
         mobilewidth, setmobilewidth,
         idprescricao, setidprescricao,
