@@ -810,20 +810,18 @@ function Agendamento() {
   const [viewopcoeshorarios, setviewopcoeshorarios] = useState(0);
   const ViewOpcoesHorarios = () => {
 
-    const [hour, sethour] = useState();
-    const [min, setmin] = useState();
     function TimeComponent() {
       var timeout = null;
       const fixHour = (valor) => {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
           if (valor > 23 || valor < 0) {
-            sethour('!');
+            localStorage.setItem('hora', valor);
             setTimeout(() => {
               document.getElementById("inputHour").focus();
             }, 200);
           } else {
-            sethour(valor);
+            localStorage.setItem('hora', valor);
             setTimeout(() => {
               document.getElementById("inputHour").focus();
             }, 200);
@@ -835,12 +833,14 @@ function Agendamento() {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
           if (valor > 59 || valor < 0) {
-            setmin('!');
+            // setmin('!');
+            localStorage.setItem('min', valor);
             setTimeout(() => {
               document.getElementById("inputMin").focus();
             }, 200);
           } else {
-            setmin(valor);
+            localStorage.setItem('min', valor);
+            // setmin(valor);
             setTimeout(() => {
               document.getElementById("inputMin").focus();
             }, 200);
@@ -858,7 +858,7 @@ function Agendamento() {
               onFocus={(e) => (e.target.placeholder = '')}
               onBlur={(e) => (e.target.placeholder = 'HH')}
               onKeyUp={(e) => fixHour(e.target.value)}
-              defaultValue={hour}
+              // defaultValue={hour}
               title="HORAS."
               maxLength={2}
               style={{
@@ -877,7 +877,7 @@ function Agendamento() {
               onFocus={(e) => (e.target.placeholder = '')}
               onBlur={(e) => (e.target.placeholder = 'MM')}
               onKeyUp={(e) => fixMin(e.target.value)}
-              defaultValue={min}
+              //defaultValue={min}
               title="MINUTOS."
               maxLength={2}
               style={{
@@ -893,9 +893,11 @@ function Agendamento() {
             className="button-green"
             title="CONFIRMAR DATA E HORA."
             onClick={() => {
+              let hora = localStorage.getItem('hora');
+              let min = localStorage.getItem('min');
               // 'DD/MM/YYYY - HH:mm'
-              console.log(selectdate + ' - ' + hour + ':' + min);
-              insertAtendimento(selectdate + ' - ' + hour + ':' + min);
+              console.log(selectdate + ' - ' + hora + ':' + min);
+              insertAtendimento(selectdate + ' - ' + hora + ':' + min);
               setviewopcoeshorarios(0);
             }}
             style={{ width: 50, maxWidth: 50, alignSelf: 'center' }}
@@ -981,9 +983,14 @@ function Agendamento() {
             <div id="botão para sair da tela de agendamento"
               className="button-yellow" style={{ maxHeight: 50, maxWidth: 50, alignSelf: 'center' }}
               onClick={() => {
-                setpagina(0);
-                history.push("/");
-                setpaciente([]);
+                if (localStorage.getItem('prevScreen') == 'CONSULTA') {
+                  setpagina(-2);
+                  history.push("/consultas");
+                } else {
+                  setpagina(0);
+                  history.push("/");
+                  setpaciente([]);
+                }
               }}>
               <img
                 alt=""

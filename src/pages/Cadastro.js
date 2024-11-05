@@ -1528,6 +1528,7 @@ function Cadastro() {
             onClick={() => {
               // identificando o procedimento com o código TUSS para consulta médica.
               localStorage.setItem('codigo_procedimento', '10101012');
+              localStorage.setItem("prevScreen", 'CADASTRO');
               setviewopcoesconvenio(1);
             }}
           >
