@@ -585,7 +585,7 @@ function Login() {
               setviewlistaunidades(1);
             }}
           >
-            {clientes.filter(valor => valor.id_cliente == item.id_cliente).map(item => item.nome_cliente)}
+            {clientes.filter(valor => valor.id_cliente == item.id_cliente).map(item => item.razao_social)}
           </div>
         ))}
       </div>
@@ -931,7 +931,6 @@ function Login() {
             top: 10,
             right: 10,
             alignSelf: 'center',
-            marginBottom: 20
           }}
           title="FAZER LOGOFF."
           onClick={() => {
@@ -960,6 +959,7 @@ function Login() {
         <div>{ }</div>
         <img
           src={logo}
+          alt=""
           style={{
             margin: 10,
             height: 30,

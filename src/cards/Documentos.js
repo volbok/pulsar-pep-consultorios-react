@@ -19,6 +19,7 @@ import checkinput from '../functions/checkinput';
 import Cid10 from '../functions/cid10';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
+import modal from '../functions/modal';
 
 function Documentos() {
 
@@ -34,8 +35,7 @@ function Documentos() {
     card, setcard,
     tipodocumento, settipodocumento,
     documentos, setdocumentos,
-    settoast,
-
+    settoast, setdialogo,
     // dados para importação na evolução.
     alergias,
     sinaisvitais,
@@ -79,8 +79,14 @@ function Documentos() {
     } else if (card == 'card-documento-exame') {
       settipodocumento('EXAME');
       preparaDocumentos();
+    } else if (card == 'card-documento-laudo') {
+      settipodocumento('LAUDO');
+      preparaDocumentos();
+    } else if (card == 'card-documento-relatorio') {
+      settipodocumento('RELATÓRIO');
+      preparaDocumentos();
+      console.log(tipodocumento);
     }
-    console.log(tipodocumento);
 
     // eslint-disable-next-line
   }, [card, paciente, atendimentos, atendimento]);
@@ -448,6 +454,9 @@ function Documentos() {
         evolucao
       insertDocumento(texto);
       // document.getElementById("gadgets_atestado").style.display = 'flex';
+    } else {
+      let texto = 'POR FAVOR, EDITE AQUI SEU DOCUMENTO.' 
+      insertDocumento(texto);
     }
   }
 
@@ -588,7 +597,8 @@ function Documentos() {
                     minHeight: 25, minWidth: 25, maxHeight: 24, maxWidth: 25,
                   }}
                   onClick={(e) => {
-                    deleteDocumento(item.id)
+                    modal(setdialogo, 'TEM CERTEZA QUE DESEJA EXCLUIR ESTE DOCUMENTO?', deleteDocumento, item.id)
+                    // deleteDocumento(item.id)
                     e.stopPropagation();
                   }}>
                   <img

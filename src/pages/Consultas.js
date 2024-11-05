@@ -6,7 +6,6 @@ import moment from "moment";
 // imagens.
 import power from "../images/power.svg";
 import back from "../images/back.svg";
-import refresh from "../images/refresh.svg";
 import flag from "../images/white_flag.svg";
 import deletar from "../images/deletar.svg";
 import lupa from '../images/lupa.svg';
@@ -15,6 +14,8 @@ import clock from "../images/clock.svg";
 // funções.
 import toast from "../functions/toast";
 import modal from "../functions/modal";
+// componentes.
+import Filter from "../components/Filter";
 // router.
 import { useHistory } from "react-router-dom";
 // cards.
@@ -128,7 +129,7 @@ function Consultas() {
       .get(html + "all_atendimentos")
       .then((response) => {
         let x = response.data.rows;
-        setatendimentos(x.filter(item => item.situacao == 1));
+        setatendimentos(x.filter(item => item.situacao == 3));
         setarrayatendimentos(x.filter(item => item.situacao == 3)); // situação 3 = consulta ambulatorial ativa. situação 4 == consulta ambulatorial encerrada.
       })
       .catch(function (error) {
@@ -166,7 +167,6 @@ function Consultas() {
     });
   }
 
-  var timeout = null;
   useEffect(() => {
     if (pagina == -2) {
       setpaciente([]);
@@ -213,82 +213,7 @@ function Consultas() {
               }}
             ></img>
           </div>
-          <FilterPaciente></FilterPaciente>
-        </div>
-      </div>
-    );
-  }
-
-  const [filterpaciente, setfilterpaciente] = useState("");
-  var searchpaciente = "";
-  const filterPaciente = () => {
-    clearTimeout(timeout);
-    document.getElementById("inputPaciente").focus();
-    searchpaciente = document
-      .getElementById("inputPaciente")
-      .value.toUpperCase();
-    timeout = setTimeout(() => {
-      if (searchpaciente == "") {
-        setfilterpaciente("");
-        setarrayatendimentos(atendimentos);
-        document.getElementById("inputPaciente").value = "";
-        setTimeout(() => {
-          document.getElementById("inputPaciente").focus();
-        }, 100);
-      } else {
-        setfilterpaciente(document.getElementById("inputPaciente").value.toUpperCase());
-        if (atendimentos.filter((item) => item.nome_paciente.includes(searchpaciente)).length > 0) {
-          setarrayatendimentos(atendimentos.filter((item) => item.nome_paciente.includes(searchpaciente)));
-          setTimeout(() => {
-            document.getElementById("inputPaciente").value = searchpaciente;
-            document.getElementById("inputPaciente").focus()
-          }, 100)
-        } else {
-          setarrayatendimentos(atendimentos.filter((item) => item.leito.includes(searchpaciente)));
-          setTimeout(() => {
-            document.getElementById("inputPaciente").value = searchpaciente;
-            document.getElementById("inputPaciente").focus()
-          }, 100)
-        }
-      }
-    }, 1000);
-  };
-  // filtro de paciente por nome.
-  function FilterPaciente() {
-    return (
-      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', width: '100%' }}>
-        <input
-          className="input cor2"
-          autoComplete="off"
-          placeholder={
-            window.innerWidth < mobilewidth ? "BUSCAR PACIENTE..." : "BUSCAR..."
-          }
-          onFocus={(e) => (e.target.placeholder = "")}
-          onBlur={(e) =>
-            window.innerWidth < mobilewidth
-              ? (e.target.placeholder = "BUSCAR PACIENTE...")
-              : "BUSCAR..."
-          }
-          onKeyUp={() => filterPaciente()}
-          type="text"
-          id="inputPaciente"
-          defaultValue={filterpaciente}
-          maxLength={100}
-          style={{ width: '100%' }}
-        ></input>
-        <div
-          id="botão para atualizar a lista de pacientes."
-          className="button"
-          style={{
-            display: "flex",
-            opacity: 1,
-            alignSelf: "center",
-          }}
-          onClick={() => { loadPacientes(); setatendimento(null); }}
-        >
-          <img
-            alt="" src={refresh}
-            style={{ width: 30, height: 30 }}></img>
+          {Filter('inputFilterConsulta', setarrayatendimentos, atendimentos.filter(item => item.situacao == 3), 'item.nome_paciente')}
         </div>
       </div>
     );
@@ -430,7 +355,7 @@ function Consultas() {
     cleanphone = cleanphone.replace("-", "");
     cleanphone = cleanphone.replace(" ", "");
     cleanphone = "55" + cleanphone;
-    
+
     fetch(gzappy_url_envia_mensagem, {
       method: 'POST',
       headers: {
@@ -717,7 +642,7 @@ function Consultas() {
       </div >
     );
     // eslint-disable-next-line
-  }, [arrayatendimentos, consultorio, setarrayitensprescricao]);
+  }, [usuario, unidades, atendimentos, arrayatendimentos, consultorio, setarrayitensprescricao]);
 
   // identificação do paciente na versão mobile, na view dos cards.
   function CabecalhoPacienteMobile() {
@@ -1384,6 +1309,8 @@ function Consultas() {
             {cartao(null, "RECEITA MÉDICA", "card-documento-receita", null, 1)}
             {cartao(null, "ATESTADO", "card-documento-atestado", null, 1)}
             {cartao(null, 'EXAMES', 'exames')}
+            {cartao(null, 'LAUDOS', 'card-documento-laudo')}
+            {cartao(null, 'RELATÓRIOS', 'card-documento-relatorio')}
           </div>
           <div id="conteúdo cheio (cards)"
             style={{

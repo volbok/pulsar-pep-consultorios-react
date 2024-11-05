@@ -105,6 +105,22 @@
     display: none !important;
   }
 
+  @page orientation-portrait {
+    size: portrait;
+  }
+
+  @page orientation-landscape {
+    size: landscape;
+  }
+
+  .landscape-page {
+    page: orientation-landscape;
+  }
+
+  .portrait-page {
+    page: orientation-portrait;
+  }
+
   .print {
     display: flex !important;
     visibility: visible !important;

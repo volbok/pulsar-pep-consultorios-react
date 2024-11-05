@@ -218,14 +218,425 @@ function GuiaSadt() {
   }
 
   // IMPRESSÃO DA GUIA SADT.
+  const [arrayguias, setarrayguias] = useState([]);
+
+  function conteudo(grupo) {
+    return (
+      <div id={"procedimento"}
+        className='print'
+        style={{
+          display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
+          width: 'calc(100% - 20px)', fontFamily: 'Helvetica',
+          breakInside: 'avoid',
+        }}>
+        <div id="cabeçalho" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+          <img alt="" src={logo}
+            style={{
+              display: logo != '' ? 'flex' : 'none',
+              width: 270, height: 100
+            }}
+          ></img>
+          <div style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center', flex: 4, fontFamily: 'Helvetica' }}>
+            {'GUIA DE SERVIÇO PROFISSIONAL / SERVIÇO AUXILIAR DE DIAGNÓSTICO E TERAPIA - SP/SADT'}
+          </div>
+          {pdfcampo('2 - Nº DA GUIA DO PRESTADOR', guia_prestador, 1)}
+        </div>
+        <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', fontFamily: 'Helvetica', width: '50vw' }}>
+          {pdfcampo('1 - REGISTRO ANS', registro_ans, 1)}
+          {pdfcampo('3 - NÚMERO DA GUIA PRINCIPAL', n_guia_principal, 1)}
+        </div>
+        <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row', fontFamily: 'Helvetica' }}>
+          {pdfcampo('4 - DATA DA AUTORIZAÇÃO', data_autorizacao, 1)}
+          {pdfcampo('5 - SENHA', senha, 1)}
+          {pdfcampo('6 - DATA DE VALIDADE DA SENHA', validade_senha, 1)}
+          {pdfcampo('7 - NÚMERO DA GUIA ATRIBUÍDO PELA OPERADORA', n_guia_operadora, 1)}
+        </div>
+        <div className='grupo'
+          style={{
+            fontFamily: 'Helvetica', fontSize: 8,
+            backgroundColor: '#B2BEBE',
+            borderRadius: 2.5,
+            padding: 1,
+            margin: 1
+          }}>
+          {'DADOS DO BENEFICIÁRIO'}
+        </div>
+        <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
+          {pdfcampo('8 - Nº DA CARTEIRA', n_carteira, 1)}
+          {pdfcampo('9 - VALIDADE DA CARTEIRA', validade_carteira, 1)}
+          {pdfcampo('10 - NOME', nome, 4)}
+          {pdfcampo('11 - CARTÃO NACIONAL DE SAÚDE', cns, 2)}
+          {pdfcampo('12 - ATENDIMENTO A RN', rn, 1)}
+        </div>
+        <div className='grupo'
+          style={{
+            fontFamily: 'Helvetica', fontSize: 8,
+            backgroundColor: '#B2BEBE',
+            borderRadius: 2.5,
+            padding: 1,
+            margin: 1
+          }}>
+          {'DADOS DO SOLICITANTE'}
+        </div>
+        <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
+          {pdfcampo('13 - CÓDIGO NA OPERADORA', codigo_prestador, 1)}
+          {pdfcampo('14 - NOME DO CONTRATADO', nome_contratado, 3)}
+        </div>
+        <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
+          {pdfcampo('15 - NOME DO PROFISSIONAL SOLICITANTE', nome_solicitante, 3)}
+          {pdfcampo('16 - CONSELHO PROFISSIONAL', conselho_solicitante, 1)}
+          {pdfcampo('17 - NÚMERO NO CONSELHO', n_conselho_solicitante, 1)}
+          {pdfcampo('18 - UF', uf_solicitante, 1)}
+          {pdfcampo('19 - CÓDIGO CBO', codigo_cbo, 1)}
+          {pdfcampo('20 - ASSINATURA DO PROFISSIONAL SOLICITANTE', '________________________', 3)}
+        </div>
+        <div className='grupo'
+          style={{
+            fontFamily: 'Helvetica', fontSize: 8,
+            backgroundColor: '#B2BEBE',
+            borderRadius: 2.5,
+            padding: 1,
+            margin: 1
+          }}>
+          {'DADOS DA SOLICITAÇÃO / PROCEDIMENTOS OU ITENS ASSISTENCIAIS SOLICITADOS'}
+        </div>
+        <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
+          {pdfcampo('21 - CARÁTER DO ATENDIMENTO', '1 - ELETIVO', 1)}
+          {pdfcampo('22 - DATA DA SOLICITAÇÃO', moment().format('DD/MM/YYYY'), 1)}
+          {pdfcampo('23 - INDICAÇÃO CLÍNICA', '______________________', 4)}
+        </div>
+        <div id='linhas dos registros de exames solicitados'
+          style={{
+            display: 'flex', flexDirection: 'row',
+            flexWrap: 'wrap',
+            borderStyle: 'solid',
+            borderColor: '#b2babb',
+            borderWidth: 1,
+            borderRadius: 2.5,
+            padding: 5,
+            margin: 5,
+          }}>
+          {grupo.map(item => (
+            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', width: '100%' }}>
+              {pdfcampo('24 - TABELA', '21', 3)}
+              {pdfcampo('25 - CÓDIGO DO PROCEDIMENTO OU ITEM ASSISTENCIAL', item.codigo_exame, 3)}
+              {pdfcampo('26 - DESCRIÇÃO', item.nome_exame, 3)}
+            </div>
+          ))}
+        </div>
+        <div className='grupo'
+          style={{
+            fontFamily: 'Helvetica', fontSize: 8,
+            backgroundColor: '#B2BEBE',
+            borderRadius: 2.5,
+            padding: 1,
+            margin: 1
+          }}>
+          {'DADOS DO CONTRATADO EXECUTANTE'}
+        </div>
+        <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
+          {pdfcampo('29 - CÓDIGO NA OPERADORA', operadora.codigo_prestador, 1)}
+          {pdfcampo('30 - NOME DO CONTRATADO', cliente.nome_cliente, 3)}
+          {pdfcampo('31 - CÓDIGO CNES', cliente.cnes, 1)}
+        </div>
+        <div className='grupo'
+          style={{
+            fontFamily: 'Helvetica', fontSize: 8,
+            backgroundColor: '#B2BEBE',
+            borderRadius: 2.5,
+            padding: 1,
+            margin: 1
+          }}>
+          {'DADOS DO ATENDIMENTO'}
+        </div>
+        <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
+          {pdfcampo('32 - TIPO DE ATENDIMENTO', '05', 1)}
+          {pdfcampo('33 - INDICAÇÃO DE ACIDENTE (ACIDENTE OU DOENÇA RELACIONADA)', '9', 2)}
+          {pdfcampo('34 - TIPO DE CONSULTA', localStorage.getItem("tipo_consulta"), 1)}
+          {pdfcampo('35 - MOTIVO DE ENCERRAMENTO DO ATENDIMENTO', '15', 1)}
+        </div>
+        <div className='grupo'
+          style={{
+            fontFamily: 'Helvetica', fontSize: 8,
+            backgroundColor: '#B2BEBE',
+            borderRadius: 2.5,
+            padding: 1,
+            margin: 1
+          }}>
+          {'DADOS DA EXECUÇÃO / PROCEDIMENTOS E EXAMES REALIZADOS'}
+        </div>
+        <div
+          style={{
+            display: 'flex', flexDirection: 'column',
+            borderStyle: 'solid',
+            borderColor: 'black',
+            borderWidth: 1,
+            borderRadius: 2.5,
+            padding: 5,
+            margin: 5,
+          }}
+        >
+          <div id='cabeçalho do grupo'
+            style={{
+              display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
+              width: '100%', alignSelf: 'center'
+            }}>
+            <div className='fonte_titulo_header'
+              style={{ minWidth: 130, maxWidth: 130, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'36 - DATA'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 73, maxWidth: 73, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'37 - HORA INICIAL'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 73, maxWidth: 73, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'38 - HORA FINAL'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 38, maxWidth: 38, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'39 - TABELA'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'40 - CÓDIGO DO PROCEDIMENTO'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'41 - DESCRIÇÃO'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 50, maxWidth: 50, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'42 - QTDE'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 25, maxWidth: 25, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'43 - VIA'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 25, maxWidth: 25, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'44 - TEC'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 55, maxWidth: 55, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'45 - FATOR PERD/ACRESC'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 115, maxWidth: 115, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'46 - VALOR UNITÁRIO (R$)'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 115, maxWidth: 115, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'47 - VALOR TOTAL (R$)'}
+            </div>
+          </div>
+          {GrupoExamesExecutados('1 ')}
+          {GrupoExamesExecutados('2 ')}
+          {GrupoExamesExecutados('3 ')}
+          {GrupoExamesExecutados('4 ')}
+          {GrupoExamesExecutados('5 ')}
+        </div>
+        <div className='grupo'
+          style={{
+            fontFamily: 'Helvetica', fontSize: 8,
+            backgroundColor: '#B2BEBE',
+            borderRadius: 2.5,
+            padding: 1,
+            margin: 1
+          }}>
+          {'IDENTIFICAÇÃO DO(S) PROFISSIONAL(IS) EXECUTANTE(S)'}
+        </div>
+        <div
+          style={{
+            display: 'flex', flexDirection: 'column',
+            borderStyle: 'solid',
+            borderColor: 'black',
+            borderWidth: 1,
+            borderRadius: 2.5,
+            padding: 5,
+            margin: 5,
+          }}
+        >
+          <div id='cabeçalho do grupo'
+            style={{
+              display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
+              width: '100%', alignSelf: 'center'
+            }}>
+            <div className='fonte_titulo_header' style={{ minWidth: 50, maxWidth: 50, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'48 - SEQ. REF'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 50, maxWidth: 50, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'49 - GRAU PART.'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 200, maxWidth: 200, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'50 - CÓDIGO NA OPERADORA/CPF'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 270, maxWidth: 270, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'51 - NOME DO PROFISSIONAL'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 100, maxWidth: 100, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'52 - CONSELHO PROFISSIONAL'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 200, maxWidth: 200, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'53 - NÚMERO NO CONSELHO'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 50, maxWidth: 50, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'54 - UF'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 100, maxWidth: 100, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'55 - CÓDIGO CBO'}
+            </div>
+          </div>
+          {GrupoIdentificacaoDosProfissionais()}
+          {GrupoIdentificacaoDosProfissionais()}
+          {GrupoIdentificacaoDosProfissionais()}
+          {GrupoIdentificacaoDosProfissionais()}
+        </div>
+        <div
+          style={{
+            display: 'flex', flexDirection: 'column',
+            borderStyle: 'solid',
+            borderColor: 'black',
+            borderWidth: 1,
+            borderRadius: 2.5,
+            padding: 5,
+            margin: 5,
+          }}
+        >
+          <div className='fonte_titulo_header'
+            style={{ display: 'flex', justifyContent: 'flex-start', alignSelf: 'flex-start', fontFamily: 'Helvetica', fontSize: 8 }}>
+            {'56 - DATA DE REALIZAÇÃO DE PROCEDIMENTOS EM SÉRIE  57 - ASSINATURA DO BENEFICIÁRIO OU RESPONSÁVEL'}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap' }}>
+            {ProcedimentosEmSerie('01')}
+            {ProcedimentosEmSerie('03')}
+            {ProcedimentosEmSerie('05')}
+            {ProcedimentosEmSerie('07')}
+            {ProcedimentosEmSerie('09')}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap' }}>
+            {ProcedimentosEmSerie('02')}
+            {ProcedimentosEmSerie('04')}
+            {ProcedimentosEmSerie('06')}
+            {ProcedimentosEmSerie('08')}
+            {ProcedimentosEmSerie('10')}
+          </div>
+        </div>
+
+        <div className='fonte_titulo_header' style={{
+          display: 'flex', flexDirection: 'row',
+          height: 50, backgroundColor: '#B2BEBE',
+          position: 'relative', width: '100%', borderRadius: 2.5,
+          marginTop: 5, marginBottom: 5,
+        }}>
+          <div style={{ position: 'absolute', top: 5, left: 5, fontFamily: 'Helvetica', fontSize: 8 }}>
+            {'58 - OBSERVAÇÃO/JUSTIFICATIVA'}
+          </div>
+        </div>
+        <div
+          style={{
+            display: 'flex', flexDirection: 'column',
+            borderStyle: 'solid',
+            borderColor: 'black',
+            borderWidth: 1,
+            borderRadius: 2.5,
+            padding: 5,
+            margin: 5,
+          }}
+        >
+          <div id='cabeçalho do grupo'
+            style={{
+              display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
+              width: '100%', alignSelf: 'center'
+            }}>
+            <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'59 - TOTAL DE PROCEDIMENTOS (R$)'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'60 - TOTAL DE TAXAS E ALUGUÉIS (R$)'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'61 - TOTAL DE MATERIAIS (R$)'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'62 - TOTAL DE OPME (R$)'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'63 - TOTAL DE MEDICAMENTOS (R$)'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'64 - TOTAL DE GASES MEDICINAIS (R$)'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'65 - TOTAL GERAL (R$)'}
+            </div>
+          </div>
+          {GrupoTotalDeGastos()}
+        </div>
+        <div
+          style={{
+            display: 'flex', flexDirection: 'column',
+            borderStyle: 'solid',
+            borderColor: 'black',
+            borderWidth: 1,
+            borderRadius: 2.5,
+            padding: 5,
+            margin: 5,
+            fontFamily: 'Helvetica', fontSize: 8,
+          }}
+        >
+          <div id='cabeçalho do grupo'
+            style={{
+              display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
+              width: '100%', alignSelf: 'center', fontFamily: 'Helvetica', fontSize: 8
+            }}>
+            <div className='fonte_titulo_header' style={{ minWidth: 200, maxWidth: 200, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'66 - ASSINATURA DO RESPONSÁVEL PELA AUTORIZAÇÃO'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 200, maxWidth: 200, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'67 - ASSINATURA DO BENEFICIÁRIO OU RESPONSÁVEL'}
+            </div>
+            <div className='fonte_titulo_header' style={{ minWidth: 200, maxWidth: 200, fontFamily: 'Helvetica', fontSize: 8 }}>
+              {'68 - ASSINATURA DO CONTRATADO'}
+            </div>
+          </div>
+          <div
+            style={{
+              display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
+              width: '100%', alignSelf: 'center'
+            }}
+          >
+            <div className='fonte_titulo_header' style={{ minWidth: 200, width: 200, fontFamily: 'Helvetica', fontSize: 8 }}>{'____________________________'}</div>
+            <div className='fonte_titulo_header' style={{ minWidth: 200, width: 200, fontFamily: 'Helvetica', fontSize: 8 }}>{'____________________________'}</div>
+            <div className='fonte_titulo_header' style={{ minWidth: 200, width: 200, fontFamily: 'Helvetica', fontSize: 8 }}>{'____________________________'}</div>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   function printDiv() {
-    let printdocument = document.getElementById("GUIA SADT PRINT").innerHTML;
-    var a = window.open();
-    a.document.write('<html>');
-    a.document.write('<link rel="stylesheet" type="text/css" href="design.css"></link>');
-    a.document.write(printdocument);
-    a.document.write('</html>');
-    a.print();
+    let iniciogrupo = 0;
+    let paginas = Math.ceil(laboratorio.length / 5);
+    console.log('PÁGINAS: ' + paginas);
+
+    // gerando as guias.
+    let grupolaboratorio = [];
+    while (paginas > 0) {
+      // inserindo um grupo de 5 registros de procedimentos.
+      grupolaboratorio.push(
+        {
+          pagina: paginas,
+          procedimentos: laboratorio.slice(iniciogrupo, iniciogrupo + 5),
+        }
+      );
+      // atualizando grupo para os próximos 5 procedimentos, até o esgotamento das páginas.
+      iniciogrupo = iniciogrupo + 6;
+      paginas = paginas - 1;
+    }
+    console.log(grupolaboratorio.map(item => 'PÁGINA: ' + item.pagina + ' PROCEDIMENTOS: ' + item.procedimentos.length));
+    setarrayguias(grupolaboratorio);
+
+    // imprimindo as guias.
+    setTimeout(() => {
+      let printdocument = document.getElementById("GUIA SADT PRINT").innerHTML;
+      var a = window.open();
+      a.document.write('<html>');
+      a.document.write('<link rel="stylesheet" type="text/css" href="design.css"></link>');
+      a.document.write(printdocument);
+      a.document.write('</html>');
+      a.print();
+      // a.close();
+    }, 2000);
   }
 
   function GrupoExamesExecutados(numero) {
@@ -757,377 +1168,11 @@ function GuiaSadt() {
                 </div>
               </div>
             </div>
-
-            <div id="GUIA SADT PRINT"
-              className='print'
+            <div id="GUIA SADT PRINT" className='print portrait-page'
               style={{
-                display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
-                width: 'calc(100% - 20px)', fontFamily: 'Helvetica',
+                display: 'flex', flexDirection: 'column',
               }}>
-              <div id="cabeçalho" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-                <img alt="" src={logo} style={{ width: 100, height: 100, marginTop: -40 }}></img>
-                <div style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center', flex: 4, fontFamily: 'Helvetica' }}>
-                  {'GUIA DE SERVIÇO PROFISSIONAL / SERVIÇO AUXILIAR DE DIAGNÓSTICO E TERAPIA - SP/SADT'}
-                </div>
-                {pdfcampo('2 - Nº DA GUIA DO PRESTADOR', guia_prestador, 1)}
-              </div>
-              <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', fontFamily: 'Helvetica', width: '50vw' }}>
-                {pdfcampo('1 - REGISTRO ANS', registro_ans, 1)}
-                {pdfcampo('3 - NÚMERO DA GUIA PRINCIPAL', n_guia_principal, 1)}
-              </div>
-              <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row', fontFamily: 'Helvetica' }}>
-                {pdfcampo('4 - DATA DA AUTORIZAÇÃO', data_autorizacao, 1)}
-                {pdfcampo('5 - SENHA', senha, 1)}
-                {pdfcampo('6 - DATA DE VALIDADE DA SENHA', validade_senha, 1)}
-                {pdfcampo('7 - NÚMERO DA GUIA ATRIBUÍDO PELA OPERADORA', n_guia_operadora, 1)}
-              </div>
-              <div className='grupo'
-                style={{
-                  fontFamily: 'Helvetica', fontSize: 8,
-                  backgroundColor: '#B2BEBE',
-                  borderRadius: 2.5,
-                  padding: 1,
-                  margin: 1
-                }}>
-                {'DADOS DO BENEFICIÁRIO'}
-              </div>
-              <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
-                {pdfcampo('8 - Nº DA CARTEIRA', n_carteira, 1)}
-                {pdfcampo('9 - VALIDADE DA CARTEIRA', validade_carteira, 1)}
-                {pdfcampo('10 - NOME', nome, 4)}
-                {pdfcampo('11 - CARTÃO NACIONAL DE SAÚDE', cns, 2)}
-                {pdfcampo('12 - ATENDIMENTO A RN', rn, 1)}
-              </div>
-              <div className='grupo'
-                style={{
-                  fontFamily: 'Helvetica', fontSize: 8,
-                  backgroundColor: '#B2BEBE',
-                  borderRadius: 2.5,
-                  padding: 1,
-                  margin: 1
-                }}>
-                {'DADOS DO SOLICITANTE'}
-              </div>
-              <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
-                {pdfcampo('13 - CÓDIGO NA OPERADORA', codigo_prestador, 1)}
-                {pdfcampo('14 - NOME DO CONTRATADO', nome_contratado, 3)}
-              </div>
-              <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
-                {pdfcampo('15 - NOME DO PROFISSIONAL SOLICITANTE', nome_solicitante, 3)}
-                {pdfcampo('16 - CONSELHO PROFISSIONAL', conselho_solicitante, 1)}
-                {pdfcampo('17 - NÚMERO NO CONSELHO', n_conselho_solicitante, 1)}
-                {pdfcampo('18 - UF', uf_solicitante, 1)}
-                {pdfcampo('19 - CÓDIGO CBO', codigo_cbo, 1)}
-                {pdfcampo('20 - ASSINATURA DO PROFISSIONAL SOLICITANTE', '________________________', 3)}
-              </div>
-              <div className='grupo'
-                style={{
-                  fontFamily: 'Helvetica', fontSize: 8,
-                  backgroundColor: '#B2BEBE',
-                  borderRadius: 2.5,
-                  padding: 1,
-                  margin: 1
-                }}>
-                {'DADOS DA SOLICITAÇÃO / PROCEDIMENTOS OU ITENS ASSISTENCIAIS SOLICITADOS'}
-              </div>
-              <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
-                {pdfcampo('21 - CARÁTER DO ATENDIMENTO', '1 - ELETIVO', 1)}
-                {pdfcampo('22 - DATA DA SOLICITAÇÃO', moment().format('DD/MM/YYYY'), 1)}
-                {pdfcampo('23 - INDICAÇÃO CLÍNICA', '______________________', 4)}
-              </div>
-              <div id='linhas dos registros de exames solicitados'
-                style={{
-                  display: 'flex', flexDirection: 'row',
-                  flexWrap: 'wrap',
-                  borderStyle: 'solid',
-                  borderColor: '#b2babb',
-                  borderWidth: 1,
-                  borderRadius: 2.5,
-                  padding: 5,
-                  margin: 5,
-                }}>
-                {laboratorio.map(item => (
-                  <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', fontFamily: 'Helvetica', fontSize: 8, winWidth: 200 }}>
-                    {item.codigo_exame + ' - ' + item.nome_exame.substring(0, 20).toUpperCase() + '..., '}
-                  </div>
-                ))}
-              </div>
-              <div className='grupo'
-                style={{
-                  fontFamily: 'Helvetica', fontSize: 8,
-                  backgroundColor: '#B2BEBE',
-                  borderRadius: 2.5,
-                  padding: 1,
-                  margin: 1
-                }}>
-                {'DADOS DO CONTRATADO EXECUTANTE'}
-              </div>
-              <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
-                {pdfcampo('29 - CÓDIGO NA OPERADORA', operadora.codigo_prestador, 1)}
-                {pdfcampo('30 - NOME DO CONTRATADO', cliente.nome_cliente, 3)}
-                {pdfcampo('31 - CÓDIGO CNES', cliente.cnes, 1)}
-              </div>
-              <div className='grupo'
-                style={{
-                  fontFamily: 'Helvetica', fontSize: 8,
-                  backgroundColor: '#B2BEBE',
-                  borderRadius: 2.5,
-                  padding: 1,
-                  margin: 1
-                }}>
-                {'DADOS DO ATENDIMENTO'}
-              </div>
-              <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
-                {pdfcampo('32 - TIPO DE ATENDIMENTO', '05', 1)}
-                {pdfcampo('33 - INDICAÇÃO DE ACIDENTE (ACIDENTE OU DOENÇA RELACIONADA)', '9', 2)}
-                {pdfcampo('34 - TIPO DE CONSULTA', localStorage.getItem("tipo_consulta"), 1)}
-                {pdfcampo('35 - MOTIVO DE ENCERRAMENTO DO ATENDIMENTO', '15', 1)}
-              </div>
-              <div className='grupo'
-                style={{
-                  fontFamily: 'Helvetica', fontSize: 8,
-                  backgroundColor: '#B2BEBE',
-                  borderRadius: 2.5,
-                  padding: 1,
-                  margin: 1
-                }}>
-                {'DADOS DA EXECUÇÃO / PROCEDIMENTOS E EXAMES REALIZADOS'}
-              </div>
-              <div
-                style={{
-                  display: 'flex', flexDirection: 'column',
-                  borderStyle: 'solid',
-                  borderColor: 'black',
-                  borderWidth: 1,
-                  borderRadius: 2.5,
-                  padding: 5,
-                  margin: 5,
-                }}
-              >
-                <div id='cabeçalho do grupo'
-                  style={{
-                    display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
-                    width: '100%', alignSelf: 'center'
-                  }}>
-                  <div className='fonte_titulo_header'
-                    style={{ minWidth: 130, maxWidth: 130, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'36 - DATA'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 73, maxWidth: 73, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'37 - HORA INICIAL'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 73, maxWidth: 73, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'38 - HORA FINAL'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 38, maxWidth: 38, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'39 - TABELA'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'40 - CÓDIGO DO PROCEDIMENTO'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'41 - DESCRIÇÃO'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 50, maxWidth: 50, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'42 - QTDE'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 25, maxWidth: 25, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'43 - VIA'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 25, maxWidth: 25, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'44 - TEC'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 55, maxWidth: 55, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'45 - FATOR PERD/ACRESC'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 115, maxWidth: 115, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'46 - VALOR UNITÁRIO (R$)'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 115, maxWidth: 115, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'47 - VALOR TOTAL (R$)'}
-                  </div>
-                </div>
-                {GrupoExamesExecutados('1 ')}
-                {GrupoExamesExecutados('2 ')}
-                {GrupoExamesExecutados('3 ')}
-                {GrupoExamesExecutados('4 ')}
-                {GrupoExamesExecutados('5 ')}
-              </div>
-              <div className='grupo'
-                style={{
-                  fontFamily: 'Helvetica', fontSize: 8,
-                  backgroundColor: '#B2BEBE',
-                  borderRadius: 2.5,
-                  padding: 1,
-                  margin: 1
-                }}>
-                {'IDENTIFICAÇÃO DO(S) PROFISSIONAL(IS) EXECUTANTE(S)'}
-              </div>
-              <div
-                style={{
-                  display: 'flex', flexDirection: 'column',
-                  borderStyle: 'solid',
-                  borderColor: 'black',
-                  borderWidth: 1,
-                  borderRadius: 2.5,
-                  padding: 5,
-                  margin: 5,
-                }}
-              >
-                <div id='cabeçalho do grupo'
-                  style={{
-                    display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
-                    width: '100%', alignSelf: 'center'
-                  }}>
-                  <div className='fonte_titulo_header' style={{ minWidth: 50, maxWidth: 50, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'48 - SEQ. REF'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 50, maxWidth: 50, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'49 - GRAU PART.'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 200, maxWidth: 200, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'50 - CÓDIGO NA OPERADORA/CPF'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 270, maxWidth: 270, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'51 - NOME DO PROFISSIONAL'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 100, maxWidth: 100, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'52 - CONSELHO PROFISSIONAL'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 200, maxWidth: 200, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'53 - NÚMERO NO CONSELHO'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 50, maxWidth: 50, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'54 - UF'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 100, maxWidth: 100, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'55 - CÓDIGO CBO'}
-                  </div>
-                </div>
-                {GrupoIdentificacaoDosProfissionais()}
-                {GrupoIdentificacaoDosProfissionais()}
-                {GrupoIdentificacaoDosProfissionais()}
-                {GrupoIdentificacaoDosProfissionais()}
-              </div>
-              <div
-                style={{
-                  display: 'flex', flexDirection: 'column',
-                  borderStyle: 'solid',
-                  borderColor: 'black',
-                  borderWidth: 1,
-                  borderRadius: 2.5,
-                  padding: 5,
-                  margin: 5,
-                }}
-              >
-                <div className='fonte_titulo_header'
-                  style={{ display: 'flex', justifyContent: 'flex-start', alignSelf: 'flex-start', fontFamily: 'Helvetica', fontSize: 8 }}>
-                  {'56 - DATA DE REALIZAÇÃO DE PROCEDIMENTOS EM SÉRIE  57 - ASSINATURA DO BENEFICIÁRIO OU RESPONSÁVEL'}
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap' }}>
-                  {ProcedimentosEmSerie('01')}
-                  {ProcedimentosEmSerie('03')}
-                  {ProcedimentosEmSerie('05')}
-                  {ProcedimentosEmSerie('07')}
-                  {ProcedimentosEmSerie('09')}
-                </div>
-                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap' }}>
-                  {ProcedimentosEmSerie('02')}
-                  {ProcedimentosEmSerie('04')}
-                  {ProcedimentosEmSerie('06')}
-                  {ProcedimentosEmSerie('08')}
-                  {ProcedimentosEmSerie('10')}
-                </div>
-              </div>
-
-              <div className='fonte_titulo_header' style={{
-                display: 'flex', flexDirection: 'row',
-                height: 50, backgroundColor: '#B2BEBE',
-                position: 'relative', width: '100%', borderRadius: 2.5,
-                marginTop: 5, marginBottom: 5,
-              }}>
-                <div style={{ position: 'absolute', top: 5, left: 5, fontFamily: 'Helvetica', fontSize: 8 }}>
-                  {'58 - OBSERVAÇÃO/JUSTIFICATIVA'}
-                </div>
-              </div>
-              <div
-                style={{
-                  display: 'flex', flexDirection: 'column',
-                  borderStyle: 'solid',
-                  borderColor: 'black',
-                  borderWidth: 1,
-                  borderRadius: 2.5,
-                  padding: 5,
-                  margin: 5,
-                }}
-              >
-                <div id='cabeçalho do grupo'
-                  style={{
-                    display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
-                    width: '100%', alignSelf: 'center'
-                  }}>
-                  <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'59 - TOTAL DE PROCEDIMENTOS (R$)'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'60 - TOTAL DE TAXAS E ALUGUÉIS (R$)'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'61 - TOTAL DE MATERIAIS (R$)'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'62 - TOTAL DE OPME (R$)'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'63 - TOTAL DE MEDICAMENTOS (R$)'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'64 - TOTAL DE GASES MEDICINAIS (R$)'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'65 - TOTAL GERAL (R$)'}
-                  </div>
-                </div>
-                {GrupoTotalDeGastos()}
-              </div>
-              <div
-                style={{
-                  display: 'flex', flexDirection: 'column',
-                  borderStyle: 'solid',
-                  borderColor: 'black',
-                  borderWidth: 1,
-                  borderRadius: 2.5,
-                  padding: 5,
-                  margin: 5,
-                  fontFamily: 'Helvetica', fontSize: 8,
-                }}
-              >
-                <div id='cabeçalho do grupo'
-                  style={{
-                    display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
-                    width: '100%', alignSelf: 'center', fontFamily: 'Helvetica', fontSize: 8
-                  }}>
-                  <div className='fonte_titulo_header' style={{ minWidth: 200, maxWidth: 200, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'66 - ASSINATURA DO RESPONSÁVEL PELA AUTORIZAÇÃO'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 200, maxWidth: 200, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'67 - ASSINATURA DO BENEFICIÁRIO OU RESPONSÁVEL'}
-                  </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 200, maxWidth: 200, fontFamily: 'Helvetica', fontSize: 8 }}>
-                    {'68 - ASSINATURA DO CONTRATADO'}
-                  </div>
-                </div>
-                <div
-                  style={{
-                    display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
-                    width: '100%', alignSelf: 'center'
-                  }}
-                >
-                  <div className='fonte_titulo_header' style={{ minWidth: 200, width: 200, fontFamily: 'Helvetica', fontSize: 8 }}>{'____________________________'}</div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 200, width: 200, fontFamily: 'Helvetica', fontSize: 8 }}>{'____________________________'}</div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 200, width: 200, fontFamily: 'Helvetica', fontSize: 8 }}>{'____________________________'}</div>
-                </div>
-              </div>
+              {arrayguias.map((item) => conteudo(item.procedimentos))}
             </div>
           </div>
         </div>

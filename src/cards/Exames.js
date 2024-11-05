@@ -363,7 +363,7 @@ function Exames() {
             backgroundColor: '#e5e7e9',
             borderColor: '#e5e7e9'
           }}>
-          {Filter(setarrayprocedimentos_tuss, procedimentos_tuss, 'item.terminologia')}
+          {Filter("inputExamesSadt", setarrayprocedimentos_tuss, procedimentos_tuss, 'item.terminologia')}
           {arrayprocedimentos_tuss.map(item => (
             <div
               className='button'

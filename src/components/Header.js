@@ -3,7 +3,6 @@
 import React, { useContext } from 'react';
 import Context from '../pages/Context';
 import moment from "moment";
-import logo from '../images/logo.svg';
 
 function Header() {
 
@@ -30,17 +29,17 @@ function Header() {
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
           <img
             alt=""
-            src={logo}
+            src={cliente.logo}
             style={{
               margin: 0, marginBottom: 10,
-              width: 100,
+              width: 150,
             }}
           ></img>
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', fontSize: 10, marginRight: 10 }}>
-            <div className='text1'>{cliente.razao_social}</div>
-            <div className='text1'>{'CNPJ: ' + cliente.cnpj}</div>
-            <div className='text1'>{'ENDEREÇO: ' + cliente.endereco}</div>
-            <div className='text1'>{'TELEFONE: ' + cliente.telefone}</div>
+            <div className='text1' style={{ fontSize: 16 }}>{cliente.razao_social}</div>
+            <div className='text1' style={{ fontSize: 16 }}>{'CNPJ: ' + cliente.cnpj}</div>
+            <div className='text1' style={{ fontSize: 16 }}>{'ENDEREÇO: ' + cliente.endereco}</div>
+            <div className='text1' style={{ fontSize: 16 }}>{'TELEFONE: ' + cliente.telefone}</div>
           </div>
         </div>
         <div

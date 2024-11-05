@@ -1592,7 +1592,7 @@ function Cadastro() {
               disparaconsulta();
             }}
           >
-            CONSULTA DA GESTANTE
+            PUERICULTURA
           </div>
           <div className="button" style={{ width: 200, minWidth: 200 }}
             onClick={() => {
