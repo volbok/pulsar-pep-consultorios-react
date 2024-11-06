@@ -466,8 +466,13 @@ function Login() {
             pointerEvents: 'none'
           }}
         ></input>
-        <div className="button-red"
-          style={{ width: 130, alignSelf: 'center' }}
+        <div
+          id="btn_entrar"
+          className="button"
+          style={{
+            width: 130, alignSelf: 'center',
+            backgroundColor: 'rgb(82, 190, 128, 0.5)'
+          }}
           onClick={() => {
             checkLogin();
           }}

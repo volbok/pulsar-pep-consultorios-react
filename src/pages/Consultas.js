@@ -4,7 +4,7 @@ import axios from "axios";
 import Context from "./Context";
 import moment from "moment";
 // imagens.
-import power from "../images/power.svg";
+// import power from "../images/power.svg";
 import back from "../images/back.svg";
 import flag from "../images/white_flag.svg";
 import lupa from '../images/lupa.svg';
@@ -31,7 +31,7 @@ function Consultas() {
     unidades,
     usuario,
     setusuario,
-    
+
     settoast,
     pagina,
     setpagina,
@@ -209,7 +209,7 @@ function Consultas() {
           >
             <img
               alt=""
-              src={power}
+              src={back}
               style={{
                 height: 30,
                 width: 30,
@@ -622,91 +622,6 @@ function Consultas() {
     // eslint-disable-next-line
   }, [usuario, unidades, atendimentos, arrayatendimentos, consultorio, setarrayitensprescricao]);
 
-  // identificação do paciente na versão mobile, na view dos cards.
-  function CabecalhoPacienteMobile() {
-    return (
-      <div
-        id="mobile_pacientes"
-        style={{
-          position: "sticky",
-          marginTop: 0,
-          top: 0,
-          left: 0,
-          right: 0,
-          display: window.innerWidth < mobilewidth ? "flex" : "none",
-          flexDirection: "row",
-          justifyContent: "center",
-          flex: 1,
-          backgroundColor: "#f2f2f2",
-          borderColor: "#f2f2f2",
-          borderRadius: 5,
-          zIndex: 30,
-          minWidth: "calc(90vw - 10px)",
-          width: "calc(90vw - 10px)",
-        }}
-      >
-        <div
-          id="botão de retorno"
-          className="button-red"
-          style={{
-            display: window.innerWidth < mobilewidth ? "flex" : "none",
-            opacity: 1,
-            backgroundColor: "#ec7063",
-            alignSelf: "center",
-          }}
-          onClick={card == "" ? () => setviewlista(1) : () => setcard(0)}
-        >
-          <img alt="" src={back} style={{ width: 30, height: 30 }}></img>
-        </div>
-        {arrayatendimentos
-          .filter((item) => item.id_atendimento == atendimento)
-          .map((item) => (
-            <div
-              className="row"
-              key={"paciente selecionado " + item.id_atendimento}
-              style={{
-                margin: 0,
-                padding: 0,
-                flex: 1,
-                justifyContent: "space-around",
-                width: "100%",
-                backgroundColor: "transparent",
-              }}
-            >
-              <div
-                className="button-grey"
-                style={{
-                  margin: 5,
-                  marginRight: 0,
-                  marginLeft: 0,
-                  borderTopRightRadius: 0,
-                  borderBottomRightRadius: 0,
-                }}
-              >
-                {item.leito}
-              </div>
-              <div
-                className="button"
-                style={{
-                  flex: 1,
-                  marginLeft: 0,
-                  borderTopLeftRadius: 0,
-                  borderBottomLeftRadius: 0,
-                }}
-              >
-                <div style={{ width: "100%" }}>
-                  {pacientes.filter(
-                    (valor) => valor.id_paciente == item.id_paciente
-                  )
-                    .map((valor) => valor.nome_paciente)}
-                </div>
-              </div>
-            </div>
-          ))}
-      </div>
-    );
-  }
-
   // carregando todas as informações do atendimento.
   const getAllData = (paciente, atendimento) => {
     // Dados relacionados ao paciente.
@@ -819,7 +734,7 @@ function Consultas() {
         <div id="usuário, botões, busca de paciente e lista de pacientes"
           style={{
             display: window.innerWidth < mobilewidth && viewlista == 0 ? "none" : "flex",
-            flexDirection: 'column', justifyContent: 'space-between',
+            flexDirection: 'column', justifyContent: 'center',
             position: 'sticky', top: 5,
             width: window.innerWidth < mobilewidth ? '90vw' : '30vw',
             height: '95%',
@@ -831,8 +746,8 @@ function Consultas() {
         </div>
         <div style={{
           display: 'flex', flexDirection: 'column',
-          height: 'calc(100vh - 20px)',
-          marginRight: -10,
+          justifyContent: 'center',
+          // height: 'calc(100vh - 20px)',
         }}>
           <div id="cards (cartões) fixos"
             className="scroll"
@@ -855,24 +770,14 @@ function Consultas() {
             {cartao(null, 'LAUDOS', 'card-documento-laudo')}
             {cartao(null, 'RELATÓRIOS', 'card-documento-relatorio')}
           </div>
-          <div id="conteúdo cheio (cards)"
-            style={{
-              display: atendimento != null && card != 0 && viewlista == 0 ? 'flex' : 'none',
-              flexDirection: "row",
-              justifyContent: 'center',
-              alignContent: 'flex-start',
-              flexWrap: "wrap",
-              width: window.innerWidth < mobilewidth ? '90vw' : '65vw',
-            }}
-          >
-            <CabecalhoPacienteMobile></CabecalhoPacienteMobile>
-          </div>
           <div id="conteúdo cheio (componentes)"
             style={{
-              display: 'flex',
+              display: card == '' ? 'none' : 'flex',
               flexDirection: "row",
               flexWrap: "wrap",
               width: window.innerWidth < mobilewidth ? '90vw' : '65vw',
+              height: '80vh',
+              backgroundColor: 'red',
             }}
           >
             <Alergias></Alergias>
@@ -882,7 +787,7 @@ function Consultas() {
           <div id="conteúdo vazio"
             className="lupa"
             style={{
-              display: window.innerWidth < mobilewidth ? "none" : atendimento == null ? "flex" : "none",
+              display: window.innerWidth < mobilewidth ? "none" : card == '' ? "flex" : "none",
               flexDirection: "row",
               justifyContent: 'center',
               alignSelf: 'center',

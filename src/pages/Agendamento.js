@@ -434,7 +434,6 @@ function Agendamento() {
                 className={selectdate == item ? "button-selected" : "button"}
                 onClick={(e) => {
                   setselectdate(item);
-                  mountHorarios(item);
                   e.stopPropagation()
                 }}
                 style={{
@@ -792,21 +791,6 @@ function Agendamento() {
     // eslint-disable-next-line
   }, [arrayatendimentos, selectedespecialista, selectdate]);
 
-  const [arrayhorarios, setarrayhorarios] = useState([]);
-  const mountHorarios = (selectdate) => {
-    let array = [];
-    let inicio = moment(selectdate, 'DD/MM/YYYY').startOf('day').add(7, 'hours');
-    array.push(inicio.format('DD/MM/YYYY - HH:mm'))
-    for (var i = 0; i < 24; i++) {
-      if (localStorage.getItem('PARTICULAR')) {
-        array.push(inicio.add(45, 'minutes').format('DD/MM/YYYY - HH:mm'));
-      } else {
-        array.push(inicio.add(30, 'minutes').format('DD/MM/YYYY - HH:mm'));
-      }
-    }
-    setarrayhorarios(array);
-  }
-
   const [viewopcoeshorarios, setviewopcoeshorarios] = useState(0);
   const ViewOpcoesHorarios = () => {
 
@@ -816,15 +800,10 @@ function Agendamento() {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
           if (valor > 23 || valor < 0) {
-            localStorage.setItem('hora', valor);
-            setTimeout(() => {
-              document.getElementById("inputHour").focus();
-            }, 200);
+            document.getElementById("inputHour").value = '';
+            document.getElementById("inputHour").focus();
           } else {
             localStorage.setItem('hora', valor);
-            setTimeout(() => {
-              document.getElementById("inputHour").focus();
-            }, 200);
           }
         }, 1000);
       };
@@ -833,17 +812,10 @@ function Agendamento() {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
           if (valor > 59 || valor < 0) {
-            // setmin('!');
-            localStorage.setItem('min', valor);
-            setTimeout(() => {
-              document.getElementById("inputMin").focus();
-            }, 200);
+            document.getElementById("inputMin").value = '';
+            document.getElementById("inputMin").focus();
           } else {
             localStorage.setItem('min', valor);
-            // setmin(valor);
-            setTimeout(() => {
-              document.getElementById("inputMin").focus();
-            }, 200);
           }
         }, 200);
       };
@@ -945,24 +917,9 @@ function Agendamento() {
               style={{ width: 30, height: 30 }}
             ></img>
           </div>
+          <div className='text1' style={{ marginTop: 0 }}>{'DATA: ' + selectdate + ' - PROFISSIONAL: ' + selectedespecialista.nome_usuario}</div>
           <div className='text1' style={{ fontSize: 18, marginBottom: 0 }}>HORÁRIO DA CONSULTA</div>
           <TimeComponent></TimeComponent>
-          <div className='text1' style={{ fontSize: 18, marginBottom: 0 }}>HORÁRIOS DISPONÍVEIS</div>
-          <div className='text1' style={{ marginTop: 0 }}>{'DATA: ' + selectdate + ' - PROFISSIONAL: ' + selectedespecialista.nome_usuario}</div>
-          <div style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap' }}>
-            {arrayhorarios.map(item => (
-              <div className='button'
-                style={{
-                  backgroundColor: arrayatendimentos.filter(valor => moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') == item && valor.id_profissional == selectedespecialista.id_usuario).length > 0 ? '#EC7063' : '',
-                  pointerEvents: arrayatendimentos.filter(valor => moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') == item && valor.id_profissional == selectedespecialista.id_usuario).length > 0 ? 'none' : 'auto',
-                  width: 100, height: 100,
-                }}
-                onClick={() => { insertAtendimento(item); setviewopcoeshorarios(0) }}
-              >
-                {moment(item, 'DD/MM/YYYY - HH:mm').format('HH:mm')}
-              </div>
-            ))}
-          </div>
         </div>
       </div>
     )

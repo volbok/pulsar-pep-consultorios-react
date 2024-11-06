@@ -20,6 +20,7 @@ import Cid10 from '../functions/cid10';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 import modal from '../functions/modal';
+import toast from '../functions/toast';
 
 function Documentos() {
 
@@ -38,14 +39,6 @@ function Documentos() {
     settoast, setdialogo,
     // dados para importação na evolução.
     alergias,
-    sinaisvitais,
-    vm,
-    invasoes,
-    lesoes,
-    culturas,
-    laboratorio,
-
-    prescricao,
     mobilewidth,
 
     selecteddocumento, setselecteddocumento,
@@ -343,119 +336,27 @@ function Documentos() {
         'CONDUTA:'
       insertDocumento(texto);
     } else if (tipodocumento == 'EVOLUÇÃO') {
-      // recuperando dados vitais registrados pela enfermagem.
+      // recuperando alergias.
       let tag_alergias = '';
-      let tag_dadosvitais = '';
-      let tag_invasoes = '';
-      let tag_lesoes = '';
-      let tag_vm = '';
-      let tag_examesatuais = '';
-      let tag_culturas = '';
-      let tag_antibioticos = '';
-      let tag_laboratorio = '';
 
       // função para montar os dados importados dos cards e demais componentes.
       if (alergias.length > 0) {
         tag_alergias =
           "ALERGIAS:" + alergias.map(item => '\n' + item.alergia)
       }
-      if (sinaisvitais.length > 0) {
-        tag_dadosvitais =
-          "\nDADOS VITAIS:\nPA: " + sinaisvitais.slice(-1).map((item) => item.pas) + 'x' + sinaisvitais.slice(-1).map((item) => item.pad) + 'mmHg, FC: ' + sinaisvitais.slice(-1).map((item) => item.fc) + 'bpm, FR: ' + sinaisvitais.slice(-1).map((item) => item.fr) + 'irom, SAO2: ' + sinaisvitais.slice(-1).map((item) => item.sao2) + '%, TAX: ' + sinaisvitais.slice(-1).map((item) => item.tax) + 'ºC';
-      }
-      if (invasoes.length > 0) {
-        let arrayinvasoes = invasoes.map(item => '\n' + item.dispositivo + ' - ' + item.local + ' (' + moment(item.data_implante).format('DD/MM/YY') + ')')
-        tag_invasoes =
-          "\nINVASÕES:" +
-          arrayinvasoes;
-      }
-      if (lesoes.length > 0) {
-        let arraylesoes = lesoes.filter(item => item.data_fechamento == null).map(item => '\nLOCAL: ' + item.local + ' - GRAU: ' + item.grau + ' (' + moment(item.data_abertura).format('DD/MM/YY') + ')')
-        tag_lesoes =
-          "\nLESÕES:" +
-          arraylesoes;
-      }
-      if (vm.length > 0 && vm.slice(-1).map(item => item.modo) != 'OFF') {
-        console.log(vm)
-        tag_vm = "\nVENTILAÇÃO MECÂNICA:\nMODO: " +
-          vm.slice(-1).map(item => item.modo) + ' PRESSÃO: ' + vm.slice(-1).map(item => item.pressao) + ' VOLUME: ' + vm.slice(-1).map(item => item.volume) + ' PEEP: ' + vm.slice(-1).map(item => item.peep) + ' FIO2: ' + vm.slice(-1).map(item => item.fio2);
-      }
-      if (pacientes.filter(item => item.exames_atuais) != null) {
-        tag_examesatuais =
-          "\nEXAMES ATUAIS:\n" +
-          pacientes.filter(item => item.id_paciente == paciente).map(item => item.exames_atuais);
-      }
-      if (culturas.length > 0) {
-        let arrayculturas = culturas.map(item => '\nMATERIAL: ' + item.material + '\nDATA: ' + moment(item.data_pedido).format('DD/MM/YY') + '\nRESULTADO: ' + item.resultado + '\n\n');
-        tag_culturas =
-          "\nCULTURAS:" +
-          arrayculturas;
-      }
-      if (prescricao.filter(item => item.categoria == '1. ANTIMICROBIANOS' && moment(item.data).format('DD/MM/YY') == moment().format('DD/MM/YY')).length > 0) {
-        let arrayprescricao = prescricao.filter(item => item.categoria == '1. ANTIMICROBIANOS' && moment(item.data).format('DD/MM/YY') == moment().format('DD/MM/YY')).map(item => '\nANTIBIÓTICO: ' + item.nome_item);
-        tag_antibioticos =
-          "\nANTIBIÓTICOS EM USO:\n" +
-          arrayprescricao;
-      }
-      if (laboratorio.filter(item => item.status == 2).length > 0) {
-        let arraylaboratorio = laboratorio.filter(item => item.status == 2).sort((a, b) => moment(a.data_pedido) < moment(b.data_pedido) ? 1 : -1).map(item => '\n' + moment(item.data_pedido).format('DD/MM/YY') + ' - ' + item.nome_exame + ': ' + item.resultado);
-        tag_laboratorio =
-          "\nEXAMES LABORATORIAIS:" +
-          arraylaboratorio;
-      }
-      let texto = null;
-      if (usuario.conselho == 'CRM') {
-        texto =
-          'HD: \n\n' +
-          tag_alergias +
-          tag_antibioticos +
-          tag_culturas +
-          tag_invasoes +
-          tag_vm +
-          tag_lesoes +
-          tag_examesatuais +
-          tag_laboratorio +
-          tag_dadosvitais + '\n' +
-          'EVOLUÇÃO: \n\n' +
-          'AO EXAME: \n\n' +
-          'CONDUTA:'
-        insertDocumento(texto);
-      } else {
-        let texto =
-          'EVOLUÇÃO: \n' +
-          tag_dadosvitais + '\n\n' +
-          'AO EXAME:'
-        insertDocumento(texto);
-      }
+      let texto = tag_alergias + '\nESCREVA AQUI SUA EVOLUÇÃO LIVRE OU BAIXE UM MODELO.'
+      insertDocumento(texto);
     } else if (tipodocumento == 'RECEITA MÉDICA') {
       let texto =
-        'USO ORAL: \n\n' +
-        '1. AMOXICILINA 500MG .................... 21 CP. \n' +
-        'TOMAR 1CP VO 8;8H, POR 7 DIAS. \n\n' +
-        '2. PARACETAMOL GOTAS (500MG/ML) ......... 01 FR. \n' +
-        'TOMAR 1CP VO 8;8H, POR 7 DIAS. \n\n'
+        'DIGITE AQUI UMA RECEITA NOVA OU BAIXE UM MODELO.'
       insertDocumento(texto);
     } else if (tipodocumento == 'ATESTADO MÉDICO') {
       let texto =
-        'INFORME ABAIXO OS DIAS E O CID DO ATESTADO.';
-      insertDocumento(texto);
-      // document.getElementById("gadgets_atestado").style.display = 'flex';
-    } else if (tipodocumento == 'EXAME') {
-      let texto =
-        'HEMOGRAMA...';
-      insertDocumento(texto);
-    } else if (tipodocumento == 'ALTA HOSPITALAR') {
-      let anamnese = documentos.filter(item => item.tipo_documento == 'ADMISSÃO').sort((a, b) => moment(a.data) > moment(b.data) ? 1 : -1).slice(-1).map(item => item.texto).pop();
-      let evolucao = documentos.filter(item => item.tipo_documento == 'EVOLUÇÃO').sort((a, b) => moment(a.data) > moment(b.data) ? 1 : -1).slice(-1).map(item => item.texto).pop();
-      let texto =
-        'DATA DE ADMISSÃO: ' + atendimentos.filter(item => item.id_atendimento == atendimento).map(item => moment(item.data_inicio).format('DD/MM/YY')) + '\n' +
-        'DATA DA ALTA: ' + moment().format('DD/MM/YY') + '\n\n' +
-        anamnese + '\n\n' +
-        evolucao
+        'INFORME ABAIXO OS DIAS E O CID DO ATESTADO, OU SELECIONE UM MODELO.';
       insertDocumento(texto);
       // document.getElementById("gadgets_atestado").style.display = 'flex';
     } else {
-      let texto = 'POR FAVOR, EDITE AQUI SEU DOCUMENTO.' 
+      let texto = 'POR FAVOR, EDITE AQUI SEU DOCUMENTO.'
       insertDocumento(texto);
     }
   }
@@ -675,29 +576,18 @@ function Documentos() {
       </div >
     )
     // eslint-disable-next-line
-  }, [documentos]);
+  }, [documentos, selecteddocumento]);
+
   function FieldDocumento() {
     return (
       <textarea
         id="inputFieldDocumento"
         className="textarea"
         autoComplete='off'
-        placeholder='DIGITE AQUI O TEXTO DO DOCUMENTO.'
+        placeholder={selecteddocumento.length == 0 ? 'SELECIONE UM DOCUMENTO NA LISTA À DIREITA' : 'DIGITE AQUI O TEXTO DO DOCUMENTO.'}
+        onMouseOver={() => console.log(selecteddocumento)}
         onFocus={(e) => (e.target.placeholder = '')}
         onBlur={(e) => (e.target.placeholder = 'DIGITE AQUI O TEXTO DO DOCUMENTO.')}
-        onKeyUp={(e) => {
-          clearTimeout(timeout);
-          timeout = setTimeout(() => {
-            if (document.getElementById("inputFieldDocumento").value != '') {
-              let texto = document.getElementById("inputFieldDocumento").value;
-              localStorage.setItem("id", selecteddocumento.id);
-              localStorage.setItem("texto", texto);
-              console.log('ID:' + localStorage.getItem("id"));
-              updateDocumento(selecteddocumento, document.getElementById("inputFieldDocumento").value.toUpperCase(), 0);
-            }
-            e.stopPropagation();
-          }, 2000);
-        }}
         style={{
           display: 'flex',
           flexDirection: 'row', justifyContent: 'center',
@@ -706,11 +596,37 @@ function Documentos() {
           height: 'calc(100% - 30px)',
           width: 'calc(100% - 20px)',
           margin: 0,
-          pointerEvents: selecteddocumento == [] || selecteddocumento.status == 1 ? 'none' : 'auto',
+          pointerEvents: selecteddocumento.length == 0 ? 'none' : 'auto',
           position: 'relative',
+          opacity: selecteddocumento.length == 0 ? 0.3 : 1,
+        }}
+        onChange={() => {
+          if (selecteddocumento.status == 1) {
+            toast(settoast, 'ESTE DOCUMENTO JÁ FOI ASSINADO E NÃO PODE SER ALTERADO', '#EC7063', 2000);
+            setTimeout(() => {
+              document.getElementById("inputFieldDocumento").value = selecteddocumento.texto;
+              selector("lista de documentos", 'documento ' + selecteddocumento.id, 100);
+            }, 2100);
+          }
+        }}
+        onKeyUp={(e) => {
+          let texto = document.getElementById("inputFieldDocumento").value.toUpperCase();
+          if (selecteddocumento.status == 0) {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+              if (document.getElementById("inputFieldDocumento").value != '') {
+                texto = document.getElementById("inputFieldDocumento").value.toUpperCase();
+                localStorage.setItem("id", selecteddocumento.id);
+                localStorage.setItem("texto", texto);
+                console.log('ID:' + localStorage.getItem("id"));
+                updateDocumento(selecteddocumento, document.getElementById("inputFieldDocumento").value.toUpperCase(), 0);
+              }
+              e.stopPropagation();
+            }, 2000);
+          }
         }}
       >
-      </textarea>
+      </textarea >
     )
   }
 
