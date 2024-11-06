@@ -821,7 +821,6 @@ function Agendamento() {
       };
       return (
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
-          <div className='text1'>HORA</div>
           <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
             <input
               autoComplete="off"
@@ -830,7 +829,6 @@ function Agendamento() {
               onFocus={(e) => (e.target.placeholder = '')}
               onBlur={(e) => (e.target.placeholder = 'HH')}
               onKeyUp={(e) => fixHour(e.target.value)}
-              // defaultValue={hour}
               title="HORAS."
               maxLength={2}
               style={{
@@ -849,7 +847,6 @@ function Agendamento() {
               onFocus={(e) => (e.target.placeholder = '')}
               onBlur={(e) => (e.target.placeholder = 'MM')}
               onKeyUp={(e) => fixMin(e.target.value)}
-              //defaultValue={min}
               title="MINUTOS."
               maxLength={2}
               style={{
@@ -867,12 +864,12 @@ function Agendamento() {
             onClick={() => {
               let hora = localStorage.getItem('hora');
               let min = localStorage.getItem('min');
-              // 'DD/MM/YYYY - HH:mm'
+              // modelo: 'DD/MM/YYYY - HH:mm'
               console.log(selectdate + ' - ' + hora + ':' + min);
               insertAtendimento(selectdate + ' - ' + hora + ':' + min);
               setviewopcoeshorarios(0);
             }}
-            style={{ width: 50, maxWidth: 50, alignSelf: 'center' }}
+            style={{ width: 50, maxWidth: 50, alignSelf: 'center', marginTop: 20 }}
           >
             <img
               alt=""
@@ -895,28 +892,14 @@ function Agendamento() {
           setviewopcoeshorarios(0);
         }}
       >
-        <div className="janela scroll"
+        <div className="janela"
           style={{
             display: 'flex', flexDirection: 'column', justifyItems: 'flex-start',
             justifyContent: 'flex-start',
-            width: 730, height: '85vh',
             position: 'relative',
+            padding: 20,
           }}
           onClick={(e) => e.stopPropagation()}>
-          <div id="botão para sair da tela de seleção dos horários"
-            className="button-yellow" style={{
-              maxHeight: 50, maxWidth: 50,
-              position: 'sticky', top: 10, right: 10, alignSelf: 'flex-end'
-            }}
-            onClick={() => {
-              setviewopcoeshorarios(0);
-            }}>
-            <img
-              alt=""
-              src={back}
-              style={{ width: 30, height: 30 }}
-            ></img>
-          </div>
           <div className='text1' style={{ marginTop: 0 }}>{'DATA: ' + selectdate + ' - PROFISSIONAL: ' + selectedespecialista.nome_usuario}</div>
           <div className='text1' style={{ fontSize: 18, marginBottom: 0 }}>HORÁRIO DA CONSULTA</div>
           <TimeComponent></TimeComponent>

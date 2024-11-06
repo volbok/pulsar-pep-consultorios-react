@@ -27,17 +27,23 @@ function GuiaSadt() {
     if (card == 'guia-sadt') {
       loadExames();
       loadOperadoras();
-      setn_carteira(objpaciente.convenio_carteira);
-      setvalidade_carteira(objpaciente.validade_carteira);
       setnome(objpaciente.nome_paciente);
       setcns(objpaciente.cns);
-      setnome_contratado(cliente.nome_cliente);
+      // setnome_contratado(cliente.nome_cliente);
+      setnome_contratado('');
       setnome_solicitante(usuario.nome_usuario);
       setconselho_solicitante(usuario.conselho);
       setn_conselho_solicitante(usuario.n_conselho);
       setuf_solicitante('MG');
       setcodigo_cbo(usuario.codigo_cbo);
-      console.log(usuario);
+      // atendimento por convênio.
+      if (localStorage.getItem('PARTICULAR') != 'PARTICULAR') {
+        setn_carteira(objpaciente.convenio_carteira);
+        setvalidade_carteira(objpaciente.validade_carteira);
+      } else {
+        setn_carteira('');
+        setvalidade_carteira('');
+      }
     }
     // eslint-disable-next-line
   }, [card, atendimento]);
@@ -51,7 +57,7 @@ function GuiaSadt() {
   const [n_guia_principal, setn_guia_principal] = useState('');
   const [data_autorizacao, setdata_autorizacao] = useState('');
   const [senha, setsenha] = useState('');
-  const [validade_senha, setvalidade_senha] = useState(moment().add(30, 'days').format('DD/MM/YYYY'));
+  const [validade_senha, setvalidade_senha] = useState('');
   const [n_guia_operadora, setn_guia_operadora] = useState('');
   const [n_carteira, setn_carteira] = useState('');
   const [validade_carteira, setvalidade_carteira] = useState('');

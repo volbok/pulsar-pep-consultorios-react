@@ -777,7 +777,6 @@ function Consultas() {
               flexWrap: "wrap",
               width: window.innerWidth < mobilewidth ? '90vw' : '65vw',
               height: '80vh',
-              backgroundColor: 'red',
             }}
           >
             <Alergias></Alergias>

@@ -40,6 +40,7 @@ function Documentos() {
     // dados para importação na evolução.
     alergias,
     mobilewidth,
+    objpaciente,
 
     selecteddocumento, setselecteddocumento,
   } = useContext(Context);
@@ -90,117 +91,6 @@ function Documentos() {
     setselecteddocumento([]);
   }
 
-  // SELEÇÃO DE CID PARA ATESTADO MÉDICO.
-  const [viewseletorcid10, setviewseletorcid10] = useState(0);
-  function SeletorCid10() {
-    const [cid10] = useState(Cid10());
-    const [arraycid10, setarraycid10] = useState([]);
-    // filtro de paciente por nome.
-    function FilterCid10() {
-      var searchcid10 = "";
-      const [filtercid10, setfiltercid10] = useState("");
-      const filterCid10 = () => {
-        clearTimeout(timeout);
-        searchcid10 = document.getElementById("inputCid10").value;
-        document.getElementById("inputCid10").focus();
-        timeout = setTimeout(() => {
-          if (searchcid10 == "") {
-            searchcid10 = "";
-            setarraycid10([]);
-            document.getElementById("inputCid10").value = "";
-            setTimeout(() => {
-              document.getElementById("inputCid10").focus();
-            }, 100);
-          } else {
-            console.log(searchcid10);
-            setfiltercid10(searchcid10);
-            setTimeout(() => {
-              console.log(filtercid10);
-              setarraycid10(cid10.filter((item) => item.DESCRICAO.toUpperCase().includes(searchcid10) || item.DESCRICAO.includes(searchcid10)));
-              document.getElementById("inputCid10").value = searchcid10;
-              document.getElementById("inputCid10").focus();
-            }, 100);
-          }
-        }, 1000);
-      };
-      return (
-        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', width: '100%' }}>
-          <input
-            className="input"
-            autoComplete="off"
-            placeholder={
-              window.innerWidth < mobilewidth ? "BUSCAR DOENÇA..." : "BUSCAR..."
-            }
-            onFocus={(e) => (e.target.placeholder = "")}
-            onBlur={(e) =>
-              window.innerWidth < mobilewidth
-                ? (e.target.placeholder = "BUSCAR DOENÇA...")
-                : "BUSCAR..."
-            }
-            onKeyUp={() => filterCid10()}
-            type="text"
-            id="inputCid10"
-            maxLength={100}
-            defaultValue={filtercid10}
-            style={{ width: '100%' }}
-          ></input>
-        </div>
-      );
-    }
-    return (
-      <div
-        style={{ display: viewseletorcid10 == 1 ? 'flex' : 'none' }}
-        className='fundo' onClick={() => setviewseletorcid10(0)}>
-        <div
-          className='janela scroll'
-          onClick={(e) => e.stopPropagation()}
-          style={{
-            display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
-            width: '40vw', height: '70vh'
-          }}>
-          <FilterCid10></FilterCid10>
-          {arraycid10.map(item => (
-            <div className='button'
-              style={{ width: 'calc(100% - 20px)' }}
-              onClick={() => {
-                setviewseletorcid10(0);
-                setTimeout(() => {
-                  localStorage.setItem("cid", item.CAT);
-                  document.getElementById("dias de atestado").value = localStorage.getItem("dias");
-                  document.getElementById("inputFieldDocumento").value =
-                    'ATESTO QUE O(A) PACIENTE ' + pacientes.filter(item => item.id_paciente == paciente).map(item => item.nome_paciente).pop() +
-                    ' NECESSITA AFASTAR-SE DO TRABALHO POR UM PERÍODO DE ' + localStorage.getItem("dias") + ' DIAS, A CONTAR DE ' +
-                    moment(selecteddocumento.data).format('DD/MM/YY') + ', POR MOTIVO DE DOENÇA CID 10 ' + item.CAT + '.';;
-                  document.getElementById('documento ' + selecteddocumento.id).className = "button-selected";
-                }, 500);
-              }}
-            >
-              {item.CAT + ' - ' + item.DESCRICAO.toUpperCase()}
-            </div>
-          ))}
-        </div>
-      </div >
-    )
-  }
-  function BtnCid10() {
-    return (
-      <div id="botão para selecionar cid10"
-        className="button-green"
-        title="CLIQUE PARA SELECIONAR UM CID."
-        style={{
-          display: tipodocumento != 'ATESTADO MÉDICO' || selecteddocumento.status != 0 ? 'none' : 'flex',
-          alignSelf: 'center',
-          width: 100, minWidth: 100, maxWidth: 100
-        }}
-        onClick={() => {
-          localStorage.setItem('texto', document.getElementById("inputFieldDocumento").value.toUpperCase());
-          setviewseletorcid10(1);
-        }}>
-        CID-10
-      </div>
-    )
-  }
-
   // atualizando um documento.
   const updateDocumento = (item, texto, status) => {
     var obj = {
@@ -232,110 +122,312 @@ function Documentos() {
     })
   }
 
-  // GADGETS PARA O PREGUIÇOSO...
+  // GADGETS...
   // ATESTADO
-  // função para definir os dias de atestado.
-  const DiasAtestado = () => {
-    return (
-      <input id={"dias de atestado"}
-        className='input'
-        autoComplete="off"
-        placeholder=""
-        title=""
-        type="text"
-        onFocus={(e) => (e.target.placeholder = "")}
-        onBlur={(e) => (e.target.placeholder = "")}
-        onKeyUp={(e) => {
-          let dias = document.getElementById("dias de atestado").value;
-          localStorage.setItem('dias', dias);
-          document.getElementById("inputFieldDocumento").value =
-            'ATESTO QUE O PACIENTE ' + pacientes.filter(item => item.id_paciente == paciente).map(item => item.nome_paciente).pop() +
-            ' NECESSITA AFASTAR-SE DO TRABALHO POR UM PERÍODO DE ' + localStorage.getItem('dias') + ' DIAS, A CONTAR DE ' +
-            moment(selecteddocumento.data).format('DD/MM/YY') + ' POR MOTIVO DE DOENÇA CID 10 ' + localStorage.getItem('cid') + '.'
-        }}
-        style={{
-          flexDirection: "row",
-          justifyContent: "center",
-          alignSelf: "center",
-          width: 40, minWidth: 40, maxWidth: 40,
-          alignContent: "center",
-          height: 40, minHeight: 40, maxHeight: 40,
-          borderStyle: "none",
-          textAlign: "center",
-        }}
-      ></input>
-    )
-  }
-  // função para gerar o atestado para a doença clicada.
-  const gadgetAtestado = (doenca, cid) => {
-    return (
-      <div
-        className='button'
-        onClick={() => {
-          localStorage.setItem("cid", cid);
-          document.getElementById("inputFieldDocumento").value =
-            'ATESTO QUE O PACIENTE ' + pacientes.filter(item => item.id_paciente == paciente).map(item => item.nome_paciente).pop() +
-            ' NECESSITA AFASTAR-SE DO TRABALHO POR UM PERÍODO DE ' + localStorage.getItem('dias') + ' DIAS, A CONTAR DE ' +
-            moment(selecteddocumento.data).format('DD/MM/YY') + ' POR MOTIVO DE DOENÇA CID 10 ' + cid + '.'
-        }}
-        style={{
-          display: 'flex',
-          flexDirection: 'row', justifyContent: 'center',
-          width: 100, minWidth: 100, maxWidth: 100,
-        }}
-      >
-        {doenca}
-      </div>
-    )
-  }
   // componente que lista os principais gadgets de cid.
   function GadgetsParaAtestado() {
-    return (
-      <div className='gadget'
-        style={{
-          display: tipodocumento == 'ATESTADO MÉDICO' && selecteddocumento.id != undefined && selecteddocumento.status == 0 ? 'flex' : 'none',
-          flexDirection: 'column',
-          position: 'absolute', bottom: 20, left: 20
-        }}>
-        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-          <div className='text2'>DIAS DE ATESTADO:</div>
-          <DiasAtestado></DiasAtestado>
-        </div>
-        <div
-          className='scroll'
+
+    const [viewseletorcid10, setviewseletorcid10] = useState(0);
+    if (objpaciente != null) {
+      // variáveis.
+      let mae = objpaciente.nome_mae_paciente;
+      let dias_atestado = 1;
+      let paciente = objpaciente.nome_paciente;
+      let hora_inicio = '';
+      let hora_fim = '';
+      let data = moment().format('DD/MM/YYYY');
+
+
+      let arraymotivos = [
+        'CONSULTA MÉDICA',
+        'ACOMPANHAMENTO FAMILIAR',
+        'FAZER EXAMES'
+      ]
+
+      let arraytiposatestados = [
+        'ATESTADO DE COMPARECIMENTO AMBULATORIAL',
+        'ATESTADO DE ACOMPANHAMENTO HOSPITALAR',
+        'ATESTADO DE SAÚDE',
+        'ATESTADO DE AFASTAMENTO'
+      ]
+
+      // botão para visualizar seletor para cid10.
+      function BtnCid10() {
+        return (
+          <div id="botão para selecionar cid10"
+            className="button-green"
+            title="CLIQUE PARA SELECIONAR UM CID."
+            style={{
+              display: tipodocumento != 'ATESTADO MÉDICO' || selecteddocumento.status != 0 ? 'none' : 'flex',
+              alignSelf: 'center',
+              width: 100, minWidth: 100, maxWidth: 100
+            }}
+            onClick={() => {
+              localStorage.setItem('texto', document.getElementById("inputFieldDocumento").value.toUpperCase());
+              setviewseletorcid10(1);
+            }}>
+            CID-10
+          </div>
+        )
+      }
+      // componente para selação do cid-10.
+      function SeletorCid10() {
+        const [cid10] = useState(Cid10());
+        const [arraycid10, setarraycid10] = useState([]);
+        // filtro de paciente por nome.
+        function FilterCid10() {
+          var searchcid10 = "";
+          const [filtercid10, setfiltercid10] = useState("");
+          const filterCid10 = () => {
+            clearTimeout(timeout);
+            searchcid10 = document.getElementById("inputCid10").value;
+            document.getElementById("inputCid10").focus();
+            timeout = setTimeout(() => {
+              if (searchcid10 == "") {
+                searchcid10 = "";
+                setarraycid10([]);
+                document.getElementById("inputCid10").value = "";
+                setTimeout(() => {
+                  document.getElementById("inputCid10").focus();
+                }, 100);
+              } else {
+                console.log(searchcid10);
+                setfiltercid10(searchcid10);
+                setTimeout(() => {
+                  console.log(filtercid10);
+                  setarraycid10(cid10.filter((item) => item.DESCRICAO.toUpperCase().includes(searchcid10) || item.DESCRICAO.includes(searchcid10)));
+                  document.getElementById("inputCid10").value = searchcid10;
+                  document.getElementById("inputCid10").focus();
+                }, 100);
+              }
+            }, 1000);
+          };
+          return (
+            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', width: '100%' }}>
+              <input
+                className="input"
+                autoComplete="off"
+                placeholder={
+                  window.innerWidth < mobilewidth ? "BUSCAR DOENÇA..." : "BUSCAR..."
+                }
+                onFocus={(e) => (e.target.placeholder = "")}
+                onBlur={(e) =>
+                  window.innerWidth < mobilewidth
+                    ? (e.target.placeholder = "BUSCAR DOENÇA...")
+                    : "BUSCAR..."
+                }
+                onKeyUp={() => filterCid10()}
+                type="text"
+                id="inputCid10"
+                maxLength={100}
+                defaultValue={filtercid10}
+                style={{ width: '100%' }}
+              ></input>
+            </div>
+          );
+        }
+        return (
+          <div
+            style={{ display: viewseletorcid10 == 1 ? 'flex' : 'none' }}
+            className='fundo' onClick={() => setviewseletorcid10(0)}>
+            <div
+              className='janela scroll'
+              onClick={(e) => e.stopPropagation()}
+              style={{
+                display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
+                width: '40vw', height: '70vh'
+              }}>
+              <FilterCid10></FilterCid10>
+              {arraycid10.map(item => (
+                <div className='button'
+                  style={{ width: 'calc(100% - 20px)' }}
+                  onClick={() => {
+                    localStorage.setItem("cid", item.CAT);
+                    setviewseletorcid10(0);
+                  }}
+                >
+                  {item.CAT + ' - ' + item.DESCRICAO.toUpperCase()}
+                </div>
+              ))}
+            </div>
+          </div >
+        )
+      }
+
+      return (
+        <div className='gadget'
           style={{
-            display: 'flex', justifyContent: 'flex-start',
-            flexDirection: 'column', flexWrap: 'wrap',
-            backgroundColor: 'transparent', borderStyle: 'none',
-            width: 255, height: 150,
-          }}
-        >
-          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', flexWrap: 'wrap' }}>
-            <BtnCid10></BtnCid10>
-            {gadgetAtestado('IVAS', 'J06.9')}
-            {gadgetAtestado('GECA', 'A90')}
-            {gadgetAtestado('PNM', 'J15.9')}
-            {gadgetAtestado('DENGUE', 'A90')}
-            {gadgetAtestado('ITU', 'N39')}
+            display: tipodocumento == 'ATESTADO MÉDICO' && selecteddocumento.id != undefined && selecteddocumento.status == 0 ? 'flex' : 'none',
+            flexDirection: 'column',
+            position: 'absolute', bottom: 20, left: 20
+          }}>
+          <div
+            className='scroll'
+            style={{
+              display: 'flex', justifyContent: 'flex-start',
+              flexDirection: 'column', flexWrap: 'wrap',
+              backgroundColor: 'transparent', borderStyle: 'none',
+              width: 255, height: 250,
+            }}
+          >
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', flexWrap: 'wrap' }}>
+              <BtnCid10></BtnCid10>
+              <SeletorCid10></SeletorCid10>
+              <div id="inputs"
+                style={{
+                  display: 'flex', flexDirection: 'column',
+                  justifyContent: 'center', alignContent: 'center', alignItems: 'center'
+                }}>
+                <div id='DiasAtestado'
+                  style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <div className='text2'>DIAS DE ATESTADO:</div>
+                  <input id="inputDiasAtestado"
+                    className='input input-gadget'
+                    autoComplete="off"
+                    placeholder=""
+                    title=""
+                    type="text"
+                    onFocus={(e) => (e.target.placeholder = "")}
+                    onBlur={(e) => (e.target.placeholder = "")}
+                    onKeyUp={() => {
+                      clearTimeout(timeout);
+                      localStorage.setItem('dias', '');
+                      timeout = setTimeout(() => {
+                        localStorage.setItem('dias', document.getElementById('inputDiasAtestado').value);
+                      }, 1000);
+                    }}
+                    defaultValue={dias_atestado}
+                    style={{
+                      width: 40, minWidth: 40, maxWidth: 40,
+                      height: 40, minHeight: 40, maxHeight: 40,
+                    }}
+                  ></input>
+                </div>
+                <div id='HoraInicio'
+                  style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <div className='text2'>HORA INICIAL:</div>
+                  <input id="inputHoraInicio"
+                    className='input input-gadget'
+                    autoComplete="off"
+                    placeholder=""
+                    title=""
+                    type="text"
+                    onFocus={(e) => (e.target.placeholder = "")}
+                    onBlur={(e) => (e.target.placeholder = "")}
+                    onKeyUp={() => {
+                      clearTimeout(timeout);
+                      localStorage.setItem('inicio', '');
+                      timeout = setTimeout(() => {
+                        localStorage.setItem('inicio', document.getElementById('inputHoraInicio').value);
+                      }, 1000);
+                    }}
+                    defaultValue={hora_inicio}
+                    style={{
+                      width: 50, minWidth: 50, maxWidth: 50,
+                      height: 40, minHeight: 40, maxHeight: 40,
+                    }}
+                  ></input>
+                </div>
+                <div id='HoraTermino'
+                  style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <div className='text2'>HORA FINAL:</div>
+                  <input id="inputHoraTermino"
+                    className='input input-gadget'
+                    autoComplete="off"
+                    placeholder=""
+                    title=""
+                    type="text"
+                    onFocus={(e) => (e.target.placeholder = "")}
+                    onBlur={(e) => (e.target.placeholder = "")}
+                    onKeyUp={() => {
+                      clearTimeout(timeout);
+                      localStorage.setItem('termino', '');
+                      timeout = setTimeout(() => {
+                        localStorage.setItem('termino', document.getElementById('inputHoraTermino').value);
+                      }, 1000);
+                    }}
+                    defaultValue={hora_fim}
+                    style={{
+                      width: 50, minWidth: 50, maxWidth: 50,
+                      height: 40, minHeight: 40, maxHeight: 40,
+                    }}
+                  ></input>
+                </div>
+                <div>MOTIVO DO ATESTADO</div>
+                <div id='seletor de motivo do atestado'>
+                  {arraymotivos.map(item => (
+                    <div
+                      id={'motivo ' + item}
+                      className='button'
+                      style={{ width: 200, alignSelf: 'center' }}
+                      onClick={() => {
+                        localStorage.setItem('MOTIVO', item);
+                        selector('seletor de motivo do atestado', 'motivo ' + item, 100);
+                      }}
+                    >
+                      {item}
+                    </div>
+                  ))}
+                </div>
+                <div>TIPO DE ATESTADO</div>
+                <div id='seletor de tipo de atestado'>
+                  {arraytiposatestados.map(tipo => (
+                    <div
+                      id={'tipo ' + tipo}
+                      className='button'
+                      style={{ width: 200 }}
+                      onClick={() => {
+                        selector('seletor de tipo de atestado', 'tipo ' + tipo, 100);
+                        localStorage.setItem('TIPO', tipo);
+                        if (tipo == 'ATESTADO DE COMPARECIMENTO AMBULATORIAL') {
+
+                          // texto do documento.
+                          document.getElementById("inputFieldDocumento").value =
+                            'ATESTADO DE COMPARECIMENTO / AMBULATORIAL \n\n' +
+                            'ATESTO QUE A SRA. ' + mae + ' COMPARECEU A ESTE CONSULTÓRIO MÉDICO, NO HORÁRIO DE ' +
+                            localStorage.getItem('inicio') + ' ÀS ' + localStorage.getItem('termino') +
+                            ', EM ' + data + ' PARA ' + localStorage.getItem('MOTIVO') + '.';
+
+                        } else if (tipo == 'ATESTADO DE ACOMPANHAMENTO HOSPITALAR') {
+                          document.getElementById("inputFieldDocumento").value =
+                            'ATESTADO DE ACOMPANHAMENTO HOSPITALAR \n\n' +
+                            'ATESTO QUE A SRA. ' + mae + ' ESTEVE ACOMPANHANDO SEU FILHO, ' + paciente +
+                            ' EM TRATAMENTO MÉDICO/HOSPITALAR, NO PERÍODO DE ### A ###.\n' +
+                            'SENDO QUE O MESMO AINDA NECESSITA DE COMPANHIA MATERNA EM DOMICÍLIO, DURANTE ' +
+                            localStorage.getItem('dias') + ' DIA(S), PARA A CONTINUIDADE DO TRATAMENTO PROPOSTO, CID ' +
+                            localStorage.getItem('cid');
+                        } else if (tipo == 'ATESTADO DE SAÚDE') {
+                          document.getElementById("inputFieldDocumento").value =
+                            'ATESTADO DE ACOMPANHAMENTO HOSPITALAR \n\n' +
+                            'ATESTO QUE ' + paciente + ' AO EXAME CLÍNICO NÃO APRESENTOU SINAIS DE DOENÇAS INFECTO-CONTAGIOSAS, ' +
+                            'DE ALTERAÇÕES EVIDENTES DOS ÓRGÃOS DOS SENTIDOS OU VÍCIOS DE CONFORMAÇÃO FÍSICA. DURANTE A ENTREVISTA ' +
+                            'NÃO EVIDENCIOU SINAIS DE DÉFICIT OU DOENÇA NEURO-PSIQUIÁTRICA.'
+                        } else if (tipo == 'ATESTADO DE AFASTAMENTO') {
+                          document.getElementById("inputFieldDocumento").value =
+                            'ATESTADO DE AFASTAMENTO \n\n' +
+                            'ATESTO PARA OS DEVIDOS FINS QUE ' + paciente + ' DEVERÁ SER AFASTADO(A) DE SUAS ATIVIDADES ' +
+                            'PROFISSIONAIS/ESCOLARES POR ' + localStorage.getItem('dias') + ' DIAS, DEVIDO A CID ' + localStorage.getItem('cid');
+                        }
+                      }}
+                    >
+                      {tipo}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    )
+      )
+    } else {
+      return null;
+    }
   }
 
   // inserindo um documento.
   const montaTexto = () => {
     console.log(tipodocumento);
-    if (tipodocumento == 'ADMISSÃO') {
-      let texto =
-        'LISTA DE PROBLEMAS: \n\n' +
-        'HISTÓRIA DA DOENÇA ATUAL: \n\n' +
-        'ANTECEDENTES PESSOAIS: \n\n' +
-        'MEDICAÇÕES DE USO CONTÍNUO: \n\n' +
-        'EXAMES COMPLEMENTARES PRÉVIOS RELEVANTES: \n\n' +
-        'CONDUTA:'
-      insertDocumento(texto);
-    } else if (tipodocumento == 'EVOLUÇÃO') {
+    if (tipodocumento == 'EVOLUÇÃO') {
       // recuperando alergias.
       let tag_alergias = '';
 
@@ -468,6 +560,7 @@ function Documentos() {
             <div id={'documento ' + item.id}
               className='button'
               onClick={() => {
+                console.log(item);
                 localStorage.setItem("documento", item.id);
                 setselecteddocumento(item);
                 setTimeout(() => {
@@ -499,7 +592,6 @@ function Documentos() {
                   }}
                   onClick={(e) => {
                     modal(setdialogo, 'TEM CERTEZA QUE DESEJA EXCLUIR ESTE DOCUMENTO?', deleteDocumento, item.id)
-                    // deleteDocumento(item.id)
                     e.stopPropagation();
                   }}>
                   <img
@@ -656,7 +748,9 @@ function Documentos() {
       texto: item,
       status: 0,
       tipo_documento: tipodocumento,
-      profissional: usuario.nome_usuario + '\n' + usuario.conselho + '\n' + usuario.n_conselho
+      profissional: usuario.nome_usuario + '\n' + usuario.conselho + '\n' + usuario.n_conselho,
+      conselho: usuario.conselho + ': ' + usuario.n_conselho,
+      id_profissional: usuario.id,
     }
     axios.post(html + 'insert_documento', obj).then(() => {
       setviewselectmodelos(0);
@@ -913,7 +1007,6 @@ function Documentos() {
       <PrintDocumento></PrintDocumento>
       <ViewSelectModelos></ViewSelectModelos>
       <ViewCreateModelo></ViewCreateModelo>
-      <SeletorCid10></SeletorCid10>
       <GadgetsParaAtestado></GadgetsParaAtestado>
     </div>
   )

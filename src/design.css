@@ -978,6 +978,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   cursor: default;
 }
 
+.input-gadget {
+  flex-direction: row;
+  justify-content: center;
+  align-self: center;
+  align-content: center;
+  border-style: none;
+  text-align: center;
+}
+
 .textarea {
   font-family: inherit;
   font-size: inherit;

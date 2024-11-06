@@ -8,7 +8,6 @@ import toast from "../functions/toast";
 import power from "../images/power.svg";
 import salvar from "../images/salvar.svg";
 import back from "../images/back.svg";
-import logo from "../images/logo.svg";
 
 // componentes.
 import Logo from "../components/Logo";
@@ -643,7 +642,7 @@ function Login() {
           <div
             className="button"
             style={{
-              display: "flex",
+              display: window.innerWidth < mobilewidth ? "flex" : "none",
               padding: 10,
               margin: 5,
               minWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
@@ -875,7 +874,7 @@ function Login() {
           className="text2"
           style={{
             display:
-              window.innerWidth < mobilewidth && viewalterarsenha == 1
+              (window.innerWidth < mobilewidth && viewalterarsenha == 1) || cliente.logo != undefined
                 ? "none"
                 : "flex",
             margin: 20, marginTop: 0,
@@ -962,16 +961,6 @@ function Login() {
           ></img>
         </div>
         <div>{ }</div>
-        <img
-          src={logo}
-          alt=""
-          style={{
-            margin: 10,
-            height: 30,
-            width: 30,
-            alignSelf: 'center'
-          }}
-        ></img>
         <div className="text2" style={{ fontSize: 10, marginTop: 0 }}>{'CONTATO DO DESENVOLVEDOR'}</div>
         <div className="text2" style={{ fontSize: 10, marginTop: -5 }}>{'(31) 99226-6268'}</div>
       </div>

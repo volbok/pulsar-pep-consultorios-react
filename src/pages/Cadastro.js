@@ -17,6 +17,7 @@ import deletar from "../images/deletar.svg";
 import back from "../images/back.svg";
 import novo from "../images/novo.svg";
 import modal from "../functions/modal";
+import Filter from "../components/Filter";
 
 function Cadastro() {
   // context.
@@ -120,7 +121,7 @@ function Cadastro() {
   // recuperando registros de pacientes cadastrados na aplicação.
   const loadAtendimentos = () => {
     axios
-      .get(html + "allatendimentos/" + hospital)
+      .get(html + "allatendimentosfull/" + hospital)
       .then((response) => {
         setatendimentos(response.data.rows);
       })
@@ -261,6 +262,7 @@ function Cadastro() {
   };
 
   // excluir um paciente.
+  let timeout = null;
   const deletePaciente = (paciente) => {
     axios
       .get(html + "delete_paciente/" + paciente)
@@ -311,63 +313,58 @@ function Cadastro() {
     });
   };
 
-  const [filterpaciente, setfilterpaciente] = useState("");
-  var timeout = null;
-  var searchpaciente = "";
-  const filterPaciente = () => {
-    clearTimeout(timeout);
-    document.getElementById("inputPaciente").focus();
-    searchpaciente = document
-      .getElementById("inputPaciente")
-      .value.toUpperCase();
-    timeout = setTimeout(() => {
-      if (searchpaciente == "") {
-        setfilterpaciente("");
-        setarraypacientes(pacientes);
-        document.getElementById("inputPaciente").value = "";
-        setTimeout(() => {
-          document.getElementById("inputPaciente").focus();
-        }, 100);
-      } else {
-        setfilterpaciente(
-          document.getElementById("inputPaciente").value.toUpperCase()
-        );
-        setarraypacientes(
-          pacientes.filter((item) =>
-            item.nome_paciente.includes(searchpaciente)
-          )
-        );
-        document.getElementById("inputPaciente").value = searchpaciente;
-        setTimeout(() => {
-          document.getElementById("inputPaciente").focus();
-        }, 100);
-      }
-    }, 1000);
-  };
-
-  // filtro de paciente por nome.
-  function FilterPaciente() {
-    return (
-      <input
-        className="input"
-        autoComplete="off"
-        placeholder="BUSCAR PACIENTE..."
-        onFocus={(e) => (e.target.placeholder = "")}
-        onBlur={(e) => (e.target.placeholder = "BUSCAR PACIENTE...")}
-        onKeyUp={() => filterPaciente()}
-        type="text"
-        id="inputPaciente"
-        defaultValue={filterpaciente}
-        maxLength={100}
-        style={{ margin: 0, width: window.innerWidth < 426 ? "100%" : "30vw" }}
-      ></input>
-    );
-  }
-
   function ListaDePacientes() {
     return (
       <div style={{ position: 'relative', width: 'calc(100vw - 20px)' }}>
-        <BuscaPaciente></BuscaPaciente>
+        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+          <div id="botão de voltar (sair do cadastro)"
+            className="button-yellow"
+            style={{ margin: 0, marginRight: 10, width: 50, height: 50, alignSelf: 'center' }}
+            title={"VOLTAR PARA O LOGIN"}
+            onClick={() => {
+              setpagina(0);
+              history.push("/");
+            }}
+          >
+            <img
+              alt=""
+              src={back}
+              style={{
+                margin: 0,
+                height: 30,
+                width: 30,
+              }}
+            ></img>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '25vw' }}>
+            <div className="text2">FILTRAR POR NOME DO PACIENTE</div>
+            {Filter("inputFilterPacienteNome", setarraypacientes, pacientes, 'item.nome_paciente')}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '25vw' }}>
+            <div className="text2">FILTRAR POR NOME DA MÃE</div>
+            {Filter("inputFilterMaeNome", setarraypacientes, pacientes, 'item.nome_mae_paciente')}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '25vw' }}>
+            <div className="text2">FILTRAR POR Nº DE PRONTUÁRIO</div>
+            {Filter("inputFilterProntuario", setarraypacientes, pacientes, 'item.id_paciente.toString()')}
+          </div>
+          <div id="botão para cadastrar paciente"
+            className="button-green"
+            style={{ margin: 0, marginLeft: 10, width: 50, height: 50, alignSelf: 'center' }}
+            title={"CADASTRAR PACIENTE"}
+            onClick={() => setvieweditpaciente(2)}
+          >
+            <img
+              alt=""
+              src={novo}
+              style={{
+                margin: 0,
+                height: 30,
+                width: 30,
+              }}
+            ></img>
+          </div>
+        </div>
         <div className="grid"
           style={{
             marginTop: 10,
@@ -382,12 +379,15 @@ function Cadastro() {
                 style={{
                   display: 'flex',
                   flexDirection: 'column',
-                  justifyContent: 'flex-start',
+                  justifyContent: 'space-between',
                   alignItems: 'flex-start',
                 }}
                 onClick={() => {
                   setpaciente(item);
                   setobjpaciente(item);
+                  console.log(hospital);
+                  console.log(atendimentos.filter((valor) => valor.situacao == 3).length);
+                  console.log(atendimentos.filter((valor) => valor.id_paciente == item.id_paciente).length);
                   setatendimento(
                     atendimentos.filter(
                       (valor) =>
@@ -398,23 +398,26 @@ function Cadastro() {
                   setvieweditpaciente(1)
                 }}
               >
-                <div className="texto_claro">
-                  {'NOME DO PACIENTE:'}
-                </div>
-                <div style={{ margin: 5, marginTop: 0, textAlign: 'left' }}>
-                  {item.nome_paciente.length > 25 ? item.nome_paciente.slice(0, 25) + '...' : item.nome_paciente}
-                </div>
-                <div className="texto_claro">
-                  {'DATA DE NASCIMENTO:'}
-                </div>
-                <div style={{ margin: 5, marginTop: 0, textAlign: 'left' }}>
-                  {moment(item.dn_paciente).format("DD/MM/YY")}
-                </div>
-                <div className="texto_claro">
-                  {'NOME DA MÃE DO PACIENTE:'}
-                </div>
-                <div style={{ margin: 5, marginTop: 0, textAlign: 'left' }}>
-                  {item.nome_mae_paciente.length > 25 ? item.nome_mae_paciente.slice(0, 25) + '...' : item.nome_mae_paciente}
+                <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                  <div style={{ fontSize: 10, alignSelf: 'flex-end' }}>{'PRONTUÁRIO: ' + item.id_paciente}</div>
+                  <div className="texto_claro">
+                    {'NOME DO PACIENTE:'}
+                  </div>
+                  <div style={{ margin: 5, marginTop: 0, textAlign: 'left' }}>
+                    {item.nome_paciente.length > 25 ? item.nome_paciente.slice(0, 25) + '...' : item.nome_paciente}
+                  </div>
+                  <div className="texto_claro">
+                    {'DATA DE NASCIMENTO:'}
+                  </div>
+                  <div style={{ margin: 5, marginTop: 0, textAlign: 'left' }}>
+                    {moment(item.dn_paciente).format("DD/MM/YY")}
+                  </div>
+                  <div className="texto_claro">
+                    {'NOME DA MÃE DO PACIENTE:'}
+                  </div>
+                  <div style={{ margin: 5, marginTop: 0, textAlign: 'left' }}>
+                    {item.nome_mae_paciente.length > 25 ? item.nome_mae_paciente.slice(0, 25) + '...' : item.nome_mae_paciente}
+                  </div>
                 </div>
                 <div
                   className="button"
@@ -424,7 +427,7 @@ function Cadastro() {
                       atendimentos.filter(
                         (valor) =>
                           valor.id_paciente == item.id_paciente &&
-                          valor.data_termino == null
+                          valor.situacao == 3
                       ).length > 0
                         ? "rgb(82, 190, 128, 1)"
                         : "#66b2b2"
@@ -433,9 +436,9 @@ function Cadastro() {
                   {atendimentos.filter(
                     (valor) =>
                       valor.id_paciente == item.id_paciente &&
-                      valor.data_termino == null
+                      valor.situacao == 3
                   ).length > 0
-                    ? "EM ATENDIMENTO"
+                    ? "CONSULTA AGENDADA"
                     : "AGENDAR CONSULTA"}
                 </div>
               </div>
@@ -514,10 +517,8 @@ function Cadastro() {
               onBlur={(e) =>
                 "BUSCAR..."
               }
-              // onKeyUp={() => filterProcedimento()}
               type="text"
               id="filtrarProcedimento"
-              // defaultValue={filterprocedimento}
               maxLength={100}
               style={{ width: 'calc(100% - 20px)', backgroundColor: 'white' }}
             ></input>
@@ -1705,66 +1706,6 @@ function Cadastro() {
         }, 5000);
       });
   };
-
-  function BuscaPaciente() {
-    return (
-      <div id="cadastro de pacientes e de atendimentos"
-        style={{
-          position: 'sticky', top: 0,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "flex-start",
-        }}
-      >
-        <div id="botões e pesquisa"
-          style={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "center",
-            alignSelf: "center",
-            marginTop: 10,
-          }}
-        >
-          <div
-            className="button-yellow"
-            style={{ margin: 0, marginRight: 10, width: 50, height: 50 }}
-            title={"VOLTAR PARA O LOGIN"}
-            onClick={() => {
-              setpagina(0);
-              history.push("/");
-            }}
-          >
-            <img
-              alt=""
-              src={back}
-              style={{
-                margin: 0,
-                height: 30,
-                width: 30,
-              }}
-            ></img>
-          </div>
-          <FilterPaciente></FilterPaciente>
-          <div
-            className="button-green"
-            style={{ margin: 0, marginLeft: 10, width: 50, height: 50 }}
-            title={"CADASTRAR PACIENTE"}
-            onClick={() => setvieweditpaciente(2)}
-          >
-            <img
-              alt=""
-              src={novo}
-              style={{
-                margin: 0,
-                height: 30,
-                width: 30,
-              }}
-            ></img>
-          </div>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="main" style={{ display: pagina == 2 ? "flex" : "none" }}>
