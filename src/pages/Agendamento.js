@@ -220,7 +220,8 @@ function Agendamento() {
       <div id="scroll especiaistas"
         className='grid'
         style={{
-          display: listatodosatendimentos == 0 && selectedespecialista.length == 0 ? 'grid' : 'none',
+          // display: listatodosatendimentos == 0 && selectedespecialista.length == 0 ? 'grid' : 'none',
+          display: selectedespecialista.length == 0 ? 'grid' : 'none',
           width: '100%',
         }}
         onClick={(e) => e.stopPropagation(e)}
@@ -335,7 +336,7 @@ function Agendamento() {
     setarraylist(arraydate);
   }
 
-  const [selectdate, setselectdate] = useState(null);
+  const [selectdate, setselectdate] = useState(localStorage.getItem('selectdate'));
   function DatePicker() {
     return (
       <div
@@ -434,6 +435,7 @@ function Agendamento() {
                 className={selectdate == item ? "button-selected" : "button"}
                 onClick={(e) => {
                   setselectdate(item);
+                  localStorage.setItem('selectdate', item);
                   e.stopPropagation()
                 }}
                 style={{
@@ -463,7 +465,14 @@ function Agendamento() {
                     flexDirection: 'column',
                     justifyContent: 'center'
                   }}
-                  onClick={() => setviewopcoeshorarios(1)}
+                  onClick={() => {
+                    if (listatodosatendimentos == 1) {
+                      setpagina(2);
+                      history.push("/cadastro");
+                    } else {
+                      setviewopcoeshorarios(1)
+                    }
+                  }}
                 >
                   <div>+</div>
                 </div>
@@ -635,15 +644,25 @@ function Agendamento() {
         style={{
           display: listatodosatendimentos == 1 ? 'flex' : 'none',
           flexDirection: "column",
+          justifyContent: 'center',
         }}
       >
+        <div className='button'
+          style={{ width: 200, alignSelf: 'center' }}
+          onClick={() => {
+            setpagina(2);
+            history.push("/cadastro");
+          }}
+        >
+          AGENDAR CONSULTA
+        </div>
         <div id="scroll atendimentos com pacientes - desktop"
           className='scroll'
           style={{
             display: selectdate != null && arrayatendimentos.filter(item => item.situacao == 3 && moment(item.data_inicio).format('DD/MM/YYYY') == selectdate).length > 0 ? "flex" : "none",
             flexDirection: 'column',
             justifyContent: "flex-start",
-            height: '75vh',
+            height: '70vh',
             width: window.innerWidth < mobilewidth ? '90vw' : '50vw',
             marginLeft: window.innerWidth < mobilewidth ? 0 : 20,
           }}
@@ -793,7 +812,6 @@ function Agendamento() {
 
   const [viewopcoeshorarios, setviewopcoeshorarios] = useState(0);
   const ViewOpcoesHorarios = () => {
-
     function TimeComponent() {
       var timeout = null;
       const fixHour = (valor) => {
@@ -807,7 +825,6 @@ function Agendamento() {
           }
         }, 1000);
       };
-
       const fixMin = (valor) => {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
@@ -996,17 +1013,6 @@ function Agendamento() {
                         style={{ width: 30, height: 30 }}
                       ></img>
                     </div>
-                    <div id="botão para visualizar todos os atendimentos"
-                      className="button" style={{ maxHeight: 50, alignSelf: 'center', paddingLeft: 15, paddingRight: 15 }}
-                      onClick={() => {
-                        if (listatodosatendimentos == 1) {
-                          setlistatodosatendimentos(0);
-                        } else {
-                          setlistatodosatendimentos(1);
-                        }
-                      }}>
-                      {listatodosatendimentos == 0 ? 'VER TODOS OS AGENDAMENTOS' : 'VOLTAR'}
-                    </div>
                     <div className='text1' style={{ textAlign: 'left', fontSize: 16 }}>
                       {listatodosatendimentos == 0 ? 'AGENDAMENTO COM PROFISSIONAL: ' + selectedespecialista.nome_usuario + ' (' + selectedespecialista.tipo_usuario + ')' : 'TODOS OS AGENDAMENTOS'}
                     </div>
@@ -1019,12 +1025,11 @@ function Agendamento() {
                   }}>
                   <DatePicker></DatePicker>
                   <ListaDeAtendimentos></ListaDeAtendimentos>
-                  <ListaTodosAtendimentos></ListaTodosAtendimentos>
                 </div>
               </div>
             </div>
-            <ViewOpcoesHorarios></ViewOpcoesHorarios>
           </div>
+          <ViewOpcoesHorarios></ViewOpcoesHorarios>
           <GuiaConsulta></GuiaConsulta>
         </div>
       </div>
@@ -1035,7 +1040,7 @@ function Agendamento() {
         style={{
           display: 'flex',
           flexDirection: 'column',
-          justifyContent: 'flex-start',
+          justifyContent: 'center',
           alignContent: 'center',
           alignSelf: 'center',
           backgroundColor: 'white',
@@ -1084,10 +1089,10 @@ function Agendamento() {
               backgroundColor: 'white',
               borderColor: 'white',
               borderRadius: 5,
-              zIndex: 20
             }}>
             <ListaTodosAtendimentos></ListaTodosAtendimentos>
             <div style={{ display: window.innerWidth < mobilewidth ? 'none' : 'flex' }}>
+              <ViewOpcoesHorarios></ViewOpcoesHorarios>
               <GuiaConsulta></GuiaConsulta>
             </div>
           </div>

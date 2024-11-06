@@ -642,7 +642,8 @@ function Login() {
           <div
             className="button"
             style={{
-              display: window.innerWidth < mobilewidth ? "flex" : "none",
+              // display: window.innerWidth < mobilewidth ? "flex" : "none",
+              display: 'flex',
               padding: 10,
               margin: 5,
               minWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
@@ -655,6 +656,7 @@ function Login() {
             onClick={() => {
               setpaciente(null);
               setpagina(20);
+              localStorage.setItem('AGENDAMENTO', 'DIRETO');
               history.push("/agendamento");
             }}
           >
