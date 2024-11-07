@@ -648,7 +648,11 @@ function Agendamento() {
         }}
       >
         <div className='button'
-          style={{ width: 200, alignSelf: 'center' }}
+          style={{
+            display: window.innerWidth < mobilewidth ? 'none' : 'flex',
+            width: 200,
+            alignSelf: 'center'
+          }}
           onClick={() => {
             setpagina(2);
             history.push("/cadastro");

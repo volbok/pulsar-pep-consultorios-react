@@ -196,8 +196,8 @@ function GuiaSadt() {
           display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
           position: 'relative',
           borderStyle: 'solid', borderWidth: 1, borderColor: 'black', borderRadius: 2.5,
-          margin: 1, marginTop: 5,
-          padding: 1.5,
+          margin: 0.5, marginTop: 2.5,
+          padding: 0.5,
           flex: flex,
           minHeight: 15, maxHeight: 15,
           fontSize: 8, textAlign: 'left',
@@ -214,7 +214,7 @@ function GuiaSadt() {
           {titulo}
         </div>
         <div style={{
-          paddingTop: 5,
+          paddingTop: 2.5,
           fontFamily: 'Helvetica'
         }}>
           {valor != null && valor.length > 50 ? valor.toUpperCase().slice(0, 55) + '...' : valor != null && valor.length < 51 ? valor.toUpperCase() : ''}
@@ -239,7 +239,7 @@ function GuiaSadt() {
           <img alt="" src={logo}
             style={{
               display: logo != '' ? 'flex' : 'none',
-              width: 270, height: 100
+              height: 80
             }}
           ></img>
           <div style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center', flex: 4, fontFamily: 'Helvetica' }}>
@@ -522,7 +522,7 @@ function GuiaSadt() {
           display: 'flex', flexDirection: 'row',
           height: 50, backgroundColor: '#B2BEBE',
           position: 'relative', width: '100%', borderRadius: 2.5,
-          marginTop: 5, marginBottom: 5,
+          margin: 1, padding: 1,
         }}>
           <div style={{ position: 'absolute', top: 5, left: 5, fontFamily: 'Helvetica', fontSize: 8 }}>
             {'58 - OBSERVAÇÃO/JUSTIFICATIVA'}
@@ -862,14 +862,13 @@ function GuiaSadt() {
               }}>
               <div id="cabeçalho" style={{
                 display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
-                height: 100,
                 alignContent: 'center',
                 alignItems: 'center',
               }}>
                 <img alt="" src={logo}
                   style={{
                     display: logo != '' ? 'flex' : 'none',
-                    width: 270, height: 100
+                    height: 80
                   }}>
                 </img>
                 <div style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center', width: 500 }}>
@@ -1090,7 +1089,7 @@ function GuiaSadt() {
                 height: 50, backgroundColor: '#B2BEBE',
                 position: 'relative', width: '100%',
                 borderRadius: 2.5,
-                marginTop: 5, marginBottom: 5,
+                margin: 2.5,
               }}>
                 <div style={{ position: 'absolute', top: 5, left: 5 }}>
                   {'58 - OBSERVAÇÃO/JUSTIFICATIVA'}
