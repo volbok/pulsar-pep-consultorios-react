@@ -944,7 +944,7 @@ function Documentos() {
       <div id="IMPRESSÃO - DOCUMENTO"
         className="print"
       >
-        <table style={{ width: 4960, height: 7016 }}>
+        <table style={{ width: '100%' }}>
           <thead style={{ width: '100%' }}>
             <tr style={{ width: '100%' }}>
               <td style={{ width: '100%' }}>
