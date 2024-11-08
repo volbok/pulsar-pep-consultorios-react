@@ -3,6 +3,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import Context from '../pages/Context';
 import axios from 'axios';
 import moment from "moment";
+
 // imagens.
 import back from '../images/back.svg';
 import imprimir from '../images/imprimir.svg';
@@ -122,8 +123,9 @@ function GuiaSadt() {
           fontSize: 10, textAlign: 'left',
         }}>
         <div style={{
-          position: 'absolute', top: -5, left: 5,
+          position: 'absolute', top: -2, left: 5,
           backgroundColor: 'white',
+          borderRadius: 2.5,
           fontSize: 7,
           minHeight: 15, maxHeight: 15,
           paddingLeft: 2.5, paddingRight: 2.5,
@@ -165,8 +167,8 @@ function GuiaSadt() {
           fontSize: 10, textAlign: 'left',
         }}>
         <div style={{
-          position: 'absolute', top: -5, left: 5,
-          backgroundColor: 'white',
+          position: 'absolute', top: -2, left: 5,
+          backgroundColor: 'white', borderRadius: 2.5,
           fontSize: 7,
           minHeight: 15, maxHeight: 15,
           paddingLeft: 2.5, paddingRight: 2.5,
@@ -191,13 +193,13 @@ function GuiaSadt() {
   // campo para impressão da guia.
   const pdfcampo = (titulo, valor, flex) => {
     return (
-      <div id="versão para impressão" className='noprint'
+      <div id="versão para impressão" className='print'
         style={{
           display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
           position: 'relative',
           borderStyle: 'solid', borderWidth: 1, borderColor: 'black', borderRadius: 2.5,
-          margin: 0.5, marginTop: 2.5,
-          padding: 0.5,
+          margin: 2.5, marginTop: 5,
+          padding: 1,
           flex: flex,
           minHeight: 15, maxHeight: 15,
           fontSize: 8, textAlign: 'left',
@@ -206,7 +208,7 @@ function GuiaSadt() {
         <div style={{
           position: 'absolute', top: -6, left: 5,
           backgroundColor: 'white',
-          fontSize: 7,
+          fontSize: 8,
           minHeight: 10, maxHeight: 10,
           paddingLeft: 2.5, paddingRight: 2.5,
           fontFamily: 'Helvetica'
@@ -232,17 +234,26 @@ function GuiaSadt() {
         className='print'
         style={{
           display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
-          width: 'calc(100% - 20px)', fontFamily: 'Helvetica',
+          width: 'calc(100vw - 10px)',
+          height: 'calc(100vh - 30px)',
+          fontFamily: 'Helvetica',
           breakInside: 'avoid',
         }}>
-        <div id="cabeçalho" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+        <div id="cabeçalho"
+          style={{
+            display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
+          }}>
           <img alt="" src={logo}
             style={{
               display: logo != '' ? 'flex' : 'none',
-              height: 80
+              height: 90,
+              alignSelf: 'center',
             }}
           ></img>
-          <div style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center', flex: 4, fontFamily: 'Helvetica' }}>
+          <div style={{
+            fontSize: 14, fontWeight: 'bold', textAlign: 'center', flex: 4, fontFamily: 'Helvetica',
+            alignSelf: 'center',
+          }}>
             {'GUIA DE SERVIÇO PROFISSIONAL / SERVIÇO AUXILIAR DE DIAGNÓSTICO E TERAPIA - SP/SADT'}
           </div>
           {pdfcampo('2 - Nº DA GUIA DO PRESTADOR', guia_prestador, 1)}
@@ -290,11 +301,11 @@ function GuiaSadt() {
         </div>
         <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
           {pdfcampo('15 - NOME DO PROFISSIONAL SOLICITANTE', nome_solicitante, 3)}
-          {pdfcampo('16 - CONSELHO PROFISSIONAL', conselho_solicitante, 1)}
-          {pdfcampo('17 - NÚMERO NO CONSELHO', n_conselho_solicitante, 1)}
+          {pdfcampo('16 - CONSELHO PROFISSIONAL', conselho_solicitante, 2)}
+          {pdfcampo('17 - NÚMERO NO CONSELHO', n_conselho_solicitante, 2)}
           {pdfcampo('18 - UF', uf_solicitante, 1)}
           {pdfcampo('19 - CÓDIGO CBO', codigo_cbo, 1)}
-          {pdfcampo('20 - ASSINATURA DO PROFISSIONAL SOLICITANTE', '________________________', 3)}
+          {pdfcampo('20 - ASSINATURA DO PROFISSIONAL SOLICITANTE', '_________________________________________', 3)}
         </div>
         <div className='grupo'
           style={{
@@ -316,7 +327,7 @@ function GuiaSadt() {
             display: 'flex', flexDirection: 'row',
             flexWrap: 'wrap',
             borderStyle: 'solid',
-            borderColor: '#b2babb',
+            borderColor: 'red',
             borderWidth: 1,
             borderRadius: 2.5,
             padding: 5,
@@ -324,7 +335,7 @@ function GuiaSadt() {
           }}>
           {grupo.map(item => (
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', width: '100%' }}>
-              {pdfcampo('24 - TABELA', '21', 3)}
+              {pdfcampo('24 - TABELA', '21', 1)}
               {pdfcampo('25 - CÓDIGO DO PROCEDIMENTO OU ITEM ASSISTENCIAL', item.codigo_exame, 3)}
               {pdfcampo('26 - DESCRIÇÃO', item.nome_exame, 3)}
             </div>
@@ -378,50 +389,50 @@ function GuiaSadt() {
             borderColor: 'black',
             borderWidth: 1,
             borderRadius: 2.5,
-            padding: 5,
-            margin: 5,
+            padding: 1,
+            margin: 1,
           }}
         >
           <div id='cabeçalho do grupo'
             style={{
               display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
-              width: '100%', alignSelf: 'center'
+              width: 'calc(100% - 20px)', alignSelf: 'center'
             }}>
             <div className='fonte_titulo_header'
-              style={{ minWidth: 130, maxWidth: 130, fontFamily: 'Helvetica', fontSize: 8 }}>
+              style={{ minWidth: 160, maxWidth: 160, fontFamily: 'Helvetica', fontSize: 8 }}>
               {'36 - DATA'}
             </div>
-            <div className='fonte_titulo_header' style={{ minWidth: 73, maxWidth: 73, fontFamily: 'Helvetica', fontSize: 8 }}>
+            <div className='fonte_titulo_header' style={{ minWidth: 100, maxWidth: 100, fontFamily: 'Helvetica', fontSize: 8 }}>
               {'37 - HORA INICIAL'}
             </div>
-            <div className='fonte_titulo_header' style={{ minWidth: 73, maxWidth: 73, fontFamily: 'Helvetica', fontSize: 8 }}>
+            <div className='fonte_titulo_header' style={{ minWidth: 100, maxWidth: 100, fontFamily: 'Helvetica', fontSize: 8 }}>
               {'38 - HORA FINAL'}
             </div>
-            <div className='fonte_titulo_header' style={{ minWidth: 38, maxWidth: 38, fontFamily: 'Helvetica', fontSize: 8 }}>
+            <div className='fonte_titulo_header' style={{ minWidth: 50, maxWidth: 50, fontFamily: 'Helvetica', fontSize: 8 }}>
               {'39 - TABELA'}
             </div>
-            <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
+            <div className='fonte_titulo_header' style={{ minWidth: 160, maxWidth: 160, fontFamily: 'Helvetica', fontSize: 8 }}>
               {'40 - CÓDIGO DO PROCEDIMENTO'}
             </div>
-            <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
+            <div className='fonte_titulo_header' style={{ minWidth: 160, maxWidth: 160, fontFamily: 'Helvetica', fontSize: 8 }}>
               {'41 - DESCRIÇÃO'}
             </div>
-            <div className='fonte_titulo_header' style={{ minWidth: 50, maxWidth: 50, fontFamily: 'Helvetica', fontSize: 8 }}>
+            <div className='fonte_titulo_header' style={{ minWidth: 70, maxWidth: 70, fontFamily: 'Helvetica', fontSize: 8 }}>
               {'42 - QTDE'}
             </div>
-            <div className='fonte_titulo_header' style={{ minWidth: 25, maxWidth: 25, fontFamily: 'Helvetica', fontSize: 8 }}>
+            <div className='fonte_titulo_header' style={{ minWidth: 40, maxWidth: 40, fontFamily: 'Helvetica', fontSize: 8 }}>
               {'43 - VIA'}
             </div>
-            <div className='fonte_titulo_header' style={{ minWidth: 25, maxWidth: 25, fontFamily: 'Helvetica', fontSize: 8 }}>
+            <div className='fonte_titulo_header' style={{ minWidth: 40, maxWidth: 40, fontFamily: 'Helvetica', fontSize: 8 }}>
               {'44 - TEC'}
             </div>
-            <div className='fonte_titulo_header' style={{ minWidth: 55, maxWidth: 55, fontFamily: 'Helvetica', fontSize: 8 }}>
+            <div className='fonte_titulo_header' style={{ minWidth: 80, maxWidth: 80, fontFamily: 'Helvetica', fontSize: 8 }}>
               {'45 - FATOR PERD/ACRESC'}
             </div>
-            <div className='fonte_titulo_header' style={{ minWidth: 115, maxWidth: 115, fontFamily: 'Helvetica', fontSize: 8 }}>
+            <div className='fonte_titulo_header' style={{ minWidth: 140, maxWidth: 140, fontFamily: 'Helvetica', fontSize: 8 }}>
               {'46 - VALOR UNITÁRIO (R$)'}
             </div>
-            <div className='fonte_titulo_header' style={{ minWidth: 115, maxWidth: 115, fontFamily: 'Helvetica', fontSize: 8 }}>
+            <div className='fonte_titulo_header' style={{ minWidth: 140, maxWidth: 140, fontFamily: 'Helvetica', fontSize: 8 }}>
               {'47 - VALOR TOTAL (R$)'}
             </div>
           </div>
@@ -448,8 +459,8 @@ function GuiaSadt() {
             borderColor: 'black',
             borderWidth: 1,
             borderRadius: 2.5,
-            padding: 5,
-            margin: 5,
+            padding: 1,
+            margin: 1,
           }}
         >
           <div id='cabeçalho do grupo'
@@ -494,8 +505,8 @@ function GuiaSadt() {
             borderColor: 'black',
             borderWidth: 1,
             borderRadius: 2.5,
-            padding: 5,
-            margin: 5,
+            padding: 1,
+            margin: 1,
           }}
         >
           <div className='fonte_titulo_header'
@@ -535,34 +546,34 @@ function GuiaSadt() {
             borderColor: 'black',
             borderWidth: 1,
             borderRadius: 2.5,
-            padding: 5,
-            margin: 5,
+            padding: 1,
+            margin: 1,
           }}
         >
           <div id='cabeçalho do grupo'
             style={{
               display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
-              width: '100%', alignSelf: 'center'
+              width: 'calc(100% - 20px)', alignSelf: 'center'
             }}>
-            <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
+            <div className='fonte_titulo_header' style={{ width: 200, fontFamily: 'Helvetica', fontSize: 8 }}>
               {'59 - TOTAL DE PROCEDIMENTOS (R$)'}
             </div>
-            <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
+            <div className='fonte_titulo_header' style={{ width: 200, fontFamily: 'Helvetica', fontSize: 8 }}>
               {'60 - TOTAL DE TAXAS E ALUGUÉIS (R$)'}
             </div>
-            <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
+            <div className='fonte_titulo_header' style={{ width: 200, fontFamily: 'Helvetica', fontSize: 8 }}>
               {'61 - TOTAL DE MATERIAIS (R$)'}
             </div>
-            <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
+            <div className='fonte_titulo_header' style={{ width: 200, fontFamily: 'Helvetica', fontSize: 8 }}>
               {'62 - TOTAL DE OPME (R$)'}
             </div>
-            <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
+            <div className='fonte_titulo_header' style={{ width: 200, fontFamily: 'Helvetica', fontSize: 8 }}>
               {'63 - TOTAL DE MEDICAMENTOS (R$)'}
             </div>
-            <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
+            <div className='fonte_titulo_header' style={{ width: 200, fontFamily: 'Helvetica', fontSize: 8 }}>
               {'64 - TOTAL DE GASES MEDICINAIS (R$)'}
             </div>
-            <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
+            <div className='fonte_titulo_header' style={{ width: 200, fontFamily: 'Helvetica', fontSize: 8 }}>
               {'65 - TOTAL GERAL (R$)'}
             </div>
           </div>
@@ -575,8 +586,8 @@ function GuiaSadt() {
             borderColor: 'black',
             borderWidth: 1,
             borderRadius: 2.5,
-            padding: 5,
-            margin: 5,
+            padding: 1,
+            margin: 1,
             fontFamily: 'Helvetica', fontSize: 8,
           }}
         >
@@ -631,7 +642,6 @@ function GuiaSadt() {
     }
     console.log(grupolaboratorio.map(item => 'PÁGINA: ' + item.pagina + ' PROCEDIMENTOS: ' + item.procedimentos.length));
     setarrayguias(grupolaboratorio);
-
     // imprimindo as guias.
     setTimeout(() => {
       let printdocument = document.getElementById("GUIA SADT PRINT").innerHTML;
@@ -650,54 +660,54 @@ function GuiaSadt() {
       <div id='grupo execução dos exames'
         style={{
           display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
-          width: '100%', alignSelf: 'center'
+          width: 'calc(100% - 20px)', alignSelf: 'center'
         }}>
         <div className='fonte_titulo'
-          style={{ minWidth: 130, maxWidth: 140, fontFamily: 'Helvetica', fontSize: 10 }}>
+          style={{ minWidth: 160, maxWidth: 160, fontFamily: 'Helvetica', fontSize: 10 }}>
           {numero + '|__|__|/|__|__|/|__|__|__|__|'}
         </div>
         <div className='fonte_titulo'
-          style={{ minWidth: 73, maxWidth: 73, fontFamily: 'Helvetica', fontSize: 10 }}>
+          style={{ minWidth: 100, maxWidth: 100, fontFamily: 'Helvetica', fontSize: 10 }}>
           {'|__|__| : |__|__|'}
         </div>
         <div className='fonte_titulo'
-          style={{ minWidth: 73, maxWidth: 73, fontFamily: 'Helvetica', fontSize: 10 }}>
+          style={{ minWidth: 100, maxWidth: 100, fontFamily: 'Helvetica', fontSize: 10 }}>
           {'|__|__| : |__|__|'}
         </div>
         <div className='fonte_titulo'
-          style={{ minWidth: 38, maxWidth: 38, fontFamily: 'Helvetica', fontSize: 10 }}>
+          style={{ minWidth: 50, maxWidth: 50, fontFamily: 'Helvetica', fontSize: 10 }}>
           {'|__|__|'}
         </div>
         <div className='fonte_titulo'
-          style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 10 }}>
+          style={{ minWidth: 160, maxWidth: 160, fontFamily: 'Helvetica', fontSize: 10 }}>
           {'|__|__|__|__|__|__|__|__|__|__|'}
         </div>
         <div className='fonte_titulo'
-          style={{ minWidth: 120, maxWidth: 120, fontFamily: 'Helvetica', fontSize: 10 }}>
-          {'_________________________'}
+          style={{ minWidth: 160, maxWidth: 160, fontFamily: 'Helvetica', fontSize: 10 }}>
+          {'____________________________'}
         </div>
         <div className='fonte_titulo'
-          style={{ minWidth: 50, maxWidth: 50, fontFamily: 'Helvetica', fontSize: 10 }}>
+          style={{ minWidth: 70, maxWidth: 70, fontFamily: 'Helvetica', fontSize: 10 }}>
           {'|__|__|__|'}
         </div>
         <div className='fonte_titulo'
-          style={{ minWidth: 25, maxWidth: 25, fontFamily: 'Helvetica', fontSize: 10 }}>
+          style={{ minWidth: 40, maxWidth: 40, fontFamily: 'Helvetica', fontSize: 10 }}>
           {'|__|'}
         </div>
         <div className='fonte_titulo'
-          style={{ minWidth: 25, maxWidth: 25, fontFamily: 'Helvetica', fontSize: 10 }}>
+          style={{ minWidth: 40, maxWidth: 40, fontFamily: 'Helvetica', fontSize: 10 }}>
           {'|__|'}
         </div>
-        <div className='fonte_titulo'
-          style={{ minWidth: 50, maxWidth: 50, fontFamily: 'Helvetica', fontSize: 10 }}>
+        <div id="45 - fator per/acresc" className='fonte_titulo'
+          style={{ minWidth: 80, maxWidth: 80, fontFamily: 'Helvetica', fontSize: 10 }}>
           {'|__|,|__|__|'}
         </div>
         <div className='fonte_titulo'
-          style={{ minWidth: 115, maxWidth: 110, fontFamily: 'Helvetica', fontSize: 10 }}>
+          style={{ minWidth: 140, maxWidth: 140, fontFamily: 'Helvetica', fontSize: 10 }}>
           {'|__|__|__|__|__|__|,|__|__|'}
         </div>
         <div className='fonte_titulo'
-          style={{ minWidth: 115, maxWidth: 110, fontFamily: 'Helvetica', fontSize: 10 }}>
+          style={{ minWidth: 140, maxWidth: 140, fontFamily: 'Helvetica', fontSize: 10 }}>
           {'|__|__|__|__|__|__|,|__|__|'}
         </div>
       </div>
@@ -709,7 +719,7 @@ function GuiaSadt() {
       <div id='grupo identificação dos profissionais'
         style={{
           display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
-          width: '100%', alignSelf: 'center', fontFamily: 'Helvetica', fontSize: 8
+          width: 'calc(100% - 20px)', alignSelf: 'center', fontFamily: 'Helvetica', fontSize: 8
         }}>
         <div className='fonte_titulo' style={{ minWidth: 50, maxWidth: 50, fontFamily: 'Helvetica', fontSize: 10 }}>
           {'|__|__|'}
@@ -721,7 +731,7 @@ function GuiaSadt() {
           {'|__|__|__|__|__|__|__|__|__|__|__|__|__|__|'}
         </div>
         <div className='fonte_titulo' style={{ minWidth: 270, maxWidth: 270, fontFamily: 'Helvetica', fontSize: 10 }}>
-          {'__________________________________________________'}
+          {'_______________________________________________'}
         </div>
         <div className='fonte_titulo' style={{ minWidth: 100, maxWidth: 100, fontFamily: 'Helvetica', fontSize: 10 }}>
           {'|__|__|'}
@@ -744,29 +754,45 @@ function GuiaSadt() {
       <div id='grupo total de gastos'
         style={{
           display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
-          width: 'calc(100% - 20px)', alignSelf: 'center', fontFamily: 'Helvetica', fontSize: 8
+          width: 'calc(100% - 20px)', alignSelf: 'center',
+          fontFamily: 'Helvetica', fontSize: 8
         }}>
+        <div className='fonte_titulo'
+          style={{
+            fontFamily: 'Helvetica', fontSize: 10, width: 200,
+          }}>
+          {'|__|__|__|__|__|__|__|__|.|__|__|'}
+        </div>
+        <div className='fonte_titulo'
+          style={{
+            fontFamily: 'Helvetica', fontSize: 10, width: 200,
+          }}>
+          {'|__|__|__|__|__|__|__|__|.|__|__|'}
+        </div>
+        <div className='fonte_titulo'
+          style={{
+            fontFamily: 'Helvetica', fontSize: 10, width: 200,
+          }}>
+          {'|__|__|__|__|__|__|__|__|.|__|__|'}
+        </div>
         <div className='fonte_titulo' style={{
-          minWidth: 150, maxWidth: 150, fontFamily: 'Helvetica', fontSize: 10,
+          fontFamily: 'Helvetica', fontSize: 10, width: 200,
         }}>
           {'|__|__|__|__|__|__|__|__|.|__|__|'}
         </div>
-        <div className='fonte_titulo' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 10 }}>
+        <div className='fonte_titulo' style={{
+          fontFamily: 'Helvetica', fontSize: 10, width: 200,
+        }}>
           {'|__|__|__|__|__|__|__|__|.|__|__|'}
         </div>
-        <div className='fonte_titulo' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 10 }}>
+        <div className='fonte_titulo' style={{
+          fontFamily: 'Helvetica', fontSize: 10, width: 200,
+        }}>
           {'|__|__|__|__|__|__|__|__|.|__|__|'}
         </div>
-        <div className='fonte_titulo' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 10 }}>
-          {'|__|__|__|__|__|__|__|__|.|__|__|'}
-        </div>
-        <div className='fonte_titulo' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 10 }}>
-          {'|__|__|__|__|__|__|__|__|.|__|__|'}
-        </div>
-        <div className='fonte_titulo' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 10 }}>
-          {'|__|__|__|__|__|__|__|__|.|__|__|'}
-        </div>
-        <div className='fonte_titulo' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 10 }}>
+        <div className='fonte_titulo' style={{
+          fontFamily: 'Helvetica', fontSize: 10, width: 200,
+        }}>
           {'|__|__|__|__|__|__|__|__|.|__|__|'}
         </div>
       </div>
@@ -777,16 +803,15 @@ function GuiaSadt() {
     return (
       <div style={{ display: 'flex', flexDirection: 'row' }}>
         <div className='fonte_titulo' style={{
-          minWidth: 150, maxWidth: 150, fontFamily: 'Helvetica', fontSize: 10,
-          // backgroundColor: 'red',
+          fontFamily: 'Helvetica', fontSize: 10,
           marginRight: 2.5,
         }}>
           {numero + ' |__|__|/|__|__|/|__|__|__|__|'}
         </div>
         <div className='fonte_titulo' style={{
-          minWidth: 90, maxWidth: 90, fontFamily: 'Helvetica', fontSize: 10, marginLeft: 0, marginRight: 5,
+          fontFamily: 'Helvetica', fontSize: 10, marginLeft: 0, marginRight: 5,
         }}>
-          {'________________'}
+          {'_______________'}
         </div>
       </div>
     )
@@ -808,7 +833,7 @@ function GuiaSadt() {
               alignItems: 'flex-start',
               width: '80vw',
               height: '70vh',
-              padding: 20, paddinRight: 30,
+              padding: 20,
               backgroundColor: 'white', borderColor: 'white',
               overflowX: 'scroll', overflowY: 'scroll',
             }}>
@@ -817,7 +842,7 @@ function GuiaSadt() {
                 display: 'flex',
                 flexDirection: 'row',
                 justifyContent: 'center',
-                alignSelf: 'flex-end',
+                alignSelf: 'flex-start',
                 paddingRight: 20,
               }}>
               <div
@@ -917,7 +942,7 @@ function GuiaSadt() {
                 style={{
                   display: 'flex', flexDirection: 'column',
                   borderStyle: 'solid',
-                  borderColor: 'black',
+                  borderColor: 'red',
                   borderWidth: 1,
                   borderRadius: 2.5,
                   padding: 5,
@@ -953,50 +978,50 @@ function GuiaSadt() {
                   borderColor: 'black',
                   borderWidth: 1,
                   borderRadius: 2.5,
-                  padding: 5,
-                  margin: 5,
+                  padding: 1,
+                  margin: 1,
                 }}
               >
                 <div id='cabeçalho do grupo'
                   style={{
                     display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
-                    width: '100%', alignSelf: 'center'
+                    width: 'calc(100% - 20px)', alignSelf: 'center'
                   }}>
                   <div className='fonte_titulo_header'
-                    style={{ minWidth: 130, maxWidth: 130, fontFamily: 'Helvetica', fontSize: 8 }}>
+                    style={{ minWidth: 160, maxWidth: 160, fontFamily: 'Helvetica', fontSize: 8 }}>
                     {'36 - DATA'}
                   </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 73, maxWidth: 73, fontFamily: 'Helvetica', fontSize: 8 }}>
+                  <div className='fonte_titulo_header' style={{ minWidth: 100, maxWidth: 100, fontFamily: 'Helvetica', fontSize: 8 }}>
                     {'37 - HORA INICIAL'}
                   </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 73, maxWidth: 73, fontFamily: 'Helvetica', fontSize: 8 }}>
+                  <div className='fonte_titulo_header' style={{ minWidth: 100, maxWidth: 100, fontFamily: 'Helvetica', fontSize: 8 }}>
                     {'38 - HORA FINAL'}
                   </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 38, maxWidth: 38, fontFamily: 'Helvetica', fontSize: 8 }}>
+                  <div className='fonte_titulo_header' style={{ minWidth: 50, maxWidth: 50, fontFamily: 'Helvetica', fontSize: 8 }}>
                     {'39 - TABELA'}
                   </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 135, fontFamily: 'Helvetica', fontSize: 8 }}>
+                  <div className='fonte_titulo_header' style={{ minWidth: 160, maxWidth: 160, fontFamily: 'Helvetica', fontSize: 8 }}>
                     {'40 - CÓDIGO DO PROCEDIMENTO'}
                   </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 120, maxWidth: 120, fontFamily: 'Helvetica', fontSize: 8 }}>
+                  <div className='fonte_titulo_header' style={{ minWidth: 160, maxWidth: 160, fontFamily: 'Helvetica', fontSize: 8 }}>
                     {'41 - DESCRIÇÃO'}
                   </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 50, maxWidth: 50, fontFamily: 'Helvetica', fontSize: 8 }}>
+                  <div className='fonte_titulo_header' style={{ minWidth: 70, maxWidth: 70, fontFamily: 'Helvetica', fontSize: 8 }}>
                     {'42 - QTDE'}
                   </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 25, maxWidth: 25, fontFamily: 'Helvetica', fontSize: 8 }}>
+                  <div className='fonte_titulo_header' style={{ minWidth: 40, maxWidth: 40, fontFamily: 'Helvetica', fontSize: 8 }}>
                     {'43 - VIA'}
                   </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 25, maxWidth: 25, fontFamily: 'Helvetica', fontSize: 8 }}>
+                  <div className='fonte_titulo_header' style={{ minWidth: 40, maxWidth: 40, fontFamily: 'Helvetica', fontSize: 8 }}>
                     {'44 - TEC'}
                   </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 50, maxWidth: 50, fontFamily: 'Helvetica', fontSize: 8 }}>
+                  <div className='fonte_titulo_header' style={{ minWidth: 80, maxWidth: 80, fontFamily: 'Helvetica', fontSize: 8 }}>
                     {'45 - FATOR PERD/ACRESC'}
                   </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 115, maxWidth: 115, fontFamily: 'Helvetica', fontSize: 8 }}>
+                  <div className='fonte_titulo_header' style={{ minWidth: 140, maxWidth: 140, fontFamily: 'Helvetica', fontSize: 8 }}>
                     {'46 - VALOR UNITÁRIO (R$)'}
                   </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 115, maxWidth: 115, fontFamily: 'Helvetica', fontSize: 8 }}>
+                  <div className='fonte_titulo_header' style={{ minWidth: 140, maxWidth: 140, fontFamily: 'Helvetica', fontSize: 8 }}>
                     {'47 - VALOR TOTAL (R$)'}
                   </div>
                 </div>
@@ -1014,14 +1039,14 @@ function GuiaSadt() {
                   borderColor: 'black',
                   borderWidth: 1,
                   borderRadius: 2.5,
-                  padding: 5,
-                  margin: 5,
+                  padding: 1,
+                  margin: 1,
                 }}
               >
                 <div id='cabeçalho do grupo'
                   style={{
                     display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
-                    width: '100%', alignSelf: 'center'
+                    width: 'calc(100% - 20px)', alignSelf: 'center', fontFamily: 'Helvetica', fontSize: 8
                   }}>
                   <div className='fonte_titulo_header' style={{ minWidth: 50, maxWidth: 50 }}>
                     {'48 - SEQ. REF'}
@@ -1060,22 +1085,23 @@ function GuiaSadt() {
                   borderColor: 'black',
                   borderWidth: 1,
                   borderRadius: 2.5,
-                  padding: 5,
-                  margin: 5,
+                  padding: 1,
+                  margin: 1,
                 }}
               >
                 <div className='fonte_titulo_header'
                   style={{ display: 'flex', justifyContent: 'flex-start', alignSelf: 'flex-start', fontFamily: 'Helvetica', fontSize: 8 }}>
                   {'56 - DATA DE REALIZAÇÃO DE PROCEDIMENTOS EM SÉRIE  57 - ASSINATURA DO BENEFICIÁRIO OU RESPONSÁVEL'}
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <div
+                  style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap' }}>
                   {ProcedimentosEmSerie('01')}
                   {ProcedimentosEmSerie('03')}
                   {ProcedimentosEmSerie('05')}
                   {ProcedimentosEmSerie('07')}
                   {ProcedimentosEmSerie('09')}
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap' }}>
+                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', flexWrap: 'wrap' }}>
                   {ProcedimentosEmSerie('02')}
                   {ProcedimentosEmSerie('04')}
                   {ProcedimentosEmSerie('06')}
@@ -1089,9 +1115,9 @@ function GuiaSadt() {
                 height: 50, backgroundColor: '#B2BEBE',
                 position: 'relative', width: '100%',
                 borderRadius: 2.5,
-                margin: 2.5,
+                margin: 1,
               }}>
-                <div style={{ position: 'absolute', top: 5, left: 5 }}>
+                <div style={{ position: 'absolute', top: 1, left: 5 }}>
                   {'58 - OBSERVAÇÃO/JUSTIFICATIVA'}
                 </div>
               </div>
@@ -1102,8 +1128,8 @@ function GuiaSadt() {
                   borderColor: 'black',
                   borderWidth: 1,
                   borderRadius: 2.5,
-                  padding: 5,
-                  margin: 5,
+                  padding: 1,
+                  margin: 1,
                 }}
               >
                 <div id='cabeçalho do grupo'
@@ -1111,25 +1137,25 @@ function GuiaSadt() {
                     display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
                     width: 'calc(100% - 20px)', alignSelf: 'center'
                   }}>
-                  <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 140 }}>
+                  <div className='fonte_titulo_header' style={{ width: 200 }}>
                     {'59 - TOTAL DE PROCEDIMENTOS (R$)'}
                   </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 140 }}>
+                  <div className='fonte_titulo_header' style={{ width: 200 }}>
                     {'60 - TOTAL DE TAXAS E ALUGUÉIS (R$)'}
                   </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 140 }}>
+                  <div className='fonte_titulo_header' style={{ width: 200 }}>
                     {'61 - TOTAL DE MATERIAIS (R$)'}
                   </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 140 }}>
+                  <div className='fonte_titulo_header' style={{ width: 200 }}>
                     {'62 - TOTAL DE OPME (R$)'}
                   </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 140 }}>
+                  <div className='fonte_titulo_header' style={{ width: 200 }}>
                     {'63 - TOTAL DE MEDICAMENTOS (R$)'}
                   </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 140 }}>
+                  <div className='fonte_titulo_header' style={{ width: 200 }}>
                     {'64 - TOTAL DE GASES MEDICINAIS (R$)'}
                   </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 135, maxWidth: 140 }}>
+                  <div className='fonte_titulo_header' style={{ width: 200 }}>
                     {'65 - TOTAL GERAL (R$)'}
                   </div>
                 </div>
@@ -1142,14 +1168,13 @@ function GuiaSadt() {
                   borderColor: 'black',
                   borderWidth: 1,
                   borderRadius: 2.5,
-                  padding: 5,
-                  margin: 5,
+                  padding: 1,
+                  margin: 1,
                 }}
               >
                 <div id='cabeçalho do grupo'
                   style={{
                     display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
-                    width: '100%', alignSelf: 'center'
                   }}>
                   <div className='fonte_titulo_header' style={{ minWidth: 200, maxWidth: 200 }}>
                     {'66 - ASSINATURA DO RESPONSÁVEL PELA AUTORIZAÇÃO'}
@@ -1164,16 +1189,16 @@ function GuiaSadt() {
                 <div
                   style={{
                     display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
-                    width: '100%', alignSelf: 'center'
+
                   }}
                 >
-                  <div className='fonte_titulo_header' style={{ minWidth: 200, width: 200 }}>{'____________________________'}</div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 200, width: 200 }}>{'____________________________'}</div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 200, width: 200 }}>{'____________________________'}</div>
+                  <div className='fonte_titulo_header' style={{ minWidth: 200, width: 200 }}>{'__________________________________________'}</div>
+                  <div className='fonte_titulo_header' style={{ minWidth: 200, width: 200 }}>{'__________________________________________'}</div>
+                  <div className='fonte_titulo_header' style={{ minWidth: 200, width: 200 }}>{'__________________________________________'}</div>
                 </div>
               </div>
             </div>
-            <div id="GUIA SADT PRINT" className='print portrait-page'
+            <div id="GUIA SADT PRINT" className='print'
               style={{
                 display: 'flex', flexDirection: 'column',
               }}>

@@ -1,5 +1,6 @@
 /* eslint eqeqeq: "off" */
 import React, { useContext, useState, useEffect, useCallback } from 'react';
+// import { useReactToPrint } from "react-to-print";
 import Context from '../pages/Context';
 import axios from 'axios';
 import moment from "moment";
@@ -957,7 +958,7 @@ function Documentos() {
                 <div id="campos"
                   style={{
                     display: 'flex', flexDirection: 'column',
-                    breakInside: 'auto', alignSelf: 'center', width: '100%'
+                    breakInside: 'auto', alignSelf: 'center', width: '100%',
                   }}>
                   <Conteudo></Conteudo>
                 </div>
@@ -979,10 +980,11 @@ function Documentos() {
   function Conteudo() {
     return (
       <div style={{
-        display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+        display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
         fontFamily: 'Helvetica',
         breakInside: 'auto',
         whiteSpace: 'pre-wrap',
+        height: '90vh',
       }}>
         {selecteddocumento.texto}
       </div>
