@@ -1201,6 +1201,8 @@ function GuiaSadt() {
             <div id="GUIA SADT PRINT" className='print'
               style={{
                 display: 'flex', flexDirection: 'column',
+                width: 7016,
+                height: 4960,
               }}>
               {arrayguias.map((item) => conteudo(item.procedimentos))}
             </div>
