@@ -984,7 +984,7 @@ function Documentos() {
         fontFamily: 'Helvetica',
         breakInside: 'auto',
         whiteSpace: 'pre-wrap',
-        height: '90vh',
+        // height: '100vh',
       }}>
         {selecteddocumento.texto}
       </div>
