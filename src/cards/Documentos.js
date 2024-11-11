@@ -949,7 +949,7 @@ function Documentos() {
   function PrintDocumento() {
     return (
       <div id="IMPRESSÃO - DOCUMENTO"
-        //className='print'
+        className='print'
         style={{
           display: 'flex',
           flexDirection: 'column',
