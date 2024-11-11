@@ -19,13 +19,16 @@ function Header() {
   return (
     <div style={{
       display: 'flex',
-      flexDirection: 'column', justifyContent: 'center',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignSelf: 'center',
       fontFamily: 'Helvetica',
       breakInside: 'avoid',
+      // backgroundColor: 'rgb(0,0,0, 0.1)',
+      width: '100%',
     }}>
       <div style={{
         display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
-        width: 'calc(100% - 20px)',
       }}>
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
           <img
@@ -36,10 +39,14 @@ function Header() {
               width: 150,
             }}
           ></img>
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', fontSize: 10, marginRight: 10 }}>
-            <div className='text1' style={{ fontSize: 10 }}>{cliente.razao_social}</div>
-            <div className='text1' style={{ fontSize: 10 }}>{'ENDEREÇO: ' + cliente.endereco}</div>
-            <div className='text1' style={{ fontSize: 10 }}>{'TELEFONE: ' + cliente.telefone}</div>
+          <div style={{
+            display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', fontSize: 10,
+            marginRight: 50,
+            width: '30vw',
+          }}>
+            <div style={{ fontSize: 10 }}>{cliente.razao_social}</div>
+            <div style={{ fontSize: 10 }}>{'ENDEREÇO: ' + cliente.endereco}</div>
+            <div style={{ fontSize: 10 }}>{'TELEFONE: ' + cliente.telefone}</div>
           </div>
         </div>
         <div
@@ -48,7 +55,7 @@ function Header() {
             justifyContent: 'center',
             alignContent: 'center',
             alignItems: 'center',
-            borderRadius: 5, backgroundColor: 'gray', 
+            borderRadius: 5, backgroundColor: 'gray',
             color: 'white', fontSize: 10, fontWeight: 'bold',
             padding: 5,
           }}
@@ -58,7 +65,6 @@ function Header() {
           <QRCodeSVG style={{ height: 100, width: 100 }} value="https://www.instagram.com/pediatrianarede/reel/DB_E3aVNjL9/" />
         </div>
       </div>
-      <hr style={{ border: '1px solid black', width: 'calc(100vw - 20px)' }}></hr>
       <div style={{ fontFamily: 'Helvetica', fontWeight: 'bold', fontSize: 20, marginTop: 10 }}>
         {objatendimento != undefined ? 'CLIENTE: ' + objatendimento.nome_paciente : ''}
       </div>
@@ -69,7 +75,8 @@ function Header() {
         }}>
         {'ALERGIAS: ' + alergias.map(item => ' ' + item.alergia + ' ')}
       </div>
-      <div style={{ fontFamily: 'Helvetica', fontWeight: 'bold', width: '100%', fontSize: 22, marginTop: 20, textAlign: 'center' }}>
+      <hr style={{ display: 'flex', border: '1px solid black', width: '100%' }}></hr>
+      <div style={{ fontFamily: 'Helvetica', fontWeight: 'bold', fontSize: 22, marginTop: 20, textAlign: 'center' }}>
         {tipodocumento}
       </div>
     </div>

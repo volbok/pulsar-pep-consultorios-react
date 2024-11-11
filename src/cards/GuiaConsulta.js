@@ -5,6 +5,7 @@ import moment from "moment";
 // imagens.
 import back from '../images/back.svg';
 import imprimir from '../images/imprimir.svg';
+import html2pdf from 'html2pdf.js'
 
 function GuiaConsulta() {
 
@@ -115,7 +116,7 @@ function GuiaConsulta() {
           fontSize: 10, textAlign: 'left',
         }}>
         <div style={{
-          position: 'absolute', top: -5, left: 5,
+          position: 'absolute', top: -2.5, left: 5,
           backgroundColor: 'white',
           fontSize: 7,
           minHeight: 15, maxHeight: 15,
@@ -219,13 +220,18 @@ function GuiaConsulta() {
 
   // IMPRESSÃO DA GUIA DE CONSULTA.
   function printDiv() {
-    let printdocument = document.getElementById("GUIA CONSULTA PRINT").innerHTML;
-    var a = window.open();
-    a.document.write('<html>');
-    a.document.write('<link rel="stylesheet" type="text/css" href="design.css"></link>');
-    a.document.write(printdocument);
-    a.document.write('</html>');
-    a.print();
+
+    var opt = {
+      margin: 0.1,
+      filename: 'guia_consulta',
+      image: { type: 'jpeg', quality: 1 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' },
+      pagebreak: { mode: 'css' }
+    };
+
+    var element = document.getElementById('GUIA CONSULTA PRINT').innerHTML;
+    html2pdf().set(opt).from(element).output('dataurlnewwindow');
   }
 
   if (operadora != null) {
@@ -347,7 +353,7 @@ function GuiaConsulta() {
                 height: 50, backgroundColor: '#B2BEBE',
                 position: 'relative', width: '100%',
                 borderRadius: 2.5,
-                marginTop: 5, marginBottom: 5,
+                marginTop: 2.5, marginBottom: 2.5,
               }}>
                 <div style={{ position: 'absolute', top: 5, left: 5 }}>
                   {'23 - OBSERVAÇÃO/JUSTIFICATIVA'}
@@ -360,8 +366,8 @@ function GuiaConsulta() {
                   borderColor: 'black',
                   borderWidth: 1,
                   borderRadius: 2.5,
-                  padding: 5,
-                  margin: 5,
+                  padding: 2.5,
+                  margin: 2.5,
                 }}
               >
                 <div id='cabeçalho do grupo'
@@ -369,10 +375,10 @@ function GuiaConsulta() {
                     display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
                     width: '100%',
                   }}>
-                  <div className='fonte_titulo_header' style={{ minWidth: 200, maxWidth: 200 }}>
+                  <div className='fonte_titulo_header' style={{ minWidth: 300, maxWidth: 300 }}>
                     {'24 - ASSINATURA DO PROFISSIONAL EXECUTANTE'}
                   </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 200, maxWidth: 200 }}>
+                  <div className='fonte_titulo_header' style={{ minWidth: 300, maxWidth: 300 }}>
                     {'25 - ASSINATURA DO BENEFICIÁRIO OU RESPONSÁVEL'}
                   </div>
                 </div>
@@ -382,8 +388,8 @@ function GuiaConsulta() {
                     width: '100%',
                   }}
                 >
-                  <div className='fonte_titulo_header' style={{ minWidth: 200, width: 200 }}>{'____________________________'}</div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 200, width: 200 }}>{'____________________________'}</div>
+                  <div className='fonte_titulo_header' style={{ minWidth: 200, width: 200 }}>{'__________________________________________'}</div>
+                  <div className='fonte_titulo_header' style={{ minWidth: 200, width: 200 }}>{'__________________________________________'}</div>
                 </div>
               </div>
             </div>
@@ -391,7 +397,7 @@ function GuiaConsulta() {
             <div id="GUIA CONSULTA PRINT"
               className='print'
               style={{
-                display: 'flex', flexDirection: 'column', width: 'calc(100% - 20px)',
+                display: 'none', flexDirection: 'column', width: 'calc(100% - 20px)',
                 justifyContent: 'flex-start', marginTop: 25
               }}>
               <div id="cabeçalho" style={{
@@ -484,7 +490,7 @@ function GuiaConsulta() {
                 height: 50, backgroundColor: '#B2BEBE',
                 position: 'relative', width: '100%',
                 borderRadius: 2.5,
-                marginTop: 5, marginBottom: 5,
+                marginTop: 2.5, marginBottom: 2.5,
               }}>
                 <div style={{ position: 'absolute', top: 5, left: 5, fontFamily: 'Helvetica', fontSize: 8 }}>
                   {'23 - OBSERVAÇÃO/JUSTIFICATIVA'}
@@ -497,8 +503,8 @@ function GuiaConsulta() {
                   borderColor: 'black',
                   borderWidth: 1,
                   borderRadius: 2.5,
-                  padding: 5,
-                  margin: 5,
+                  padding: 2.5,
+                  margin: 1,
                 }}
               >
                 <div id='cabeçalho do grupo'
@@ -530,8 +536,8 @@ function GuiaConsulta() {
                     width: '100%',
                   }}
                 >
-                  <div className='fonte_titulo_header' style={{ minWidth: 300, width: 300 }}>{'____________________________'}</div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 300, width: 300 }}>{'____________________________'}</div>
+                  <div className='fonte_titulo_header' style={{ minWidth: 300, width: 300 }}>{'______________________________________'}</div>
+                  <div className='fonte_titulo_header' style={{ minWidth: 300, width: 300 }}>{'______________________________________'}</div>
                 </div>
               </div>
             </div>

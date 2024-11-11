@@ -100,36 +100,12 @@
 /* OCULTANDO CABEÇALHO E RODAPÉ PARA IMPRESSÃO */
 @media print {
 
-  body {
-    margin: 0px;
-  }
-
-  #Header,
-  #Footer {
-    display: none !important;
-  }
-
-  @page orientation-portrait {
-    size: portrait;
-  }
-
-  @page orientation-landscape {
-    size: landscape;
-  }
-
-  .landscape-page {
-    page: orientation-landscape;
-  }
-
-  .portrait-page {
-    page: orientation-portrait;
-  }
-
   .print {
     display: flex !important;
     visibility: visible !important;
     margin: 0px;
-    padding: opx;
+    padding: 0px;
+    height: 100vh;
   }
 
   .noprint {

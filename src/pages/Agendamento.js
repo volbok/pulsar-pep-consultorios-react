@@ -187,7 +187,7 @@ function Agendamento() {
       id_profissional: selectedespecialista.id_usuario,
       convenio_id: paciente.convenio_codigo,
       convenio_carteira: paciente.convenio_carteira,
-      faturamento_codigo_procedimento: null,
+      faturamento_codigo_procedimento: localStorage.getItem('PARTICULAR'),
     };
     console.log(obj);
     axios
@@ -195,7 +195,6 @@ function Agendamento() {
       .then(() => {
         console.log('AGENDAMENTO DE CONSULTA INSERIDO COM SUCESSO')
         loadAtendimentos();
-        // geraGuiaConsulta();
         // geraWhatsapp(inicio);
       });
   };
@@ -226,7 +225,7 @@ function Agendamento() {
         }}
         onClick={(e) => e.stopPropagation(e)}
       >
-        {arrayespecialistas
+        {arrayespecialistas.filter(item => item.conselho != null)
           .sort((a, b) => (a.nome_usuario > b.nome_usuario ? 1 : -1))
           .map((item) => (
             <div
@@ -524,8 +523,22 @@ function Agendamento() {
                       borderTopRightRadius: 0,
                       borderBottomRightRadius: 0,
                       backgroundColor: '#006666',
+                      position: 'relative',
                     }}>
                     {moment(item.data_inicio).format('HH:mm') + ' ÀS ' + moment(item.data_termino).format('HH:mm')}
+                    <div
+                      style={{
+                        position: 'absolute',
+                        top: -5, left: -5,
+                        padding: 2.5,
+                        paddingLeft: 10, paddingRight: 10,
+                        borderRadius: 5,
+                        backgroundColor: item.faturamento_codigo_procedimento == 'PARTICULAR' ? 'rgb(82, 190, 128, 1)' : '#03aacd',
+                        color: 'white',
+                        fontWeight: 'bold',
+                      }}>
+                      {item.faturamento_codigo_procedimento}
+                    </div>
                   </div>
                   <div
                     id={"atendimento " + item.id_atendimento}
@@ -544,6 +557,7 @@ function Agendamento() {
                           justifyContent: "flex-start",
                           padding: 5,
                           alignSelf: 'center',
+                          position: 'relative',
                         }}
                       >
                         <div style={{ textAlign: 'left' }}>
@@ -563,7 +577,10 @@ function Agendamento() {
                           onClick={() => {
                             setobjpaciente(pacientes.filter(valor => valor.id_paciente == item.id_paciente).pop());
                             setdono_documento(especialistas.filter(valor => valor.id_usuario == item.id_profissional).pop());
-                            geraGuiaConsulta();
+                            setTimeout(() => {
+                              geraGuiaConsulta();
+                            }, 2000);
+
                           }}
                           style={{ width: 50, height: 50, alignSelf: 'flex-end' }}
                         >
@@ -684,6 +701,19 @@ function Agendamento() {
                   }}
                 >
                   <div
+                    style={{
+                      position: 'absolute',
+                      top: -2.5, left: -2.5,
+                      padding: 2.5,
+                      paddingLeft: 10, paddingRight: 10,
+                      borderRadius: 5,
+                      backgroundColor: item.faturamento_codigo_procedimento == 'PARTICULAR' ? 'rgb(82, 190, 128, 1)' : '#03aacd',
+                      color: 'white',
+                      fontWeight: 'bold',
+                    }}>
+                    {item.faturamento_codigo_procedimento}
+                  </div>
+                  <div
                     id={"atendimento " + item.id_atendimento}
                     className="button"
                     style={{
@@ -734,7 +764,9 @@ function Agendamento() {
                           onClick={() => {
                             setobjpaciente(pacientes.filter(valor => valor.id_paciente == item.id_paciente).pop());
                             setdono_documento(especialistas.filter(valor => valor.id_usuario == item.id_profissional).pop());
-                            geraGuiaConsulta();
+                            setTimeout(() => {
+                              geraGuiaConsulta();
+                            }, 2000);
                           }}
                           style={{
                             display: window.innerWidth < mobilewidth ? 'none' : 'flex',
@@ -791,7 +823,7 @@ function Agendamento() {
             display: selectdate == null || arrayatendimentos.filter(item => item.situacao == 3 && moment(item.data_inicio).format('DD/MM/YYYY') == selectdate).length == 0 ? "flex" : "none",
             flexDirection: 'column',
             justifyContent: "center",
-            height: '75vh',
+            height: '70vh',
             width: window.innerWidth < mobilewidth ? '80vw' : '50vw',
             marginLeft: 20
           }}
@@ -827,7 +859,7 @@ function Agendamento() {
           } else {
             localStorage.setItem('hora', valor);
           }
-        }, 1000);
+        }, 200);
       };
       const fixMin = (valor) => {
         clearTimeout(timeout);

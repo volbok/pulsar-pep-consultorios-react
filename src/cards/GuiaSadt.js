@@ -7,6 +7,7 @@ import moment from "moment";
 // imagens.
 import back from '../images/back.svg';
 import imprimir from '../images/imprimir.svg';
+import html2pdf from 'html2pdf.js'
 
 function GuiaSadt() {
 
@@ -193,15 +194,15 @@ function GuiaSadt() {
   // campo para impressão da guia.
   const pdfcampo = (titulo, valor, flex) => {
     return (
-      <div id="versão para impressão" className='print'
+      <div id="versão para impressão"
         style={{
           display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
           position: 'relative',
           borderStyle: 'solid', borderWidth: 1, borderColor: 'black', borderRadius: 2.5,
-          margin: 2.5, marginTop: 5,
+          margin: 1, marginTop: 5,
           padding: 1,
           flex: flex,
-          minHeight: 15, maxHeight: 15,
+          minHeight: 12, maxHeight: 12,
           fontSize: 8, textAlign: 'left',
           fontFamily: 'Helvetica'
         }}>
@@ -209,14 +210,14 @@ function GuiaSadt() {
           position: 'absolute', top: -6, left: 5,
           backgroundColor: 'white',
           fontSize: 8,
-          minHeight: 10, maxHeight: 10,
-          paddingLeft: 2.5, paddingRight: 2.5,
+          minHeight: 9, maxHeight: 9,
+          paddingLeft: 1, paddingRight: 1,
           fontFamily: 'Helvetica'
         }}>
           {titulo}
         </div>
         <div style={{
-          paddingTop: 2.5,
+          paddingTop: 1.8,
           fontFamily: 'Helvetica'
         }}>
           {valor != null && valor.length > 50 ? valor.toUpperCase().slice(0, 55) + '...' : valor != null && valor.length < 51 ? valor.toUpperCase() : ''}
@@ -228,14 +229,11 @@ function GuiaSadt() {
   // IMPRESSÃO DA GUIA SADT.
   const [arrayguias, setarrayguias] = useState([]);
 
-  function conteudo(grupo) {
+  function conteudo(grupo, pagina) {
     return (
-      <div id={"procedimento"}
-        className='print'
+      <div id={"GUIA SADT " + pagina}
         style={{
-          display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
-          width: 'calc(100vw - 10px)',
-          height: 'calc(100vh - 30px)',
+          display: 'none', flexDirection: 'column', justifyContent: 'flex-start',
           fontFamily: 'Helvetica',
           breakInside: 'avoid',
         }}>
@@ -246,7 +244,7 @@ function GuiaSadt() {
           <img alt="" src={logo}
             style={{
               display: logo != '' ? 'flex' : 'none',
-              height: 90,
+              height: 70,
               alignSelf: 'center',
             }}
           ></img>
@@ -330,14 +328,15 @@ function GuiaSadt() {
             borderColor: 'red',
             borderWidth: 1,
             borderRadius: 2.5,
-            padding: 5,
-            margin: 5,
+            padding: 1,
+            margin: 1,
+            minHeight: 120,
           }}>
           {grupo.map(item => (
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', width: '100%' }}>
               {pdfcampo('24 - TABELA', '21', 1)}
-              {pdfcampo('25 - CÓDIGO DO PROCEDIMENTO OU ITEM ASSISTENCIAL', item.codigo_exame, 3)}
-              {pdfcampo('26 - DESCRIÇÃO', item.nome_exame, 3)}
+              {pdfcampo('25 - CÓDIGO DO PROCEDIMENTO OU ITEM ASSISTENCIAL', item.codigo_exame, 2)}
+              {pdfcampo('26 - DESCRIÇÃO', item.nome_exame, 4)}
             </div>
           ))}
         </div>
@@ -399,7 +398,7 @@ function GuiaSadt() {
               width: 'calc(100% - 20px)', alignSelf: 'center'
             }}>
             <div className='fonte_titulo_header'
-              style={{ minWidth: 160, maxWidth: 160, fontFamily: 'Helvetica', fontSize: 8 }}>
+              style={{ minWidth: 140, maxWidth: 140, fontFamily: 'Helvetica', fontSize: 8 }}>
               {'36 - DATA'}
             </div>
             <div className='fonte_titulo_header' style={{ minWidth: 100, maxWidth: 100, fontFamily: 'Helvetica', fontSize: 8 }}>
@@ -642,17 +641,25 @@ function GuiaSadt() {
     }
     console.log(grupolaboratorio.map(item => 'PÁGINA: ' + item.pagina + ' PROCEDIMENTOS: ' + item.procedimentos.length));
     setarrayguias(grupolaboratorio);
-    // imprimindo as guias.
+
     setTimeout(() => {
-      let printdocument = document.getElementById("GUIA SADT PRINT").innerHTML;
-      var a = window.open();
-      a.document.write('<html>');
-      a.document.write('<link rel="stylesheet" type="text/css" href="design.css"></link>');
-      a.document.write(printdocument);
-      a.document.write('</html>');
-      a.print();
-      // a.close();
-    }, 2000);
+
+      var nome_guia = 'GUIA SADT - ' + cliente.nome_cliente;
+      var opt = {
+        margin: 0.1,
+        filename: nome_guia,
+        image: { type: 'jpeg', quality: 1 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' },
+        pagebreak: { mode: 'css' }
+      };
+
+      grupolaboratorio.map(item => {
+        var element = document.getElementById('GUIA SADT ' + item.pagina).innerHTML;
+        html2pdf().set(opt).from(element).output('dataurlnewwindow');
+        return null;
+      })
+    }, 3000);
   }
 
   function GrupoExamesExecutados(numero) {
@@ -663,7 +670,7 @@ function GuiaSadt() {
           width: 'calc(100% - 20px)', alignSelf: 'center'
         }}>
         <div className='fonte_titulo'
-          style={{ minWidth: 160, maxWidth: 160, fontFamily: 'Helvetica', fontSize: 10 }}>
+          style={{ minWidth: 140, maxWidth: 140, fontFamily: 'Helvetica', fontSize: 10 }}>
           {numero + '|__|__|/|__|__|/|__|__|__|__|'}
         </div>
         <div className='fonte_titulo'
@@ -808,10 +815,11 @@ function GuiaSadt() {
         }}>
           {numero + ' |__|__|/|__|__|/|__|__|__|__|'}
         </div>
-        <div className='fonte_titulo' style={{
-          fontFamily: 'Helvetica', fontSize: 10, marginLeft: 0, marginRight: 5,
-        }}>
-          {'_______________'}
+        <div className='fonte_titulo'
+          style={{
+            fontFamily: 'Helvetica', fontSize: 10, marginLeft: 0, marginRight: 5,
+          }}>
+          {'_____________'}
         </div>
       </div>
     )
@@ -831,7 +839,7 @@ function GuiaSadt() {
               justifyContent: 'flex-start',
               alignContent: 'flex-start',
               alignItems: 'flex-start',
-              width: '80vw',
+              width: '70vw',
               height: '70vh',
               padding: 20,
               backgroundColor: 'white', borderColor: 'white',
@@ -843,7 +851,6 @@ function GuiaSadt() {
                 flexDirection: 'row',
                 justifyContent: 'center',
                 alignSelf: 'flex-start',
-                paddingRight: 20,
               }}>
               <div
                 id="botão de retorno"
@@ -873,17 +880,18 @@ function GuiaSadt() {
                 }}
                 onClick={() => {
                   printDiv();
+                  // printjsPdf();
                 }}
               >
                 <img alt="" src={imprimir} style={{ width: 30, height: 30 }}></img>
               </div>
             </div>
-            <div id="GUIA SADT EDIT"
-              className='noprint'
+            <div id="GUIA SADT EDIT" className='landscape noprint'
               style={{
                 display: 'flex', flexDirection: 'column',
-                justifyContent: 'flex-start', marginTop: 25,
-                width: '200%',
+                justifyContent: 'flex-start',
+                marginTop: 25, marginRight: 10,
+                // backgroundColor: 'red',
               }}>
               <div id="cabeçalho" style={{
                 display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
@@ -945,8 +953,8 @@ function GuiaSadt() {
                   borderColor: 'red',
                   borderWidth: 1,
                   borderRadius: 2.5,
-                  padding: 5,
-                  margin: 5,
+                  padding: 2.5,
+                  margin: 2.5,
                 }}>
                 {laboratorio.map(item => (
                   <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', width: '100%' }}>
@@ -978,8 +986,8 @@ function GuiaSadt() {
                   borderColor: 'black',
                   borderWidth: 1,
                   borderRadius: 2.5,
-                  padding: 1,
-                  margin: 1,
+                  padding: 2.5,
+                  margin: 2.5,
                 }}
               >
                 <div id='cabeçalho do grupo'
@@ -988,7 +996,7 @@ function GuiaSadt() {
                     width: 'calc(100% - 20px)', alignSelf: 'center'
                   }}>
                   <div className='fonte_titulo_header'
-                    style={{ minWidth: 160, maxWidth: 160, fontFamily: 'Helvetica', fontSize: 8 }}>
+                    style={{ minWidth: 140, maxWidth: 140, fontFamily: 'Helvetica', fontSize: 8 }}>
                     {'36 - DATA'}
                   </div>
                   <div className='fonte_titulo_header' style={{ minWidth: 100, maxWidth: 100, fontFamily: 'Helvetica', fontSize: 8 }}>
@@ -1039,8 +1047,8 @@ function GuiaSadt() {
                   borderColor: 'black',
                   borderWidth: 1,
                   borderRadius: 2.5,
-                  padding: 1,
-                  margin: 1,
+                  padding: 2.5,
+                  margin: 2.5,
                 }}
               >
                 <div id='cabeçalho do grupo'
@@ -1085,12 +1093,12 @@ function GuiaSadt() {
                   borderColor: 'black',
                   borderWidth: 1,
                   borderRadius: 2.5,
-                  padding: 1,
-                  margin: 1,
+                  padding: 2.5,
+                  margin: 2.5,
                 }}
               >
                 <div className='fonte_titulo_header'
-                  style={{ display: 'flex', justifyContent: 'flex-start', alignSelf: 'flex-start', fontFamily: 'Helvetica', fontSize: 8 }}>
+                  style={{ display: 'flex', justifyContent: 'flex-start', alignSelf: 'flex-start', fontFamily: 'Helvetica', fontSize: 8, margin: 2.5 }}>
                   {'56 - DATA DE REALIZAÇÃO DE PROCEDIMENTOS EM SÉRIE  57 - ASSINATURA DO BENEFICIÁRIO OU RESPONSÁVEL'}
                 </div>
                 <div
@@ -1115,7 +1123,7 @@ function GuiaSadt() {
                 height: 50, backgroundColor: '#B2BEBE',
                 position: 'relative', width: '100%',
                 borderRadius: 2.5,
-                margin: 1,
+                margin: 2.5,
               }}>
                 <div style={{ position: 'absolute', top: 1, left: 5 }}>
                   {'58 - OBSERVAÇÃO/JUSTIFICATIVA'}
@@ -1128,8 +1136,8 @@ function GuiaSadt() {
                   borderColor: 'black',
                   borderWidth: 1,
                   borderRadius: 2.5,
-                  padding: 1,
-                  margin: 1,
+                  padding: 2.5,
+                  margin: 2.5,
                 }}
               >
                 <div id='cabeçalho do grupo'
@@ -1168,8 +1176,8 @@ function GuiaSadt() {
                   borderColor: 'black',
                   borderWidth: 1,
                   borderRadius: 2.5,
-                  padding: 1,
-                  margin: 1,
+                  padding: 2.5,
+                  margin: 2.5,
                 }}
               >
                 <div id='cabeçalho do grupo'
@@ -1183,7 +1191,7 @@ function GuiaSadt() {
                     {'67 - ASSINATURA DO BENEFICIÁRIO OU RESPONSÁVEL'}
                   </div>
                   <div className='fonte_titulo_header' style={{ minWidth: 200, maxWidth: 200 }}>
-                    {'68 - ASSIANTURA DO CONTRATADO'}
+                    {'68 - ASSINATURA DO CONTRATADO'}
                   </div>
                 </div>
                 <div
@@ -1198,13 +1206,11 @@ function GuiaSadt() {
                 </div>
               </div>
             </div>
-            <div id="GUIA SADT PRINT" className='print'
+            <div id="GUIA SADT PRINT"
               style={{
-                display: 'flex', flexDirection: 'column',
-                width: 7016,
-                height: 4960,
+                display: 'none', flexDirection: 'column',
               }}>
-              {arrayguias.map((item) => conteudo(item.procedimentos))}
+              {arrayguias.map((item) => conteudo(item.procedimentos, item.pagina))}
             </div>
           </div>
         </div>

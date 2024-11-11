@@ -23,6 +23,8 @@ import Footer from '../components/Footer';
 import modal from '../functions/modal';
 import toast from '../functions/toast';
 
+import html2pdf from 'html2pdf.js'
+
 function Documentos() {
 
   // context.
@@ -931,48 +933,37 @@ function Documentos() {
   // IMPRESSÃO DO DOCUMENTO.
   function printDiv() {
     console.log('PREPARANDO DOCUMENTO PARA IMPRESSÃO');
-    let printdocument = document.getElementById("IMPRESSÃO - DOCUMENTO").innerHTML;
-    var a = window.open();
-    a.document.write('<html>');
-    a.document.write(printdocument);
-    a.document.write('</html>');
-    a.print();
-    a.close();
+
+    var opt = {
+      margin: 0.5,
+      filename: 'OI',
+      image: { type: 'jpeg', quality: 1 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+    };
+
+    var element = document.getElementById('IMPRESSÃO - DOCUMENTO').innerHTML;
+    html2pdf().set(opt).from(element).output('dataurlnewwindow');
   }
+
   function PrintDocumento() {
     return (
       <div id="IMPRESSÃO - DOCUMENTO"
-        className="print"
-      >
-        <table style={{ width: '100%' }}>
-          <thead style={{ width: '100%' }}>
-            <tr style={{ width: '100%' }}>
-              <td style={{ width: '100%' }}>
-                <Header selecteddocumento={selecteddocumento}></Header>
-              </td>
-            </tr>
-          </thead>
-          <tbody style={{ width: '100%' }}>
-            <tr style={{ width: '100%' }}>
-              <td style={{ width: '100%' }}>
-                <div id="campos"
-                  style={{
-                    display: 'flex', flexDirection: 'column',
-                    breakInside: 'auto', alignSelf: 'center', width: '100%',
-                  }}>
-                  <Conteudo></Conteudo>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-          <tfoot style={{ width: '100%' }}>
-            <tr style={{ width: '100%' }}>
-              <td style={{ width: '100%' }}>
-                <Footer></Footer>
-              </td>
-            </tr>
-          </tfoot>
-        </table>
+        //className='print'
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'space-between',
+          backgroundColor: 'red',
+        }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column', justifyContent: 'flex-start',
+        }}>
+          <Header></Header>
+          <Conteudo></Conteudo>
+        </div>
+        <Footer></Footer>
       </div>
     )
   };

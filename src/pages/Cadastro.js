@@ -141,6 +141,7 @@ function Cadastro() {
 
   // registrando um novo paciente.
   const insertPaciente = () => {
+    console.log('PORRA TA INSERINDO!');
     var obj = {
       nome_paciente: document
         .getElementById("inputEditNomePaciente")
@@ -418,6 +419,34 @@ function Cadastro() {
                   <div style={{ margin: 5, marginTop: 0, textAlign: 'left' }}>
                     {item.nome_mae_paciente.length > 25 ? item.nome_mae_paciente.slice(0, 25) + '...' : item.nome_mae_paciente}
                   </div>
+                  <textarea
+                    autoComplete="off"
+                    placeholder="OBSERVAÇÕES"
+                    className="textarea"
+                    type="text"
+                    id={"inputObservacoes " + item.id_paciente}
+                    onFocus={(e) => (e.target.placeholder = "")}
+                    onBlur={(e) => (e.target.placeholder = "OBSERVAÇÕES")}
+                    defaultValue={item.obs}
+                    onClick={(e) => e.stopPropagation()}
+                    onKeyUp={() => {
+                      clearTimeout(timeout);
+                      timeout = setTimeout(() => {
+                        console.log('ATUALIZANDO OBSERVAÇÃO')
+                        updatePacienteObservacao(item, document.getElementById("inputObservacoes " + item.id_paciente).value.toUpperCase())
+                      }, 1000);
+                    }}
+                    style={{
+                      flexDirection: "center",
+                      justifyContent: "center",
+                      alignSelf: "center",
+                      width: 'calc(100% - 50px)',
+                      padding: 15,
+                      height: 60,
+                      minHeight: 60,
+                      maxHeight: 60,
+                    }}
+                  ></textarea>
                 </div>
                 <div
                   className="button"
@@ -583,6 +612,7 @@ function Cadastro() {
                 onClick={() => {
                   convenioselector('PARTICULAR');
                   localStorage.setItem('PARTICULAR', 'PARTICULAR');
+                  console.log(localStorage.getItem('PARTICULAR'));
                 }}
               >
                 {'PARTICULAR'}
@@ -596,6 +626,7 @@ function Cadastro() {
                 onClick={() => {
                   convenioselector('CONVENIO');
                   localStorage.setItem('PARTICULAR', 'CONVENIO');
+                  console.log(localStorage.getItem('PARTICULAR'));
                 }}
               >
                 {
@@ -1679,6 +1710,7 @@ function Cadastro() {
       convenio_carteira: document.getElementById("inputConvenioCarteira").value.toUpperCase(),
       validade_carteira: document.getElementById("inputValidadeCarteira").value.toUpperCase(),
       nome_social: document.getElementById("inputNomeSocial").value.toUpperCase(),
+      obs: paciente.obs,
 
     };
     axios
@@ -1692,6 +1724,68 @@ function Cadastro() {
           "rgb(82, 190, 128, 1)",
           3000
         );
+      })
+      .catch(function () {
+        toast(
+          settoast,
+          "ERRO DE CONEXÃO, REINICIANDO APLICAÇÃO.",
+          "black",
+          5000
+        );
+        setTimeout(() => {
+          setpagina(0);
+          history.push("/");
+        }, 5000);
+      });
+  };
+
+  const updatePacienteObservacao = (item, obs) => {
+    var obj = {
+      nome_paciente: item.nome_paciente,
+      nome_mae_paciente: item.nome_mae_paciente,
+      dn_paciente: item.dn_paciente,
+      antecedentes_pessoais: item.antecedentes_pessoais,
+      medicacoes_previas: item.medicacoes_previas,
+      exames_previos: item.exames_previos,
+      exames_atuais: item.exames_atuais,
+      tipo_documento: item.tipo_documento,
+      numero_documento: item.numero_documento,
+      cns: item.cns,
+      endereco: item.endereco,
+
+      logradouro: item.logradouro,
+      bairro: item.bairro,
+      localidade: item.localidade,
+      uf: item.uf,
+      cep: item.cep,
+
+      telefone: item.telefone,
+      email: item.email,
+
+      nome_responsavel: item.nome_responsavel,
+      sexo: item.sexo,
+      nacionalidade: item.nacionalidade,
+      cor: item.cor,
+      etnia: item.etnia,
+
+      orgao_emissor: item.orgao_emissor,
+      endereco_numero: item.endereco_numero,
+      endereco_complemento: item.endereco_complemento,
+
+      // CONVÊNIO.
+      convenio_nome: item.convenio_nome,
+      convenio_codigo: item.convenio_codigo,
+      convenio_carteira: item.convenio_carteira,
+      validade_carteira: item.validade_carteira,
+      nome_social: item.nome_social,
+      obs: obs,
+    };
+
+    console.log(obj);
+    axios
+      .post(html + "update_paciente/" + item.id_paciente, obj)
+      .then(() => {
+        loadPacientes();
       })
       .catch(function () {
         toast(
