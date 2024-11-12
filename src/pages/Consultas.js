@@ -463,6 +463,7 @@ function Consultas() {
                         minHeight: 100,
                         height: 100,
                         width: '100%',
+                        justifyContent: 'flex-start',
                       }}
                       onClick={() => {
                         setviewlista(0);
@@ -483,13 +484,24 @@ function Consultas() {
                           display: "flex",
                           flexDirection: "column",
                           justifyContent: "flex-start",
-                          padding: 5
+                          padding: 5,
+                          alignItems: 'flex-start',
+                          textAlign: 'left',
                         }}
                       >
-                        {pacientes.filter(
-                          (valor) => valor.id_paciente == item.id_paciente
-                        )
-                          .map((valor) => valor.nome_paciente)}
+                        <div style={{
+                          maxHeight: 20, height: 20, margin: 0,
+                          backgroundColor: item.faturamento_codigo_procedimento == 'PARTICULAR' ? 'rgb(82, 190, 128, 1)' : item.faturamento_codigo_procedimento == 'CONVENIO' ? '#03aacd' : '#af7ac5 ',
+                          borderRadius: 5, padding: 2.5, paddingLeft: 5, paddingRight: 5,
+                        }}>
+                          {item.faturamento_codigo_procedimento != null ? item.faturamento_codigo_procedimento : 'INDEFINIDO'}
+                        </div>
+                        <div>
+                          {pacientes.filter(
+                            (valor) => valor.id_paciente == item.id_paciente
+                          )
+                            .map((valor) => valor.nome_paciente)}
+                        </div>
                         <div>
                           {moment().diff(
                             moment(

@@ -23,7 +23,8 @@ import Footer from '../components/Footer';
 import modal from '../functions/modal';
 import toast from '../functions/toast';
 
-import html2pdf from 'html2pdf.js'
+// import html2pdf from 'html2pdf.js'
+// import ReactPDF from '@react-pdf/renderer';
 
 function Documentos() {
 
@@ -651,7 +652,7 @@ function Documentos() {
                   onClick={() => {
                     setselecteddocumento(item);
                     setTimeout(() => {
-                      printDiv()
+                      printDiv(item.texto)
                     }, 1000);
                   }}>
                   <img
@@ -671,16 +672,17 @@ function Documentos() {
       </div >
     )
     // eslint-disable-next-line
-  }, [documentos, selecteddocumento]);
+  }, [documentos]);
 
   function FieldDocumento() {
     return (
-      <textarea
+      < textarea
         id="inputFieldDocumento"
         className="textarea"
         autoComplete='off'
         placeholder={selecteddocumento.length == 0 ? 'SELECIONE UM DOCUMENTO NA LISTA À DIREITA' : 'DIGITE AQUI O TEXTO DO DOCUMENTO.'}
-        onMouseOver={() => console.log(selecteddocumento)}
+        onMouseOver={() => console.log(selecteddocumento)
+        }
         onFocus={(e) => (e.target.placeholder = '')}
         onBlur={(e) => (e.target.placeholder = 'DIGITE AQUI O TEXTO DO DOCUMENTO.')}
         style={{
@@ -689,11 +691,13 @@ function Documentos() {
           alignSelf: 'center', alignContent: 'center',
           whiteSpace: 'pre-wrap',
           height: 'calc(100% - 30px)',
-          width: 'calc(100% - 20px)',
+          width: 'calc(100% - 40px)',
           margin: 0,
+          borderRadius: 5,
           pointerEvents: selecteddocumento.length == 0 ? 'none' : 'auto',
           position: 'relative',
           opacity: selecteddocumento.length == 0 ? 0.3 : 1,
+          overflowY: 'unset',
         }}
         onChange={() => {
           if (selecteddocumento.status == 1) {
@@ -705,6 +709,8 @@ function Documentos() {
           }
         }}
         onKeyUp={(e) => {
+          let textarea = document.getElementById('inputFieldDocumento');
+          console.log(textarea.scrollTop);
           let texto = document.getElementById("inputFieldDocumento").value.toUpperCase();
           if (selecteddocumento.status == 0) {
             clearTimeout(timeout);
@@ -931,56 +937,188 @@ function Documentos() {
   }
 
   // IMPRESSÃO DO DOCUMENTO.
-  function printDiv() {
+  // const [arrayelementos, setarrayelementos] = useState([]);
+  /*
+  function printDivHard(texto) {
     console.log('PREPARANDO DOCUMENTO PARA IMPRESSÃO');
+
+
+    // convertendo o texto em uma array, depois em conteúdo html.
+    let arraytexto = texto.split('\n');
+    let arrayhtml = [];
+    arraytexto.map(item => {
+      if (item.lenght > 100) {
+        let part_a = item.substring(0, 50);
+        let part_b = item.substring(52, item.lenght);
+        arrayhtml.push("<div>" + part_a + "</div>");
+        arrayhtml.push("<div>" + part_b + "</div>");
+      } else {
+        arrayhtml.push("<div>" + item + "</div>")
+      }
+      return null;
+    });
+
+    let iniciogrupo = 0;
+    let paginas = Math.ceil(arrayhtml.length / 15);
+    console.log('PÁGINAS: ' + paginas);
+
+    // gerando as páginas do documento.
+    let grupoelementos = [];
+    while (paginas > 0) {
+      // inserindo um grupo de 15 elementos.
+      grupoelementos.push(
+        {
+          pagina: paginas,
+          elementos: arrayhtml.slice(iniciogrupo, iniciogrupo + 15),
+        }
+      );
+      // atualizando grupo para os próximos 5 procedimentos, até o esgotamento das páginas.
+      iniciogrupo = iniciogrupo + 16;
+      paginas = paginas - 1;
+    }
+    // setarrayelementos(grupoelementos);
 
     var opt = {
       margin: 0.5,
       filename: 'OI',
       image: { type: 'jpeg', quality: 1 },
       html2canvas: { scale: 2 },
-      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' },
+      jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' },
     };
 
-    var element = document.getElementById('IMPRESSÃO - DOCUMENTO').innerHTML;
-    html2pdf().set(opt).from(element).output('dataurlnewwindow');
+    grupoelementos.map(item => {
+      document.getElementById('conteudo').innerHTML = item.elementos;
+      var element = document.getElementById('IMPRESSÃO - DIV').innerHTML;
+      html2pdf().set(opt).from(element).output('dataurlnewwindow');
+      return null;
+    })
+  }
+    */
+
+  function printDiv(texto) {
+
+    /*
+    let arraytexto = texto.split('\n');
+    let arrayhtml = [];
+    arraytexto.map(item => {
+      if (item.lenght > 100) {
+        let part_a = item.substring(0, 50);
+        let part_b = item.substring(52, item.lenght);
+        arrayhtml.push("<div>" + part_a + "</div>");
+        arrayhtml.push("<div>" + part_b + "</div>");
+      } else {
+        arrayhtml.push("<div>" + item + "</div>")
+      }
+      return null;
+    });
+    */
+
+    // document.getElementById('conteudo').innerHTML = arrayhtml;
+    let divContents = document.getElementById("IMPRESSÃO - DIV").innerHTML;
+    var printWindow = window.open();
+    printWindow.document.write('<html><head>');
+    printWindow.document.write('</head><body>');
+    printWindow.document.write(divContents);
+    printWindow.document.write('</body></html>');
+    printWindow.document.close();
+    printWindow.print();
+    printWindow.close();
   }
 
   function PrintDocumento() {
     return (
-      <div id="IMPRESSÃO - DOCUMENTO"
+      <div id="IMPRESSÃO - DIV"
         className='print'
         style={{
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          backgroundColor: 'red',
         }}>
         <div style={{
           display: 'flex',
           flexDirection: 'column', justifyContent: 'flex-start',
+          marginTop: 10,
         }}>
           <Header></Header>
-          <Conteudo></Conteudo>
+          <div>
+            <Conteudo></Conteudo>
+          </div>
         </div>
         <Footer></Footer>
       </div>
     )
   };
 
+  function TableDocument() {
+    return (
+      <div id="IMPRESSÃO - TABELA"
+        className='print'
+        style={{
+          display: 'flex',
+          flexDirection: 'column', justifyContent: 'center',
+        }}>
+        <table>
+          <thead>
+            <tr>
+              <th>
+                <div>
+                  <Header></Header>
+                </div>
+              </th>
+            </tr>
+          </thead>
+          <tfoot>
+            <tr>
+              <td>
+                <div>
+                  <Footer></Footer>
+                </div>
+              </td>
+            </tr>
+          </tfoot>
+          <tbody>
+            <tr>
+              <td>
+                <div>
+                  <div>
+                    <Conteudo></Conteudo>
+                  </div>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    )
+  };
+
   function Conteudo() {
     return (
-      <div style={{
-        display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
-        fontFamily: 'Helvetica',
-        breakInside: 'auto',
-        whiteSpace: 'pre-wrap',
-        // height: '100vh',
-      }}>
+      <div id='conteudo'
+        style={{
+          display: 'flex',
+          flexDirection: 'column', justifyContent: 'flex-start',
+          fontFamily: 'Helvetica',
+          whiteSpace: 'pre-wrap',
+        }}>
         {selecteddocumento.texto}
       </div>
     )
   }
+
+  /*
+  const styles = StyleSheet.create({
+    page: {
+      flexDirection: 'row',
+      backgroundColor: '#E4E4E4'
+    },
+    section: {
+      margin: 10,
+      padding: 10,
+      flexGrow: 1
+    }
+  });
+  */
 
   var timeout = null;
   return (
@@ -998,6 +1136,7 @@ function Documentos() {
       <FieldDocumento></FieldDocumento>
       <ListaDeDocumentos></ListaDeDocumentos>
       <PrintDocumento></PrintDocumento>
+      <TableDocument></TableDocument>
       <ViewSelectModelos></ViewSelectModelos>
       <ViewCreateModelo></ViewCreateModelo>
       <GadgetsParaAtestado></GadgetsParaAtestado>

@@ -9,6 +9,8 @@ import moment from "moment";
 import lupa from '../images/lupa_cinza.svg';
 import imprimir from '../images/imprimir.svg';
 import salvar from '../images/salvar.svg';
+// funções.
+import maskdate from "../functions/maskdate";
 // router.
 import { useHistory } from "react-router-dom";
 import modal from '../functions/modal';
@@ -31,6 +33,7 @@ function Agendamento() {
     usuario,
   } = useContext(Context);
 
+  const [viewupdateatendimento, setviewupdateatendimento] = useState(0);
   useEffect(() => {
     // eslint-disable-next-line
     if (pagina == 20) {
@@ -194,6 +197,33 @@ function Agendamento() {
       .post(html + "insert_consulta", obj)
       .then(() => {
         console.log('AGENDAMENTO DE CONSULTA INSERIDO COM SUCESSO')
+        loadAtendimentos();
+        // geraWhatsapp(inicio);
+      });
+  };
+
+  const updateAtendimento = (item, inicio) => {
+    var obj = {
+      data_inicio: moment(inicio, 'DD/MM/YYYY - HH:mm'),
+      data_termino: localStorage.getItem('PARTICULAR') == 'PARTICULAR' ? moment(inicio, 'DD/MM/YYYY - HH:mm').add(45, 'minutes') : moment(inicio, 'DD/MM/YYYY - HH:mm').add(30, 'minutes'),
+      problemas: item.problemas,
+      id_paciente: item.id_paciente,
+      id_unidade: 5, // ATENÇÃO: 5 é o ID da unidade ambulatorial.
+      nome_paciente: item.nome_paciente,
+      leito: null,
+      situacao: 3, // 3 = atendimento ambulatorial (consulta).
+      id_cliente: hospital,
+      classificacao: null,
+      id_profissional: item.id_profissional,
+      convenio_id: item.convenio_codigo,
+      convenio_carteira: item.convenio_carteira,
+      faturamento_codigo_procedimento: item.faturamento_codigo_procedimento,
+    };
+    console.log(obj);
+    axios
+      .post(html + "update_atendimento/" + item.id_atendimento, obj)
+      .then(() => {
+        console.log('AGENDAMENTO DE CONSULTA ATUALIZADO COM SUCESSO')
         loadAtendimentos();
         // geraWhatsapp(inicio);
       });
@@ -515,8 +545,25 @@ function Agendamento() {
                   }}
                 >
                   <div
-                    id={"atendimento " + item.id_atendimento}
+                    style={{
+                      position: 'absolute',
+                      top: -2.5, left: -2.5,
+                      padding: 2.5,
+                      paddingLeft: 10, paddingRight: 10,
+                      borderRadius: 5,
+                      backgroundColor: item.faturamento_codigo_procedimento == 'PARTICULAR' ? 'rgb(82, 190, 128, 1)' : '#03aacd',
+                      color: 'white',
+                      fontWeight: 'bold',
+                      zIndex: 20,
+                    }}>
+                    {item.faturamento_codigo_procedimento}
+                  </div>
+                  {ViewUpdateAtendimento(item)}
+                  <div id={"btn_lista_atendimento " + item.id_atendimento}
                     className="button"
+                    onClick={() => {
+                      setviewupdateatendimento(1);
+                    }}
                     style={{
                       marginRight: 0,
                       padding: 10,
@@ -529,7 +576,8 @@ function Agendamento() {
                     <div
                       style={{
                         position: 'absolute',
-                        top: -5, left: -5,
+                        top: -5,
+                        left: -5,
                         padding: 2.5,
                         paddingLeft: 10, paddingRight: 10,
                         borderRadius: 5,
@@ -541,7 +589,7 @@ function Agendamento() {
                     </div>
                   </div>
                   <div
-                    id={"atendimento " + item.id_atendimento}
+                    id={"lista_atendimento " + item.id_atendimento}
                     className="button"
                     style={{
                       flex: 3,
@@ -652,7 +700,7 @@ function Agendamento() {
       </div >
     );
     // eslint-disable-next-line
-  }, [arrayatendimentos, selectedespecialista, selectdate]);
+  }, [arrayatendimentos, selectedespecialista, selectdate, viewupdateatendimento]);
 
   const [listatodosatendimentos, setlistatodosatendimentos] = useState(0);
   const ListaTodosAtendimentos = useCallback(() => {
@@ -713,9 +761,13 @@ function Agendamento() {
                     }}>
                     {item.faturamento_codigo_procedimento}
                   </div>
+                  {ViewUpdateAtendimento(item)}
                   <div
-                    id={"atendimento " + item.id_atendimento}
+                    id={"btn_todos_atendimentos " + item.id_atendimento}
                     className="button"
+                    onClick={() => {
+                      setviewupdateatendimento(1);
+                    }}
                     style={{
                       marginRight: 0,
                       padding: 10,
@@ -726,7 +778,7 @@ function Agendamento() {
                     {moment(item.data_inicio).format('HH:mm') + ' ÀS ' + moment(item.data_termino).format('HH:mm')}
                   </div>
                   <div
-                    id={"atendimento " + item.id_atendimento}
+                    id={"todos_atendimentos " + item.id_atendimento}
                     className="button"
                     style={{
                       flex: 3,
@@ -844,7 +896,7 @@ function Agendamento() {
       </div>
     );
     // eslint-disable-next-line
-  }, [arrayatendimentos, selectedespecialista, selectdate]);
+  }, [arrayatendimentos, selectedespecialista, selectdate, viewupdateatendimento]);
 
   const [viewopcoeshorarios, setviewopcoeshorarios] = useState(0);
   const ViewOpcoesHorarios = () => {
@@ -859,7 +911,7 @@ function Agendamento() {
           } else {
             localStorage.setItem('hora', valor);
           }
-        }, 200);
+        }, 100);
       };
       const fixMin = (valor) => {
         clearTimeout(timeout);
@@ -870,7 +922,7 @@ function Agendamento() {
           } else {
             localStorage.setItem('min', valor);
           }
-        }, 200);
+        }, 100);
       };
       return (
         <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
@@ -956,6 +1008,150 @@ function Agendamento() {
           <div className='text1' style={{ marginTop: 0 }}>{'DATA: ' + selectdate + ' - PROFISSIONAL: ' + selectedespecialista.nome_usuario}</div>
           <div className='text1' style={{ fontSize: 18, marginBottom: 0 }}>HORÁRIO DA CONSULTA</div>
           <TimeComponent></TimeComponent>
+        </div>
+      </div>
+    )
+  }
+
+  const ViewUpdateAtendimento = (item) => {
+    function TimeUpdateComponent() {
+      var timeout = null;
+      const fixHour = (valor) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          if (valor > 23 || valor < 0) {
+            document.getElementById("inputEditHour").value = '';
+            document.getElementById("inputEditHour").focus();
+          } else {
+            localStorage.setItem('hora', valor);
+          }
+        }, 100);
+      };
+      const fixMin = (valor) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+          if (valor > 59 || valor < 0) {
+            document.getElementById("inputEditMin").value = '';
+            document.getElementById("inputEditMin").focus();
+          } else {
+            localStorage.setItem('min', valor);
+          }
+        }, 100);
+      };
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
+          <div id='dia' style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <textarea
+              autoComplete="off"
+              placeholder="DN"
+              className="textarea"
+              type="text"
+              inputMode="numeric"
+              maxLength={10}
+              id="inputEditDataConsulta"
+              title="FORMATO: DD/MM/YYYY"
+              onClick={() => document.getElementById("inputEditDataConsulta").value = ""}
+              onFocus={(e) => (e.target.placeholder = "")}
+              onBlur={(e) => (e.target.placeholder = "DATA")}
+              onKeyUp={() => maskdate(timeout, "inputEditDataConsulta")}
+              defaultValue={moment(item.data_inicio).format('DD/MM/YYYY')}
+              style={{
+                flexDirection: "center",
+                justifyContent: "center",
+                alignSelf: "center",
+                width: 100,
+                textAlign: "center",
+                padding: 15,
+                height: 20,
+                minHeight: 20,
+                maxHeight: 20,
+              }}
+            ></textarea>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+            <input
+              autoComplete="off"
+              className="input"
+              placeholder="HH"
+              onFocus={(e) => (e.target.placeholder = '')}
+              onBlur={(e) => (e.target.placeholder = 'HH')}
+              onKeyUp={(e) => fixHour(e.target.value)}
+              title="HORAS."
+              maxLength={2}
+              style={{
+                width: 100,
+                height: 50,
+              }}
+              min={0}
+              max={23}
+              id="inputEditHour"
+            ></input>
+            <div className='text1'>{' : '}</div>
+            <input
+              autoComplete="off"
+              className="input"
+              placeholder="MM"
+              onFocus={(e) => (e.target.placeholder = '')}
+              onBlur={(e) => (e.target.placeholder = 'MM')}
+              onKeyUp={(e) => fixMin(e.target.value)}
+              title="MINUTOS."
+              maxLength={2}
+              style={{
+                width: 100,
+                height: 50,
+              }}
+              min={0}
+              max={59}
+              id="inputEditMin"
+            ></input>
+          </div>
+          <div id="btnAdd"
+            className="button-green"
+            title="CONFIRMAR DATA E HORA."
+            onClick={() => {
+              let hora = localStorage.getItem('hora');
+              let min = localStorage.getItem('min');
+              // modelo: 'DD/MM/YYYY - HH:mm'
+              console.log(selectdate + ' - ' + hora + ':' + min);
+              let nova_data = document.getElementById("inputEditDataConsulta").value;
+              let nova_hora = document.getElementById("inputEditHour").value;
+              let novo_minuto = document.getElementById("inputEditMin").value;
+              updateAtendimento(item, nova_data + ' - ' + nova_hora + ':' + novo_minuto);
+              setviewupdateatendimento(0);
+            }}
+            style={{ width: 50, maxWidth: 50, alignSelf: 'center', marginTop: 20 }}
+          >
+            <img
+              alt=""
+              src={salvar}
+              style={{
+                margin: 10,
+                height: 30,
+                width: 30,
+              }}
+            ></img>
+          </div>
+        </div>
+      )
+    }
+    return (
+      <div
+        className="fundo"
+        style={{ display: viewupdateatendimento == 1 ? "flex" : "none" }}
+        onClick={() => {
+          setviewupdateatendimento(0);
+        }}
+      >
+        <div className="janela"
+          style={{
+            display: 'flex', flexDirection: 'column', justifyItems: 'flex-start',
+            justifyContent: 'flex-start',
+            position: 'relative',
+            padding: 20,
+          }}
+          onClick={(e) => e.stopPropagation()}>
+          <div className='text1' style={{ fontSize: 18, marginBottom: 0 }}>HORÁRIO DA CONSULTA</div>
+          <TimeUpdateComponent></TimeUpdateComponent>
         </div>
       </div>
     )
