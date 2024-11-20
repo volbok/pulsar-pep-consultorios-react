@@ -138,13 +138,15 @@ function Cadastro() {
 
   // registrando um novo paciente.
   const insertPaciente = () => {
-    console.log('PORRA TA INSERINDO!');
     var obj = {
       nome_paciente: document
         .getElementById("inputEditNomePaciente")
         .value.toUpperCase(),
       nome_mae_paciente: document
         .getElementById("inputEditNomeMae")
+        .value.toUpperCase(),
+      nome_pai_paciente: document
+        .getElementById("inputEditNomePai")
         .value.toUpperCase(),
       dn_paciente: moment(
         document.getElementById("inputEditDn").value,
@@ -1064,6 +1066,37 @@ function Cadastro() {
                 }}
               ></textarea>
             </div>
+
+            <div id="nome do pai"
+              style={{
+                display: "flex",
+                flexDirection: "column",
+                justifyContent: "center",
+              }}
+            >
+              <div className="text1">NOME DO PAI</div>
+              <textarea
+                autoComplete="off"
+                placeholder="NOME DO PAI"
+                className="textarea"
+                type="text"
+                id="inputEditNomePai"
+                onFocus={(e) => (e.target.placeholder = "")}
+                onBlur={(e) => (e.target.placeholder = "NOME DO PAI")}
+                defaultValue={vieweditpaciente == 1 ? paciente.nome_pai_paciente : ''}
+                style={{
+                  flexDirection: "center",
+                  justifyContent: "center",
+                  alignSelf: "center",
+                  width: 400,
+                  padding: 15,
+                  height: 20,
+                  minHeight: 20,
+                  maxHeight: 20,
+                }}
+              ></textarea>
+            </div>
+
             <div id="endereco completo"
               style={{
                 display: "flex",
@@ -1669,6 +1702,7 @@ function Cadastro() {
     var obj = {
       nome_paciente: document.getElementById("inputEditNomePaciente").value.toUpperCase(),
       nome_mae_paciente: document.getElementById("inputEditNomeMae").value.toUpperCase(),
+      nome_pai_paciente: document.getElementById("inputEditNomePai").value.toUpperCase(),
       dn_paciente: moment(document.getElementById("inputEditDn").value, "DD/MM/YYYY"),
       antecedentes_pessoais: paciente.antecedentes_pessoais,
       medicacoes_previas: paciente.medicacoes_previas,
