@@ -22,6 +22,7 @@ import Header from '../components/Header';
 import Footer from '../components/Footer';
 import modal from '../functions/modal';
 import toast from '../functions/toast';
+import Gravador from '../components/Gravador';
 
 // import html2pdf from 'html2pdf.js'
 // import ReactPDF from '@react-pdf/renderer';
@@ -437,11 +438,12 @@ function Documentos() {
 
       // função para montar os dados importados dos cards e demais componentes.
       if (alergias.length > 0) {
-        tag_alergias =
-          "ALERGIAS:" + alergias.map(item => '\n' + item.alergia)
+        tag_alergias = "ALERGIAS:" + alergias.map(item => '\n' + item.alergia)
+        let texto = tag_alergias + '\nESCREVA AQUI SUA EVOLUÇÃO LIVRE OU BAIXE UM MODELO.'
+        insertDocumento(texto);
+      } else {
+        insertDocumento('POR FAVOR DIGITE AQUI A EVOLUÇÃO OU BAIXE UM MODELO.');
       }
-      let texto = tag_alergias + '\nESCREVA AQUI SUA EVOLUÇÃO LIVRE OU BAIXE UM MODELO.'
-      insertDocumento(texto);
     } else if (tipodocumento == 'RECEITA MÉDICA') {
       let texto =
         'DIGITE AQUI UMA RECEITA NOVA OU BAIXE UM MODELO.'
@@ -681,8 +683,7 @@ function Documentos() {
         className="textarea"
         autoComplete='off'
         placeholder={selecteddocumento.length == 0 ? 'SELECIONE UM DOCUMENTO NA LISTA À DIREITA' : 'DIGITE AQUI O TEXTO DO DOCUMENTO.'}
-        onMouseOver={() => console.log(selecteddocumento)
-        }
+        // onMouseOver={() => console.log(selecteddocumento)}
         onFocus={(e) => (e.target.placeholder = '')}
         onBlur={(e) => (e.target.placeholder = 'DIGITE AQUI O TEXTO DO DOCUMENTO.')}
         style={{
@@ -729,6 +730,13 @@ function Documentos() {
       >
       </textarea >
     )
+  }
+
+  function voiceField(texto) {
+    let valor = texto.toString();
+    console.log(valor);
+    document.getElementById("inputFieldDocumento").value = valor;
+    localStorage.setItem('texto', texto);
   }
 
   // MODELOS DE DOCUMENTOS
@@ -997,26 +1005,11 @@ function Documentos() {
 
   function printDiv(texto) {
 
-    /*
-    let arraytexto = texto.split('\n');
-    let arrayhtml = [];
-    arraytexto.map(item => {
-      if (item.lenght > 100) {
-        let part_a = item.substring(0, 50);
-        let part_b = item.substring(52, item.lenght);
-        arrayhtml.push("<div>" + part_a + "</div>");
-        arrayhtml.push("<div>" + part_b + "</div>");
-      } else {
-        arrayhtml.push("<div>" + item + "</div>")
-      }
-      return null;
-    });
-    */
-
     // document.getElementById('conteudo').innerHTML = arrayhtml;
-    let divContents = document.getElementById("IMPRESSÃO - DIV").innerHTML;
+    let divContents = document.getElementById("IMPRESSÃO - TABELA").innerHTML;
     var printWindow = window.open();
     printWindow.document.write('<html><head>');
+    printWindow.document.write('<link rel="stylesheet" href="notionfield.css">');
     printWindow.document.write('</head><body>');
     printWindow.document.write(divContents);
     printWindow.document.write('</body></html>');
@@ -1025,6 +1018,7 @@ function Documentos() {
     printWindow.close();
   }
 
+  /*
   function PrintDocumento() {
     return (
       <div id="IMPRESSÃO - DIV"
@@ -1040,7 +1034,7 @@ function Documentos() {
           marginTop: 10,
         }}>
           <Header></Header>
-          <div>
+          <div style={{ marginTop: 20 }}>
             <Conteudo></Conteudo>
           </div>
         </div>
@@ -1048,46 +1042,44 @@ function Documentos() {
       </div>
     )
   };
+  */
 
-  function TableDocument() {
+  // Modelo de documento em forma de tabela (para repetição de cabeçalhos e rodapés. Não funciona).
+  function PrintTabela() {
     return (
       <div id="IMPRESSÃO - TABELA"
         className='print'
         style={{
           display: 'flex',
-          flexDirection: 'column', justifyContent: 'center',
+          flexDirection: 'column', justifyContent: 'center', width: 'calc(100% - 20px)'
         }}>
         <table>
           <thead>
             <tr>
-              <th>
-                <div>
-                  <Header></Header>
-                </div>
-              </th>
+              <td>
+                <div className="header-space" style={{ height: 250, width: 'calc(100% - 20px)' }}>&nbsp;</div>
+              </td>
             </tr>
           </thead>
           <tfoot>
             <tr>
               <td>
-                <div>
-                  <Footer></Footer>
-                </div>
+                <div className="footer-space" style={{ height: 200, width: 'calc(100% - 20px)' }}>&nbsp;</div>
               </td>
             </tr>
           </tfoot>
           <tbody>
             <tr>
               <td>
-                <div>
-                  <div>
-                    <Conteudo></Conteudo>
-                  </div>
+                <div className='content' style={{ width: 'calc(100% - 20px)' }}>
+                  <Conteudo></Conteudo>
                 </div>
               </td>
             </tr>
           </tbody>
         </table>
+        <div className='header' style={{ height: 200, width: 'calc(100% - 20px)', position: 'fixed', top: 0 }}><Header></Header></div>
+        <div className='footer' style={{ height: 200, width: 'calc(100% - 20px)', position: 'fixed', bottom: 0 }}><Footer></Footer></div>
       </div>
     )
   };
@@ -1100,25 +1092,24 @@ function Documentos() {
           flexDirection: 'column', justifyContent: 'flex-start',
           fontFamily: 'Helvetica',
           whiteSpace: 'pre-wrap',
+          width: 'calc(100vw - 40px)',
+          alignSelf: 'center',
         }}>
-        {selecteddocumento.texto}
-      </div>
+        <div
+          className='notion_titulo'
+          style={{
+            display: 'flex',
+            fontFamily: 'Helvetica', fontWeight: 'bold', fontSize: 22, marginTop: 5, textAlign: 'center', alignSelf: 'center',
+            marginBottom: 20
+          }}>
+          {tipodocumento}
+        </div>
+        <div className='notion_p' style={{ whiteSpace: 'pre-wrap' }}>
+          {selecteddocumento.texto}
+        </div>
+      </div >
     )
   }
-
-  /*
-  const styles = StyleSheet.create({
-    page: {
-      flexDirection: 'row',
-      backgroundColor: '#E4E4E4'
-    },
-    section: {
-      margin: 10,
-      padding: 10,
-      flexGrow: 1
-    }
-  });
-  */
 
   var timeout = null;
   return (
@@ -1133,10 +1124,17 @@ function Documentos() {
         alignSelf: 'center',
       }}
     >
-      <FieldDocumento></FieldDocumento>
+      <div style={{ display: 'flex', flexDirection: 'column', width: '100%', position: 'relative' }}>
+        <div style={{
+          display: selecteddocumento.length == 0 || selecteddocumento.status > 0 ? 'none' : 'flex',
+          position: 'absolute', bottom: 5, right: 10, zIndex: 20
+        }}>
+          <Gravador funcao={voiceField} continuo={true} ></Gravador>
+        </div>
+        <FieldDocumento></FieldDocumento>
+      </div>
       <ListaDeDocumentos></ListaDeDocumentos>
-      <PrintDocumento></PrintDocumento>
-      <TableDocument></TableDocument>
+      <PrintTabela></PrintTabela>
       <ViewSelectModelos></ViewSelectModelos>
       <ViewCreateModelo></ViewCreateModelo>
       <GadgetsParaAtestado></GadgetsParaAtestado>

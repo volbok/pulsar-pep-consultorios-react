@@ -322,7 +322,8 @@ function GuiaSadt() {
         </div>
         <div id='linhas dos registros de exames solicitados'
           style={{
-            display: 'flex', flexDirection: 'row',
+            display: 'flex', flexDirection: 'column',
+            justifyContent: 'flex-start',
             flexWrap: 'wrap',
             borderStyle: 'solid',
             borderColor: 'red',

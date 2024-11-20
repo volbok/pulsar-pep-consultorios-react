@@ -22,6 +22,7 @@ import Alergias from "../cards/Alergias";
 import Documentos from "../cards/Documentos";
 import Exames from "../cards/Exames";
 import selector from "../functions/selector";
+import NotionField from "../cards/NotionField";
 
 function Consultas() {
   // context.
@@ -102,8 +103,7 @@ function Consultas() {
             3000
           );
           setTimeout(() => {
-            setpagina(0);
-            history.push("/");
+            window.location.reload();
           }, 3000);
         } else {
           toast(
@@ -113,8 +113,7 @@ function Consultas() {
             3000
           );
           setTimeout(() => {
-            setpagina(0);
-            history.push("/");
+            window.location.reload();
           }, 3000);
         }
       });
@@ -127,8 +126,13 @@ function Consultas() {
       .get(html + "all_atendimentos")
       .then((response) => {
         let x = response.data.rows;
-        setatendimentos(x.filter(item => item.situacao == 3));
-        setarrayatendimentos(x.filter(item => item.situacao == 3)); // situação 3 = consulta ambulatorial ativa. situação 4 == consulta ambulatorial encerrada.
+        if (localStorage.getItem('agendados') == 1) {
+          setatendimentos(x.filter(item => item.situacao == 3));
+          setarrayatendimentos(x.filter(item => item.situacao == 3)); // situação 3 = consulta ambulatorial ativa. situação 4 == consulta ambulatorial encerrada.
+        } else {
+          setatendimentos(x);
+          setarrayatendimentos(x);
+        }
       })
       .catch(function (error) {
         if (error.response == undefined) {
@@ -139,8 +143,7 @@ function Consultas() {
             3000
           );
           setTimeout(() => {
-            setpagina(0);
-            history.push("/");
+            window.location.reload();
           }, 3000);
         } else {
           toast(
@@ -150,8 +153,7 @@ function Consultas() {
             3000
           );
           setTimeout(() => {
-            setpagina(0);
-            history.push("/");
+            window.location.reload();
           }, 3000);
         }
       });
@@ -167,6 +169,7 @@ function Consultas() {
 
   useEffect(() => {
     if (pagina == -2) {
+      localStorage.setItem('agendados', 1);
       setcard('');
       setpaciente([]);
       setatendimento(null);
@@ -216,7 +219,29 @@ function Consultas() {
               }}
             ></img>
           </div>
-          {Filter('inputFilterConsulta', setarrayatendimentos, atendimentos.filter(item => item.situacao == 3), 'item.nome_paciente')}
+          <div
+            className={localStorage.getItem('agendados') == 1 ? "button red" : "button"}
+            title={localStorage.getItem('agendados') == 1 ? 'ATENDIMENTOS AGENDADOS' : 'ATENDIMENTOS ENCERRADOS'}
+            onClick={() => {
+              if (localStorage.getItem('agendados') == 1) {
+                localStorage.setItem('agendados', 0);
+                loadAtendimentos();
+              } else {
+                localStorage.setItem('agendados', 1);
+                loadAtendimentos();
+              }
+            }}
+          >
+            <img
+              alt=""
+              src={clock}
+              style={{
+                height: 30,
+                width: 30,
+              }}
+            ></img>
+          </div>
+          {Filter('inputFilterConsulta', setarrayatendimentos, atendimentos, 'item.nome_paciente')}
         </div>
       </div>
     );
@@ -358,7 +383,7 @@ function Consultas() {
           style={{
             display: arrayatendimentos.length > 0 ? "flex" : "none",
             justifyContent: "flex-start",
-            height: window.innerWidth < mobilewidth ? '72vh' : '100%',
+            height: window.innerWidth < mobilewidth ? '72vh' : '75vh',
             width: 'calc(100% - 20px)', marginTop: 5,
           }}
         >
@@ -491,8 +516,9 @@ function Consultas() {
                       >
                         <div style={{
                           maxHeight: 20, height: 20, margin: 0,
-                          backgroundColor: item.faturamento_codigo_procedimento == 'PARTICULAR' ? 'rgb(82, 190, 128, 1)' : item.faturamento_codigo_procedimento == 'CONVENIO' ? '#03aacd' : '#af7ac5 ',
+                          backgroundColor: item.faturamento_codigo_procedimento == 'PARTICULAR' ? 'rgb(82, 190, 128, 1)' : item.faturamento_codigo_procedimento == 'CONVENIO' ? '#85c1e9' : '#af7ac5 ',
                           borderRadius: 5, padding: 2.5, paddingLeft: 5, paddingRight: 5,
+                          marginBottom: 5,
                         }}>
                           {item.faturamento_codigo_procedimento != null ? item.faturamento_codigo_procedimento : 'INDEFINIDO'}
                         </div>
@@ -621,7 +647,7 @@ function Consultas() {
           style={{
             display: arrayatendimentos.length < 1 ? "flex" : "none",
             justifyContent: "flex-start",
-            height: window.innerWidth < mobilewidth ? '72vh' : '100%',
+            height: window.innerWidth < mobilewidth ? '72vh' : '75vh',
             width: 'calc(100% - 20px)',
           }}
         >
@@ -654,8 +680,7 @@ function Consultas() {
             3000
           );
           setTimeout(() => {
-            setpagina(0);
-            history.push("/");
+            window.location.reload();
           }, 3000);
         } else {
           toast(
@@ -665,8 +690,7 @@ function Consultas() {
             3000
           );
           setTimeout(() => {
-            setpagina(0);
-            history.push("/");
+            window.location.reload();
           }, 3000);
         }
       });
@@ -781,6 +805,7 @@ function Consultas() {
             {cartao(null, 'EXAMES', 'exames')}
             {cartao(null, 'LAUDOS', 'card-documento-laudo')}
             {cartao(null, 'RELATÓRIOS', 'card-documento-relatorio')}
+            {cartao(null, 'EDITOR', 'card-notion')}
           </div>
           <div id="conteúdo cheio (componentes)"
             style={{
@@ -793,6 +818,7 @@ function Consultas() {
           >
             <Alergias></Alergias>
             <Documentos></Documentos>
+            <NotionField></NotionField>
             <Exames></Exames>
           </div>
           <div id="conteúdo vazio"

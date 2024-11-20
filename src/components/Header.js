@@ -12,7 +12,6 @@ function Header() {
     atendimento, // corresponde ao id_atendimento das tabela "atendimento".
     objatendimento, // todos os parâmetros do objeto atendimento.
     selecteddocumento,
-    tipodocumento,
     alergias,
   } = useContext(Context);
 
@@ -24,7 +23,6 @@ function Header() {
       alignSelf: 'center',
       fontFamily: 'Helvetica',
       breakInside: 'avoid',
-      // backgroundColor: 'rgb(0,0,0, 0.1)',
       width: '100%',
     }}>
       <div style={{
@@ -52,17 +50,19 @@ function Header() {
         <div
           style={{
             display: 'flex', flexDirection: 'column',
-            justifyContent: 'center',
+            justifyContent: 'space-between',
             alignContent: 'center',
             alignItems: 'center',
-            borderRadius: 5, backgroundColor: 'gray',
-            color: 'white', fontSize: 10, fontWeight: 'bold',
+            borderRadius: 5, backgroundColor: '#d5d8dc',
+            color: 'black', fontSize: 10, fontWeight: 'bold',
             padding: 5,
           }}
         >
-          <div>{moment(selecteddocumento.data).format('DD/MM/YY - HH:mm')}</div>
-          <div style={{ marginBottom: 5 }}>{'ATENDIMENTO: ' + atendimento}</div>
-          <QRCodeSVG style={{ height: 100, width: 100 }} value="https://www.instagram.com/pediatrianarede/reel/DB_E3aVNjL9/" />
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+            <div>{moment(selecteddocumento.data).format('DD/MM/YY - HH:mm')}</div>
+            <div style={{ marginBottom: 5 }}>{'ATENDIMENTO: ' + atendimento}</div>
+          </div>
+          <QRCodeSVG style={{ height: 100, width: 100, margin: 5 }} value={cliente.qrcode} />
         </div>
       </div>
       <div style={{ fontFamily: 'Helvetica', fontWeight: 'bold', fontSize: 20, marginTop: 10 }}>
@@ -76,9 +76,6 @@ function Header() {
         {'ALERGIAS: ' + alergias.map(item => ' ' + item.alergia + ' ')}
       </div>
       <hr style={{ display: 'flex', border: '1px solid black', width: '100%' }}></hr>
-      <div style={{ fontFamily: 'Helvetica', fontWeight: 'bold', fontSize: 22, marginTop: 20, textAlign: 'center' }}>
-        {tipodocumento}
-      </div>
     </div>
   )
 }

@@ -25,7 +25,7 @@ function Exames() {
     setlaboratorio,
     laboratorio,
     listalaboratorio, setlistalaboratorio,
-    setdono_documento,
+    setdono_documento, dono_documento,
   } = useContext(Context);
 
 
@@ -37,6 +37,7 @@ function Exames() {
       console.log(listalaboratorio);
       loadListaLaboratorio();
       localStorage.setItem('random', 0);
+      setdono_documento(null);
     }
     // eslint-disable-next-line
   }, [card, atendimento]);
@@ -182,7 +183,10 @@ function Exames() {
           alignSelf: 'flex-start',
         }}>
         <div className='button-green'
-          onClick={() => { insertListaLaboratorio() }}
+          onClick={() => {
+            insertListaLaboratorio();
+            setdono_documento(null);
+          }}
         >
           <img
             alt=""
@@ -226,6 +230,7 @@ function Exames() {
                     console.log(item.random);
                     deleteListaLaboratorio(item.id);
                     deleteMassaItensLaboratorio(item.random);
+                    setdono_documento(null);
                     e.stopPropagation();
                   }}
                 >
@@ -280,7 +285,7 @@ function Exames() {
       </div >
     )
     // eslint-disable-next-line
-  }, [atendimento, listalaboratorio]);
+  }, [atendimento, listalaboratorio, setdono_documento]);
 
   function ListaDeExames() {
     return (
@@ -329,25 +334,32 @@ function Exames() {
             </div>
           </div>
         ))}
-        <div id="botão inserir exame."
+        <div
+          onMouseOver={() => console.log(dono_documento.length)}
           style={{
-            // display: localStorage.getItem('status') == 0 ? 'flex' : 'none',
-            display: 'flex',
-            maxWidth: 30, width: 30, minWidth: 30,
-            maxHeight: 30, height: 30, minHeight: 30,
-            alignSelf: 'center',
-          }}
-          className='button-green'
-          onClick={(e) => {
-            setforminsertexame(1);
-            e.stopPropagation();
-          }}
-        >
-          <img
-            alt=""
-            src={novo}
-            style={{ width: 20, height: 20 }}
-          ></img>
+            display: dono_documento == null ? 'none' : 'flex',
+            flexDirection: 'row', justifyContent: 'center'
+          }}>
+          <div className='text1'>CLIQUE AQUI PARA ADICIONAR OS EXAMES</div>
+          <div id="botão inserir exame."
+            style={{
+              display: 'flex',
+              maxWidth: 30, width: 30, minWidth: 30,
+              maxHeight: 30, height: 30, minHeight: 30,
+              alignSelf: 'center',
+            }}
+            className='button-green'
+            onClick={(e) => {
+              setforminsertexame(1);
+              e.stopPropagation();
+            }}
+          >
+            <img
+              alt=""
+              src={novo}
+              style={{ width: 20, height: 20 }}
+            ></img>
+          </div>
         </div>
       </div>
     )

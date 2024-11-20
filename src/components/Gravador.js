@@ -47,14 +47,18 @@ function Gravador({ funcao, continuo }) {
         ></img>
       </div>
       <div id="lista de resultados"
-        className="button blue"
+        className="button blue scroll"
         style={{
           alignSelf: 'center',
           width: window.innerWidth < 426 ? '70vw' : 150,
           minWidth: window.innerWidth < 426 ? '70vw' : '',
           maxWidth: window.innerWidth < 426 ? '70vw' : '',
+          maxHeight: 200,
           display: btngravavoz == "gravando" ? 'flex' : 'none',
           flexDirection: 'column', justifyContent: 'center', padding: 20,
+          borderColor: '#85C1E9',
+          borderWidth: 5,
+          borderStyle: 'solid',
         }}>
         {transcript.toUpperCase()}
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>

@@ -100,8 +100,7 @@ function Cadastro() {
             3000
           );
           setTimeout(() => {
-            setpagina(0);
-            history.push("/");
+            window.location.reload();
           }, 3000);
         } else {
           toast(
@@ -111,8 +110,7 @@ function Cadastro() {
             3000
           );
           setTimeout(() => {
-            setpagina(0);
-            history.push("/");
+            window.location.reload();
           }, 3000);
         }
       });
@@ -133,8 +131,7 @@ function Cadastro() {
           5000
         );
         setTimeout(() => {
-          setpagina(0);
-          history.push("/");
+          window.location.reload();
         }, 5000);
       });
   };
@@ -256,8 +253,7 @@ function Cadastro() {
           5000
         );
         setTimeout(() => {
-          setpagina(0);
-          history.push("/");
+          window.location.reload();
         }, 5000);
       });
   };
@@ -297,8 +293,7 @@ function Cadastro() {
           5000
         );
         setTimeout(() => {
-          setpagina(0);
-          history.push("/");
+          window.location.reload();
         }, 5000);
       });
   };
@@ -308,8 +303,7 @@ function Cadastro() {
     axios.get(html + "delete_atendimento/" + id).catch(function () {
       toast(settoast, "ERRO DE CONEXÃO, REINICIANDO APLICAÇÃO.", "black", 5000);
       setTimeout(() => {
-        setpagina(0);
-        history.push("/");
+        window.location.reload();
       }, 5000);
     });
   };
@@ -1733,8 +1727,7 @@ function Cadastro() {
           5000
         );
         setTimeout(() => {
-          setpagina(0);
-          history.push("/");
+          window.location.reload();
         }, 5000);
       });
   };
@@ -1795,8 +1788,7 @@ function Cadastro() {
           5000
         );
         setTimeout(() => {
-          setpagina(0);
-          history.push("/");
+          window.location.reload();
         }, 5000);
       });
   };

@@ -65,6 +65,62 @@
   flex-grow: 'inherit',
 }
 
+/* NOTION BLOCKS */
+.notion_p {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  margin: 2.5px !important;
+  margin-top: 2.5px !important;
+  margin-bottom: 2.5px !important;
+  padding: 2.5px !important;
+  border-radius: 2.5px;
+  white-space: nowrap;
+  transition: 500ms, 500ms ease-in-out;
+}
+
+.notion_p:hover {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  margin: 2.5px !important;
+  margin-top: 2.5px !important;
+  margin-bottom: 2.5px !important;
+  padding: 2.5px !important;
+  border-radius: 2.5px;
+  transition: 500ms, 500ms ease-in-out;
+}
+
+.notion_p:focus {
+  outline: none !important;
+  border: 0px;
+  box-shadow: none;
+  background-color: rgb(133, 193, 233, 0.3);
+}
+
+.notion_titulo {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-self: center;
+  margin: 2.5px !important;
+  margin-top: 2.5px !important;
+  margin-bottom: 2.5px !important;
+  padding: 2.5px !important;
+  border-radius: 2.5px;
+  white-space: nowrap;
+  transition: 500ms, 500ms ease-in-out;
+  font-weight: bolder;
+}
+
+.notion_titulo:focus {
+  outline: none !important;
+  border: 0px;
+  box-shadow: none;
+  background-color: rgb(133, 193, 233, 0.3);
+}
+
+
 /* GUIAS TISS */
 .grupo {
   font-size: 8px;
@@ -97,26 +153,8 @@
   font-family: Arial, Helvetica, sans-serif;
 }
 
-/*
-div {
-  display: block;
-  page-break-inside: avoid !important;
-  break-inside: avoid !important;
-  break-before: page;
-}
-*/
-
 /* OCULTANDO CABEÇALHO E RODAPÉ PARA IMPRESSÃO */
 @media print {
-
-  /*
-div {
-  display: block;
-  page-break-inside: avoid !important;
-  break-inside: avoid !important;
-  break-before: page;
-}
-*/
 
   .print {
     display: flex !important;
@@ -126,6 +164,61 @@ div {
   .noprint {
     display: none !important;
     visibility: hidden !important;
+  }
+
+  /* NOTION BLOCKS */
+  .notion_p {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    margin: 2.5px !important;
+    margin-top: 2.5px !important;
+    margin-bottom: 2.5px !important;
+    padding: 2.5px !important;
+    border-radius: 2.5px;
+    white-space: nowrap;
+    transition: 500ms, 500ms ease-in-out;
+  }
+
+  .notion_p:hover {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    margin: 2.5px !important;
+    margin-top: 2.5px !important;
+    margin-bottom: 2.5px !important;
+    padding: 2.5px !important;
+    border-radius: 2.5px;
+    transition: 500ms, 500ms ease-in-out;
+  }
+
+  .notion_p:focus {
+    outline: none !important;
+    border: 0px;
+    box-shadow: none;
+    background-color: rgb(133, 193, 233, 0.3);
+  }
+
+  .notion_titulo {
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-self: center !important;
+    margin: 2.5px !important;
+    margin-top: 2.5px !important;
+    margin-bottom: 2.5px !important;
+    padding: 2.5px !important;
+    border-radius: 2.5px;
+    white-space: nowrap;
+    transition: 500ms, 500ms ease-in-out;
+    font-weight: bolder;
+  }
+
+  .notion_titulo:focus {
+    outline: none !important;
+    border: 0px;
+    box-shadow: none;
+    background-color: rgb(133, 193, 233, 0.3);
   }
 
   .tiss_textarea {
