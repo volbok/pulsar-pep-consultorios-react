@@ -368,6 +368,31 @@ function Consultas() {
   }
 
   // lista de atendimentos.
+  let timeout = null;
+  const updateAtendimentoObservacao = (item, valor) => {
+    var obj = {
+      data_inicio: item.data_inicio,
+      data_termino: item.data_termino,
+      problemas: valor,
+      id_paciente: item.id_paciente,
+      id_unidade: 5, // ATENÇÃO: 5 é o ID da unidade ambulatorial (consultas).
+      nome_paciente: item.nome_paciente,
+      leito: null,
+      situacao: item.situacao, // 3 = atendimento ambulatorial (consulta).
+      id_cliente: item.hospital,
+      classificacao: null,
+      id_profissional: item.id_profissional,
+      convenio_id: item.convenio_codigo,
+      convenio_carteira: item.convenio_carteira,
+      faturamento_codigo_procedimento: item.faturamento_codigo_procedimento,
+    };
+    axios
+      .post(html + "update_atendimento/" + item.id_atendimento, obj)
+      .then(() => {
+        console.log('AGENDAMENTO DE CONSULTA ATUALIZADO COM SUCESSO')
+        loadAtendimentos();
+      });
+  };
   const ListaDeAtendimentos = useCallback(() => {
     return (
       <div
@@ -418,7 +443,7 @@ function Consultas() {
                         borderTopRightRadius: 0,
                         borderBottomRightRadius: 0,
                         minHeight: 100,
-                        height: 100,
+                        // height: 100,
                         width: 80, minWidth: 80, maxWidth: 80,
                         backgroundColor: '#006666'
                       }}
@@ -486,7 +511,7 @@ function Consultas() {
                         borderTopLeftRadius: 0,
                         borderBottomLeftRadius: 0,
                         minHeight: 100,
-                        height: 100,
+                        // height: 100,
                         width: '100%',
                         justifyContent: 'flex-start',
                       }}
@@ -540,6 +565,67 @@ function Consultas() {
                             "years"
                           ) + " ANOS"}
                         </div>
+
+                        <div id={'btn_seletor_observacoes_consultas ' + item.id_atendimento}
+                          className='button green'
+                          title="CLIQUE PARA VER OBSERVAÇÕES DO ATENDIMENTO."
+                          style={{
+                            borderRadius: 50,
+                            minHeight: 5,
+                            height: 5,
+                            maxHeight: 5,
+                            minWidth: 5,
+                            width: 5,
+                            maxWidth: 5,
+                            marginLeft: 0,
+                          }}
+                          onClick={() => {
+                            let element = document.getElementById('input_atendimento_problemas_consultas ' + item.id_atendimento);
+                            let button = document.getElementById('btn_seletor_observacoes_consultas ' + item.id_atendimento);
+                            if (element.style.display == 'flex') {
+                              element.style.display = 'none';
+                              element.style.visibility = 'hidden';
+                              button.style.opacity = 0.5;
+                            } else {
+                              element.style.display = 'flex';
+                              element.style.visibility = 'visible';
+                              button.style.opacity = 1;
+                            }
+                          }}
+                        >
+                        </div>
+                        <textarea id={'input_atendimento_problemas_consultas ' + item.id_atendimento}
+                          autoComplete="off"
+                          placeholder="OBSERVAÇÕES"
+                          className="textarea"
+                          type="text"
+                          onFocus={(e) => (e.target.placeholder = "")}
+                          onBlur={(e) => (e.target.placeholder = "OBSERVAÇÕES")}
+                          defaultValue={item.problemas}
+                          onClick={(e) => e.stopPropagation()}
+                          onKeyUp={() => {
+                            clearTimeout(timeout);
+                            // eslint-disable-next-line
+                            timeout = setTimeout(() => {
+                              console.log('ATUALIZANDO OBSERVAÇÃO')
+                              updateAtendimentoObservacao(item, document.getElementById('input_atendimento_problemas_consultas ' + item.id_atendimento).value.toUpperCase())
+                            }, 1000);
+                          }}
+                          style={{
+                            display: 'none',
+                            flexDirection: "center",
+                            justifyContent: "center",
+                            alignSelf: "center",
+                            width: 'calc(100% - 20px)',
+                            padding: 5,
+                            marginLeft: 5,
+                            marginBottom: 0,
+                            height: 60,
+                            minHeight: 60,
+                            maxHeight: 60,
+                          }}
+                        ></textarea>
+
                       </div>
                     </div>
                     <div

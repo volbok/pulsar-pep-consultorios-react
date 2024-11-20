@@ -643,7 +643,8 @@ function Agendamento() {
                         <div style={{ textAlign: 'left' }}>
                           {especialistas.filter(valor => valor.id_usuario == item.id_profissional).map(item => 'DR(A). ' + item.nome_usuario + ' - ' + item.conselho + ' ' + item.n_conselho)}
                         </div>
-                        <div className='button green'
+                        <div id={'btn_seletor_observacoes ' + item.id_atendimento}
+                          className='button green'
                           title="CLIQUE PARA VER OBSERVAÇÕES DO ATENDIMENTO."
                           style={{
                             borderRadius: 50,
