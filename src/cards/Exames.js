@@ -222,7 +222,7 @@ function Exames() {
                 <div id="botão para excluir pedido de exame laboratorial e seus respectivos itens de exames laboratoriais."
                   className='button-yellow'
                   style={{
-                    display: item.status == 0 ? 'flex' : 'none',
+                    display: 'flex',
                     maxWidth: 30, width: 30, minWidth: 30,
                     maxHeight: 30, height: 30, minHeight: 30
                   }}

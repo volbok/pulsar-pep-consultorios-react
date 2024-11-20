@@ -637,7 +637,7 @@ function GuiaSadt() {
         }
       );
       // atualizando grupo para os próximos 5 procedimentos, até o esgotamento das páginas.
-      iniciogrupo = iniciogrupo + 6;
+      iniciogrupo = iniciogrupo + 5;
       paginas = paginas - 1;
     }
     console.log(grupolaboratorio.map(item => 'PÁGINA: ' + item.pagina + ' PROCEDIMENTOS: ' + item.procedimentos.length));
