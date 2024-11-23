@@ -1,5 +1,5 @@
 /* eslint eqeqeq: "off" */
-import React, { useContext, useEffect, useCallback } from 'react';
+import React, { useContext, useEffect, useCallback, useState } from 'react';
 import Context from '../pages/Context';
 import moment from "moment";
 import axios from 'axios';
@@ -16,6 +16,7 @@ import favorito_usar from '../images/favorito_usar.svg';
 import salvar from '../images/salvar.svg';
 import novo from '../images/novo.svg';
 import deletar from '../images/deletar.svg';
+import VanillaCaret from 'vanilla-caret-js';
 
 function NotionField() {
 
@@ -24,7 +25,7 @@ function NotionField() {
     html,
     atendimento,
     paciente,
-    pacientes,
+    objpaciente,
     usuario,
     card, setcard,
     tipodocumento, settipodocumento,
@@ -53,7 +54,7 @@ function NotionField() {
   const insertDocumento = () => {
     var obj = {
       id_paciente: paciente,
-      nome_paciente: pacientes.filter(item => item.id_paciente == paciente).map(item => item.nome_paciente).pop(),
+      nome_paciente: objpaciente.nome_paciente,
       id_atendimento: atendimento,
       data: moment(),
       texto: null,
@@ -68,7 +69,9 @@ function NotionField() {
     axios.post(html + 'insert_documento', obj).then(() => {
       loadNotionDocs();
       setselecteddocumento([]);
-      localStorage.setItem("documento", 0);
+      localStorage.setItem("documento_notion", 0);
+      localStorage.setItem("texto_notion", '');
+      document.getElementById("notionfield").innerHTML = '';
     })
   }
   // copiar documento.
@@ -87,7 +90,7 @@ function NotionField() {
     axios.post(html + 'insert_documento', obj).then(() => {
       loadNotionDocs();
       setselecteddocumento([]);
-      localStorage.setItem("documento", 0);
+      localStorage.setItem("documento_notion", 0);
     })
   }
   // atualizar documento.
@@ -110,16 +113,23 @@ function NotionField() {
       if (status == 1) {
         loadNotionDocs();
         setselecteddocumento([]);
-        localStorage.setItem("documento", 0);
+        localStorage.setItem("documento_notion", 0);
+        // limpando o notionfield.
+        // removeAllChildNodes(document.getElementById('notionfield'));
+        localStorage.setItem("texto_notion", '');
+        document.getElementById('notionfield').innerHTML = '';
       }
     })
   }
+
   // excluir documento.
   const deleteDocumento = (id) => {
     axios.get(html + 'delete_documento/' + id).then(() => {
       loadNotionDocs();
       setselecteddocumento([]);
-      localStorage.setItem("documento", 0);
+      localStorage.setItem("documento_notion", 0);
+      localStorage.setItem("texto_notion", '');
+      document.getElementById("notionfield").innerHTML = '';
     })
   }
   // imprimir documento.
@@ -132,8 +142,8 @@ function NotionField() {
     printWindow.document.write(divContents);
     printWindow.document.write('</body></html>');
     printWindow.document.close();
-    //printWindow.print();
-    //printWindow.close();
+    printWindow.print();
+    printWindow.close();
   }
 
   const ListaDeDocumentos = useCallback(() => {
@@ -187,7 +197,7 @@ function NotionField() {
           </div>
         </div>
         <div
-          id="lista de documentos estruturados"
+          id="lista de documentos notion"
           className='scroll'
           style={{
             backgroundColor: 'white',
@@ -198,23 +208,28 @@ function NotionField() {
         >
           {documentos.filter(item => item.tipo_documento == tipodocumento).map((item) => (
             <div id={'documento notion ' + item.id}
+              title={'documento notion ' + item.id}
               className='button'
               onClick={() => {
-                console.log(item);
-                localStorage.setItem("documento", item.id);
+                localStorage.setItem("documento_notion", item.id);
                 setselecteddocumento(item);
                 document.getElementById('notionfield').innerHTML = item.texto;
+                selector("lista de documentos notion", 'documento notion ' + item.id, 100);
                 setTimeout(() => {
-                  selector("lista de documentos estruturados", 'documento notion ' + item.id, 100);
-                }, 200);
+                  if (item.id == localStorage.getItem("id_notion") && item.status == 0) {
+                    document.getElementById("notionfield").innerHTML = localStorage.getItem("texto_notion");
+                  } else {
+                    document.getElementById("notionfield").innerHTML = item.texto;
+                  }
+                }, 100);
               }}
               style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: 180 }}
             >
               <div id="botões"
                 style={{
                   display: 'flex', flexDirection: 'row', justifyContent: 'center',
-                  pointerEvents: item.id == localStorage.getItem("documento") ? 'auto' : 'none',
-                  opacity: item.id == localStorage.getItem("documento") ? 1 : 0.3
+                  pointerEvents: item.id == parseInt(localStorage.getItem("documento_notion")) ? 'auto' : 'none',
+                  opacity: item.id == parseInt(localStorage.getItem("documento_notion")) ? 1 : 0.3
                 }}>
                 <div id="botão para deletar documento"
                   className="button-yellow"
@@ -311,6 +326,8 @@ function NotionField() {
       insereTitulo();
     } else if (tipo == 'texto') {
       insereFirstP();
+    } else if (tipo == 'bloco') {
+      insereBloco();
     }
   }
 
@@ -322,7 +339,7 @@ function NotionField() {
           flexDirection: 'column', justifyContent: 'flex-start',
           fontFamily: 'Helvetica',
           whiteSpace: 'pre-wrap',
-          
+
         }}>
       </div>
     )
@@ -356,36 +373,21 @@ function NotionField() {
   const insereFirstP = () => {
     console.log('insere <p>');
     let random = Math.random();
-    let element = document.createElement("p");
+    let element = document.createElement("div");
     element.id = 'notionblock ' + random;
     element.className = 'notion_p';
+    element.style.width = 300;
     element.setAttribute('contenteditable', "true");
-    if (document.getElementById("notionfield").nextSibling) {
+    if (document.getElementById('notionfield').nextElementSibling != null) {
       console.log(document.getElementById(document.activeElement.id).nextSibling.id);
       document.getElementById("notionfield").insertBefore(document.activeElement.nextSibling, element);
     } else {
       document.getElementById("notionfield").appendChild(element);
     }
     document.getElementById(element.id).focus();
+    localStorage.setItem('element', element.id);
   };
-  const insereTitulo = () => {
-    console.log('insere título');
-    let random = Math.random();
-    let element = document.createElement("p");
-    element.id = 'notionblock ' + random;
-    element.className = 'notion_titulo';
-    element.setAttribute('contenteditable', "true");
-    if (document.getElementById("notionfield").nextSibling) {
-      console.log(document.getElementById(document.activeElement.id).nextSibling.id);
-      document.getElementById("notionfield").insertBefore(document.activeElement.nextSibling, element);
-    } else {
-      document.getElementById("notionfield").appendChild(element);
-    }
-    document.getElementById(element.id).focus();
-  }
-
   const insereP = () => {
-    console.log('insere <p> após um elemento pré-existente');
     let random = Math.random();
     if (document.activeElement.nextSibling != null) {
       let element = document.createElement("div");
@@ -394,6 +396,7 @@ function NotionField() {
       element.setAttribute('contenteditable', "true");
       document.getElementById("notionfield").insertBefore(element, document.activeElement.nextSibling);
       document.getElementById(element.id).focus();
+      localStorage.setItem('element', element.id);
     } else {
       let element = document.createElement("div");
       element.id = 'notionblock ' + random;
@@ -401,11 +404,110 @@ function NotionField() {
       element.setAttribute('contenteditable', "true");
       document.getElementById("notionfield").appendChild(element);
       document.getElementById(element.id).focus();
+      localStorage.setItem('element', element.id);
     }
+  }
+  const insereTitulo = () => {
+    console.log('insere título');
+    let random = Math.random();
+    let element = document.createElement("div");
+    element.id = 'notionblock ' + random;
+    element.className = 'notion_titulo';
+    element.setAttribute('contenteditable', "true");
+    if (document.getElementById('notionfield').nextElementSibling != null) {
+      document.getElementById("notionfield").insertBefore(element, document.activeElement.nextSibling);
+    } else {
+      document.getElementById("notionfield").appendChild(element);
+    }
+    document.getElementById(element.id).focus();
+    localStorage.setItem('element', element.id);
+  }
+  const insereBloco = () => {
+    console.log('insere bloco');
+    let random = Math.random();
+    let element = document.createElement("div");
+    element.id = 'notionblock ' + random;
+    element.className = 'notion_block';
+    element.setAttribute('contenteditable', "true");
+    if (document.getElementById('notionfield').nextElementSibling != null) {
+      document.getElementById("notionfield").insertBefore(element, document.activeElement.nextSibling);
+    } else {
+      document.getElementById("notionfield").appendChild(element);
+    }
+    document.getElementById(element.id).focus();
+    localStorage.setItem('element', element.id);
+  }
+
+
+  const [viewmenucolinha, setviewmenucolinha] = useState(0);
+
+  const putcolinha = (tag, dado) => {
+    return (
+      <div className='button' style={{ width: 250, justifyContent: 'flex-start', paddingLeft: 10 }}
+        onClick={() => {
+          if (objpaciente != null) {
+            setviewmenucolinha(0);
+            let element = localStorage.getItem('element');
+            console.log(element);
+            let corte = localStorage.getItem('caret');
+            console.log(corte);
+            let texto = document.getElementById(element).textContent;
+            let text_before = texto.slice(0, corte);
+            let text_after = texto.slice(corte, texto.length);
+            console.log(texto);
+            console.log(text_before);
+            console.log(text_after);
+            document.getElementById(element).textContent = text_before + ' ' + dado + ' ' + text_after;
+            let caret = new VanillaCaret(document.getElementById(element));
+            let novocorte = parseInt(corte) + parseInt(dado.length) + 1;
+            console.log(novocorte);
+            caret.setPos(parseInt(novocorte));
+          }
+        }}
+      >
+        {objpaciente != null ? tag + ': ' + dado : ''}
+      </div>
+    )
+  }
+
+  function MenuColinhas() {
+    return (
+      <div className='janela scroll menucolinha'
+        id="menucolinha"
+        style={{
+          display: viewmenucolinha == 1 ? 'flex' : 'none',
+          position: 'absolute',
+          alignSelf: 'center',
+          bottom: 5,
+          left: 15,
+          zIndex: 10,
+          height: 280,
+          // backgroundColor: '#a6cee8',
+          // borderColor: '#a6cee8',
+        }}
+        onMouseOver={() => {
+          document.getElementById('menucolinha').style.backgroundColor = '#85c1e9';
+          document.getElementById('menucolinha').style.borderColor = '#85c1e9';
+        }}
+        onMouseLeave={() => {
+          document.getElementById('menucolinha').style.backgroundColor = '#a6cee8';
+          document.getElementById('menucolinha').style.borderColor = '#a6cee8';
+        }}
+      >
+        {putcolinha('HOJE', moment().format('DD/MM/YYYY'))}
+        {putcolinha('PACIENTE', objpaciente != null ? objpaciente.nome_paciente : '')}
+        {putcolinha('DN', objpaciente != null ? moment(objpaciente.dn_paciente).format('DD/MM/YY') : '')}
+        {putcolinha('DOCUMENTO', objpaciente != null ? objpaciente.numero_documento : '')}
+        {putcolinha('MÃE', objpaciente != null ? objpaciente.nome_mae_paciente : '')}
+      </div>
+    )
   }
 
   // função que insere ou altera elementos ao clicar-se em uma tecla do teclado.
   const keyHandler = (e) => {
+    console.log(e.keyCode);
+    console.log(document.activeElement.id);
+    localStorage.setItem('element', document.activeElement.id);
     if (e.keyCode == 13) { // tecla enter
       e.preventDefault();
       insereP();
@@ -418,6 +520,9 @@ function NotionField() {
           let id = document.getElementById(document.activeElement.id).previousSibling.id;
           document.getElementById("notionfield").removeChild(document.activeElement);
           document.getElementById(id).focus();
+          localStorage.setItem('element', id);
+        } else {
+          document.getElementById("notionfield").removeChild(document.activeElement);
         }
       }
     } else if (e.keyCode == 38) { // tecla seta para cima
@@ -425,17 +530,40 @@ function NotionField() {
         console.log('DESLOCANDO PARA O ELEMENTO ANTERIOR');
         let id = document.getElementById(document.activeElement.id).previousSibling.id;
         document.getElementById(id).focus();
+        localStorage.setItem('element', id);
       }
     } else if (e.keyCode == 40) { // tecla seta para baixo
       if (document.activeElement.nextSibling != null) {
         console.log('DESLOCANDO PARA O PRÓXIMO ELEMENTO');
         let id = document.getElementById(document.activeElement.id).nextSibling.id;
         document.getElementById(id).focus();
+        localStorage.setItem('element', id);
       }
-    } else {
-      // console.log('CADASTRAR NOVAS TECLAS E FUNCOINALIDADES...');
+    } else if (e.keyCode == 226) { // tecla de barra invertida >> "\" (para o menucolinhas!).
+      e.preventDefault();
+      let caret = new VanillaCaret(document.getElementById(document.activeElement.id));
+      console.log(caret.getPos());
+      localStorage.setItem('caret', caret.getPos());
+      setviewmenucolinha(1);
+    } else if (e.keyCode == 46) { // tecla delete
+      // verificando se o conteúdo do elemento é vazio, para realizar sua exclusão.
+      if (document.activeElement.textContent.length == 0) {
+        e.preventDefault();
+        if (document.activeElement.previousSibling != null) {
+          let id = document.getElementById(document.activeElement.id).previousSibling.id;
+          document.getElementById("notionfield").removeChild(document.activeElement);
+          document.getElementById(id).focus();
+          localStorage.setItem('element', id);
+        } else {
+          document.getElementById("notionfield").removeChild(document.activeElement);
+        }
+      }
+    } else if (e.keyCode == 27) { // tecla esc
+      setviewmenucolinha(0);
     }
+    localStorage.setItem("id_notion", selecteddocumento.id);
     localStorage.setItem('texto_notion', document.getElementById('notionfield').innerHTML);
+    updateDocumento(selecteddocumento, 0);
   }
 
   return (
@@ -445,19 +573,23 @@ function NotionField() {
       justifyItems: 'center',
       alignSelf: 'center',
       width: '65vw',
+      position: 'relative',
     }}>
+      <MenuColinhas></MenuColinhas>
       <div style={{
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
         height: '75vh',
         marginLeft: 10,
+        position: 'relative',
       }}>
         <div id='menu'
           style={{
             display: 'flex',
             flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap',
-            opacity: selecteddocumento == [] ? 0.3 : 1,
-            pointerEvents: selecteddocumento == null ? 'none' : 'auto',
+            opacity: selecteddocumento.length == 0 || selecteddocumento.status == 1 ? 0.3 : 1,
+            pointerEvents: selecteddocumento.length == 0 || selecteddocumento.status == 1 ? 'none' : 'auto',
           }}
+          onMouseOver={() => console.log(selecteddocumento)}
         >
           <div className='button'
             onClick={() => appendElement('titulo')}
@@ -470,6 +602,12 @@ function NotionField() {
             style={{ width: 100 }}
           >
             TEXTO
+          </div>
+          <div className='button'
+            onClick={() => appendElement('bloco')}
+            style={{ width: 100 }}
+          >
+            BLOCO
           </div>
         </div>
         <div id='notionfield'
@@ -485,7 +623,9 @@ function NotionField() {
             borderRadius: 5,
             marginTop: 10,
             position: 'relative',
+            pointerEvents: selecteddocumento.status == 1 ? 'none' : 'auto',
           }}
+          onClick={() => setviewmenucolinha(0)}
           onKeyDown={(e) => {
             keyHandler(e);
           }}

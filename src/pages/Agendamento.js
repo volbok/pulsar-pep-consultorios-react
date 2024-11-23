@@ -31,6 +31,7 @@ function Agendamento() {
     setdono_documento,
     mobilewidth,
     usuario,
+    cliente,
   } = useContext(Context);
 
   const [viewupdateatendimento, setviewupdateatendimento] = useState(0);
@@ -175,10 +176,54 @@ function Agendamento() {
   }
   */
 
+  // checando se há consultas já agendadas para o horário selecionado para inserir atendimento.
+  const checkConsultas = (inicio) => {
+    let poolatendimentos = [];
+    console.log(inicio);
+    console.log(moment(inicio, 'DD/MM/YYYY - HH:mm'));
+    console.log(moment(inicio, 'DD/MM/YYYY - HH:mm').milliseconds());
+    if (localStorage.getItem('PARTICULAR') == 'PARTICULAR') {
+      poolatendimentos = arrayatendimentos.filter(item =>
+        item.id_paciente == paciente.id_paciente
+        &&
+        item.id_profissional == selectedespecialista.id_usuario
+        &&
+        (
+          moment(inicio, 'DD/MM/YYYY - HH:mm') > moment(item.data_inicio).subtract(cliente.tempo_consulta_particular, 'minutes')
+          &&
+          moment(inicio, 'DD/MM/YYYY - HH:mm') < moment(item.data_termino)
+        )
+      )
+    } else {
+      poolatendimentos = arrayatendimentos.filter(item =>
+        item.id_paciente == paciente.id_paciente
+        &&
+        item.id_profissional == selectedespecialista.id_usuario
+        &&
+        (
+          moment(inicio, 'DD/MM/YYYY - HH:mm') > moment(item.data_inicio).subtract(cliente.tempo_consulta_convenio, 'minutes')
+          &&
+          moment(inicio, 'DD/MM/YYYY - HH:mm') < moment(item.data_termino)
+        )
+      )
+    }
+
+    console.log(poolatendimentos.length);
+
+    if (poolatendimentos.length > 0) {
+      // modal...
+      console.log(poolatendimentos);
+      console.log('CONSULTA JÁ AGENDADA NESTE PERÍODO.');
+      modal(setdialogo, 'JÁ EXISTE UMA CONSULTA AGENDADA PARA ESTE HORÁRIO, CONFIRMAR ESTE NOVO AGENDAMENTO?', insertAtendimento, inicio);
+    } else {
+      insertAtendimento(inicio);
+    }
+  }
+
   const insertAtendimento = (inicio) => {
     var obj = {
       data_inicio: moment(inicio, 'DD/MM/YYYY - HH:mm'),
-      data_termino: localStorage.getItem('PARTICULAR') == 'PARTICULAR' ? moment(inicio, 'DD/MM/YYYY - HH:mm').add(45, 'minutes') : moment(inicio, 'DD/MM/YYYY - HH:mm').add(30, 'minutes'),
+      data_termino: localStorage.getItem('PARTICULAR') == 'PARTICULAR' ? moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_particular, 'minutes') : moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_convenio, 'minutes'),
       problemas: null,
       id_paciente: paciente.id_paciente,
       id_unidade: 5, // ATENÇÃO: 5 é o ID da unidade ambulatorial.
@@ -205,7 +250,7 @@ function Agendamento() {
   const updateAtendimento = (item, inicio) => {
     var obj = {
       data_inicio: moment(inicio, 'DD/MM/YYYY - HH:mm'),
-      data_termino: localStorage.getItem('PARTICULAR') == 'PARTICULAR' ? moment(inicio, 'DD/MM/YYYY - HH:mm').add(45, 'minutes') : moment(inicio, 'DD/MM/YYYY - HH:mm').add(30, 'minutes'),
+      data_termino: localStorage.getItem('PARTICULAR') == 'PARTICULAR' ? moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_particular, 'minutes') : moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_convenio, 'minutes'),
       problemas: item.problemas,
       id_paciente: item.id_paciente,
       id_unidade: 5, // ATENÇÃO: 5 é o ID da unidade ambulatorial.
@@ -632,6 +677,7 @@ function Agendamento() {
                           padding: 5,
                           alignSelf: 'center',
                           position: 'relative',
+                          width: '100%',
                         }}
                       >
                         <div style={{ textAlign: 'left' }}>
@@ -879,6 +925,7 @@ function Agendamento() {
                           justifyContent: "flex-start",
                           padding: 5,
                           alignSelf: 'center',
+                          width: '100%',
                         }}
                       >
                         <div style={{ textAlign: 'left' }}>
@@ -1116,7 +1163,8 @@ function Agendamento() {
               let min = localStorage.getItem('min');
               // modelo: 'DD/MM/YYYY - HH:mm'
               console.log(selectdate + ' - ' + hora + ':' + min);
-              insertAtendimento(selectdate + ' - ' + hora + ':' + min);
+              checkConsultas(selectdate + ' - ' + hora + ':' + min)
+              // insertAtendimento(selectdate + ' - ' + hora + ':' + min);
               setviewopcoeshorarios(0);
             }}
             style={{ width: 50, maxWidth: 50, alignSelf: 'center', marginTop: 20 }}

@@ -566,7 +566,6 @@ function Documentos() {
             <div id={'documento ' + item.id}
               className='button'
               onClick={() => {
-                console.log(item);
                 localStorage.setItem("documento", item.id);
                 setselecteddocumento(item);
                 setTimeout(() => {
