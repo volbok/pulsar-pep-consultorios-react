@@ -141,9 +141,10 @@ function NotionField() {
     printWindow.document.write('</head><body>');
     printWindow.document.write(divContents);
     printWindow.document.write('</body></html>');
-    printWindow.document.close();
-    printWindow.print();
-    printWindow.close();
+    setTimeout(() => {
+      printWindow.print();
+      printWindow.close();
+    }, 1000);
   }
 
   const ListaDeDocumentos = useCallback(() => {

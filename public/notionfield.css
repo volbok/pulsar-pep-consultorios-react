@@ -50,6 +50,29 @@
   background-color: rgb(133, 193, 233, 0.3);
 }
 
+.notion_block {
+  display: flex;
+  flex-direction: row;
+  justify-content: left;
+  margin: 2.5px !important;
+  margin-top: 2.5px !important;
+  margin-bottom: 2.5px !important;
+  padding: 15px !important;
+  border-radius: 2.5px;
+  white-space: nowrap;
+  transition: 500ms, 500ms ease-in-out;
+  font-weight: bold;
+  text-align: left !important;
+  text-wrap: wrap !important;
+  line-break: normal !important;
+  word-wrap: break-word;
+  overflow: auto !important;
+  height: auto !important;
+  width: 300px;
+  align-self: center;
+  background-color: #e5e8e8;
+}
+
 .document {
   display: flex;
   flex-direction: row;
@@ -58,4 +81,77 @@
   margin-top: 2.5px !important;
   margin-bottom: 2.5px !important;
   padding: 2.5px !important;
+}
+
+@media print {
+  .notion_p {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: left;
+    margin: 2.5px !important;
+    margin-top: 2.5px !important;
+    margin-bottom: 2.5px !important;
+    padding: 2.5px !important;
+    border-radius: 2.5px;
+    transition: 500ms, 500ms ease-in-out;
+    text-align: left !important;
+    text-wrap: wrap !important;
+    line-break: normal !important;
+    word-wrap: break-word;
+    width: 200px !important;
+    min-width: 200px !important;
+    height: auto !important;
+    overflow: auto !important;
+  }
+
+  .notion_titulo {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-self: center !important;
+    margin: 2.5px !important;
+    margin-top: 2.5px !important;
+    margin-bottom: 2.5px !important;
+    padding: 2.5px !important;
+    border-radius: 2.5px;
+    transition: 500ms, 500ms ease-in-out;
+    font-weight: bolder;
+    text-align: center !important;
+    text-wrap: wrap !important;
+  }
+
+  .notion_block {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    margin: 2.5px !important;
+    margin-top: 2.5px !important;
+    margin-bottom: 2.5px !important;
+    padding: 15px !important;
+    border-radius: 2.5px;
+    white-space: nowrap;
+    transition: 500ms, 500ms ease-in-out;
+    font-weight: bold;
+    text-align: left !important;
+    text-wrap: wrap !important;
+    line-break: normal !important;
+    word-wrap: break-word;
+    overflow: auto !important;
+    height: auto !important;
+    width: 300px;
+    align-self: center;
+    background-color: #e5e8e8;
+  }
+
+  .document {
+    display: flex;
+    flex-direction: row;
+    justify-content: left;
+    margin: 2.5px !important;
+    margin-top: 2.5px !important;
+    margin-bottom: 2.5px !important;
+    padding: 2.5px !important;
+  }
 }

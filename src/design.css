@@ -210,6 +210,12 @@
     border-radius: 2.5px;
     white-space: nowrap;
     transition: 500ms, 500ms ease-in-out;
+    text-align: left !important;
+    text-wrap: wrap !important;
+    line-break: normal !important;
+    word-wrap: break-word;
+    height: auto !important;
+    overflow: auto !important;
   }
 
   .notion_p:focus {
@@ -223,7 +229,7 @@
     display: flex;
     flex-direction: row;
     justify-content: center;
-    align-self: center !important;
+    align-self: center;
     margin: 2.5px !important;
     margin-top: 2.5px !important;
     margin-bottom: 2.5px !important;
@@ -232,6 +238,12 @@
     white-space: nowrap;
     transition: 500ms, 500ms ease-in-out;
     font-weight: bolder;
+    text-align: left !important;
+    text-wrap: wrap !important;
+    line-break: normal !important;
+    word-wrap: break-word;
+    height: auto !important;
+    overflow: auto !important;
   }
 
   .notion_titulo:focus {
@@ -262,6 +274,14 @@
     width: 300px;
     align-self: center;
     background-color: #e5e8e8;
+  }
+
+  .notion_block:focus {
+    outline: none !important;
+    border: 0px;
+    box-shadow: none;
+    background-color: #ccd1d1;
+    width: 310px;
   }
 
   .tiss_textarea {
