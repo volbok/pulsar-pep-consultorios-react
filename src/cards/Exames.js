@@ -204,6 +204,8 @@ function Exames() {
           </div>
           <div className='button-green'
             onClick={() => {
+              loadModelosExames();
+              loadModelosExamesItens();
               setviewmodelospackexames(1);
             }}
           >
@@ -592,6 +594,7 @@ function Exames() {
       localStorage.setItem('random', newrandom);
       axios.get(html + 'lista_laboratorio/' + atendimento).then((response) => {
         setlistalaboratorio(response.data.rows);
+        setdono_documento(null);
       });
     });
     // inserindo os itens de exames/procedimentos.
