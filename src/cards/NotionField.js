@@ -154,9 +154,8 @@ function NotionField() {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          width: '25vw',
           margin: 0, marginLeft: 10,
-          height: '75vh',
+          width: '25vw',
         }}
       >
         <div style={{
@@ -203,8 +202,8 @@ function NotionField() {
           style={{
             backgroundColor: 'white',
             borderColor: 'white',
-            height: '100%',
-            width: 'calc(100% - 20px)',
+            height: 'calc(100vh - 200px)',
+            width: 'calc(100% - 15px)',
           }}
         >
           {documentos.filter(item => item.tipo_documento == tipodocumento).map((item) => (
@@ -440,8 +439,8 @@ function NotionField() {
   }
 
 
+  // menu de atalho, com informações importantes para inserção no texto.
   const [viewmenucolinha, setviewmenucolinha] = useState(0);
-
   const putcolinha = (tag, dado) => {
     return (
       <div className='button' style={{ width: 250, justifyContent: 'flex-start', paddingLeft: 10 }}
@@ -455,13 +454,9 @@ function NotionField() {
             let texto = document.getElementById(element).textContent;
             let text_before = texto.slice(0, corte);
             let text_after = texto.slice(corte, texto.length);
-            console.log(texto);
-            console.log(text_before);
-            console.log(text_after);
             document.getElementById(element).textContent = text_before + ' ' + dado + ' ' + text_after;
             let caret = new VanillaCaret(document.getElementById(element));
             let novocorte = parseInt(corte) + parseInt(dado.length) + 1;
-            console.log(novocorte);
             caret.setPos(parseInt(novocorte));
           }
         }}
@@ -470,7 +465,6 @@ function NotionField() {
       </div>
     )
   }
-
   function MenuColinhas() {
     return (
       <div className='janela scroll menucolinha'
@@ -571,24 +565,26 @@ function NotionField() {
     <div style={{
       display: card == 'card-notion' ? 'flex' : 'none',
       flexDirection: 'row',
-      justifyItems: 'center',
-      alignSelf: 'center',
-      width: '65vw',
+      width: '100%',
+      height: '100%',
       position: 'relative',
     }}>
       <MenuColinhas></MenuColinhas>
       <div style={{
         display: 'flex', flexDirection: 'column', justifyContent: 'center',
-        height: '75vh',
-        marginLeft: 10,
+        width: '100%',
+        height: '100%',
         position: 'relative',
+        alignSelf: 'flex-end',
       }}>
         <div id='menu'
           style={{
             display: 'flex',
             flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap',
+            width: '100%',
             opacity: selecteddocumento.length == 0 || selecteddocumento.status == 1 ? 0.3 : 1,
             pointerEvents: selecteddocumento.length == 0 || selecteddocumento.status == 1 ? 'none' : 'auto',
+            marginBottom: 2.5,
           }}
           onMouseOver={() => console.log(selecteddocumento)}
         >
@@ -616,13 +612,12 @@ function NotionField() {
           style={{
             display: 'flex',
             flexDirection: 'column', justifyContent: 'flex-start',
-            alignSelf: 'center', alignContent: 'flex-start',
-            height: '100%',
-            width: '45vw',
+            alignContent: 'flex-start',
+            height: 'calc(100% - 20px)',
+            width: 'calc(100% - 15px)',
             backgroundColor: 'white',
             borderColor: 'white',
             borderRadius: 5,
-            marginTop: 10,
             position: 'relative',
             pointerEvents: selecteddocumento.status == 1 ? 'none' : 'auto',
           }}

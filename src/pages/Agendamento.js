@@ -689,18 +689,18 @@ function Agendamento() {
                         <div style={{ textAlign: 'left' }}>
                           {especialistas.filter(valor => valor.id_usuario == item.id_profissional).map(item => 'DR(A). ' + item.nome_usuario + ' - ' + item.conselho + ' ' + item.n_conselho)}
                         </div>
+
                         <div id={'btn_seletor_observacoes ' + item.id_atendimento}
-                          className='button green'
+                          className='text2'
                           title="CLIQUE PARA VER OBSERVAÇÕES DO ATENDIMENTO."
                           style={{
-                            borderRadius: 50,
-                            minHeight: 5,
-                            height: 5,
-                            maxHeight: 5,
-                            minWidth: 5,
-                            width: 5,
-                            maxWidth: 5,
+                            textDecoration: 'underline',
+                            fontSize: 12,
+                            justifyContent: 'flex-start',
+                            alignSelf: 'flex-start',
+                            margin: 5,
                             marginLeft: 0,
+                            padding: 0,
                           }}
                           onClick={() => {
                             let element = document.getElementById('input_atendimento_problemas ' + item.id_atendimento);
@@ -716,7 +716,9 @@ function Agendamento() {
                             }
                           }}
                         >
+                          OBS
                         </div>
+
                         <textarea id={'input_atendimento_problemas ' + item.id_atendimento}
                           autoComplete="off"
                           placeholder="OBSERVAÇÕES"
@@ -940,19 +942,18 @@ function Agendamento() {
                         }}>
                           {especialistas.filter(valor => valor.id_usuario == item.id_profissional).map(item => 'DR(A). ' + item.nome_usuario + ' - ' + item.conselho + ' ' + item.n_conselho)}
                         </div>
+
                         <div id={'btn_seletor_observacoes ' + item.id_atendimento}
-                          className='button green'
+                          className='text2'
                           title="CLIQUE PARA VER OBSERVAÇÕES DO ATENDIMENTO."
                           style={{
-                            borderRadius: 50,
-                            minHeight: 5,
-                            height: 5,
-                            maxHeight: 5,
-                            minWidth: 5,
-                            width: 5,
-                            maxWidth: 5,
+                            textDecoration: 'underline',
+                            fontSize: 12,
+                            justifyContent: 'flex-start',
+                            alignSelf: 'flex-start',
+                            margin: 5,
                             marginLeft: 0,
-                            opacity: 0.5,
+                            padding: 0,
                           }}
                           onClick={() => {
                             let element = document.getElementById('input_atendimento_problemas ' + item.id_atendimento);
@@ -968,6 +969,7 @@ function Agendamento() {
                             }
                           }}
                         >
+                          OBS
                         </div>
                         <textarea id={'input_atendimento_problemas ' + item.id_atendimento}
                           autoComplete="off"

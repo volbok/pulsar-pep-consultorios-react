@@ -183,11 +183,12 @@ function Exames() {
       <div id="scroll lista de pedidos de exames laboratoriais"
         className='scroll'
         style={{
-          width: '15vw', minWidth: '15vw', maxWidth: '15vw',
-          height: '75vh',
+          width: 'calc(25vw - 10px)',
+          height: 'calc(100vh - 120px)',
+          margin: 0, marginLeft: 10,
           backgroundColor: 'white',
           borderColor: 'white',
-          alignSelf: 'flex-start',
+          alignSelf: 'flex-end',
         }}>
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
           <div className='button-green'
@@ -427,11 +428,13 @@ function Exames() {
         className='scroll'
         style={{
           display: 'flex',
-          height: '75vh', width: '45vw',
+          height: 'calc(100vh - 120px)',
+          width: 'calc(100% - 30px)',
           backgroundColor: 'white',
           borderColor: 'white',
+          margin: 0,
           borderRadius: 5,
-          marginRight: 10, marginLeft: 12.5,
+          alignSelf: 'flex-end',
         }}>
         {laboratorio.filter(item => item.random == localStorage.getItem('random')).map(item => (
           <div style={{
@@ -439,6 +442,7 @@ function Exames() {
             justifyContent: 'space-between',
             borderRadius: 5,
             margin: 2.5,
+            backgroundColor: '#e5e8e8'
           }}>
             <div className='text1'
               style={{
@@ -447,14 +451,10 @@ function Exames() {
               }}>
               {item.nome_exame != null ? item.nome_exame.toUpperCase() : ''}
             </div>
-            <div className='button-red' style={{ flex: 1, paddingLeft: 15, paddingRight: 15 }}>{item.codigo_exame}</div>
+            <div className='button' style={{ flex: 1, paddingLeft: 15, paddingRight: 15, pointerEvents: 'none' }}>{item.codigo_exame}</div>
             <div id="botão para excluir exame laboratorial"
               className='button-red'
-              style={{
-                display: 'flex',
-                // maxWidth: 30, width: 30, minWidth: 30,
-                // maxHeight: 30, height: 30, minHeight: 30
-              }}
+              style={{ display: 'flex' }}
               onClick={(e) => {
                 deleteLaboratorio(item.id);
                 e.stopPropagation();
@@ -675,21 +675,18 @@ function Exames() {
     <div id="tela para solicitação de exames complementares e liberação de guia TISS SADT."
       style={{
         display: card == 'exames' || card == 'guia-sadt' ? 'flex' : 'none',
-        flexDirection: 'column',
-        justifyContent: 'center'
+        flexDirection: 'row',
+        justifyContent: 'center',
+        height: '100%',
+        width: '100%',
       }}
     >
-      <div
-        style={{
-          display: 'flex', flexDirection: 'row', justifyContent: 'center',
-        }}>
-        <ListaDeExames></ListaDeExames>
-        <PackExames></PackExames>
-        <FormInsertExame></FormInsertExame>
-        <GuiaSadt></GuiaSadt>
-        <InsertModeloExames></InsertModeloExames>
-        <ModelosPackExames></ModelosPackExames>
-      </div>
+      <ListaDeExames></ListaDeExames>
+      <PackExames></PackExames>
+      <FormInsertExame></FormInsertExame>
+      <GuiaSadt></GuiaSadt>
+      <InsertModeloExames></InsertModeloExames>
+      <ModelosPackExames></ModelosPackExames>
     </div>
   )
 }

@@ -40,11 +40,12 @@ function Header() {
           <div style={{
             display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', fontSize: 10,
             marginRight: 50,
-            width: '30vw',
+            width: '100%',
           }}>
             <div style={{ fontSize: 10 }}>{cliente.razao_social}</div>
             <div style={{ fontSize: 10 }}>{'ENDEREÇO: ' + cliente.endereco}</div>
             <div style={{ fontSize: 10 }}>{'TELEFONE: ' + cliente.telefone}</div>
+            <div style={{ fontSize: 10 }}>{'EMAIL: ' + cliente.email}</div>
           </div>
         </div>
         <div

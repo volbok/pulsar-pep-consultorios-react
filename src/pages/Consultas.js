@@ -188,15 +188,25 @@ function Consultas() {
     return (
       <div id="identificação do usuário, filtro de pacientes e botões principais"
         style={{
-          display: 'flex', flexDirection: 'column', justifyContent: 'center',
-          alignContent: 'center', width: 'calc(100% - 10px)', alignSelf: 'center',
+          display: 'flex', flexDirection: 'row',
+          justifyContent: 'center',
+          alignContent: 'center',
+          alignSelf: 'center',
+          flexWrap: 'wrap',
+          marginBottom: 5,
+          width: '100%',
+          // backgroundColor: 'yellow'
+
         }}>
         <div className="text1" style={{ alignSelf: 'flex-start', margin: 0 }}>{'USUÁRIO: ' + usuario.nome_usuario.split(' ', 1)}</div>
         <div
           style={{
             display: "flex",
             flexDirection: "row",
-            marginBottom: 10,
+            justifyContent: 'center',
+            flexWrap: 'wrap',
+            alignContent: 'center',
+            alignSelf: 'center',
           }}
         >
           <div
@@ -241,7 +251,9 @@ function Consultas() {
               }}
             ></img>
           </div>
-          {Filter('inputFilterConsulta', setarrayatendimentos, atendimentos, 'item.nome_paciente')}
+          <div style={{ width: 200 }}>
+            {Filter('inputFilterConsulta', setarrayatendimentos, atendimentos, 'item.nome_paciente')}
+          </div>
         </div>
       </div>
     );
@@ -399,8 +411,9 @@ function Consultas() {
         style={{
           display: "flex",
           flexDirection: "column",
-          justifyContent: "space-between",
-          height: '75vh',
+          justifyContent: "flex-start",
+          height: 200,
+          flexGrow: 1,
         }}
       >
         <div id="scroll atendimentos com pacientes"
@@ -408,8 +421,8 @@ function Consultas() {
           style={{
             display: arrayatendimentos.length > 0 ? "flex" : "none",
             justifyContent: "flex-start",
-            height: window.innerWidth < mobilewidth ? '72vh' : '75vh',
-            width: 'calc(100% - 20px)', marginTop: 5,
+            width: 'calc(100% - 15px)',
+            height: '100%',
           }}
         >
           <div className="text3">
@@ -443,7 +456,6 @@ function Consultas() {
                         borderTopRightRadius: 0,
                         borderBottomRightRadius: 0,
                         minHeight: 100,
-                        // height: 100,
                         width: 80, minWidth: 80, maxWidth: 80,
                         backgroundColor: '#006666'
                       }}
@@ -537,6 +549,8 @@ function Consultas() {
                           padding: 5,
                           alignItems: 'flex-start',
                           textAlign: 'left',
+                          marginBottom: 5,
+                          width: '100%',
                         }}
                       >
                         <div style={{
@@ -563,21 +577,51 @@ function Consultas() {
                                 .map((item) => item.dn_paciente)
                             ),
                             "years"
-                          ) + " ANOS"}
+                          ) > 1 ?
+                            moment().diff(
+                              moment(
+                                pacientes
+                                  .filter(
+                                    (valor) => valor.id_paciente == item.id_paciente
+                                  )
+                                  .map((item) => item.dn_paciente)
+                              ),
+                              "years"
+                            ) + " ANOS"
+                            :
+                            moment().diff(
+                              moment(
+                                pacientes
+                                  .filter(
+                                    (valor) => valor.id_paciente == item.id_paciente
+                                  )
+                                  .map((item) => item.dn_paciente)
+                              ),
+                              "years"
+                            ) + " ANO E " + moment().diff(
+                              moment(
+                                pacientes
+                                  .filter(
+                                    (valor) => valor.id_paciente == item.id_paciente
+                                  )
+                                  .map((item) => item.dn_paciente)
+                              ),
+                              "months"
+                            ) + " MESES"
+                          }
                         </div>
 
                         <div id={'btn_seletor_observacoes_consultas ' + item.id_atendimento}
-                          className='button green'
+                          className='text2'
                           title="CLIQUE PARA VER OBSERVAÇÕES DO ATENDIMENTO."
                           style={{
-                            borderRadius: 50,
-                            minHeight: 5,
-                            height: 5,
-                            maxHeight: 5,
-                            minWidth: 5,
-                            width: 5,
-                            maxWidth: 5,
+                            textDecoration: 'underline',
+                            fontSize: 12,
+                            justifyContent: 'flex-start',
+                            alignSelf: 'flex-start',
+                            margin: 5,
                             marginLeft: 0,
+                            padding: 0,
                           }}
                           onClick={() => {
                             let element = document.getElementById('input_atendimento_problemas_consultas ' + item.id_atendimento);
@@ -593,6 +637,7 @@ function Consultas() {
                             }
                           }}
                         >
+                          OBS
                         </div>
                         <textarea id={'input_atendimento_problemas_consultas ' + item.id_atendimento}
                           autoComplete="off"
@@ -619,10 +664,10 @@ function Consultas() {
                             width: 'calc(100% - 20px)',
                             padding: 5,
                             marginLeft: 5,
-                            marginBottom: 0,
                             height: 60,
                             minHeight: 60,
                             maxHeight: 60,
+                            marginBottom: 32,
                           }}
                         ></textarea>
 
@@ -733,8 +778,8 @@ function Consultas() {
           style={{
             display: arrayatendimentos.length < 1 ? "flex" : "none",
             justifyContent: "flex-start",
-            height: window.innerWidth < mobilewidth ? '72vh' : '75vh',
-            width: 'calc(100% - 20px)',
+            width: 'calc(100% - 15px)',
+            height: '100%',
           }}
         >
           <div className="text3" style={{ opacity: 0.5 }}>
@@ -828,7 +873,7 @@ function Consultas() {
             className="button"
             style={{
               display: sinal != null && sinal.length > 0 ? 'flex' : 'none',
-              position: 'absolute', bottom: -15, right: -15,
+              position: 'absolute', bottom: -10, right: -10,
               borderRadius: 50,
               backgroundColor: '#EC7063',
               borderStyle: 'solid',
@@ -851,16 +896,20 @@ function Consultas() {
       <div
         className="chassi"
         id="conteúdo do prontuário"
-        style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly' }}
+        style={{
+          display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly',
+        }}
       >
         <div id="usuário, botões, busca de paciente e lista de pacientes"
           style={{
             display: window.innerWidth < mobilewidth && viewlista == 0 ? "none" : "flex",
-            flexDirection: 'column', justifyContent: 'center',
-            position: 'sticky', top: 5,
-            width: window.innerWidth < mobilewidth ? '90vw' : '30vw',
-            height: '95%',
-            alignSelf: 'center',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            position: 'sticky', top: 0,
+            margin: 0,
+            marginRight: 5,
+            // backgroundColor: 'red',
+            width: window.innerWidth < 800 ? '30vw' : '25vw'
           }}
         >
           <Usuario></Usuario>
@@ -868,8 +917,10 @@ function Consultas() {
         </div>
         <div style={{
           display: 'flex', flexDirection: 'column',
-          justifyContent: 'center',
-          // height: 'calc(100vh - 20px)',
+          justifyContent: 'flex-end',
+          marginLeft: 5,
+          width: window.innerWidth < 800 ? '65vw' : '70vw',
+          // backgroundColor: 'green',
         }}>
           <div id="cards (cartões) fixos"
             className="scroll"
@@ -877,11 +928,13 @@ function Consultas() {
               display: 'flex',
               flexDirection: 'row',
               justifyContent: 'flex-start',
-              width: '60vw', alignSelf: 'center',
+              alignSelf: 'center',
               overflowX: 'scroll',
               overflowY: 'hidden',
-              margin: 10,
+              margin: 0,
+              marginBottom: 10,
               minHeight: 80,
+              width: 'calc(100% - 15px)',
               opacity: atendimento == null ? 0.5 : 1,
             }}>
             {cartao(alergias, "ALERGIAS", "card-alergias", busyalergias, 0)}
@@ -895,11 +948,13 @@ function Consultas() {
           </div>
           <div id="conteúdo cheio (componentes)"
             style={{
+              // display: 'flex',
               display: card == '' ? 'none' : 'flex',
-              flexDirection: "row",
+              flexDirection: "column",
+              justifyContent: 'center',
               flexWrap: "wrap",
-              width: window.innerWidth < mobilewidth ? '90vw' : '65vw',
-              height: '80vh',
+              height: '100%',
+              width: '100%',
             }}
           >
             <Alergias></Alergias>
@@ -910,13 +965,13 @@ function Consultas() {
           <div id="conteúdo vazio"
             className="lupa"
             style={{
+              // display: 'none',
               display: window.innerWidth < mobilewidth ? "none" : card == '' ? "flex" : "none",
-              flexDirection: "row",
+              flexDirection: "column",
               justifyContent: 'center',
-              alignSelf: 'center',
               flexWrap: "wrap",
-              width: '65vw',
-              height: '80vh',
+              height: '100%',
+              width: '100%',
             }}
           >
             <img

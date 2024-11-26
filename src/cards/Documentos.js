@@ -4,6 +4,7 @@ import React, { useContext, useState, useEffect, useCallback } from 'react';
 import Context from '../pages/Context';
 import axios from 'axios';
 import moment from "moment";
+import VanillaCaret from 'vanilla-caret-js';
 // funções.
 import selector from '../functions/selector';
 // imagens.
@@ -508,14 +509,13 @@ function Documentos() {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          width: '25vw',
           margin: 0, marginLeft: 10,
+          width: '25vw',
           height: '100%',
         }}
       >
         <div style={{
           display: 'flex', flexDirection: 'row', justifyContent: 'center',
-          marginBottom: 10,
         }}>
           <div id="botão para sair da tela de documentos"
             className="button-yellow"
@@ -556,10 +556,11 @@ function Documentos() {
           id="lista de documentos"
           className='scroll'
           style={{
+            display: 'flex',
             backgroundColor: 'white',
             borderColor: 'white',
-            height: '100%', marginBottom: 0.5,
-            width: 'calc(100% - 20px)',
+            height: 'calc(100vh - 200px)',
+            width: 'calc(100% - 15px)',
           }}
         >
           {documentos.filter(item => item.tipo_documento == tipodocumento).map((item) => (
@@ -676,58 +677,138 @@ function Documentos() {
   }, [documentos]);
 
   function FieldDocumento() {
+    // menu de atalho, com informações importantes para inserção no texto.
+    const [viewmenucolinha, setviewmenucolinha] = useState(0);
+    const putcolinha = (tag, dado) => {
+      return (
+        <div className='button' style={{ width: 250, justifyContent: 'flex-start', paddingLeft: 10 }}
+          onClick={() => {
+            if (objpaciente != null) {
+              setviewmenucolinha(0);
+              let element = document.getElementById("inputFieldDocumento");
+              let corte = localStorage.getItem('caret');
+              console.log(corte);
+              let texto = element.value;
+              console.log(texto);
+              let text_before = texto.slice(0, corte);
+              let text_after = texto.slice(corte, texto.length);
+              element.value = text_before + ' ' + dado + ' ' + text_after;
+              let caret = new VanillaCaret(document.getElementById("inputFieldDocumento"));
+              let novocorte = parseInt(corte) + parseInt(dado.length) + 1;
+              console.log(novocorte);
+              element.focus();
+              caret.setPos(parseInt(novocorte));
+            }
+          }}
+        >
+          {objpaciente != null ? tag + ': ' + dado : ''}
+        </div>
+      )
+    }
+    function MenuColinhas() {
+      return (
+        <div className='janela scroll menucolinha'
+          id="menucolinha"
+          style={{
+            display: viewmenucolinha == 1 ? 'flex' : 'none',
+            // display: 'flex',
+            position: 'absolute',
+            alignSelf: 'center',
+            bottom: 5,
+            left: 5,
+            zIndex: 10,
+            height: 280,
+          }}
+          onMouseOver={() => {
+            document.getElementById('menucolinha').style.backgroundColor = '#85c1e9';
+            document.getElementById('menucolinha').style.borderColor = '#85c1e9';
+          }}
+          onMouseLeave={() => {
+            document.getElementById('menucolinha').style.backgroundColor = '#a6cee8';
+            document.getElementById('menucolinha').style.borderColor = '#a6cee8';
+          }}
+        >
+          {putcolinha('HOJE', moment().format('DD/MM/YYYY'))}
+          {putcolinha('PACIENTE', objpaciente != null ? objpaciente.nome_paciente : '')}
+          {putcolinha('DN', objpaciente != null ? moment(objpaciente.dn_paciente).format('DD/MM/YY') : '')}
+          {putcolinha('DOCUMENTO', objpaciente != null ? objpaciente.numero_documento : '')}
+          {putcolinha('MÃE', objpaciente != null ? objpaciente.nome_mae_paciente : '')}
+        </div>
+      )
+    }
     return (
-      < textarea
-        id="inputFieldDocumento"
-        className="textarea"
-        autoComplete='off'
-        placeholder={selecteddocumento.length == 0 ? 'SELECIONE UM DOCUMENTO NA LISTA À DIREITA' : 'DIGITE AQUI O TEXTO DO DOCUMENTO.'}
-        // onMouseOver={() => console.log(selecteddocumento)}
-        onFocus={(e) => (e.target.placeholder = '')}
-        onBlur={(e) => (e.target.placeholder = 'DIGITE AQUI O TEXTO DO DOCUMENTO.')}
-        style={{
-          display: 'flex',
-          flexDirection: 'row', justifyContent: 'center',
-          alignSelf: 'center', alignContent: 'center',
-          whiteSpace: 'pre-wrap',
-          height: 'calc(100% - 30px)',
-          width: 'calc(100% - 40px)',
-          margin: 0,
-          borderRadius: 5,
-          pointerEvents: selecteddocumento.length == 0 ? 'none' : 'auto',
-          position: 'relative',
-          opacity: selecteddocumento.length == 0 ? 0.3 : 1,
-          overflowY: 'unset',
-        }}
-        onChange={() => {
-          if (selecteddocumento.status == 1) {
-            toast(settoast, 'ESTE DOCUMENTO JÁ FOI ASSINADO E NÃO PODE SER ALTERADO', '#EC7063', 2000);
-            setTimeout(() => {
-              document.getElementById("inputFieldDocumento").value = selecteddocumento.texto;
-              selector("lista de documentos", 'documento ' + selecteddocumento.id, 100);
-            }, 2100);
-          }
-        }}
-        onKeyUp={(e) => {
-          let textarea = document.getElementById('inputFieldDocumento');
-          console.log(textarea.scrollTop);
-          let texto = document.getElementById("inputFieldDocumento").value.toUpperCase();
-          if (selecteddocumento.status == 0) {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
-              if (document.getElementById("inputFieldDocumento").value != '') {
-                texto = document.getElementById("inputFieldDocumento").value.toUpperCase();
-                localStorage.setItem("id", selecteddocumento.id);
-                localStorage.setItem("texto", texto);
-                console.log('ID:' + localStorage.getItem("id"));
-                updateDocumento(selecteddocumento, document.getElementById("inputFieldDocumento").value.toUpperCase(), 0);
-              }
-              e.stopPropagation();
-            }, 2000);
-          }
-        }}
-      >
-      </textarea >
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: 'calc(100%)', position: 'relative'
+      }}>
+        <textarea
+          id="inputFieldDocumento"
+          className="textarea"
+          autoComplete='off'
+          placeholder={selecteddocumento.length == 0 ? 'SELECIONE UM DOCUMENTO NA LISTA À DIREITA' : 'DIGITE AQUI O TEXTO DO DOCUMENTO.'}
+          onFocus={(e) => (e.target.placeholder = '')}
+          onBlur={(e) => (e.target.placeholder = 'DIGITE AQUI O TEXTO DO DOCUMENTO.')}
+          style={{
+            display: 'flex',
+            flexDirection: 'row', justifyContent: 'center',
+            alignContent: 'center',
+            whiteSpace: 'pre-wrap',
+            margin: 0,
+            borderRadius: 5,
+            pointerEvents: selecteddocumento.length == 0 ? 'none' : 'auto',
+            position: 'relative',
+            opacity: selecteddocumento.length == 0 ? 0.3 : 1,
+            overflowY: 'unset',
+            width: 'calc(100% - 30px)',
+            height: '100%',
+          }}
+          onClick={() => setviewmenucolinha(0)}
+          onChange={() => {
+            if (selecteddocumento.status == 1) {
+              toast(settoast, 'ESTE DOCUMENTO JÁ FOI ASSINADO E NÃO PODE SER ALTERADO', '#EC7063', 2000);
+              setTimeout(() => {
+                document.getElementById("inputFieldDocumento").value = selecteddocumento.texto;
+                selector("lista de documentos", 'documento ' + selecteddocumento.id, 100);
+              }, 2100);
+            }
+          }}
+
+          onKeyDown={(e) => {
+            // capturando a posição da caret.
+            if (e.key == "|") { // tecla de barra invertida >> "\" (para o menucolinhas!).
+              e.preventDefault();
+              let caret = new VanillaCaret(document.getElementById(document.activeElement.id));
+              console.log(caret.getPos());
+              localStorage.setItem('caret', caret.getPos());
+              setviewmenucolinha(1);
+            } else if (e.keyCode == 27) { // tecla esc
+              setviewmenucolinha(0);
+            }
+          }}
+
+          onKeyUp={(e) => {
+            let textarea = document.getElementById('inputFieldDocumento');
+            console.log(textarea.scrollTop);
+            let texto = document.getElementById("inputFieldDocumento").value.toUpperCase();
+            if (selecteddocumento.status == 0) {
+              clearTimeout(timeout);
+              timeout = setTimeout(() => {
+                if (document.getElementById("inputFieldDocumento").value != '') {
+                  texto = document.getElementById("inputFieldDocumento").value.toUpperCase();
+                  localStorage.setItem("id", selecteddocumento.id);
+                  localStorage.setItem("texto", texto);
+                  console.log('ID:' + localStorage.getItem("id"));
+                  updateDocumento(selecteddocumento, document.getElementById("inputFieldDocumento").value.toUpperCase(), 0);
+                }
+                e.stopPropagation();
+              }, 2000);
+            }
+          }}
+        >
+        </textarea>
+        <MenuColinhas></MenuColinhas>
+      </div>
     )
   }
 
@@ -1117,16 +1198,26 @@ function Documentos() {
       style={{
         display: card.toString().substring(0, 14) == 'card-documento' ? 'flex' : 'none',
         flexDirection: 'row',
-        justifyContent: 'center',
-        height: '75vh',
+        justifyContent: 'space-between',
         position: 'relative',
-        alignSelf: 'center',
+        padding: 0,
+        margin: 0,
+        width: '100%',
+        alignContent: 'flex-end',
+        alignItems: 'flex-end',
+        // backgroundColor: 'blue',
       }}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', width: '100%', position: 'relative' }}>
+      <div style={{
+        display: 'flex',
+        flexDirection: 'column',
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+      }}>
         <div style={{
           display: selecteddocumento.length == 0 || selecteddocumento.status > 0 ? 'none' : 'flex',
-          position: 'absolute', bottom: 5, right: 10, zIndex: 20
+          position: 'absolute', bottom: 5, right: 5, zIndex: 20
         }}>
           <Gravador funcao={voiceField} continuo={true} ></Gravador>
         </div>
