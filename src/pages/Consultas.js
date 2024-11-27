@@ -568,16 +568,7 @@ function Consultas() {
                             .map((valor) => valor.nome_paciente)}
                         </div>
                         <div>
-                          {moment().diff(
-                            moment(
-                              pacientes
-                                .filter(
-                                  (valor) => valor.id_paciente == item.id_paciente
-                                )
-                                .map((item) => item.dn_paciente)
-                            ),
-                            "years"
-                          ) > 1 ?
+                          {
                             moment().diff(
                               moment(
                                 pacientes
@@ -588,26 +579,6 @@ function Consultas() {
                               ),
                               "years"
                             ) + " ANOS"
-                            :
-                            moment().diff(
-                              moment(
-                                pacientes
-                                  .filter(
-                                    (valor) => valor.id_paciente == item.id_paciente
-                                  )
-                                  .map((item) => item.dn_paciente)
-                              ),
-                              "years"
-                            ) + " ANO E " + moment().diff(
-                              moment(
-                                pacientes
-                                  .filter(
-                                    (valor) => valor.id_paciente == item.id_paciente
-                                  )
-                                  .map((item) => item.dn_paciente)
-                              ),
-                              "months"
-                            ) + " MESES"
                           }
                         </div>
 
