@@ -2,7 +2,7 @@
 import React, { useContext, useState, useEffect } from 'react';
 import Context from '../pages/Context';
 import axios from 'axios';
-import moment from "moment";
+// import moment from "moment";
 
 // imagens.
 import back from '../images/back.svg';
@@ -317,7 +317,7 @@ function GuiaSadt() {
         </div>
         <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
           {pdfcampo('21 - CARÁTER DO ATENDIMENTO', '1 - ELETIVO', 1)}
-          {pdfcampo('22 - DATA DA SOLICITAÇÃO', moment().format('DD/MM/YYYY'), 1)}
+          {pdfcampo('22 - DATA DA SOLICITAÇÃO', '', 1)}
           {pdfcampo('23 - INDICAÇÃO CLÍNICA', '______________________', 4)}
         </div>
         <div id='linhas dos registros de exames solicitados'
@@ -944,7 +944,7 @@ function GuiaSadt() {
               <div className='grupo'>{'DADOS DA SOLICITAÇÃO / PROCEDIMENTOS OU ITENS ASSISTENCIAIS SOLICITADOS'}</div>
               <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
                 {editcampovalor('21 - CARÁTER DO ATENDIMENTO', '1 - ELETIVO', 200, 0)}
-                {editcampovalor('22 - DATA DA SOLICITAÇÃO', moment().format('DD/MM/YYYY'), 250, 0)}
+                {editcampovalor('22 - DATA DA SOLICITAÇÃO', '', 250, 0)}
                 {editcampovalor('23 - INDICAÇÃO CLÍNICA', '', '', 1)}
               </div>
               <div id='linhas dos registros de exames solicitados'
