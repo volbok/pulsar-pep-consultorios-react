@@ -52,6 +52,7 @@ function Documentos() {
   } = useContext(Context);
 
   const loadDocumentos = () => {
+    setdocumentos([]);
     axios.get(html + "list_documentos/" + atendimento).then((response) => {
       var x = response.data.rows;
       setdocumentos(x.sort((a, b) => moment(a.data) < moment(b.data) ? 1 : -1));
@@ -665,9 +666,12 @@ function Documentos() {
                 </div>
               </div>
               <div>{tipodocumento}</div>
+              <div style={{ fontSize: 12, marginTop: 10, whiteSpace: 'pre-wrap', marginBottom: 5 }}>{'DR(A) ' + item.profissional}</div>
+              <div style={{ fontSize: 12, marginBottom: 5 }}>
+                {item.registro_profissional}
+              </div>
               <div>{moment(item.data).format('DD/MM/YY')}</div>
               <div>{moment(item.data).format('HH:mm')}</div>
-              <div style={{ fontSize: 12, marginTop: 10, whiteSpace: 'pre-wrap', marginBottom: 5 }}>{item.profissional}</div>
             </div>
           ))}
         </div>

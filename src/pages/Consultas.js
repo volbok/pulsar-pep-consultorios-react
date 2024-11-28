@@ -406,6 +406,22 @@ function Consultas() {
       });
   };
   const ListaDeAtendimentos = useCallback(() => {
+    const mountAge = (item) => {
+      console.log('DN: ' + item);
+      let meses = moment().diff(moment(item, 'DD/MM/YYYY'), 'months');
+      console.log('MESES: ' + meses);
+      let anos = Math.floor(meses / 12);
+      console.log('ANOS: ' + anos)
+      let meses_restantes = meses - (anos * 12);
+      if (anos > 1) {
+        return anos + ' ANOS E ' + meses_restantes + ' MESES';
+      } else if (anos == 1) {
+        return anos + ' ANO E ' + meses_restantes + ' MESES';
+      } else {
+        return meses_restantes + ' MESES';
+      }
+    }
+
     return (
       <div
         style={{
@@ -567,19 +583,13 @@ function Consultas() {
                           )
                             .map((valor) => valor.nome_paciente)}
                         </div>
-                        <div>
-                          {
-                            moment().diff(
-                              moment(
-                                pacientes
-                                  .filter(
-                                    (valor) => valor.id_paciente == item.id_paciente
-                                  )
-                                  .map((item) => item.dn_paciente)
-                              ),
-                              "years"
-                            ) + " ANOS"
-                          }
+                        <div style={{ display: 'flex' }}>
+                          {mountAge(pacientes.filter((valor) => valor.id_paciente == item.id_paciente)
+                            .map((valor) => moment(valor.dn_paciente).format('DD/MM/YYYY')))}
+                        </div>
+                        <div style={{ display: 'none' }}>
+                          {pacientes.filter((valor) => valor.id_paciente == item.id_paciente)
+                            .map((valor) => moment(valor.dn_paciente).format('DD/MM/YYYY'))}
                         </div>
 
                         <div id={'btn_seletor_observacoes_consultas ' + item.id_atendimento}

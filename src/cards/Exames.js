@@ -307,10 +307,10 @@ function Exames() {
                 </div>
               </div>
               <div style={{ padding: 10, display: 'flex', flexDirection: 'column' }}>
-                <div style={{ fontSize: 10 }}>
+                <div style={{ fontSize: 12 }}>
                   {'DR(A) ' + item.nome_profissional}
                 </div>
-                <div style={{ fontSize: 10, marginBottom: 5 }}>
+                <div style={{ fontSize: 12, marginBottom: 5 }}>
                   {item.registro_profissional}
                 </div>
                 <div>

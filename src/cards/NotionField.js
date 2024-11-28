@@ -160,7 +160,6 @@ function NotionField() {
       >
         <div style={{
           display: 'flex', flexDirection: 'row', justifyContent: 'center',
-          marginBottom: 10,
         }}>
           <div id="botão para sair da tela de documentos"
             className="button-yellow"
@@ -328,6 +327,8 @@ function NotionField() {
       insereFirstP();
     } else if (tipo == 'bloco') {
       insereBloco();
+    } else if (tipo == 'imagem'){
+      insereImagem();
     }
   }
 
@@ -436,6 +437,9 @@ function NotionField() {
     }
     document.getElementById(element.id).focus();
     localStorage.setItem('element', element.id);
+  }
+  const insereImagem = () => {
+    
   }
 
 
@@ -571,7 +575,7 @@ function NotionField() {
     }}>
       <MenuColinhas></MenuColinhas>
       <div style={{
-        display: 'flex', flexDirection: 'column', justifyContent: 'center',
+        display: 'flex', flexDirection: 'column', justifyContent: 'flex-end',
         width: '100%',
         height: '100%',
         position: 'relative',
@@ -580,11 +584,11 @@ function NotionField() {
         <div id='menu'
           style={{
             display: 'flex',
-            flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap',
+            flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', 
             width: '100%',
             opacity: selecteddocumento.length == 0 || selecteddocumento.status == 1 ? 0.3 : 1,
             pointerEvents: selecteddocumento.length == 0 || selecteddocumento.status == 1 ? 'none' : 'auto',
-            marginBottom: 2.5,
+            marginBottom: 10,
           }}
           onMouseOver={() => console.log(selecteddocumento)}
         >
@@ -606,6 +610,12 @@ function NotionField() {
           >
             BLOCO
           </div>
+          <div className='button'
+            onClick={() => appendElement('imagem')}
+            style={{ width: 100 }}
+          >
+            IMAGEM
+          </div>
         </div>
         <div id='notionfield'
           className='scroll'
@@ -613,7 +623,7 @@ function NotionField() {
             display: 'flex',
             flexDirection: 'column', justifyContent: 'flex-start',
             alignContent: 'flex-start',
-            height: 'calc(100% - 20px)',
+            height: 'calc(100vh - 200px)',
             width: 'calc(100% - 15px)',
             backgroundColor: 'white',
             borderColor: 'white',
