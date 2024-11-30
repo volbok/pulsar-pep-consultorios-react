@@ -82,6 +82,7 @@
   line-break: normal !important;
   word-wrap: break-word;
   height: auto !important;
+  min-height: 25px;
   overflow: auto !important;
 }
 
@@ -110,6 +111,7 @@
   line-break: normal !important;
   word-wrap: break-word;
   height: auto !important;
+  min-height: 30px;
   overflow: auto !important;
 }
 
@@ -138,9 +140,11 @@
   word-wrap: break-word;
   overflow: auto !important;
   height: auto !important;
+  min-height: 25px;
   width: 300px;
   align-self: center;
   background-color: #e5e8e8;
+  transition: 500ms, 500ms ease-in-out;
 }
 
 .notion_block:focus {
@@ -149,9 +153,75 @@
   box-shadow: none;
   background-color: #ccd1d1;
   width: 310px;
+  transition: 500ms, 500ms ease-in-out;
 }
 
+.notion_canvas {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-self: center;
+  background-color: #e5e8e8;
+  border-radius: 5px;
+  opacity: 0.9;
+  transition: 500ms, 500ms ease-in-out;
+}
 
+.notion_canvas:hover {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-self: center;
+  background-color: rgb(133, 193, 233, 0.3);
+  border-radius: 5px;
+  opacity: 1;
+  transition: 500ms, 500ms ease-in-out;
+}
+
+.notion_image_pequeno {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-self: center;
+  background-color: #e5e8e8;
+  border-radius: 5px;
+  opacity: 1;
+  width: 50%;
+  transition: 500ms, 500ms ease-in-out;
+}
+
+.notion_image_grande {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-self: center;
+  background-color: #e5e8e8;
+  border-radius: 5px;
+  opacity: 1;
+  width: 70%;
+  transition: 500ms, 500ms ease-in-out;
+}
+
+.notion_img_button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  align-self: center;
+  color: #ffffff;
+  font-weight: bold;
+  min-width: 50px;
+  width: 170px;
+  min-height: 50px;
+  background-color: var(--cor1opaque);
+  border: none;
+  border-color: transparent;
+  border-radius: 5px;
+  outline: 0px;
+  margin: 5px;
+  padding: 5px;
+  cursor: default;
+}
 
 /* GUIAS TISS */
 .grupo {

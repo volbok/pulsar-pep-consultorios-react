@@ -73,6 +73,32 @@
   background-color: #e5e8e8;
 }
 
+.notion_canvas {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-self: center;
+  background-color: #e5e8e8;
+  border-radius: 5;
+  width: 30vw;
+  height: 30vh;
+  opacity: 0.9;
+  transition: 500ms, 500ms ease-in-out;
+}
+
+.notion_canvas:hover {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-self: center;
+  background-color: white;
+  border-radius: 5;
+  width: 35vw;
+  height: 35vh;
+  opacity: 1;
+  transition: 500ms, 500ms ease-in-out;
+}
+
 .document {
   display: flex;
   flex-direction: row;
@@ -154,4 +180,36 @@
     margin-bottom: 2.5px !important;
     padding: 2.5px !important;
   }
+
+  .notion_canvas {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-self: center;
+    background-color: #e5e8e8;
+    border-radius: 5;
+    opacity: 0.9;
+    transition: 500ms, 500ms ease-in-out;
+  }
+
+  .notion_img_button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: #ffffff;
+    font-weight: bold;
+    min-width: 50px;
+    width: 100px;
+    min-height: 50px;
+    background-color: var(--cor1opaque);
+    border: none;
+    border-color: transparent;
+    border-radius: 5px;
+    outline: 0px;
+    margin: 5px;
+    padding: 5px;
+    cursor: default;
+  }
+  
 }

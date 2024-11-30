@@ -327,7 +327,7 @@ function NotionField() {
       insereFirstP();
     } else if (tipo == 'bloco') {
       insereBloco();
-    } else if (tipo == 'imagem'){
+    } else if (tipo == 'imagem') {
       insereImagem();
     }
   }
@@ -439,9 +439,119 @@ function NotionField() {
     localStorage.setItem('element', element.id);
   }
   const insereImagem = () => {
-    
-  }
+    console.log('insere canvas');
 
+    // criando o random para tratamento dos id's dos elementos.
+    let random = Math.random();
+
+    // criando os elementos HTML.
+    let element_canvas = null;
+    let element_input = null;
+    let element_pseudo_input = null;
+    let img = null;
+    let element_image = null;
+
+    element_canvas = document.createElement("canvas");
+    element_canvas.id = 'notionblock_canvas ' + random;
+    element_canvas.className = 'notion_canvas'
+
+    element_input = document.createElement("input");
+    element_input.type = 'file';
+    element_input.id = 'notionblock_picker ' + random;
+    element_input.style.display = 'none';
+
+    element_pseudo_input = document.createElement("div");
+    element_pseudo_input.className = "notion_img_button";
+    element_pseudo_input.innerText = 'ESCOLHER IMAGEM';
+    element_pseudo_input.id = 'notionblock_pseudo_picker ' + random;
+
+    if (document.getElementById('notionfield').nextElementSibling != null) {
+      document.getElementById("notionfield").insertBefore(element_canvas, document.activeElement.nextSibling);
+      document.getElementById("notionfield").insertBefore(element_input, document.activeElement.nextSibling);
+      document.getElementById("notionfield").insertBefore(element_pseudo_input, document.activeElement.nextSibling);
+    } else {
+      document.getElementById("notionfield").appendChild(element_canvas);
+      document.getElementById("notionfield").appendChild(element_input);
+      document.getElementById("notionfield").appendChild(element_pseudo_input);
+    }
+
+    // adicionando as funções para abrir a janela do explorer e capturar uma imagem.
+    element_pseudo_input.addEventListener('click', function () {
+      document.getElementById('notionblock_picker ' + random).click();
+    })
+    element_input.addEventListener('change', function () {
+      // removendo o elemento imagem, caso existente, e adicionando o elemento canvas.
+      if (element_image != null) {
+        document.getElementById('notionblock_img ' + random).remove();
+      }
+      document.getElementById("notionfield").appendChild(element_canvas);
+
+      // carregando a imagem selecionada no explorador de arquivos no canvas.
+      let canvas = document.getElementById(element_canvas.id);
+      canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
+      const myFile = document.getElementById('notionblock_picker ' + random).files[0];
+      img = new Image();
+      img.src = URL.createObjectURL(myFile);
+      img.onload = () => {
+        console.log('image uploaded');
+
+        console.log('IMG WIDTH: ' + img.width);
+        console.log('IMG HEIGHT: ' + img.height);
+
+        let notionfieldwidth = document.getElementById("notionfield").offsetWidth;
+        let ratio = notionfieldwidth / img.width;
+
+        if (notionfieldwidth < img.width) {
+          console.log('imagem grande!');
+          canvas.width = 0.6 * ratio * img.width;
+          canvas.height = 0.6 * ratio * img.height;
+          console.log('VEJA: ' + canvas.width + ' - ' + canvas.height);
+        } else {
+          console.log('imagem menor...');
+          canvas.width = 0.7 * img.width;
+          canvas.height = 0.7 * img.height;
+          console.log('VEJA: ' + canvas.width + ' - ' + canvas.height);
+        }
+
+        document.getElementById('notionblock_canvas ' + random).getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+
+        /*
+        // ajustando tamanho da imagem para a width do elemento pai (notionfield).
+        console.log(img.height + ' - ' + img.width);
+        let notionfieldwidth = document.getElementById("notionfield").offsetWidth;
+        console.log(notionfieldwidth);
+        let ratio = notionfieldwidth / img.width;
+        console.log(ratio);
+        if (notionfieldwidth < img.width) {
+          let newwidth = ratio * img.width;
+          let newheight = ratio * img.height;
+          console.log(newwidth + ' - ' + newheight);
+          document.getElementById('notionblock_canvas ' + random).width = newwidth;
+          document.getElementById('notionblock_canvas ' + random).height = newheight;
+        } else {
+          document.getElementById('notionblock_canvas ' + random).getContext('2d').clearRect(0, 0, img.width, img.height);
+          document.getElementById('notionblock_canvas ' + random).getContext('2d').drawImage(img, 0, 0, img.width, img.height);
+        }
+        */
+
+        // criando o elemento imagem e transferindo a figura para o elemento imagem.
+        element_image = document.createElement("img");
+        element_image.id = 'notionblock_img ' + random;
+        element_image.className = 'notion_image_grande';
+        element_image.src = document.getElementById('notionblock_canvas ' + random).toDataURL("image/jpeg");
+        document.getElementById("notionfield").appendChild(element_image);
+
+        // removendo o canvas com a imagem antiga e os elementos para seleção de um arquivo de imagem no computador.
+        document.getElementById('notionblock_canvas ' + random).remove();
+        document.getElementById('notionblock_picker ' + random).remove();
+        document.getElementById('notionblock_pseudo_picker ' + random).remove();
+
+        // recriar os elementos...
+        document.getElementById("notionfield").appendChild(element_input);
+        document.getElementById("notionfield").appendChild(element_pseudo_input);
+      }
+    })
+  }
 
   // menu de atalho, com informações importantes para inserção no texto.
   const [viewmenucolinha, setviewmenucolinha] = useState(0);
@@ -580,39 +690,43 @@ function NotionField() {
         height: '100%',
         position: 'relative',
         alignSelf: 'flex-end',
+        // backgroundColor: 'red',
       }}>
         <div id='menu'
+          className='scroll'
           style={{
             display: 'flex',
-            flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap', 
-            width: '100%',
+            flexDirection: 'row', justifyContent: 'flex-start', flexWrap: 'wrap',
+            alignSelf: 'center',
+            width: 'calc(100% - 15px)',
+            height: 50,
             opacity: selecteddocumento.length == 0 || selecteddocumento.status == 1 ? 0.3 : 1,
             pointerEvents: selecteddocumento.length == 0 || selecteddocumento.status == 1 ? 'none' : 'auto',
             marginBottom: 10,
           }}
-          onMouseOver={() => console.log(selecteddocumento)}
+        // onMouseOver={() => console.log(selecteddocumento)}
         >
           <div className='button'
             onClick={() => appendElement('titulo')}
-            style={{ width: 100 }}
+            style={{ width: 100, height: 30, minHeight: 30, maxHeight: 30 }}
           >
             TÍTULO
           </div>
           <div className='button'
             onClick={() => appendElement('texto')}
-            style={{ width: 100 }}
+            style={{ width: 100, height: 30, minHeight: 30, maxHeight: 30 }}
           >
             TEXTO
           </div>
           <div className='button'
             onClick={() => appendElement('bloco')}
-            style={{ width: 100 }}
+            style={{ width: 100, height: 30, minHeight: 30, maxHeight: 30 }}
           >
             BLOCO
           </div>
-          <div className='button'
+          <div className='button' for="uploader"
             onClick={() => appendElement('imagem')}
-            style={{ width: 100 }}
+            style={{ width: 100, height: 30, minHeight: 30, maxHeight: 30 }}
           >
             IMAGEM
           </div>
@@ -637,7 +751,7 @@ function NotionField() {
           }}
           onMouseMove={() => {
             localStorage.setItem('texto_notion', document.getElementById('notionfield').innerHTML);
-            console.log(document.getElementById('notionfield').innerHTML);
+            // console.log(document.getElementById('notionfield').innerHTML);
           }}
         >
         </div>
