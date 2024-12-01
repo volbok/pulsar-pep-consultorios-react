@@ -223,6 +223,27 @@
   cursor: default;
 }
 
+.notion_img_button_red {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  align-self: center;
+  color: #ffffff;
+  font-weight: bold;
+  min-width: 50px;
+  width: 170px;
+  min-height: 50px;
+  background-color: var(--red);
+  border: none;
+  border-color: transparent;
+  border-radius: 5px;
+  outline: 0px;
+  margin: 5px;
+  padding: 5px;
+  cursor: default;
+}
+
 /* GUIAS TISS */
 .grupo {
   font-size: 8px;

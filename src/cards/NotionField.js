@@ -446,14 +446,26 @@ function NotionField() {
 
     // criando os elementos HTML.
     let element_canvas = null;
+
+    let element_parent = null; // div que vai ter como elementos filhos o botão selecionar imagem, deletar imagem e botões de zoom.
     let element_input = null;
     let element_pseudo_input = null;
+    let element_delete = null;
+    // let element_zoom_up = null;
+    // let element_zoom_down = null;
+
     let img = null;
     let element_image = null;
 
     element_canvas = document.createElement("canvas");
     element_canvas.id = 'notionblock_canvas ' + random;
     element_canvas.className = 'notion_canvas'
+
+    element_parent = document.createElement("div");
+    element_parent.id = 'notionblock_parent ' + random;
+    element_parent.style.display = 'flex';
+    element_parent.style.flexDirection = 'row';
+    element_parent.style.justifyContent = 'center';
 
     element_input = document.createElement("input");
     element_input.type = 'file';
@@ -465,20 +477,34 @@ function NotionField() {
     element_pseudo_input.innerText = 'ESCOLHER IMAGEM';
     element_pseudo_input.id = 'notionblock_pseudo_picker ' + random;
 
+    element_delete = document.createElement("div");
+    element_delete.className = 'notion_img_button_red';
+    element_delete.innerText = 'EXCLUIR';
+    element_delete.id = 'notionblock_delete ' + random;
+
     if (document.getElementById('notionfield').nextElementSibling != null) {
       document.getElementById("notionfield").insertBefore(element_canvas, document.activeElement.nextSibling);
-      document.getElementById("notionfield").insertBefore(element_input, document.activeElement.nextSibling);
-      document.getElementById("notionfield").insertBefore(element_pseudo_input, document.activeElement.nextSibling);
+      document.getElementById("notionfield").insertBefore(element_parent, document.activeElement.nextSibling);
+      element_parent.appendChild(element_input);
+      element_parent.appendChild(element_pseudo_input);
+      element_parent.appendChild(element_delete);
+      //document.getElementById("notionfield").insertBefore(element_input, document.activeElement.nextSibling);
+      //document.getElementById("notionfield").insertBefore(element_pseudo_input, document.activeElement.nextSibling);
     } else {
       document.getElementById("notionfield").appendChild(element_canvas);
-      document.getElementById("notionfield").appendChild(element_input);
-      document.getElementById("notionfield").appendChild(element_pseudo_input);
+      document.getElementById("notionfield").insertBefore(element_parent, document.activeElement.nextSibling);
+      element_parent.appendChild(element_input);
+      element_parent.appendChild(element_pseudo_input);
+      element_parent.appendChild(element_delete);
+      // document.getElementById("notionfield").appendChild(element_input);
+      // document.getElementById("notionfield").appendChild(element_pseudo_input);
     }
 
     // adicionando as funções para abrir a janela do explorer e capturar uma imagem.
     element_pseudo_input.addEventListener('click', function () {
       document.getElementById('notionblock_picker ' + random).click();
     })
+    
     element_input.addEventListener('change', function () {
       // removendo o elemento imagem, caso existente, e adicionando o elemento canvas.
       if (element_image != null) {
@@ -545,11 +571,19 @@ function NotionField() {
         document.getElementById('notionblock_canvas ' + random).remove();
         document.getElementById('notionblock_picker ' + random).remove();
         document.getElementById('notionblock_pseudo_picker ' + random).remove();
+        document.getElementById('notionblock_delete ' + random).remove();
 
         // recriar os elementos...
-        document.getElementById("notionfield").appendChild(element_input);
-        document.getElementById("notionfield").appendChild(element_pseudo_input);
+        document.getElementById("notionfield").appendChild(element_parent);
+        element_parent.appendChild(element_input);
+        element_parent.appendChild(element_pseudo_input);
+        element_parent.appendChild(element_delete);
       }
+    })
+
+    element_delete.addEventListener('click', function(){
+      element_parent.remove();
+      element_image.remove();
     })
   }
 
