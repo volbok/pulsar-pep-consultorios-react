@@ -96,7 +96,7 @@ function NotionField() {
   // atualizar documento.
   const updateDocumento = (item, status) => {
     let texto = localStorage.getItem('texto_notion');
-    console.log(texto);
+    // console.log(texto);
     var obj = {
       id_paciente: item.id_paciente,
       nome_paciente: item.nome_paciente,
@@ -531,12 +531,12 @@ function NotionField() {
           console.log('imagem grande!');
           canvas.width = 0.6 * ratio * img.width;
           canvas.height = 0.6 * ratio * img.height;
-          console.log('VEJA: ' + canvas.width + ' - ' + canvas.height);
+          // console.log('VEJA: ' + canvas.width + ' - ' + canvas.height);
         } else {
           console.log('imagem menor...');
           canvas.width = 0.7 * img.width;
           canvas.height = 0.7 * img.height;
-          console.log('VEJA: ' + canvas.width + ' - ' + canvas.height);
+          // console.log('VEJA: ' + canvas.width + ' - ' + canvas.height);
         }
 
         document.getElementById('notionblock_canvas ' + random).getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);

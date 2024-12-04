@@ -395,54 +395,61 @@ function Cadastro() {
                   setvieweditpaciente(1)
                 }}
               >
-                <div style={{ display: 'flex', flexDirection: 'column', width: '100%' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
                   <div style={{ fontSize: 10, alignSelf: 'flex-end' }}>{'PRONTUÁRIO: ' + item.id_paciente}</div>
-                  <div className="texto_claro">
-                    {'NOME DO PACIENTE:'}
+                  <div style={{
+                    display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                    height: '100%',
+                  }}>
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <div className="texto_claro">
+                        {'NOME DO PACIENTE:'}
+                      </div>
+                      <div style={{ margin: 5, marginTop: 0, textAlign: 'left' }}>
+                        {item.nome_paciente.length > 25 ? item.nome_paciente.slice(0, 25) + '...' : item.nome_paciente}
+                      </div>
+                      <div className="texto_claro">
+                        {'DATA DE NASCIMENTO:'}
+                      </div>
+                      <div style={{ margin: 5, marginTop: 0, textAlign: 'left' }}>
+                        {moment(item.dn_paciente).format("DD/MM/YY")}
+                      </div>
+                      <div className="texto_claro">
+                        {'NOME DA MÃE DO PACIENTE:'}
+                      </div>
+                      <div style={{ margin: 5, marginTop: 0, textAlign: 'left' }}>
+                        {item.nome_mae_paciente.length > 25 ? item.nome_mae_paciente.slice(0, 25) + '...' : item.nome_mae_paciente}
+                      </div>
+                    </div>
+                    <textarea
+                      autoComplete="off"
+                      placeholder="OBSERVAÇÕES"
+                      className="textarea"
+                      type="text"
+                      id={"inputObservacoes " + item.id_paciente}
+                      onFocus={(e) => (e.target.placeholder = "")}
+                      onBlur={(e) => (e.target.placeholder = "OBSERVAÇÕES")}
+                      defaultValue={item.obs}
+                      onClick={(e) => e.stopPropagation()}
+                      onKeyUp={() => {
+                        clearTimeout(timeout);
+                        timeout = setTimeout(() => {
+                          console.log('ATUALIZANDO OBSERVAÇÃO')
+                          updatePacienteObservacao(item, document.getElementById("inputObservacoes " + item.id_paciente).value.toUpperCase())
+                        }, 1000);
+                      }}
+                      style={{
+                        flexDirection: "center",
+                        justifyContent: "center",
+                        alignSelf: "center",
+                        width: 'calc(100% - 50px)',
+                        padding: 15,
+                        height: 60,
+                        minHeight: 60,
+                        maxHeight: 60,
+                      }}
+                    ></textarea>
                   </div>
-                  <div style={{ margin: 5, marginTop: 0, textAlign: 'left' }}>
-                    {item.nome_paciente.length > 25 ? item.nome_paciente.slice(0, 25) + '...' : item.nome_paciente}
-                  </div>
-                  <div className="texto_claro">
-                    {'DATA DE NASCIMENTO:'}
-                  </div>
-                  <div style={{ margin: 5, marginTop: 0, textAlign: 'left' }}>
-                    {moment(item.dn_paciente).format("DD/MM/YY")}
-                  </div>
-                  <div className="texto_claro">
-                    {'NOME DA MÃE DO PACIENTE:'}
-                  </div>
-                  <div style={{ margin: 5, marginTop: 0, textAlign: 'left' }}>
-                    {item.nome_mae_paciente.length > 25 ? item.nome_mae_paciente.slice(0, 25) + '...' : item.nome_mae_paciente}
-                  </div>
-                  <textarea
-                    autoComplete="off"
-                    placeholder="OBSERVAÇÕES"
-                    className="textarea"
-                    type="text"
-                    id={"inputObservacoes " + item.id_paciente}
-                    onFocus={(e) => (e.target.placeholder = "")}
-                    onBlur={(e) => (e.target.placeholder = "OBSERVAÇÕES")}
-                    defaultValue={item.obs}
-                    onClick={(e) => e.stopPropagation()}
-                    onKeyUp={() => {
-                      clearTimeout(timeout);
-                      timeout = setTimeout(() => {
-                        console.log('ATUALIZANDO OBSERVAÇÃO')
-                        updatePacienteObservacao(item, document.getElementById("inputObservacoes " + item.id_paciente).value.toUpperCase())
-                      }, 1000);
-                    }}
-                    style={{
-                      flexDirection: "center",
-                      justifyContent: "center",
-                      alignSelf: "center",
-                      width: 'calc(100% - 50px)',
-                      padding: 15,
-                      height: 60,
-                      minHeight: 60,
-                      maxHeight: 60,
-                    }}
-                  ></textarea>
                 </div>
                 <div
                   className="button"
@@ -528,7 +535,7 @@ function Cadastro() {
           }}
           onClick={() => setviewoperadoraselector(0)}
         >
-          <div className="janela scroll"
+          <div className="janela scroll cor2"
             style={{ height: '90vh', width: '40vw' }}
             onClick={(e) => e.stopPropagation()}
           >
@@ -545,7 +552,7 @@ function Cadastro() {
               type="text"
               id="filtrarProcedimento"
               maxLength={100}
-              style={{ width: 'calc(100% - 20px)', backgroundColor: 'white' }}
+              style={{ width: 'calc(100% - 20px)' }}
             ></input>
             {operadoras.map(item => (
               <div
@@ -645,7 +652,7 @@ function Cadastro() {
         onClick={() => setvieweditpaciente(0)}
       >
         <div
-          className="janela"
+          className="janela cor0"
           onClick={(e) => e.stopPropagation()}
           style={{
             position: 'relative',
@@ -673,7 +680,7 @@ function Cadastro() {
             ></img>
           </div>
           <div id="dados do paciente"
-            className="scroll"
+            className="scroll cor2"
             style={{
               flexDirection: "column",
               justifyContent: 'flex-start',

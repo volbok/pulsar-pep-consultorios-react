@@ -437,13 +437,13 @@ function Exames() {
           alignSelf: 'flex-end',
         }}>
         {laboratorio.filter(item => item.random == localStorage.getItem('random')).map(item => (
-          <div style={{
-            display: 'flex', flexDirection: 'row',
-            justifyContent: 'space-between',
-            borderRadius: 5,
-            margin: 2.5,
-            backgroundColor: '#e5e8e8'
-          }}>
+          <div className='cor3'
+            style={{
+              display: 'flex', flexDirection: 'row',
+              justifyContent: 'space-between',
+              borderRadius: 5,
+              margin: 2.5,
+            }}>
             <div className='text1'
               style={{
                 flex: 4, textAlign: 'left', justifyContent: 'flex-start', alignContent: 'flex-start',

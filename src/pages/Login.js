@@ -36,6 +36,8 @@ function Login() {
     mobilewidth,
     setoperadoras,
     setpaciente,
+    logocor,
+    setlogocor,
   } = useContext(Context);
 
   // history (router).
@@ -43,6 +45,8 @@ function Login() {
 
   useEffect(() => {
     if (pagina == 0) {
+      // console.log('CLIENTE ' + JSON.stringify(cliente));
+      // console.log(cliente.id_cliente);
       setviewalterarsenha(0);
       setviewlistaunidades(0);
       loadOperadoras();
@@ -62,6 +66,69 @@ function Login() {
     }
     // eslint-disable-next-line
   }, [pagina, cliente]);
+
+  const updateTemaCor = (id, temacor) => {
+    let obj = {
+      nome_unidade: cliente.nome_unidade,
+      cnpj: cliente.cnpj,
+      cnes: cliente.cnes,
+      razao_social: cliente.razao_social,
+      endereco: cliente.endereco,
+      telefone: cliente.telefone,
+      logo: cliente.logo,
+      qrcode: cliente.qrcode,
+      tempo_consulta_convenio: cliente.tempo_consulta_convenio,
+      tempo_consulta_particular: cliente.tempo_consulta_particular,
+      email: cliente.email,
+      tema: temacor,
+    }
+    axios.post(html + 'update_cliente/' + id, obj).then(() => {
+      console.log('TEMA ATUALIZADO COM SUCESSO.')
+    })
+  }
+
+  function TemaCorSelector() {
+    return (
+      <div style={{
+        display: cliente.id_cliente != undefined ? 'flex' : 'none',
+        flexDirection: 'row', justifyContent: 'center',
+        position: 'absolute',
+        top: 5, right: 10,
+      }}>
+        <div
+          id="botao_tema_cor"
+          className="button"
+          style={{
+            display: pagina === 0 ? 'flex' : 'none',
+            minWidth: 25, width: 25, maxWidth: 25,
+            minHeight: 25, height: 25, maxHeight: 25,
+            margin: 0, padding: 0,
+            borderColor: 'white', borderWidth: 2.5, borderStyle: 'solid'
+          }}
+          onClick={() => {
+            console.log('ANTERIOR: ' + localStorage.getItem('temacores'));
+            if (localStorage.getItem('temacores') == 0) {
+              document.getElementById('aplicacao').className = 'blue';
+              updateTemaCor(cliente.id_cliente, 1);
+              localStorage.setItem('temacores', 1);
+            } else if (localStorage.getItem('temacores') == 1) {
+              document.getElementById('aplicacao').className = 'gray';
+              updateTemaCor(cliente.id_cliente, 2);
+              localStorage.setItem('temacores', 2);
+            } else {
+              document.getElementById('aplicacao').className = 'teal';
+              updateTemaCor(cliente.id_cliente, 0);
+              localStorage.setItem('temacores', 0);
+            }
+            setTimeout(() => {
+              setlogocor(window.getComputedStyle(document.getElementById('aplicacao')).getPropertyValue('--pallete2'));
+            }, 100);
+          }}
+        >
+        </div>
+      </div>
+    )
+  }
 
   // carregar configurações do usuário logado.
   // eslint-disable-next-line
@@ -453,8 +520,11 @@ function Login() {
           id="inputSenha"
           onFocus={(e) => (e.target.placeholder = "")}
           onBlur={(e) => (e.target.placeholder = "SENHA")}
-          onChange={() => {
-            // checkLogin();
+          onKeyDown={(e) => {
+            if (e.keyCode == 13) { // tecla enter
+              e.preventDefault();
+              checkLogin();
+            }
           }}
           style={{
             marginTop: 10,
@@ -469,8 +539,7 @@ function Login() {
           id="btn_entrar"
           className="button"
           style={{
-            width: 130, alignSelf: 'center',
-            backgroundColor: 'rgb(82, 190, 128, 0.5)'
+            width: 90, alignSelf: 'center',
           }}
           onClick={() => {
             checkLogin();
@@ -587,6 +656,18 @@ function Login() {
               setcliente(clientes.filter(valor => valor.id_cliente == item.id_cliente).pop());
               sethospital(clientes.filter(valor => valor.id_cliente == item.id_cliente).map(item => item.id_cliente).pop());
               setviewlistaunidades(1);
+
+              // aplicando tema de cores do cliente.
+              localStorage.setItem('temacores', clientes.filter(valor => valor.id_cliente == item.id_cliente).map(item => item.tema).pop());
+
+              if (localStorage.getItem('temacores') == 0) {
+                document.getElementById('aplicacao').className = 'teal';
+              } else if (localStorage.getItem('temacores') == 1) {
+                document.getElementById('aplicacao').className = 'blue';
+              } else {
+                document.getElementById('aplicacao').className = 'gray';
+              }
+
             }}
           >
             {clientes.filter(valor => valor.id_cliente == item.id_cliente).map(item => item.razao_social)}
@@ -842,17 +923,20 @@ function Login() {
         className="chassi login_color_1 login_align_1"
         style={{
           overflowY: 'scroll', width: 'calc(100% - 10px)',
+          position: 'relative'
         }}
         id="conteudo_login"
       >
-        <div
-          className="text2 popin"
+        <div id="logo"
+          className="logo"
           style={{
+            // display: 'flex',
+            alignSelf: 'center',
             marginTop: 20,
             display: cliente.logo == undefined ? "flex" : "none",
           }}
         >
-          <Logo href="/site/index.html" target="_blank" rel="noreferrer" height={100} width={100}></Logo>
+          <Logo height={100} width={100} color1={logocor}></Logo>
         </div>
         <div style={{
           display: cliente.logo != undefined ? "flex" : "none",
@@ -937,6 +1021,7 @@ function Login() {
             top: 10,
             right: 10,
             alignSelf: 'center',
+            backgroundColor: 'transparent',
           }}
           title="FAZER LOGOFF."
           onClick={() => {
@@ -962,9 +1047,9 @@ function Login() {
             }}
           ></img>
         </div>
-        <div>{ }</div>
         <div className="text2" style={{ fontSize: 10, marginTop: 0 }}>{'CONTATO DO DESENVOLVEDOR'}</div>
         <div className="text2" style={{ fontSize: 10, marginTop: -5 }}>{'(31) 99226-6268'}</div>
+        <TemaCorSelector></TemaCorSelector>
       </div>
     </div>
   );

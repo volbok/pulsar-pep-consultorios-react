@@ -15,6 +15,7 @@ import maskdate from "../functions/maskdate";
 import { useHistory } from "react-router-dom";
 import modal from '../functions/modal';
 import GuiaConsulta from '../cards/GuiaConsulta';
+import mountage from '../functions/mountage';
 
 function Agendamento() {
 
@@ -32,9 +33,9 @@ function Agendamento() {
     mobilewidth,
     usuario,
     cliente,
+    agenda, setagenda,
   } = useContext(Context);
 
-  const [viewupdateatendimento, setviewupdateatendimento] = useState(0);
   useEffect(() => {
     // eslint-disable-next-line
     if (pagina == 20) {
@@ -42,6 +43,7 @@ function Agendamento() {
       loadPacientes();
       loadAtendimentos();
       currentMonth();
+      loadAgenda();
     }
     if (paciente == null) {
       setlistatodosatendimentos(1);
@@ -219,6 +221,47 @@ function Agendamento() {
       insertAtendimento(inicio);
     }
   }
+  const checkUpdateConsultas = (item, inicio) => {
+    let poolatendimentos = [];
+    console.log(item); // obj ok.
+    console.log(inicio); // data ok.
+    if (item.faturamento_codigo_procedimento == 'PARTICULAR') {
+      poolatendimentos = arrayatendimentos.filter(item =>
+        item.id_paciente == paciente.id_paciente
+        &&
+        item.id_profissional == selectedespecialista.id_usuario
+        &&
+        (
+          moment(inicio, 'DD/MM/YYYY - HH:mm') > moment(item.data_inicio).subtract(cliente.tempo_consulta_particular, 'minutes')
+          &&
+          moment(inicio, 'DD/MM/YYYY - HH:mm') < moment(item.data_termino)
+        )
+      )
+    } else {
+      poolatendimentos = arrayatendimentos.filter(item =>
+        item.id_paciente == paciente.id_paciente
+        &&
+        item.id_profissional == selectedespecialista.id_usuario
+        &&
+        (
+          moment(inicio, 'DD/MM/YYYY - HH:mm') > moment(item.data_inicio).subtract(cliente.tempo_consulta_convenio, 'minutes')
+          &&
+          moment(inicio, 'DD/MM/YYYY - HH:mm') < moment(item.data_termino)
+        )
+      )
+    }
+
+    console.log(poolatendimentos.length);
+
+    if (poolatendimentos.length > 0) { // BUCETA: MUDAR AQUI PARA > 1!
+      // modal...
+      console.log(poolatendimentos);
+      console.log('CONSULTA JÁ AGENDADA NESTE PERÍODO.');
+      modal(setdialogo, 'JÁ EXISTE UMA CONSULTA AGENDADA PARA ESTE HORÁRIO, CONFIRMAR ESTE NOVO AGENDAMENTO?', updateAtendimento, [item, inicio]);
+    } else {
+      updateAtendimento([item, inicio]);
+    }
+  }
 
   const insertAtendimento = (inicio) => {
     var obj = {
@@ -247,10 +290,12 @@ function Agendamento() {
       });
   };
 
-  const updateAtendimento = (item, inicio) => {
+  const updateAtendimento = ([item, inicio]) => {
+    console.log(item);
+    console.log(inicio);
     var obj = {
       data_inicio: moment(inicio, 'DD/MM/YYYY - HH:mm'),
-      data_termino: localStorage.getItem('PARTICULAR') == 'PARTICULAR' ? moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_particular, 'minutes') : moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_convenio, 'minutes'),
+      data_termino: item.faturamento_codigo_procedimento == 'PARTICULAR' ? moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_particular, 'minutes') : moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_convenio, 'minutes'),
       problemas: item.problemas,
       id_paciente: item.id_paciente,
       id_unidade: 5, // ATENÇÃO: 5 é o ID da unidade ambulatorial.
@@ -535,6 +580,7 @@ function Agendamento() {
                 className={selectdate == item ? "button-selected" : "button"}
                 onClick={(e) => {
                   setselectdate(item);
+                  console.log(moment(item).format('dddd'))
                   localStorage.setItem('selectdate', item);
                   e.stopPropagation()
                 }}
@@ -554,16 +600,16 @@ function Agendamento() {
                   style={{
                     display: listatodosatendimentos == 1 ? 'none' : 'flex',
                     borderRadius: 50,
-                    backgroundColor: 'rgb(82, 190, 128, 1)',
                     borderWidth: 3,
                     borderStyle: 'solid',
-                    borderColor: 'rgba(242, 242, 242)',
                     width: 20, height: 20,
                     position: 'absolute',
                     bottom: -5, right: -5,
                     alignContent: 'center',
                     flexDirection: 'column',
-                    justifyContent: 'center'
+                    justifyContent: 'center',
+                    backgroundColor: 'rgb(82, 190, 128, 1)',
+                    borderColor: 'rgba(242, 242, 242)'
                   }}
                   onClick={() => {
                     if (listatodosatendimentos == 1) {
@@ -590,6 +636,7 @@ function Agendamento() {
         style={{
           display: listatodosatendimentos == 0 ? 'flex' : 'none',
           flexDirection: "column",
+          alignSelf: 'center',
         }}
       >
         <div id="scroll atendimentos com pacientes"
@@ -598,7 +645,7 @@ function Agendamento() {
             display: selectdate != null && arrayatendimentos.filter(item => item.situacao == 3 && moment(item.data_inicio).format('DD/MM/YYYY') == selectdate && item.id_profissional == selectedespecialista.id_usuario).length > 0 ? "flex" : "none",
             flexDirection: 'column',
             justifyContent: "flex-start",
-            height: '75vh',
+            height: '50vh',
             width: '50vw',
             marginLeft: 20
           }}
@@ -633,15 +680,16 @@ function Agendamento() {
                   <div id={"btn_lista_atendimento " + item.id_atendimento}
                     className="button"
                     onClick={() => {
-                      setviewupdateatendimento(1);
+                      document.getElementById('viewupdateatendimento ' + item.id_atendimento).style.display = 'flex';
+                      document.getElementById('viewupdateatendimento ' + item.id_atendimento).style.visibility = 'visible';
                     }}
                     style={{
                       marginRight: 0,
                       padding: 10,
                       borderTopRightRadius: 0,
                       borderBottomRightRadius: 0,
-                      backgroundColor: '#006666',
                       position: 'relative',
+                      opacity: 0.9,
                     }}>
                     {moment(item.data_inicio).format('HH:mm') + ' ÀS ' + moment(item.data_termino).format('HH:mm')}
                     <div
@@ -655,6 +703,7 @@ function Agendamento() {
                         backgroundColor: item.faturamento_codigo_procedimento == 'PARTICULAR' ? 'rgb(82, 190, 128, 1)' : '#03aacd',
                         color: 'white',
                         fontWeight: 'bold',
+                        zIndex: 20,
                       }}>
                       {item.faturamento_codigo_procedimento}
                     </div>
@@ -684,7 +733,7 @@ function Agendamento() {
                           {pacientes.filter(
                             (valor) => valor.id_paciente == item.id_paciente
                           )
-                            .map((valor) => valor.nome_paciente + ', ' + moment().diff(moment(valor.dn_paciente), 'years') + ' ANOS')}
+                            .map((valor) => valor.nome_paciente + ', ' + mountage(moment(valor.dn_paciente).format('DD/MM/YYYY')))}
                         </div>
                         <div style={{ textAlign: 'left' }}>
                           {especialistas.filter(valor => valor.id_usuario == item.id_profissional).map(item => 'DR(A). ' + item.nome_usuario + ' - ' + item.conselho + ' ' + item.n_conselho)}
@@ -812,7 +861,7 @@ function Agendamento() {
             display: selectdate == null || arrayatendimentos.filter(item => item.situacao == 3 && moment(item.data_inicio).format('DD/MM/YYYY') == selectdate && item.id_profissional == selectedespecialista.id_usuario).length == 0 ? "flex" : "none",
             flexDirection: 'column',
             justifyContent: "center",
-            height: '75vh',
+            height: '50vh',
             width: '50vw',
             marginLeft: 20
           }}
@@ -830,10 +879,11 @@ function Agendamento() {
             }}
           ></img>
         </div>
-      </div >
+        <Agenda></Agenda>
+      </div>
     );
     // eslint-disable-next-line
-  }, [arrayatendimentos, selectedespecialista, selectdate, viewupdateatendimento]);
+  }, [arrayatendimentos, selectedespecialista, selectdate]);
 
   const [listatodosatendimentos, setlistatodosatendimentos] = useState(0);
   const ListaTodosAtendimentos = useCallback(() => {
@@ -843,6 +893,7 @@ function Agendamento() {
           display: listatodosatendimentos == 1 ? 'flex' : 'none',
           flexDirection: "column",
           justifyContent: 'center',
+          alignSelf: 'center',
         }}
       >
         <div className='button'
@@ -864,9 +915,9 @@ function Agendamento() {
             display: selectdate != null && arrayatendimentos.filter(item => item.situacao == 3 && moment(item.data_inicio).format('DD/MM/YYYY') == selectdate).length > 0 ? "flex" : "none",
             flexDirection: 'column',
             justifyContent: "flex-start",
-            height: '70vh',
-            width: window.innerWidth < mobilewidth ? '90vw' : '50vw',
-            marginLeft: window.innerWidth < mobilewidth ? 0 : 20,
+            height: '55vh',
+            width: window.innerWidth < mobilewidth ? '80vw' : '50vw',
+            marginLeft: window.innerWidth < mobilewidth ? 0 : 0,
           }}
         >
           {arrayatendimentos
@@ -891,6 +942,7 @@ function Agendamento() {
                       backgroundColor: item.faturamento_codigo_procedimento == 'PARTICULAR' ? 'rgb(82, 190, 128, 1)' : '#03aacd',
                       color: 'white',
                       fontWeight: 'bold',
+                      zIndex: 20,
                     }}>
                     {item.faturamento_codigo_procedimento}
                   </div>
@@ -899,14 +951,15 @@ function Agendamento() {
                     id={"btn_todos_atendimentos " + item.id_atendimento}
                     className="button"
                     onClick={() => {
-                      setviewupdateatendimento(1);
+                      document.getElementById('viewupdateatendimento ' + item.id_atendimento).style.display = 'flex';
+                      document.getElementById('viewupdateatendimento ' + item.id_atendimento).style.visibility = 'visible';
                     }}
                     style={{
                       marginRight: 0,
                       padding: 10,
                       borderTopRightRadius: 0,
                       borderBottomRightRadius: 0,
-                      backgroundColor: '#006666',
+                      opacity: 0.9,
                     }}>
                     {moment(item.data_inicio).format('HH:mm') + ' ÀS ' + moment(item.data_termino).format('HH:mm')}
                   </div>
@@ -934,7 +987,7 @@ function Agendamento() {
                           {pacientes.filter(
                             (valor) => valor.id_paciente == item.id_paciente
                           )
-                            .map((valor) => valor.nome_paciente + ', ' + moment().diff(moment(valor.dn_paciente), 'years') + ' ANOS')}
+                            .map((valor) => valor.nome_paciente + ', ' + mountage(moment(valor.dn_paciente).format('DD/MM/YYYY')))}
                         </div>
                         <div style={{
                           display: window.innerWidth < mobilewidth ? 'none' : 'flex',
@@ -1069,9 +1122,9 @@ function Agendamento() {
             display: selectdate == null || arrayatendimentos.filter(item => item.situacao == 3 && moment(item.data_inicio).format('DD/MM/YYYY') == selectdate).length == 0 ? "flex" : "none",
             flexDirection: 'column',
             justifyContent: "center",
-            height: '70vh',
+            height: '55vh',
             width: window.innerWidth < mobilewidth ? '80vw' : '50vw',
-            marginLeft: 20
+            marginLeft: window.innerWidth < mobilewidth ? 0 : 0,
           }}
         >
           <img
@@ -1090,7 +1143,7 @@ function Agendamento() {
       </div>
     );
     // eslint-disable-next-line
-  }, [arrayatendimentos, selectedespecialista, selectdate, viewupdateatendimento]);
+  }, [arrayatendimentos, selectedespecialista, selectdate]);
 
   const [viewopcoeshorarios, setviewopcoeshorarios] = useState(0);
   const ViewOpcoesHorarios = () => {
@@ -1163,10 +1216,8 @@ function Agendamento() {
             onClick={() => {
               let hora = localStorage.getItem('hora');
               let min = localStorage.getItem('min');
-              // modelo: 'DD/MM/YYYY - HH:mm'
               console.log(selectdate + ' - ' + hora + ':' + min);
               checkConsultas(selectdate + ' - ' + hora + ':' + min)
-              // insertAtendimento(selectdate + ' - ' + hora + ':' + min);
               setviewopcoeshorarios(0);
             }}
             style={{ width: 50, maxWidth: 50, alignSelf: 'center', marginTop: 20 }}
@@ -1211,23 +1262,23 @@ function Agendamento() {
   const ViewUpdateAtendimento = (item) => {
     function TimeUpdateComponent() {
       var timeout = null;
-      const fixHour = (valor) => {
+      const fixEditHour = (valor) => {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
           if (valor > 23 || valor < 0) {
-            document.getElementById("inputEditHour").value = '';
-            document.getElementById("inputEditHour").focus();
+            document.getElementById("inputEditHour " + item.id_atendimento).value = '';
+            document.getElementById("inputEditHour " + item.id_atendimento).focus();
           } else {
             localStorage.setItem('hora', valor);
           }
         }, 100);
       };
-      const fixMin = (valor) => {
+      const fixEditMin = (valor) => {
         clearTimeout(timeout);
         timeout = setTimeout(() => {
           if (valor > 59 || valor < 0) {
-            document.getElementById("inputEditMin").value = '';
-            document.getElementById("inputEditMin").focus();
+            document.getElementById("inputEditMin " + item.id_atendimento).value = '';
+            document.getElementById("inputEditMin " + item.id_atendimento).focus();
           } else {
             localStorage.setItem('min', valor);
           }
@@ -1243,12 +1294,12 @@ function Agendamento() {
               type="text"
               inputMode="numeric"
               maxLength={10}
-              id="inputEditDataConsulta"
+              id={"inputEditDataConsulta " + item.id_atendimento}
               title="FORMATO: DD/MM/YYYY"
-              onClick={() => document.getElementById("inputEditDataConsulta").value = ""}
+              onClick={() => document.getElementById("inputEditDataConsulta " + item.id_atendimento).value = ""}
               onFocus={(e) => (e.target.placeholder = "")}
               onBlur={(e) => (e.target.placeholder = "DATA")}
-              onKeyUp={() => maskdate(timeout, "inputEditDataConsulta")}
+              onKeyUp={() => maskdate(timeout, "inputEditDataConsulta " + item.id_atendimento)}
               defaultValue={moment(item.data_inicio).format('DD/MM/YYYY')}
               style={{
                 flexDirection: "center",
@@ -1270,7 +1321,7 @@ function Agendamento() {
               placeholder="HH"
               onFocus={(e) => (e.target.placeholder = '')}
               onBlur={(e) => (e.target.placeholder = 'HH')}
-              onKeyUp={(e) => fixHour(e.target.value)}
+              onKeyUp={(e) => fixEditHour(e.target.value)}
               title="HORAS."
               maxLength={2}
               style={{
@@ -1279,7 +1330,7 @@ function Agendamento() {
               }}
               min={0}
               max={23}
-              id="inputEditHour"
+              id={"inputEditHour " + item.id_atendimento}
             ></input>
             <div className='text1'>{' : '}</div>
             <input
@@ -1288,7 +1339,7 @@ function Agendamento() {
               placeholder="MM"
               onFocus={(e) => (e.target.placeholder = '')}
               onBlur={(e) => (e.target.placeholder = 'MM')}
-              onKeyUp={(e) => fixMin(e.target.value)}
+              onKeyUp={(e) => fixEditMin(e.target.value)}
               title="MINUTOS."
               maxLength={2}
               style={{
@@ -1297,22 +1348,21 @@ function Agendamento() {
               }}
               min={0}
               max={59}
-              id="inputEditMin"
+              id={"inputEditMin " + + item.id_atendimento}
             ></input>
           </div>
           <div id="btnAdd"
             className="button-green"
             title="CONFIRMAR DATA E HORA."
             onClick={() => {
-              let hora = localStorage.getItem('hora');
-              let min = localStorage.getItem('min');
-              // modelo: 'DD/MM/YYYY - HH:mm'
-              console.log(selectdate + ' - ' + hora + ':' + min);
-              let nova_data = document.getElementById("inputEditDataConsulta").value;
-              let nova_hora = document.getElementById("inputEditHour").value;
-              let novo_minuto = document.getElementById("inputEditMin").value;
-              updateAtendimento(item, nova_data + ' - ' + nova_hora + ':' + novo_minuto);
-              setviewupdateatendimento(0);
+              let nova_data = document.getElementById("inputEditDataConsulta " + item.id_atendimento).value;
+              let nova_hora = document.getElementById("inputEditHour " + item.id_atendimento).value;
+              let novo_minuto = document.getElementById("inputEditMin " + item.id_atendimento).value;
+              console.log(selectdate + ' - ' + nova_hora + ':' + novo_minuto);
+              checkUpdateConsultas(item, nova_data + ' - ' + nova_hora + ':' + novo_minuto);
+              //updateAtendimento(item, nova_data + ' - ' + nova_hora + ':' + novo_minuto);
+              document.getElementById('viewupdateatendimento ' + item.id_atendimento).style.display = 'none';
+              document.getElementById('viewupdateatendimento ' + item.id_atendimento).style.visibility = 'hidden';
             }}
             style={{ width: 50, maxWidth: 50, alignSelf: 'center', marginTop: 20 }}
           >
@@ -1331,10 +1381,12 @@ function Agendamento() {
     }
     return (
       <div
+        id={'viewupdateatendimento ' + item.id_atendimento}
         className="fundo"
-        style={{ display: viewupdateatendimento == 1 ? "flex" : "none" }}
+        style={{ display: "none" }}
         onClick={() => {
-          setviewupdateatendimento(0);
+          document.getElementById('viewupdateatendimento ' + item.id_atendimento).style.display = 'none';
+          document.getElementById('viewupdateatendimento ' + item.id_atendimento).style.visibility = 'hidden';
         }}
       >
         <div className="janela"
@@ -1352,15 +1404,90 @@ function Agendamento() {
     )
   }
 
+  // agenda de consultas (horários predefinidos).
+  const loadAgenda = () => {
+    axios.get(html + "list_agenda").then((response) => {
+      let x = response.data.rows;
+      setagenda(x);
+    })
+  }
+
+  function Agenda() {
+    return (
+      <div className='scroll'
+        style={{
+          display: 'flex', flexDirection: 'row', justifyContent: 'flex-start',
+          alignSelf: 'center',
+          marginTop: 10, marginLeft: 20,
+          width: '50vw',
+          minHeight: 80,
+          height: 80,
+          maxHeight: 80,
+          overflowX: 'scroll',
+          overflowY: 'hidden',
+        }}
+      >
+        {agenda.filter(item => item.id_usuario == selectedespecialista.id_usuario && item.dia_semana == moment(selectdate).format('dddd').toUpperCase()).sort((a, b) => moment(a.hora_inicio, 'HH:mm') > moment(b.hora_inicio, 'HH:mm') ? 1 : -1).map(item => (
+          <div className='button'
+            style={{
+              width: 120, minWidth: 120,
+              display: 'flex', flexDirection: 'column', justifyContent: 'center',
+              position: 'relative',
+            }}
+            onClick={() => {
+              checkConsultas(selectdate + ' - ' + item.hora_inicio)
+              // insertAtendimento(selectdate + ' - ' + item.hora_inicio);
+              console.log(selectdate + ' - ' + item.hora_inicio);
+            }}
+          >
+            <div>
+              {item.hora_inicio + ' ÀS ' + item.hora_termino}
+            </div>
+            <div
+              className={moment(item.hora_termino, 'HH:mm').diff(moment(item.hora_inicio, 'HH:mm'), 'minutes') == cliente.tempo_consulta_convenio ? 'button blue' : 'button green'}
+              title={moment(item.hora_termino, 'HH:mm')}
+              style={{
+                marginTop: 10,
+                height: 25, minHeight: 25, maxHeight: 25, padding: 0.5,
+                margin: 5,
+                width: 'calc(100% - 10px)'
+              }}
+            >
+              {moment(item.hora_termino, 'HH:mm').diff(moment(item.hora_inicio, 'HH:mm'), 'minutes') == cliente.tempo_consulta_convenio ? 'CONVÊNIO' : 'PARTICULAR'}
+            </div>
+            <div
+              className='button red'
+              style={{
+                display: moment(item.hora_termino, 'HH:mm').diff(moment(item.hora_inicio, 'HH:mm'), 'minutes') == cliente.tempo_consulta_convenio && localStorage.getItem('PARTICULAR') ? 'flex' : 'none',
+                minWidth: 10, maxWidth: 10,
+                minHeight: 10, maxHeight: 10,
+                borderRadius: 50,
+                borderColor: 'white', borderWidth: 2.5, borderStyle: 'solid',
+                position: 'absolute', top: -12, left: -12,
+                zIndex: 20,
+              }}>
+              !
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+
   if (paciente != null) {
     return (
       <div id="tela de agendamento das consultas"
-        className='main'
-        style={{ display: pagina == 20 ? 'flex' : 'none', }}
+        className='main cor2'
+        style={{
+          display: pagina == 20 ? 'flex' : 'none',
+        }}
       >
         <div
           className="chassi scroll"
-          style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignContent: 'center' }}
+          style={{
+            display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignContent: 'center',
+
+          }}
           id="conteúdo do agendamento"
         >
           <div style={{ display: 'flex', flexDirection: 'row', width: 'calc(100vw - 20px)', justifyContent: 'flex-start' }}>
@@ -1396,11 +1523,13 @@ function Agendamento() {
               alignItems: 'flex-start', textAlign: 'left', alignSelf: 'flex-start',
               marginTop: 10, marginBottom: 10,
             }}>
-            <div className='text2' style={{
-              fontSize: 20, justifyContent: 'flex-start', alignSelf: 'flex-start', margin: 0,
+            <div className='text1' style={{
+              fontSize: 18, justifyContent: 'flex-start', alignSelf: 'flex-start',
+              textAlign: 'left',
+              margin: 0,
               marginTop: 5
             }}>
-              {'AGENDAMENTO DE CONSULTA PARA ' + paciente.nome_paciente + ' - DN: ' + moment(paciente.dn_paciente).format('DD/MM/YYYY') + ' (' + moment().diff(moment(paciente.dn_paciente), 'years') + ' ANOS)'}
+              {'AGENDAMENTO DE CONSULTA PARA ' + paciente.nome_paciente + ' - DN: ' + moment(paciente.dn_paciente).format('DD/MM/YYYY - ') + mountage(moment(paciente.dn_paciente).format('DD/MM/YYYY'))}
             </div>
             <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignContent: 'center' }}>
               <div className='text1' style={{ fontSize: 14, margin: 0, alignSelf: 'center' }}>
@@ -1416,13 +1545,12 @@ function Agendamento() {
               style={{ display: viewconsultas == 1 ? "flex" : "none" }}
               onClick={() => { setviewconsultas(0); setselectedespecialista([]) }}
             >
-              <div className="janela"
+              <div className="janela cor2"
                 onClick={(e) => e.stopPropagation()}
                 style={{
                   position: 'relative',
                   display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
                   width: '100%', height: '100%', borderRadius: 0,
-
                 }}
               >
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
@@ -1440,8 +1568,13 @@ function Agendamento() {
                         style={{ width: 30, height: 30 }}
                       ></img>
                     </div>
-                    <div className='text1' style={{ textAlign: 'left', fontSize: 16 }}>
-                      {listatodosatendimentos == 0 ? 'AGENDAMENTO COM PROFISSIONAL: ' + selectedespecialista.nome_usuario + ' (' + selectedespecialista.tipo_usuario + ')' : 'TODOS OS AGENDAMENTOS'}
+                    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start' }}>
+                      <div className='text1' style={{ textAlign: 'left', fontSize: 16, alignSelf: 'flex-start' }}>
+                        {listatodosatendimentos == 0 ? 'AGENDAMENTO COM PROFISSIONAL: ' + selectedespecialista.nome_usuario + ' (' + selectedespecialista.tipo_usuario + ')' : 'TODOS OS AGENDAMENTOS'}
+                      </div>
+                      <div className='text1' style={{ textAlign: 'left', marginTop: -10, alignSelf: 'flex-start' }}>
+                        {'PACIENTE: ' + paciente.nome_paciente + ' - CONSULTA: ' + localStorage.getItem('PARTICULAR')}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -1463,15 +1596,15 @@ function Agendamento() {
     )
   } else {
     return (
-      <div className='main'
+      <div className='main cor2'
         style={{
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'center',
           alignContent: 'center',
           alignSelf: 'center',
-          backgroundColor: 'white',
           borderColor: 'white',
+          backgroundColor: 'white',
         }}>
 
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
@@ -1498,7 +1631,7 @@ function Agendamento() {
             {'CONSULTAS AGENDADAS'}
           </div>
         </div>
-        <div
+        <div className='cor2'
           style={{
             display: 'flex',
             flexDirection: window.innerWidth < mobilewidth ? 'column' : 'row',
@@ -1513,9 +1646,8 @@ function Agendamento() {
             style={{
               display: 'flex',
               flexDirection: window.innerWidth < mobilewidth ? 'column' : 'row',
-              backgroundColor: 'white',
-              borderColor: 'white',
               borderRadius: 5,
+              marginLeft: 10,
             }}>
             <ListaTodosAtendimentos></ListaTodosAtendimentos>
             <div style={{ display: window.innerWidth < mobilewidth ? 'none' : 'flex' }}>

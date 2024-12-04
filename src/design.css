@@ -1,22 +1,10 @@
 :root {
-  --pallete1: #b2d8d8;
-  --pallete2: #66b2b2;
-  --pallete3: #008080;
-  --pallete4: #006666;
-  --pallete4: #006666;
-  --pallete5: #004c4c;
-  --pallete6: #004c4c80;
-  --pallete7: #03aacd;
-
   --red: #EC7063;
   --orange: #E59866;
   --yellow: #F7DC6F;
   --green: rgb(82, 190, 128, 1);
   --blue: #85C1E9;
 
-  --cor1: rgb(31, 122, 140, 0.8) !important;
-  --cor1hover: rgb(102, 178, 178) !important;
-  --cor1opaque: rgb(31, 122, 140, 1) !important;
   --cor0: white;
   --cor2: rgba(242, 242, 242);
   --cor3: rgb(215, 219, 221);
@@ -29,16 +17,98 @@
   --cor7: #004c4c40;
   --cor8: '#F1C40F';
 
-  --texto1: #006666 !important;
-  --texto2: #ffffff;
-  --texto3: rgb(31, 122, 140, 1) !important;
-
-  --placeholder: #004c4c60;
-
   --logo1: "green";
   --logo2: "yellow";
 
   --doc-height: "100%";
+}
+
+.teal {
+  --pallete1: #b2d8d8;
+  --pallete2: #66b2b2;
+  --pallete3: #008080;
+  --pallete4: #006666;
+  --pallete5: #004c4c;
+  --pallete6: #004c4cdf;
+  --pallete7: #03aacd;
+  --pallete8: #00808080;
+
+  --login1: rgb(41, 156, 179);
+  --login2: rgb(55, 208, 239);
+
+  --cor1: rgb(31, 122, 140, 0.8) !important;
+  --cor1hover: rgb(31, 122, 140, 0.8) !important;
+  --cor1opaque: rgb(31, 122, 140, 1) !important;
+
+  --cor0: white !important;
+  --cor3: var(--pallete8);
+
+  --texto1: #006666 !important;
+  --texto2: #ffffff;
+  --texto3: rgb(31, 122, 140, 1) !important;
+  --placeholder: #004c4c60;
+}
+
+.blue {
+  --pallete1: #ffffff;
+  --pallete2: #2f99e0;
+  --pallete3: #f4f6f7;
+  --pallete4: #f0f3f4;
+  --pallete5: #d0d3d4;
+  --pallete6: #246e9fc9;
+  --pallete7: #01c3ea;
+  --pallete8: #2f99e036;
+
+  --login2: #2f88c3;
+  --login1: #1b557c;
+
+  --cor0: white !important;
+  --cor1: #2572a4 !important;
+  --cor1hover: #37a8f3 !important;
+  --cor1opaque: #2572a4 !important;
+
+  --cor3: var(--pallete8);
+  --cor5: var(--pallete5);
+
+  --texto1: #174767 !important;
+  --texto2: #ffffff;
+  --texto3: #424949 !important;
+  --placeholder: #a6acaf;
+}
+
+.gray {
+  --pallete1: #ffffff;
+  --pallete2: #797979;
+  --pallete3: #f4f6f7;
+  --pallete4: #f0f3f4;
+  --pallete5: #d0d3d4;
+  --pallete6: #5e5e5e;
+  --pallete7: #01c3ea;
+  --pallete8: #353535;
+
+  --login2: #919191;
+  --login1: #545454;
+
+  --cor0: white !important;
+  --cor1: #353535 !important;
+  --cor1hover: #5e5e5e !important;
+  --cor1opaque: #353535 !important;
+
+  --cor3: var(--pallete8);
+  --cor5: var(--pallete5);
+
+  --texto1: black !important;
+  --texto2: #ffffff;
+  --texto3: #424949 !important;
+  --placeholder: #a6acaf;
+}
+
+.logo-cor1 {
+  background-color: var(--pallete1);
+}
+
+.logo-cor2 {
+  background-color: white;
 }
 
 .print {
@@ -67,7 +137,7 @@
 
 /* NOTION BLOCKS */
 .notion_p {
-  display: flex;
+  display: inline-block;
   flex-direction: row;
   justify-content: left;
   margin: 2.5px !important;
@@ -76,14 +146,14 @@
   padding: 2.5px !important;
   border-radius: 2.5px;
   white-space: nowrap;
+  word-break: normal;
   transition: 500ms, 500ms ease-in-out;
   text-align: left !important;
   text-wrap: wrap !important;
   line-break: normal !important;
   word-wrap: break-word;
-  height: auto !important;
-  min-height: 25px;
-  overflow: auto !important;
+  overflow-wrap: break-word;
+  vertical-align: top;
 }
 
 .notion_p:focus {
@@ -94,7 +164,7 @@
 }
 
 .notion_titulo {
-  display: flex;
+  display: inline-block;
   flex-direction: row;
   justify-content: center;
   align-self: center;
@@ -110,9 +180,7 @@
   text-wrap: wrap !important;
   line-break: normal !important;
   word-wrap: break-word;
-  height: auto !important;
-  min-height: 30px;
-  overflow: auto !important;
+  vertical-align: top;
 }
 
 .notion_titulo:focus {
@@ -123,7 +191,7 @@
 }
 
 .notion_block {
-  display: flex;
+  display: inline-block;
   flex-direction: row;
   justify-content: left;
   margin: 2.5px !important;
@@ -138,13 +206,11 @@
   text-wrap: wrap !important;
   line-break: normal !important;
   word-wrap: break-word;
-  overflow: auto !important;
-  height: auto !important;
-  min-height: 25px;
-  width: 300px;
+  width: 30vw;
   align-self: center;
   background-color: #e5e8e8;
   transition: 500ms, 500ms ease-in-out;
+  vertical-align: top;
 }
 
 .notion_block:focus {
@@ -534,14 +600,14 @@ body {
 .login_color_1 {
   display: flex;
   flex-direction: column;
-  background-color: var(--cor1opaque) !important;
+  background-color: var(--login1) !important;
   transition: 500ms, 500ms ease-in-out;
 }
 
 .login_color_2 {
   display: flex;
   flex-direction: column;
-  background-color: var(--cor1hover) !important;
+  background-color: var(--login2) !important;
   transition: 500ms, 500ms ease-in-out;
 }
 
@@ -566,7 +632,7 @@ body {
 }
 
 .janela {
-  background-color: var(--cor3);
+  background-color: var(--cor2);
   border-radius: 5px;
   display: flex;
   flex-direction: column;
@@ -1074,8 +1140,8 @@ body {
   overflow-y: scroll;
   overflow-x: hidden;
   overflow-anchor: none;
-  background-color: var(--cor2);
-  border-color: var(--cor2);
+  background-color: var(--cor0);
+  border-color: var(--cor0);
   border-style: solid;
   border-width: 5px;
   border-radius: 5px;
@@ -1092,7 +1158,7 @@ body {
 }
 
 .scroll::-webkit-scrollbar-track {
-  background-color: var(--pallete2);
+  background-color: var(--pallete8);
   border-radius: 5px;
 }
 
@@ -1191,7 +1257,8 @@ body {
   padding-left: 5px;
   margin-bottom: 0px;
   text-align: left;
-  color: var(--pallete2);
+  color: white;
+  opacity: 0.5;
 }
 
 /* INPUTS E TEXTAREAS */
@@ -1203,9 +1270,9 @@ body {
   text-align: center;
   text-transform: uppercase;
   font-weight: bold;
-  background-color: var(--cor0);
+  background-color: var(--cor0) !important;
   border: 0px;
-  border-color: var(--cor0);
+  border-color: var(--cor0) !important;
   color: var(--texto1);
   border-radius: 5px;
   outline: 0px;
@@ -1264,9 +1331,9 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   font-weight: bold;
   text-transform: uppercase;
   color: var(--texto1);
-  background-color: var(--cor0);
+  background-color: var(--cor0) !important;
   border-width: 5px;
-  border-color: var(--cor0);
+  border-color: var(--cor0) !important;
   border-radius: 5px;
   outline: 0px;
   margin: 5px;
@@ -1572,7 +1639,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .button:hover {
-  background-color: var(--cor1);
+  background-color: var(--cor1hover);
   transition: 200ms ease-in-out;
 }
 
@@ -1639,7 +1706,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .button-green:hover {
-  background-color: var(--cor5);
+  background-color: var(--green);
   transition: 200ms ease-in-out;
 }
 

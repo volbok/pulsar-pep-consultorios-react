@@ -246,6 +246,8 @@ function GuiaSadt() {
               display: logo != '' ? 'flex' : 'none',
               height: 70,
               alignSelf: 'center',
+              borderRadius: 5,
+              marginBottom: 5,
             }}
           ></img>
           <div style={{
@@ -859,7 +861,7 @@ function GuiaSadt() {
                 style={{
                   display: 'flex',
                   opacity: 1,
-                  backgroundColor: "#ec7063",
+                  // backgroundColor: "#ec7063",
                   alignSelf: "center",
                 }}
                 onClick={() => {
@@ -876,7 +878,6 @@ function GuiaSadt() {
                 style={{
                   display: 'flex',
                   opacity: 1,
-                  backgroundColor: "#ec7063",
                   alignSelf: "center",
                 }}
                 onClick={() => {
@@ -902,7 +903,10 @@ function GuiaSadt() {
                 <img alt="" src={logo}
                   style={{
                     display: logo != '' ? 'flex' : 'none',
-                    height: 80
+                    height: 70,
+                    alignSelf: 'center',
+                    borderRadius: 5,
+                    marginBottom: 5,
                   }}>
                 </img>
                 <div style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center', width: 500 }}>
@@ -1224,7 +1228,9 @@ function GuiaSadt() {
       >
         < div className="fundo"
           style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 20 }}>
-          <div className="janela">PREPARANDO GUIA...</div>
+          <div className="janela">
+            <div className='text1'>PREPARANDO GUIA...</div>
+          </div>
         </div>
       </div>
     )

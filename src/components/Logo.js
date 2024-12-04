@@ -1,12 +1,19 @@
-import React from 'react';
+import React, { useContext, useEffect } from "react";
+import Context from "../pages/Context";
 
-export default function Logo({ height, width }) {
+export default function Logo({ height, width, color1 }) {
 
-  // definindo cores do logo conforme as cores do css.
-  var r = document.querySelector(':root');
-  var rs = getComputedStyle(r);
-  var cor1 = rs.getPropertyValue('--cor1');
-  var cor2 = rs.getPropertyValue('--cor2');
+  const {
+    logocor,
+  } = useContext(Context);
+
+  var cor1 = '#008080';
+  var cor2 = 'white';
+
+  useEffect(() => {
+    //eslint-disable-next-line
+    cor1 = logocor;
+  }, [logocor]);
 
   return (
     <svg

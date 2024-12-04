@@ -25,7 +25,6 @@ import DatePicker from "./components/DatePicker";
 
 // import logo from "./images/logo.svg";
 
-
 // router.
 import {
   // BrowserRouter as Router, >> pode usar fora do githubPages.
@@ -157,6 +156,12 @@ function App() {
   const [selectedprocedimento, setselectedprocedimento] = useState(0);
   const [guiasconsulta, setguiasconsulta] = useState([]);
   const [selectedguiaconsulta, setselectedguiaconsulta] = useState([]);
+
+  const [agenda, setagenda] = useState([]);
+
+  // tema de cores.
+  const [temacor, settemacor] = useState(0);
+  const [logocor, setlogocor] = useState('grey');
 
   // resolvendo a responsividade para o innerHeight nos celulares.
   const [altura, setaltura] = useState(`${window.innerHeight}px`);
@@ -327,9 +332,13 @@ function App() {
         selectedprocedimento, setselectedprocedimento,
         guiasconsulta, setguiasconsulta,
         selectedguiaconsulta, setselectedguiaconsulta,
+        agenda, setagenda,
+
+        temacor, settemacor,
+        logocor, setlogocor,
       }}
     >
-      <div>
+      <div id="aplicacao" className="teal">
         <Router>
           <Switch>
             <Route exact path="/">
@@ -385,3 +394,4 @@ function App() {
 }
 
 export default App;
+

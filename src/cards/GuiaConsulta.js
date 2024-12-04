@@ -265,7 +265,6 @@ function GuiaConsulta() {
                 style={{
                   display: 'flex',
                   opacity: 1,
-                  backgroundColor: "#ec7063",
                   alignSelf: "center",
                 }}
                 onClick={() => {
@@ -281,7 +280,6 @@ function GuiaConsulta() {
                 style={{
                   display: 'flex',
                   opacity: 1,
-                  backgroundColor: "#ec7063",
                   alignSelf: "center",
                 }}
                 onClick={() => {
@@ -305,7 +303,9 @@ function GuiaConsulta() {
                 <img alt="" src={logo}
                   style={{
                     display: logo == '' ? 'none' : 'flex',
-                    width: 270, height: 100
+                    height: 80,
+                    borderRadius: 5,
+                    marginBottom: 5,
                   }}>
                 </img>
                 <div style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center', width: 500 }}>

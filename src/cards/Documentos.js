@@ -360,13 +360,18 @@ function Documentos() {
                     }}
                   ></input>
                 </div>
-                <div>MOTIVO DO ATESTADO</div>
-                <div id='seletor de motivo do atestado'>
+                <div style={{ fontSize: 14 }}>MOTIVO DO ATESTADO</div>
+                <div id='seletor de motivo do atestado' style={{ width: '100%' }}>
                   {arraymotivos.map(item => (
                     <div
                       id={'motivo ' + item}
                       className='button'
-                      style={{ width: 200, alignSelf: 'center' }}
+                      style={{
+                        width: 'calc(100% - 20px)',
+                        minWidth: 'calc(100% - 20px)',
+                        maxWidth: 'calc(100% - 20px)',
+                        alignSelf: 'center'
+                      }}
                       onClick={() => {
                         localStorage.setItem('MOTIVO', item);
                         selector('seletor de motivo do atestado', 'motivo ' + item, 100);
@@ -376,13 +381,18 @@ function Documentos() {
                     </div>
                   ))}
                 </div>
-                <div>TIPO DE ATESTADO</div>
-                <div id='seletor de tipo de atestado'>
+                <div style={{ fontSize: 14 }}>TIPO DE ATESTADO</div>
+                <div id='seletor de tipo de atestado' style={{ width: '100%' }}>
                   {arraytiposatestados.map(tipo => (
                     <div
                       id={'tipo ' + tipo}
                       className='button'
-                      style={{ width: 200 }}
+                      style={{
+                        width: 'calc(100% - 20px)',
+                        minWidth: 'calc(100% - 20px)',
+                        maxWidth: 'calc(100% - 20px)',
+                        alignSelf: 'center',
+                      }}
                       onClick={() => {
                         selector('seletor de tipo de atestado', 'tipo ' + tipo, 100);
                         localStorage.setItem('TIPO', tipo);

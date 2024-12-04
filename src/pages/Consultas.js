@@ -23,6 +23,7 @@ import Documentos from "../cards/Documentos";
 import Exames from "../cards/Exames";
 import selector from "../functions/selector";
 import NotionField from "../cards/NotionField";
+import mountage from "../functions/mountage";
 
 function Consultas() {
   // context.
@@ -188,25 +189,24 @@ function Consultas() {
     return (
       <div id="identificação do usuário, filtro de pacientes e botões principais"
         style={{
-          display: 'flex', flexDirection: 'row',
+          display: 'flex', flexDirection: 'column',
           justifyContent: 'center',
           alignContent: 'center',
           alignSelf: 'center',
           flexWrap: 'wrap',
           marginBottom: 5,
           width: '100%',
-          // backgroundColor: 'yellow'
-
         }}>
-        <div className="text1" style={{ alignSelf: 'flex-start', margin: 0 }}>{'USUÁRIO: ' + usuario.nome_usuario.split(' ', 1)}</div>
+        <div className="text3"
+          style={{ alignSelf: 'center', margin: 0, color: 'white', fontSize: 16 }}>{'USUÁRIO: ' + usuario.nome_usuario.split(' ', 1)}</div>
         <div
           style={{
             display: "flex",
             flexDirection: "row",
             justifyContent: 'center',
-            flexWrap: 'wrap',
             alignContent: 'center',
             alignSelf: 'center',
+            width: '100%',
           }}
         >
           <div
@@ -229,8 +229,8 @@ function Consultas() {
               }}
             ></img>
           </div>
-          <div
-            className={localStorage.getItem('agendados') == 1 ? "button red" : "button"}
+          <div id="botão consultas agendadas / todas as consultas"
+            className={localStorage.getItem('agendados') == 1 ? "button-selected" : "button"}
             title={localStorage.getItem('agendados') == 1 ? 'ATENDIMENTOS AGENDADOS' : 'ATENDIMENTOS ENCERRADOS'}
             onClick={() => {
               if (localStorage.getItem('agendados') == 1) {
@@ -251,7 +251,7 @@ function Consultas() {
               }}
             ></img>
           </div>
-          <div style={{ width: 200 }}>
+          <div style={{ width: '100%' }}>
             {Filter('inputFilterConsulta', setarrayatendimentos, atendimentos, 'item.nome_paciente')}
           </div>
         </div>
@@ -406,22 +406,6 @@ function Consultas() {
       });
   };
   const ListaDeAtendimentos = useCallback(() => {
-    const mountAge = (item) => {
-      console.log('DN: ' + item);
-      let meses = moment().diff(moment(item, 'DD/MM/YYYY'), 'months');
-      console.log('MESES: ' + meses);
-      let anos = Math.floor(meses / 12);
-      console.log('ANOS: ' + anos)
-      let meses_restantes = meses - (anos * 12);
-      if (anos > 1) {
-        return anos + ' ANOS E ' + meses_restantes + ' MESES';
-      } else if (anos == 1) {
-        return anos + ' ANO E ' + meses_restantes + ' MESES';
-      } else {
-        return meses_restantes + ' MESES';
-      }
-    }
-
     return (
       <div
         style={{
@@ -463,7 +447,7 @@ function Consultas() {
                     }}
                   >
                     <div
-                      className="button-yellow"
+                      className="button"
                       style={{
                         display: 'flex',
                         flexDirection: 'column',
@@ -473,7 +457,7 @@ function Consultas() {
                         borderBottomRightRadius: 0,
                         minHeight: 100,
                         width: 80, minWidth: 80, maxWidth: 80,
-                        backgroundColor: '#006666'
+                        opacity: 0.9,
                       }}
                     >
                       <div
@@ -584,8 +568,7 @@ function Consultas() {
                             .map((valor) => valor.nome_paciente)}
                         </div>
                         <div style={{ display: 'flex' }}>
-                          {mountAge(pacientes.filter((valor) => valor.id_paciente == item.id_paciente)
-                            .map((valor) => moment(valor.dn_paciente).format('DD/MM/YYYY')))}
+                          {mountage(pacientes.filter((valor) => valor.id_paciente == item.id_paciente).map((valor) => moment(valor.dn_paciente).format('DD/MM/YYYY')))}
                         </div>
                         <div style={{ display: 'none' }}>
                           {pacientes.filter((valor) => valor.id_paciente == item.id_paciente)
@@ -836,7 +819,7 @@ function Consultas() {
     return (
       <div style={{ display: 'flex' }}>
         <div
-          className={card == opcao ? "button red" : "button"}
+          className={card == opcao ? "button-selected" : "button"}
           style={{
             display: "flex",
             pointerEvents: opcao == null || atendimento == null ? 'none' : 'auto',
@@ -854,14 +837,14 @@ function Consultas() {
             className="button"
             style={{
               display: sinal != null && sinal.length > 0 ? 'flex' : 'none',
-              position: 'absolute', bottom: -10, right: -10,
+              position: 'absolute', bottom: -10, right: -15,
               borderRadius: 50,
               backgroundColor: '#EC7063',
               borderStyle: 'solid',
               borderWidth: 5,
               borderColor: 'white',
-              width: 20, minWidth: 20, maxWidth: 20,
-              height: 20, minHeight: 20, maxHeight: 20,
+              width: 15, minWidth: 15, maxWidth: 15,
+              height: 15, minHeight: 15, maxHeight: 15,
             }}>!</div>
           <div style={{ margin: 0, padding: 10 }}>{titulo}</div>
         </div>
@@ -878,7 +861,8 @@ function Consultas() {
         className="chassi"
         id="conteúdo do prontuário"
         style={{
-          display: 'flex', flexDirection: 'row', justifyContent: 'space-evenly',
+          display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
+          width: 'calc(100vw - 20px)',
         }}
       >
         <div id="usuário, botões, busca de paciente e lista de pacientes"
@@ -900,8 +884,7 @@ function Consultas() {
           display: 'flex', flexDirection: 'column',
           justifyContent: 'flex-end',
           marginLeft: 5,
-          width: window.innerWidth < 800 ? '65vw' : '70vw',
-          // backgroundColor: 'green',
+          width: window.innerWidth < 800 ? '65vw' : 'calc(75vw - 20px)',
         }}>
           <div id="cards (cartões) fixos"
             className="scroll"

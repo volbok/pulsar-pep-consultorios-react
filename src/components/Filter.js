@@ -33,7 +33,7 @@ function Filter(input_id, setarraylist, list, parameter) {
     <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', width: '100%' }}>
       <input
         title={input_id}
-        className="input cor2"
+        className="input"
         autoComplete="off"
         placeholder={"FILTRAR..."}
         onFocus={(e) => (e.target.placeholder = "")}

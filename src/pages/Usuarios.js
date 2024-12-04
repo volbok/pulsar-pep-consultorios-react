@@ -36,6 +36,7 @@ function Usuarios() {
     unidades,
     usuario,
     arrayespecialidades,
+    agenda, setagenda,
   } = useContext(Context);
 
   // history (router).
@@ -58,6 +59,7 @@ function Usuarios() {
     if (pagina == 5) {
       setselectedusuario(0);
       loadUsuarios();
+      loadAgenda();
     }
     // eslint-disable-next-line
   }, [pagina]);
@@ -647,10 +649,9 @@ function Usuarios() {
         className="scroll"
         id="scroll usuários"
         style={{
-          width: 400,
-          maxWidth: 400,
-          height: "60vh",
-          marginTop: 10,
+          flexGrow: 1,
+          marginTop: 5,
+          width: 'calc(100% - 15px)',
         }}
       >
         {arrayusuarios
@@ -670,6 +671,7 @@ function Usuarios() {
                 onClick={() => {
                   localStorage.setItem("selecteduser", JSON.stringify(item));
                   setselectedusuario(item);
+                  console.log(selectedusuario.id_usuario);
                   localStorage.setItem('id', item.id_usuario);
                   localStorage.setItem('nome', item.nome_usuario);
                   localStorage.setItem('dn', item.dn_usuario);
@@ -692,9 +694,9 @@ function Usuarios() {
                   selector("scroll usuários", "usuario " + item.id_usuario, 300);
                 }}
                 style={{
-                  flex: 2,
                   justifyContent: "space-between",
                   paddingLeft: 10,
+                  textAlign: 'left'
                 }}
               >
                 {item.nome_usuario.length < 26 ? item.nome_usuario : item.nome_usuario.substring(0, 25) + '...'}
@@ -759,7 +761,6 @@ function Usuarios() {
           className="text1"
           style={{
             display: arrayusuarios.length == 0 ? "flex" : "none",
-            width: "90vw",
             opacity: 0.5,
           }}
         >
@@ -831,13 +832,15 @@ function Usuarios() {
 
   function Acessos() {
     return (
-      <div style={{ display: 'flex', width: '100%' }}>
+      <div style={{ display: 'flex', width: '100%', flexDirection: 'column', justifyContent: 'center' }}>
         <div
           id="acessos e módulos"
           style={{
             display: selectedusuario != 0 ? "flex" : "none",
             flexDirection: "column",
-            justifyContent: "flex-start",
+            justifyContent: "center",
+            alignSelf: 'center',
+            marginBottom: 10,
           }}
         >
           <ListaDeModulos></ListaDeModulos>
@@ -846,9 +849,10 @@ function Usuarios() {
           id="vazio"
           style={{
             display: selectedusuario == 0 ? "flex" : "none",
+            // display: 'none',
             flexDirection: "column",
             justifyContent: "center",
-            width: '40vw', height: 'calc(100vh - 20px)',
+            width: '100%', height: 'calc(100vh - 20px)',
           }}
         >
           <img
@@ -891,10 +895,10 @@ function Usuarios() {
           alignContent: "center",
           alignSelf: "center",
           alignItems: "center",
-          width: '40vw', height: 'calc(100vh - 20px)',
+          width: '100%',
         }}
       >
-        <div className="text3" style={{ margin: 5, padding: 5 }}>
+        <div className="text3" style={{ margin: 5 }}>
           MÓDULOS DO SISTEMA LIBERADOS:
         </div>
         <div
@@ -1003,19 +1007,313 @@ function Usuarios() {
     localStorage.setItem('tipo_usuario', '');
   }
 
-  return (
-    <div className="main" style={{ display: pagina == 5 ? "flex" : "none" }}>
+  // AGENDAMENTO SEMANAL DE CONSULTAS.
+  const loadAgenda = () => {
+    axios.get(html + "list_agenda").then((response) => {
+      let x = response.data.rows;
+      setagenda(x);
+      // filtrar para usuário logado.
+    })
+  }
+
+  const insertAgenda = (obj) => {
+    axios.post(html + 'insert_usuario_agenda', obj).then(() => {
+      console.log('registro de agenda inserido com sucesso.');
+      loadAgenda();
+    })
+  }
+
+  const deleteAgenda = (id) => {
+    axios.get(html + 'delete_usuario_agenda/' + id).then(() => {
+      console.log('REGISTRO DE AGENDA EXCLUÍDO COM SUCESSO');
+      loadAgenda();
+    })
+  }
+
+  // LISTA DE AGENDAMENTOS PREDEDINIDOS.
+  const horariossemana = (dia, filtro) => {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', height: '100%', margin: 5 }}>
+        <div className="text1" style={{ width: '100%' }}>{dia}</div>
+        <div className="scroll cor2" style={{ height: '100%', width: '15vw' }}>
+          {agenda.filter(item => item.id_usuario == localStorage.getItem('id') && item.dia_semana == filtro).sort((a, b) => moment(a.hora_inicio, 'HH:mm') > moment(b.hora_inicio, 'HH:mm') ? 1 : -1).map(item => (
+            <div className='button'
+              style={{
+                width: 'calc(100% - 20px)',
+                minWidth: 'calc(100% - 20px)',
+                maxWidth: 'calc(100% - 20px)',
+                display: 'flex', flexDirection: 'column', justifyContent: 'center',
+              }}>
+              <div>{item.hora_inicio + ' ÀS ' + item.hora_termino}</div>
+              <div
+                id="btn-delete-agenda"
+                className="button-yellow"
+                style={{
+                  display: 'flex',
+                  width: 30,
+                  height: 30,
+                }}
+                onClick={() => {
+                  modal(
+                    setdialogo,
+                    "EXCLUIR O HORÁRIO DE AGENDAMENTO?",
+                    deleteAgenda,
+                    [item.id]
+                  );
+                }}
+              >
+                <img
+                  alt=""
+                  src={deletar}
+                  style={{
+                    margin: 10,
+                    height: 20,
+                    width: 20,
+                  }}
+                ></img>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  function AgendaSemanal() {
+    return (
+      <div style={{
+        display: selectedusuario == 0 ? 'none' : 'flex',
+        flexDirection: 'column', justifyContent: 'center',
+        alignItems: 'center',
+      }}>
+        <div className="text3" style={{ margin: 5, marginBottom: 10 }}>
+          AGENDAMENTO SEMANAL DE CONSULTAS
+        </div>
+        <div
+          className="scroll"
+          style={{
+            display: 'flex', flexDirection: 'row',
+            height: '100%', minHeight: 300,
+            marginBottom: 5,
+            backgroundColor: 'white', borderColor: 'white',
+            width: '55vw',
+            overflowX: 'scroll',
+            overflowY: 'hidden',
+            paddingBottom: 10,
+          }}>
+          {horariossemana('SEGUNDA', 'SEGUNDA-FEIRA')}
+          {horariossemana('TERÇA', 'TERÇA-FEIRA')}
+          {horariossemana('QUARTA', 'QUARTA-FEIRA')}
+          {horariossemana('QUINTA', 'QUINTA-FEIRA')}
+          {horariossemana('SEXTA', 'SEXTA-FEIRA')}
+          {horariossemana('SÁBADO', 'SÁBADO')}
+        </div>
+        <div
+          className="button-green"
+          style={{ marginTop: 10 }}
+          title={"CADASTRAR AGENDA"}
+          onClick={() => {
+            setinsertagendaview(1);
+          }}
+        >
+          <img
+            alt=""
+            src={novo}
+            style={{
+              margin: 0,
+              height: 30,
+              width: 30,
+            }}
+          ></img>
+        </div>
+      </div>
+    )
+  }
+
+  let arrayweek = ['SEGUNDA-FEIRA', 'TERÇA-FEIRA', 'QUARTA-FEIRA', 'QUINTA-FEIRA', 'SEXTA-FEIRA', 'SÁBADO']
+  const [insertagendaview, setinsertagendaview] = useState(0);
+  function InsertAgendaView() {
+    var timeout = null;
+    const fixHour = (input, valor, storage) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        if (valor > 23 || valor < 0) {
+          document.getElementById(input).value = '';
+          document.getElementById(input).focus();
+        } else {
+          localStorage.setItem(storage, valor);
+        }
+      }, 100);
+    };
+    const fixMin = (input, valor, storage) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        if (valor > 59 || valor < 0) {
+          document.getElementById(input).value = '';
+          document.getElementById(input).focus();
+        } else {
+          localStorage.setItem(storage, valor);
+        }
+      }, 100);
+    };
+    return (
       <div
-        className="chassi"
+        className="fundo"
+        style={{ display: insertagendaview == 1 ? "flex" : "none" }}
+        onClick={() => {
+          setinsertagendaview(0);
+          console.log(localStorage.getItem('id'));
+          setTimeout(() => {
+            document.getElementById("usuario " + localStorage.getItem('id')).className = "button-selected"
+          }, 200);
+        }}
+      >
+        <div className="janela" onClick={(e) => e.stopPropagation()}
+          style={{ display: 'flex', flexDirection: 'column', width: '50vw', height: '80vh' }}>
+          <div id="weeklist" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap' }}>
+            {arrayweek.map(item => (
+              <div id={'weekday ' + item}
+                className="button" style={{ width: 150 }}
+                onClick={() => {
+                  localStorage.setItem('dia', item);
+                  selector("weeklist", 'weekday ' + item, 200);
+                }}
+              >
+                {item}
+              </div>
+            ))}
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', marginTop: 10 }}>
+            <div className="text3">HORÁRIO INICIAL DA CONSULTA</div>
+            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+              <input id="inputAgendaHoraInicio"
+                autoComplete="off"
+                className="input"
+                placeholder="HH"
+                onFocus={(e) => (e.target.placeholder = '')}
+                onBlur={(e) => (e.target.placeholder = 'HH')}
+                onKeyUp={(e) => fixHour('inputAgendaHoraInicio', e.target.value, 'storageAgendaHoraInicio')}
+                title="HORAS."
+                maxLength={2}
+                style={{
+                  width: 100,
+                  height: 50,
+                }}
+                min={0}
+                max={23}
+              ></input>
+              <div className='text1'>{' : '}</div>
+              <input id="inputAgendaMinutoInicio"
+                autoComplete="off"
+                className="input"
+                placeholder="MM"
+                onFocus={(e) => (e.target.placeholder = '')}
+                onBlur={(e) => (e.target.placeholder = 'MM')}
+                onKeyUp={(e) => fixMin('inputAgendaMinutoInicio', e.target.value, 'storageAgendaMinutoInicio')}
+                title="MINUTOS."
+                maxLength={2}
+                style={{
+                  width: 100,
+                  height: 50,
+                }}
+                min={0}
+                max={59}
+              ></input>
+            </div>
+            <div className="text3">HORÁRIO FINAL DA CONSULTA</div>
+            <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+              <input id="inputAgendaHoraFinal"
+                autoComplete="off"
+                className="input"
+                placeholder="HH"
+                onFocus={(e) => (e.target.placeholder = '')}
+                onBlur={(e) => (e.target.placeholder = 'HH')}
+                onKeyUp={(e) => fixHour('inputAgendaHoraFinal', e.target.value, 'storageAgendaHoraFinal')}
+                title="HORAS."
+                maxLength={2}
+                style={{
+                  width: 100,
+                  height: 50,
+                }}
+                min={0}
+                max={23}
+              ></input>
+              <div className='text1'>{' : '}</div>
+              <input id="inputAgendaMinutoFinal"
+                autoComplete="off"
+                className="input"
+                placeholder="MM"
+                onFocus={(e) => (e.target.placeholder = '')}
+                onBlur={(e) => (e.target.placeholder = 'MM')}
+                onKeyUp={(e) => fixMin('inputAgendaMinutoFinal', e.target.value, 'storageAgendaMinutoFinal')}
+                title="MINUTOS."
+                maxLength={2}
+                style={{
+                  width: 100,
+                  height: 50,
+                }}
+                min={0}
+                max={59}
+              ></input>
+            </div>
+            <div id="btnAdd"
+              className="button-green"
+              title="CONFIRMAR DIA DA SEMANA E HORA."
+              onClick={() => {
+                let horainicio = localStorage.getItem('storageAgendaHoraInicio') + ':' + localStorage.getItem('storageAgendaMinutoInicio');
+                let horatermino = localStorage.getItem('storageAgendaHoraFinal') + ':' + localStorage.getItem('storageAgendaMinutoFinal');
+                let obj = {
+                  id_usuario: usuario.id,
+                  nome_usuario: usuario.nome_usuario,
+                  dia_semana: localStorage.getItem('dia'),
+                  hora_inicio: horainicio,
+                  hora_termino: horatermino,
+                }
+                insertAgenda(obj);
+                setinsertagendaview(0);
+              }}
+              style={{ width: 50, maxWidth: 50, alignSelf: 'center', marginTop: 30 }}
+            >
+              <img
+                alt=""
+                src={salvar}
+                style={{
+                  margin: 10,
+                  height: 30,
+                  width: 30,
+                }}
+              ></img>
+            </div>
+          </div>
+        </div>
+      </div >
+    )
+  }
+
+  return (
+    <div className="main"
+      style={{ display: pagina == 5 ? "flex" : "none" }}>
+      <div
+        className="scroll"
         id="conteúdo do prontuário"
-        style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', position: 'relative' }}
+        style={{
+          display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', position: 'relative',
+          width: 'calc(100% - 20px)',
+          height: 'calc(100vh - 20px)',
+          backgroundColor: 'transparent',
+          borderWidth: 0,
+          borderStyle: 'hidden',
+        }}
       >
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            justifyContent: "center",
-            position: 'sticky', top: 10,
+            justifyContent: "space-between",
+            width: '30vw',
+            marginRight: 10,
+            position: 'sticky',
+            top: 0,
           }}
         >
           <div id="botões e pesquisa"
@@ -1024,7 +1322,6 @@ function Usuarios() {
               flexDirection: "row",
               justifyContent: "center",
               alignSelf: "center",
-              width: "100%",
             }}
           >
             <div
@@ -1070,9 +1367,17 @@ function Usuarios() {
           </div>
           <ListaDeUsuarios></ListaDeUsuarios>
         </div>
-        <Acessos></Acessos>
+        <div
+          style={{
+            display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
+            alignSelf: 'center', height: '100%', width: 'calc(80vw - 20px)'
+          }}>
+          <Acessos></Acessos>
+          <AgendaSemanal></AgendaSemanal>
+        </div>
         <InsertUsuario></InsertUsuario>
         <InsertAcesso></InsertAcesso>
+        <InsertAgendaView></InsertAgendaView>
       </div>
     </div>
   );
