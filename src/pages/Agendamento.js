@@ -41,7 +41,7 @@ function Agendamento() {
     if (pagina == 20) {
       loadUsuarios();
       loadPacientes();
-      loadAtendimentos();
+      // loadAtendimentos();
       currentMonth();
       loadAgenda();
     }
@@ -126,18 +126,33 @@ function Agendamento() {
 
   const [arrayatendimentos, setarrayatendimentos] = useState([]);
   const loadAtendimentos = () => {
+    // carregando os atendimentos já registrados.
     axios
       .get(html + "list_consultas/" + 5) // 5 corresponde ao id da unidade "AMBULATÓRIO".
       .then((response) => {
         var x = response.data.rows;
         var y = x.filter(item => item.id_unidade == 5);
-        // item.id_paciente == paciente.id_paciente
         if (window.innerWidth > mobilewidth) {
           setarrayatendimentos(y);
         } else {
           setarrayatendimentos(y.filter(atendimento => atendimento.id_profissional == usuario.id));
         }
-      })
+      });
+  };
+
+  const loadModdedAtendimentos = (item) => {
+    // carregando os atendimentos já registrados.
+    axios
+      .get(html + "list_consultas/" + 5) // 5 corresponde ao id da unidade "AMBULATÓRIO".
+      .then((response) => {
+        var x = response.data.rows;
+        var y = x.filter(item => item.id_unidade == 5);
+        if (window.innerWidth > mobilewidth) {
+          carregaHorarioslivres(y, item);
+        } else {
+          setarrayatendimentos(y.filter(atendimento => atendimento.id_profissional == usuario.id));
+        }
+      });
   };
 
   // ENVIO DE MENSAGENS DE AGENDAMENTO DA CONSULTA PELO WHATSAPP.
@@ -582,7 +597,8 @@ function Agendamento() {
                   setselectdate(item);
                   console.log(moment(item).format('dddd'))
                   localStorage.setItem('selectdate', item);
-                  e.stopPropagation()
+                  loadModdedAtendimentos(item);
+                  e.stopPropagation();
                 }}
                 style={{
                   height: 50,
@@ -630,6 +646,30 @@ function Agendamento() {
     )
   }
 
+  const carregaHorarioslivres = (array_origin, data) => {
+    console.log(data);
+    console.log(moment(data, 'DD/MM/YYYY').format('dddd').toUpperCase());
+    console.log('ARRAYATENDIMENTOS ANTES: ' + array_origin.length);
+    let array = array_origin;
+    agenda.filter(item => item.id_usuario == selectedespecialista.id_usuario &&
+      item.dia_semana == moment(data, 'DD/MM/YYYY').format('dddd').toUpperCase()).map(item => {
+        console.log('pega horário da agenda...')
+        array.push(
+          {
+            situacao: 'AGENDAMENTO',
+            id_profissional: selectedespecialista.id_usuario,
+            data_inicio: moment(data + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'),
+            data_termino: moment(data + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm'),
+            faturamento_codigo_procedimento: moment(item.data_termino).diff(moment(item.data_inicio, 'minutes')) == cliente.tempo_consulta_convenio ? 'CONVÊNIO' : 'PARTICULAR',
+          }
+        );
+        return null;
+      });
+    console.log('ARRAYATENDIMENTOS DEPOIS: ' + array.length);
+    console.log(array);
+    setarrayatendimentos(array);
+  }
+
   const ListaDeAtendimentos = useCallback(() => {
     return (
       <div
@@ -642,22 +682,28 @@ function Agendamento() {
         <div id="scroll atendimentos com pacientes"
           className='scroll'
           style={{
-            display: selectdate != null && arrayatendimentos.filter(item => item.situacao == 3 && moment(item.data_inicio).format('DD/MM/YYYY') == selectdate && item.id_profissional == selectedespecialista.id_usuario).length > 0 ? "flex" : "none",
+            display: selectdate != null && arrayatendimentos.filter(item => moment(item.data_inicio).format('DD/MM/YYYY') == selectdate).length > 0 ? "flex" : "none",
             flexDirection: 'column',
             justifyContent: "flex-start",
-            height: '50vh',
+            height: '80vh',
             width: '50vw',
             marginLeft: 20
           }}
         >
           {arrayatendimentos
-            .filter(item => item.situacao == 3 && moment(item.data_inicio).format('DD/MM/YYYY') == selectdate && item.id_profissional == selectedespecialista.id_usuario)
+            .filter(item => moment(item.data_inicio).format('DD/MM/YYYY') == selectdate && (item.situacao == 3 || item.situacao == 'AGENDAMENTO') && item.id_profissional == selectedespecialista.id_usuario)
             .sort((a, b) => (moment(a.data_inicio) > moment(b.data_inicio) ? 1 : -1))
             .map((item) => (
-              <div key={"pacientes" + item.id_atendimento} style={{ width: '100%' }}>
-                <div
+              <div
+                key={"pacientes" + item.id_atendimento} style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  width: '100%'
+                }}>
+                <div id='atendimentos agendados'
                   style={{
-                    display: 'flex', flexDirection: 'row',
+                    display: item.situacao == 3 ? 'flex' : 'none',
+                    flexDirection: 'row',
                     position: "relative",
                     margin: 2.5, padding: 0,
                   }}
@@ -851,6 +897,52 @@ function Agendamento() {
                     </div>
                   </div>
                 </div>
+                <div id='horários predefinidos vagos'
+                  style={{
+                    display: item.situacao == 'AGENDAMENTO' ? 'flex' : 'none',
+                    margin: 2.5, padding: 0,
+                  }}>
+                  <div
+                    className='button cor3'
+                    style={{
+                      width: 'calc(100% - 20px)',
+                      display: 'flex', flexDirection: 'row',
+                      justifyContent: 'space-between',
+                    }}>
+                    {item.situacao}
+                    <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
+                      <div style={{ alignSelf: 'center' }}>
+                        {'HORÁRIO VAGO: ' + moment(item.data_inicio).format('HH:mm')}
+                      </div>
+                      <div
+                        onClick={() => {
+                          // insertAtendimento(moment(item.data_inicio).format('DD/MM/YYYY - HH:mm'));
+                          checkConsultas(moment(item.data_inicio).format('DD/MM/YYYY - HH:mm'));
+                        }}
+                        className='button-red'
+                        style={{
+                          padding: 2.5,
+                          paddingLeft: 10, paddingRight: 10,
+                          marginLeft: 10,
+                          borderRadius: 5,
+                          maxHeight: 30, minHeight: 30,
+                          backgroundColor: item.faturamento_codigo_procedimento == 'PARTICULAR' ? 'rgb(82, 190, 128, 1)' : '#03aacd',
+                          color: 'white',
+                          fontWeight: 'bold',
+                          pointerEvents: 'none',
+                        }}>
+                        {item.faturamento_codigo_procedimento}
+                      </div>
+                    </div>
+
+                    <div className='button' style={{
+                      padding: 2.5, paddingLeft: 15, paddingRight: 15,
+                      maxHeight: 30, minHeight: 30,
+                    }}>
+                      AGENDAR
+                    </div>
+                  </div>
+                </div>
               </div>
             ))
           }
@@ -858,7 +950,7 @@ function Agendamento() {
         <div id="scroll atendimento vazio"
           className='scroll'
           style={{
-            display: selectdate == null || arrayatendimentos.filter(item => item.situacao == 3 && moment(item.data_inicio).format('DD/MM/YYYY') == selectdate && item.id_profissional == selectedespecialista.id_usuario).length == 0 ? "flex" : "none",
+            display: selectdate == null || arrayatendimentos.length == 0 ? "flex" : "none",
             flexDirection: 'column',
             justifyContent: "center",
             height: '50vh',
@@ -879,10 +971,9 @@ function Agendamento() {
             }}
           ></img>
         </div>
-        <Agenda></Agenda>
       </div>
     );
-    // eslint-disable-next-line
+    // eslint-disable-next-lin
   }, [arrayatendimentos, selectedespecialista, selectdate]);
 
   const [listatodosatendimentos, setlistatodosatendimentos] = useState(0);
