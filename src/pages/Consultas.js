@@ -272,6 +272,7 @@ function Consultas() {
             style={{ display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center' }}>
             {salas.map(item => (
               <div
+                key={"btnsala " + item}
                 id={"btnsala " + item}
                 className="button"
                 onClick={() => {
@@ -649,12 +650,13 @@ function Consultas() {
                       }}
                     >
                       <div id="botões para finalizar atendimento e reagendar consulta"
+                        className="cor0"
                         style={{
                           display: "flex",
                           flexDirection: "row",
                           alignContent: "center",
-                          backgroundColor: "rgba(242, 242, 242)",
-                          borderColor: "rgba(242, 242, 242)",
+                          // backgroundColor: "rgba(242, 242, 242)",
+                          // borderColor: "rgba(242, 242, 242)",
                           borderRadius: 5,
                           borderStyle: 'solid',
                           borderWidth: 3,

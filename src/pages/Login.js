@@ -651,7 +651,9 @@ function Login() {
     return (
       <div style={{ display: acessos.length > 0 && usuario != {} && viewlistaunidades == 0 ? 'flex' : 'none', alignSelf: 'center' }}>
         {acessos.map(item => (
-          <div className="button" style={{ width: 200, height: 200 }}
+          <div
+            key={'cliente_selector: ' + item.id_cliente}
+            className="button" style={{ width: 200, height: 200 }}
             onClick={() => {
               setcliente(clientes.filter(valor => valor.id_cliente == item.id_cliente).pop());
               sethospital(clientes.filter(valor => valor.id_cliente == item.id_cliente).map(item => item.id_cliente).pop());

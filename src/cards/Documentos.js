@@ -53,7 +53,7 @@ function Documentos() {
 
   const loadDocumentos = () => {
     setdocumentos([]);
-    axios.get(html + "list_documentos/" + atendimento).then((response) => {
+    axios.get(html + "list_documentos_idpct/" + paciente).then((response) => {
       var x = response.data.rows;
       setdocumentos(x.sort((a, b) => moment(a.data) < moment(b.data) ? 1 : -1));
       setselecteddocumento([]);
@@ -592,7 +592,11 @@ function Documentos() {
                   }
                 }, 200);
               }}
-              style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: 180 }}
+              style={{
+                display: atendimentos.length > 0 ? 'flex' : 'none',
+                flexDirection: 'column', justifyContent: 'center', minHeight: 180,
+                opacity: item.id_atendimento == atendimento ? 1 : 0.7
+              }}
             >
               <div id="botões"
                 style={{

@@ -39,11 +39,14 @@ function Agendamento() {
   useEffect(() => {
     // eslint-disable-next-line
     if (pagina == 20) {
+      setselectdate(moment().format('DD/MM/YYYY'))
       loadUsuarios();
       loadPacientes();
-      // loadAtendimentos();
-      currentMonth();
       loadAgenda();
+      currentMonth();
+      setTimeout(() => {
+        loadModdedAtendimentos(moment().format('DD/MM/YYYY'));
+      }, 2000);
     }
     if (paciente == null) {
       setlistatodosatendimentos(1);
@@ -125,23 +128,9 @@ function Agendamento() {
   }
 
   const [arrayatendimentos, setarrayatendimentos] = useState([]);
-  const loadAtendimentos = () => {
-    // carregando os atendimentos já registrados.
-    axios
-      .get(html + "list_consultas/" + 5) // 5 corresponde ao id da unidade "AMBULATÓRIO".
-      .then((response) => {
-        var x = response.data.rows;
-        var y = x.filter(item => item.id_unidade == 5);
-        if (window.innerWidth > mobilewidth) {
-          setarrayatendimentos(y);
-        } else {
-          setarrayatendimentos(y.filter(atendimento => atendimento.id_profissional == usuario.id));
-        }
-      });
-  };
-
   const loadModdedAtendimentos = (item) => {
     // carregando os atendimentos já registrados.
+    setarrayatendimentos([]);
     axios
       .get(html + "list_consultas/" + 5) // 5 corresponde ao id da unidade "AMBULATÓRIO".
       .then((response) => {
@@ -236,6 +225,8 @@ function Agendamento() {
       insertAtendimento(inicio);
     }
   }
+
+  /*
   const checkUpdateConsultas = (item, inicio) => {
     let poolatendimentos = [];
     console.log(item); // obj ok.
@@ -277,6 +268,7 @@ function Agendamento() {
       updateAtendimento([item, inicio]);
     }
   }
+  */
 
   const insertAtendimento = (inicio) => {
     var obj = {
@@ -300,7 +292,8 @@ function Agendamento() {
       .post(html + "insert_consulta", obj)
       .then(() => {
         console.log('AGENDAMENTO DE CONSULTA INSERIDO COM SUCESSO')
-        loadAtendimentos();
+        // loadAtendimentos();
+        loadModdedAtendimentos(selectdate);
         // geraWhatsapp(inicio);
       });
   };
@@ -329,7 +322,8 @@ function Agendamento() {
       .post(html + "update_atendimento/" + item.id_atendimento, obj)
       .then(() => {
         console.log('AGENDAMENTO DE CONSULTA ATUALIZADO COM SUCESSO')
-        loadAtendimentos();
+        // loadAtendimentos();
+        loadModdedAtendimentos(selectdate);
         // geraWhatsapp(inicio);
       });
   };
@@ -356,7 +350,8 @@ function Agendamento() {
       .post(html + "update_atendimento/" + item.id_atendimento, obj)
       .then(() => {
         console.log('AGENDAMENTO DE CONSULTA ATUALIZADO COM SUCESSO')
-        loadAtendimentos();
+        // loadAtendimentos();
+        loadModdedAtendimentos(selectdate);
       });
   };
 
@@ -370,7 +365,8 @@ function Agendamento() {
   const deleteAtendimento = (id) => {
     axios.get(html + "delete_atendimento/" + id).then(() => {
       console.log('DELETANDO AGENDAMENTO DE CONSULTA');
-      loadAtendimentos();
+      // loadAtendimentos();
+      loadModdedAtendimentos(selectdate);
     });
   };
 
@@ -595,8 +591,8 @@ function Agendamento() {
                 className={selectdate == item ? "button-selected" : "button"}
                 onClick={(e) => {
                   setselectdate(item);
-                  console.log(moment(item).format('dddd'))
                   localStorage.setItem('selectdate', item);
+                  carregaHorarioslivres(agenda, item);
                   loadModdedAtendimentos(item);
                   e.stopPropagation();
                 }}
@@ -647,26 +643,22 @@ function Agendamento() {
   }
 
   const carregaHorarioslivres = (array_origin, data) => {
-    console.log(data);
-    console.log(moment(data, 'DD/MM/YYYY').format('dddd').toUpperCase());
-    console.log('ARRAYATENDIMENTOS ANTES: ' + array_origin.length);
     let array = array_origin;
     agenda.filter(item => item.id_usuario == selectedespecialista.id_usuario &&
       item.dia_semana == moment(data, 'DD/MM/YYYY').format('dddd').toUpperCase()).map(item => {
         console.log('pega horário da agenda...')
+        console.log(moment(data + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm').diff(moment(data + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'), 'minutes'));
         array.push(
           {
             situacao: 'AGENDAMENTO',
             id_profissional: selectedespecialista.id_usuario,
             data_inicio: moment(data + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'),
             data_termino: moment(data + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm'),
-            faturamento_codigo_procedimento: moment(item.data_termino).diff(moment(item.data_inicio, 'minutes')) == cliente.tempo_consulta_convenio ? 'CONVÊNIO' : 'PARTICULAR',
+            faturamento_codigo_procedimento: moment(data + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm').diff(moment(data + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'), 'minutes') == cliente.tempo_consulta_convenio ? 'CONVÊNIO' : 'PARTICULAR',
           }
         );
         return null;
       });
-    console.log('ARRAYATENDIMENTOS DEPOIS: ' + array.length);
-    console.log(array);
     setarrayatendimentos(array);
   }
 
@@ -682,7 +674,8 @@ function Agendamento() {
         <div id="scroll atendimentos com pacientes"
           className='scroll'
           style={{
-            display: selectdate != null && arrayatendimentos.filter(item => moment(item.data_inicio).format('DD/MM/YYYY') == selectdate).length > 0 ? "flex" : "none",
+            display: arrayatendimentos.filter(item => moment(item.data_inicio).format('DD/MM/YYYY') == selectdate && (item.situacao == 3 || item.situacao == 'AGENDAMENTO') && item.id_profissional == selectedespecialista.id_usuario).length > 0 ? "flex" : "none",
+            // display: 'none',
             flexDirection: 'column',
             justifyContent: "flex-start",
             height: '80vh',
@@ -695,7 +688,7 @@ function Agendamento() {
             .sort((a, b) => (moment(a.data_inicio) > moment(b.data_inicio) ? 1 : -1))
             .map((item) => (
               <div
-                key={"pacientes" + item.id_atendimento} style={{
+                key={"pacientes" + Math.random()} style={{
                   display: 'flex',
                   flexDirection: 'column',
                   width: '100%'
@@ -899,7 +892,47 @@ function Agendamento() {
                 </div>
                 <div id='horários predefinidos vagos'
                   style={{
-                    display: item.situacao == 'AGENDAMENTO' ? 'flex' : 'none',
+                    display:
+                      item.situacao != 'AGENDAMENTO'
+                        ||
+                        arrayatendimentos.filter(valor =>
+                          valor.situacao != 'AGENDAMENTO'
+                          &&
+                          moment(valor.data_inicio).format('DD/MM/YYYY') == selectdate
+                          &&
+                          valor.situacao == 3
+                          &&
+                          (
+                            (
+                              // situação 0
+                              moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') == moment(item.data_inicio).format('DD/MM/YYYY - HH:mm')
+                              ||
+                              moment(valor.data_termino).format('DD/MM/YYYY - HH:mm') == moment(item.data_termino).format('DD/MM/YYYY - HH:mm')
+                              ||
+                              // situação 1
+                              (
+                                moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') < moment(item.data_inicio).format('DD/MM/YYYY - HH:mm')
+                                &&
+                                moment(valor.data_termino).format('DD/MM/YYYY - HH:mm') > moment(item.data_inicio).format('DD/MM/YYYY - HH:mm')
+                              )
+                              ||
+                              // situação 2
+                              (
+                                moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') > moment(item.data_inicio).format('DD/MM/YYYY - HH:mm')
+                                &&
+                                moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') < moment(item.data_termino).format('DD/MM/YYYY - HH:mm')
+                              )
+                              ||
+                              // situação 3
+                              (
+                                moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') > moment(item.data_inicio).format('DD/MM/YYYY - HH:mm')
+                                &&
+                                moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') < moment(item.data_termino).format('DD/MM/YYYY - HH:mm')
+                              )
+                            )
+                          )
+                        ).length > 0
+                        ? 'none' : 'flex',
                     margin: 2.5, padding: 0,
                   }}>
                   <div
@@ -909,7 +942,6 @@ function Agendamento() {
                       display: 'flex', flexDirection: 'row',
                       justifyContent: 'space-between',
                     }}>
-                    {item.situacao}
                     <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
                       <div style={{ alignSelf: 'center' }}>
                         {'HORÁRIO VAGO: ' + moment(item.data_inicio).format('HH:mm')}
@@ -917,7 +949,7 @@ function Agendamento() {
                       <div
                         onClick={() => {
                           // insertAtendimento(moment(item.data_inicio).format('DD/MM/YYYY - HH:mm'));
-                          checkConsultas(moment(item.data_inicio).format('DD/MM/YYYY - HH:mm'));
+                          // checkConsultas(moment(item.data_inicio).format('DD/MM/YYYY - HH:mm'));
                         }}
                         className='button-red'
                         style={{
@@ -935,10 +967,13 @@ function Agendamento() {
                       </div>
                     </div>
 
-                    <div className='button' style={{
-                      padding: 2.5, paddingLeft: 15, paddingRight: 15,
-                      maxHeight: 30, minHeight: 30,
-                    }}>
+                    <div
+                      className='button'
+                      onClick={() => checkConsultas(moment(item.data_inicio).format('DD/MM/YYYY - HH:mm'))}
+                      style={{
+                        padding: 2.5, paddingLeft: 15, paddingRight: 15,
+                        maxHeight: 30, minHeight: 30,
+                      }}>
                       AGENDAR
                     </div>
                   </div>
@@ -950,10 +985,10 @@ function Agendamento() {
         <div id="scroll atendimento vazio"
           className='scroll'
           style={{
-            display: selectdate == null || arrayatendimentos.length == 0 ? "flex" : "none",
+            display: arrayatendimentos.filter(item => moment(item.data_inicio).format('DD/MM/YYYY') == selectdate && (item.situacao == 3 || item.situacao == 'AGENDAMENTO') && item.id_profissional == selectedespecialista.id_usuario).length == 0 ? "flex" : "none",
             flexDirection: 'column',
             justifyContent: "center",
-            height: '50vh',
+            height: '80vh',
             width: '50vw',
             marginLeft: 20
           }}
@@ -1308,8 +1343,12 @@ function Agendamento() {
               let hora = localStorage.getItem('hora');
               let min = localStorage.getItem('min');
               console.log(selectdate + ' - ' + hora + ':' + min);
-              checkConsultas(selectdate + ' - ' + hora + ':' + min)
-              setviewopcoeshorarios(0);
+              let inputHour = document.getElementById("inputMin").value;
+              let inputMin = document.getElementById("inputHour").value;
+              if (inputHour != '' && inputMin != '') {
+                checkConsultas(selectdate + ' - ' + hora + ':' + min)
+                setviewopcoeshorarios(0);
+              }
             }}
             style={{ width: 50, maxWidth: 50, alignSelf: 'center', marginTop: 20 }}
           >
@@ -1439,7 +1478,7 @@ function Agendamento() {
               }}
               min={0}
               max={59}
-              id={"inputEditMin " + + item.id_atendimento}
+              id={"inputEditMin " + item.id_atendimento}
             ></input>
           </div>
           <div id="btnAdd"
@@ -1450,8 +1489,8 @@ function Agendamento() {
               let nova_hora = document.getElementById("inputEditHour " + item.id_atendimento).value;
               let novo_minuto = document.getElementById("inputEditMin " + item.id_atendimento).value;
               console.log(selectdate + ' - ' + nova_hora + ':' + novo_minuto);
-              checkUpdateConsultas(item, nova_data + ' - ' + nova_hora + ':' + novo_minuto);
-              //updateAtendimento(item, nova_data + ' - ' + nova_hora + ':' + novo_minuto);
+              // checkUpdateConsultas(item, nova_data + ' - ' + nova_hora + ':' + novo_minuto);
+              updateAtendimento([item, nova_data + ' - ' + nova_hora + ':' + novo_minuto]);
               document.getElementById('viewupdateatendimento ' + item.id_atendimento).style.display = 'none';
               document.getElementById('viewupdateatendimento ' + item.id_atendimento).style.visibility = 'hidden';
             }}
@@ -1500,9 +1539,28 @@ function Agendamento() {
     axios.get(html + "list_agenda").then((response) => {
       let x = response.data.rows;
       setagenda(x);
+      setarrayatendimentos([]);
+
+
+
+      /*
+      axios
+        .get(html + "list_consultas/" + 5) // 5 corresponde ao id da unidade "AMBULATÓRIO".
+        .then((response) => {
+          var x = response.data.rows;
+          var y = x.filter(item => item.id_unidade == 5);
+          if (window.innerWidth > mobilewidth) {
+            carregaHorarioslivres(y, selectdate);
+          } else {
+            setarrayatendimentos(y.filter(atendimento => atendimento.id_profissional == usuario.id));
+          }
+        });
+      */
+
     })
   }
 
+  /*
   function Agenda() {
     return (
       <div className='scroll'
@@ -1564,6 +1622,7 @@ function Agendamento() {
       </div>
     )
   }
+  */
 
   if (paciente != null) {
     return (

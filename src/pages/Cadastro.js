@@ -556,6 +556,7 @@ function Cadastro() {
             ></input>
             {operadoras.map(item => (
               <div
+                key={'operadora: ' + item.nome_operadora}
                 className="button"
                 style={{ width: 'calc(100% - 20px)', padding: 10, display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}
                 onClick={() => {
@@ -581,9 +582,12 @@ function Cadastro() {
           style={{ display: viewtipodocumento == 1 ? "flex" : "none" }}
           onClick={() => setviewtipodocumento(0)}
         >
-          <div className="janela scroll" onClick={(e) => e.stopPropagation()}>
+          <div
+            className="janela scroll"
+            onClick={(e) => e.stopPropagation()}>
             {array.map((item) => (
               <div
+                key={item}
                 className="button"
                 style={{ width: 100 }}
                 onClick={() => {
