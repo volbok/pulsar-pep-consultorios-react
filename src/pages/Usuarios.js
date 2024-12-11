@@ -277,7 +277,7 @@ function Usuarios() {
         onClick={() => setviewnewusuario(0)}
       >
         <div
-          className="janela scroll"
+          className="janela scroll cor2"
           style={{ padding: 10 }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -346,7 +346,7 @@ function Usuarios() {
                     flexDirection: "center",
                     justifyContent: "center",
                     alignSelf: "center",
-                    width: 100,
+                    width: 200,
                   }}
                 ></input>
               </div>
@@ -432,12 +432,12 @@ function Usuarios() {
                     "CREFITO",
                   ]);
                 }}
-                defaultValue={localStorage.getItem('conselho')}
+                defaultValue={localStorage.getItem('conselho') == null ? '-X-' : localStorage.getItem('conselho')}
                 style={{
                   flexDirection: "center",
                   justifyContent: "center",
                   alignSelf: "center",
-                  width: "30vw",
+                  width: 200,
                 }}
               ></input>
               <div className="text1">NÚMERO DO CONSELHO PROFISSIONAL</div>
@@ -449,7 +449,7 @@ function Usuarios() {
                 id="inputNumeroConselho"
                 onFocus={(e) => (e.target.placeholder = "")}
                 onBlur={(e) => (e.target.placeholder = "NÚMERO DO CONSELHO")}
-                defaultValue={localStorage.getItem('n_conselho')}
+                defaultValue={localStorage.getItem('n_conselho') == null ? '-x-' : localStorage.getItem('n_conselho')}
                 onKeyUp={() => {
                   masknumbers(timeout, "inputNumeroConselho", 8);
                 }}
@@ -457,7 +457,7 @@ function Usuarios() {
                   flexDirection: "center",
                   justifyContent: "center",
                   alignSelf: "center",
-                  width: "30vw",
+                  width: 200,
                 }}
               ></input>
 
@@ -470,7 +470,7 @@ function Usuarios() {
                 id="inputUf"
                 onFocus={(e) => (e.target.placeholder = "")}
                 onBlur={(e) => (e.target.placeholder = "UF DO CONSELHO")}
-                defaultValue={localStorage.getItem('uf_conselho')}
+                defaultValue={localStorage.getItem('uf_conselho') == null ? '-x-' : localStorage.getItem('uf_conselho')}
                 style={{
                   flexDirection: "center",
                   justifyContent: "center",
@@ -501,7 +501,10 @@ function Usuarios() {
 
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', marginTop: 20 }}>
-              <div className="text1">{'ESPECIALIDADE: ' + especialidade}</div>
+              <div className="text1"
+                style={{ display: especialidade != null || especialidade != '' ? 'flex' : 'none' }}>
+                {'ESPECIALIDADE: ' + especialidade}
+              </div>
               <div id="scroll das especialidades"
                 className="scroll"
                 style={{
@@ -1044,14 +1047,14 @@ function Usuarios() {
                 maxWidth: 'calc(100% - 20px)',
                 display: 'flex', flexDirection: 'column', justifyContent: 'center',
               }}>
-              <div>{item.hora_inicio + ' ÀS ' + item.hora_termino}</div>
+              <div style={{ marginTop: 10 }}>{item.hora_inicio + ' ÀS ' + item.hora_termino}</div>
               <div
                 id="btn-delete-agenda"
                 className="button-yellow"
                 style={{
                   display: 'flex',
-                  width: 30,
-                  height: 30,
+                  width: 20, minWidth: 20, maxWidth: 20,
+                  height: 20, minHeight: 20, maxHeight: 20,
                 }}
                 onClick={() => {
                   modal(
@@ -1263,8 +1266,8 @@ function Usuarios() {
                 let horainicio = localStorage.getItem('storageAgendaHoraInicio') + ':' + localStorage.getItem('storageAgendaMinutoInicio');
                 let horatermino = localStorage.getItem('storageAgendaHoraFinal') + ':' + localStorage.getItem('storageAgendaMinutoFinal');
                 let obj = {
-                  id_usuario: usuario.id,
-                  nome_usuario: usuario.nome_usuario,
+                  id_usuario: localStorage.getItem('id'), // buceta
+                  nome_usuario: localStorage.getItem('nome'),
                   dia_semana: localStorage.getItem('dia'),
                   hora_inicio: horainicio,
                   hora_termino: horatermino,

@@ -183,11 +183,66 @@ function Agendamento() {
   */
 
   // checando se há consultas já agendadas para o horário selecionado para inserir atendimento.
-  const checkConsultas = (inicio) => {
-    let poolatendimentos = [];
-    console.log(inicio);
-    console.log(moment(inicio, 'DD/MM/YYYY - HH:mm'));
-    console.log(moment(inicio, 'DD/MM/YYYY - HH:mm').milliseconds());
+  const checkConsultas = (data_inicio) => {
+
+    let inicio = moment(data_inicio, 'DD/MM/YYYY - HH:mm');
+    let termino = null;
+    if (localStorage.getItem('PARTICULAR') == 'PARTICULAR') {
+      termino = moment(inicio).add(cliente.tempo_consulta_particular, 'minutes');
+    } else {
+      termino = moment(inicio).add(cliente.tempo_consulta_convenio, 'minutes');
+    }
+
+    console.log('INICIO: ' + moment(inicio).format('DD/MM/YY - HH:mm'));
+    console.log('TERMINO: ' + moment(termino).format('DD/MM/YY - HH:mm'));
+
+    let count = arrayatendimentos.filter(valor =>
+      valor.situacao != 'AGENDAMENTO'
+      &&
+      moment(valor.data_inicio).format('DD/MM/YYYY') == selectdate
+      &&
+      valor.situacao == 3
+      &&
+      (
+        (
+          // situação 0
+          moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') == moment(inicio).format('DD/MM/YYYY - HH:mm')
+          ||
+          moment(valor.data_termino).format('DD/MM/YYYY - HH:mm') == moment(termino).format('DD/MM/YYYY - HH:mm')
+          ||
+          // situação 1
+          (
+            moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') < moment(inicio).format('DD/MM/YYYY - HH:mm')
+            &&
+            moment(valor.data_termino).format('DD/MM/YYYY - HH:mm') > moment(inicio).format('DD/MM/YYYY - HH:mm')
+          )
+          ||
+          // situação 2
+          (
+            moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') > moment(inicio).format('DD/MM/YYYY - HH:mm')
+            &&
+            moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') < moment(termino).format('DD/MM/YYYY - HH:mm')
+          )
+          ||
+          // situação 3
+          (
+            moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') > moment(inicio).format('DD/MM/YYYY - HH:mm')
+            &&
+            moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') < moment(termino).format('DD/MM/YYYY - HH:mm')
+          )
+        )
+      )
+    ).length;
+
+    console.log('COUNT: ' + count);
+
+    if (count > 0) {
+      modal(setdialogo, 'JÁ EXISTE UMA CONSULTA AGENDADA PARA ESTE HORÁRIO, CONFIRMAR ESTE NOVO AGENDAMENTO?', insertAtendimento, inicio);
+    } else {
+      insertAtendimento(inicio);
+    }
+
+    /*
     if (localStorage.getItem('PARTICULAR') == 'PARTICULAR') {
       poolatendimentos = arrayatendimentos.filter(item =>
         item.id_paciente == paciente.id_paciente
@@ -213,9 +268,9 @@ function Agendamento() {
         )
       )
     }
-
+    
     console.log(poolatendimentos.length);
-
+    
     if (poolatendimentos.length > 0) {
       // modal...
       console.log(poolatendimentos);
@@ -223,52 +278,70 @@ function Agendamento() {
       modal(setdialogo, 'JÁ EXISTE UMA CONSULTA AGENDADA PARA ESTE HORÁRIO, CONFIRMAR ESTE NOVO AGENDAMENTO?', insertAtendimento, inicio);
     } else {
       insertAtendimento(inicio);
-    }
+  }
+  */
+
   }
 
-  /*
-  const checkUpdateConsultas = (item, inicio) => {
-    let poolatendimentos = [];
+
+  const checkUpdateConsultas = (item, data_inicio) => {
     console.log(item); // obj ok.
-    console.log(inicio); // data ok.
-    if (item.faturamento_codigo_procedimento == 'PARTICULAR') {
-      poolatendimentos = arrayatendimentos.filter(item =>
-        item.id_paciente == paciente.id_paciente
-        &&
-        item.id_profissional == selectedespecialista.id_usuario
-        &&
-        (
-          moment(inicio, 'DD/MM/YYYY - HH:mm') > moment(item.data_inicio).subtract(cliente.tempo_consulta_particular, 'minutes')
-          &&
-          moment(inicio, 'DD/MM/YYYY - HH:mm') < moment(item.data_termino)
-        )
-      )
+
+    let inicio = moment(data_inicio, 'DD/MM/YYYY - HH:mm');
+    let termino = null;
+    if (localStorage.getItem('PARTICULAR') == 'PARTICULAR') {
+      termino = moment(inicio).add(cliente.tempo_consulta_particular, 'minutes');
     } else {
-      poolatendimentos = arrayatendimentos.filter(item =>
-        item.id_paciente == paciente.id_paciente
-        &&
-        item.id_profissional == selectedespecialista.id_usuario
-        &&
-        (
-          moment(inicio, 'DD/MM/YYYY - HH:mm') > moment(item.data_inicio).subtract(cliente.tempo_consulta_convenio, 'minutes')
-          &&
-          moment(inicio, 'DD/MM/YYYY - HH:mm') < moment(item.data_termino)
-        )
-      )
+      termino = moment(inicio).add(cliente.tempo_consulta_convenio, 'minutes');
     }
 
-    console.log(poolatendimentos.length);
+    console.log('INICIO: ' + moment(inicio).format('DD/MM/YY - HH:mm'));
+    console.log('TERMINO: ' + moment(termino).format('DD/MM/YY - HH:mm'));
 
-    if (poolatendimentos.length > 0) { // BUCETA: MUDAR AQUI PARA > 1!
-      // modal...
-      console.log(poolatendimentos);
-      console.log('CONSULTA JÁ AGENDADA NESTE PERÍODO.');
+    let count = arrayatendimentos.filter(valor =>
+      valor.situacao != 'AGENDAMENTO'
+      &&
+      moment(valor.data_inicio).format('DD/MM/YYYY') == selectdate
+      &&
+      valor.situacao == 3
+      &&
+      (
+        (
+          // situação 0
+          moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') == moment(inicio).format('DD/MM/YYYY - HH:mm')
+          ||
+          moment(valor.data_termino).format('DD/MM/YYYY - HH:mm') == moment(termino).format('DD/MM/YYYY - HH:mm')
+          ||
+          // situação 1
+          (
+            moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') < moment(inicio).format('DD/MM/YYYY - HH:mm')
+            &&
+            moment(valor.data_termino).format('DD/MM/YYYY - HH:mm') > moment(inicio).format('DD/MM/YYYY - HH:mm')
+          )
+          ||
+          // situação 2
+          (
+            moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') > moment(inicio).format('DD/MM/YYYY - HH:mm')
+            &&
+            moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') < moment(termino).format('DD/MM/YYYY - HH:mm')
+          )
+          ||
+          // situação 3
+          (
+            moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') > moment(inicio).format('DD/MM/YYYY - HH:mm')
+            &&
+            moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') < moment(termino).format('DD/MM/YYYY - HH:mm')
+          )
+        )
+      )
+    ).length;
+    console.log('COUNT: ' + count);
+    if (count > 0) {
       modal(setdialogo, 'JÁ EXISTE UMA CONSULTA AGENDADA PARA ESTE HORÁRIO, CONFIRMAR ESTE NOVO AGENDAMENTO?', updateAtendimento, [item, inicio]);
     } else {
       updateAtendimento([item, inicio]);
     }
   }
-  */
 
   const insertAtendimento = (inicio) => {
     var obj = {
@@ -382,7 +455,7 @@ function Agendamento() {
         }}
         onClick={(e) => e.stopPropagation(e)}
       >
-        {arrayespecialistas.filter(item => item.conselho != null)
+        {arrayespecialistas.filter(item => item.tipo_usuario != null && item.tipo_usuario != '')
           .sort((a, b) => (a.nome_usuario > b.nome_usuario ? 1 : -1))
           .map((item) => (
             <div
@@ -1489,8 +1562,8 @@ function Agendamento() {
               let nova_hora = document.getElementById("inputEditHour " + item.id_atendimento).value;
               let novo_minuto = document.getElementById("inputEditMin " + item.id_atendimento).value;
               console.log(selectdate + ' - ' + nova_hora + ':' + novo_minuto);
-              // checkUpdateConsultas(item, nova_data + ' - ' + nova_hora + ':' + novo_minuto);
-              updateAtendimento([item, nova_data + ' - ' + nova_hora + ':' + novo_minuto]);
+              checkUpdateConsultas(item, nova_data + ' - ' + nova_hora + ':' + novo_minuto);
+              // updateAtendimento([item, nova_data + ' - ' + nova_hora + ':' + novo_minuto]);
               document.getElementById('viewupdateatendimento ' + item.id_atendimento).style.display = 'none';
               document.getElementById('viewupdateatendimento ' + item.id_atendimento).style.visibility = 'hidden';
             }}
