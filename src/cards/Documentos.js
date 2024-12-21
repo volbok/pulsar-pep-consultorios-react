@@ -19,14 +19,15 @@ import deletar from '../images/deletar.svg';
 import checkinput from '../functions/checkinput';
 // componentes.
 import Cid10 from '../functions/cid10';
-import Header from '../components/Header';
-import Footer from '../components/Footer';
 import modal from '../functions/modal';
 import toast from '../functions/toast';
 import Gravador from '../components/Gravador';
 
-// import html2pdf from 'html2pdf.js'
-// import ReactPDF from '@react-pdf/renderer';
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+import { PDFDocument } from 'pdf-lib';
+pdfMake.addVirtualFileSystem(pdfFonts);
+
 
 function Documentos() {
 
@@ -47,6 +48,8 @@ function Documentos() {
     alergias,
     mobilewidth,
     objpaciente,
+
+    cliente,
 
     selecteddocumento, setselecteddocumento,
   } = useContext(Context);
@@ -88,7 +91,6 @@ function Documentos() {
       preparaDocumentos();
       console.log(tipodocumento);
     }
-
     // eslint-disable-next-line
   }, [card, paciente, atendimentos, atendimento]);
 
@@ -106,14 +108,14 @@ function Documentos() {
       id_atendimento: item.id_atendimento,
       data: item.data,
       texto: texto,
-      status: status,
+      status: status, // 0 = não salvo, 1 = salvo, 2 = assinado.
       tipo_documento: item.tipo_documento,
       profissional: usuario.nome_usuario,
       conselho: usuario.conselho + ': ' + usuario.n_conselho,
       id_profissional: usuario.id,
     }
     axios.post(html + 'update_documento/' + item.id, obj).then(() => {
-      if (status == 1) {
+      if (status > 0) {
         loadDocumentos();
         setselecteddocumento([]);
         localStorage.setItem("documento", 0);
@@ -126,6 +128,274 @@ function Documentos() {
       loadDocumentos();
       setselecteddocumento([]);
       localStorage.setItem("documento", 0);
+    })
+  }
+
+  // calculando o total de páginas do PDF gerado pelo pdfmake.
+  let count_pages = 0;
+  const getNumberPages = (pdf) => {
+    pdf.getBlob((blob) => {
+      blob.arrayBuffer().then((blobbuffer) => {
+        console.log(blobbuffer);
+        PDFDocument.load(blobbuffer).then((result) => {
+          const pages = result.getPages()
+          console.log(pages.length);
+          count_pages = pages.length;
+        });
+      })
+    });
+  }
+
+  // ## CRIAÇÃO DE DOCUMENTOS EM PDFMAKE E ASSINATURA DIGITAL ## //
+  // imprimir arquivo não assinado.
+  const printFile = () => {
+    const docDefinition = {
+      pageSize: 'A4',
+      pageOrientation: 'portrait',
+      pageMargins: [40, 200, 40, 120],
+      header: {
+        stack: [
+          {
+            columns: [
+              {
+                image: cliente.logo,
+                width: 75,
+                alignment: 'center',
+              },
+              {
+                stack: [
+                  { text: cliente.razao_social, alignment: 'left', fontSize: 10, width: 300 },
+                  { text: 'ENDEREÇO: ' + cliente.endereco, alignment: 'left', fontSize: 6, width: 300 },
+                  { text: 'TELEFONE: ' + cliente.telefone, alignment: 'left', fontSize: 6, width: 300 },
+                  { text: 'EMAIL: ' + cliente.email, alignment: 'left', fontSize: 6, width: 300 },
+                ],
+                width: '*'
+              },
+              { qr: cliente.qrcode, width: '40%', fit: 75, alignment: 'right', margin: [0, 0, 10, 0] },
+            ],
+            columnGap: 10,
+          },
+          {
+            "canvas": [{
+              "lineColor": "gray",
+              "type": "line",
+              "x1": 0,
+              "y1": 0,
+              "x2": 524,
+              "y2": 0,
+              "lineWidth": 1
+            }], margin: [0, 10, 0, 0], alignment: 'center',
+          },
+
+        ],
+        margin: [40, 40, 40, 40],
+      },
+      footer: function (currentPage, pageCount) {
+        return {
+          stack: [
+            {
+              "canvas": [{
+                "lineColor": "gray",
+                "type": "line",
+                "x1": 0,
+                "y1": 0,
+                "x2": 524,
+                "y2": 0,
+                "lineWidth": 1
+              }], margin: [0, 10, 0, 0], alignment: 'center',
+            },
+            {
+              columns: [
+                {
+                  stack: [
+                    { text: '_______________________________________________', alignment: 'center' },
+                    { text: localStorage.getItem("dono_documento"), width: '*', alignment: 'center' },
+                  ]
+                },
+                { text: currentPage.toString() + '/' + pageCount },
+                { text: ' - ', with: '60%' }
+              ],
+              margin: [40, 40, 40, 40], alignment: 'center',
+            },
+          ],
+        }
+      },
+      content: [
+        { text: tipodocumento, alignment: 'center', fontSize: 14, bold: true, margin: 10 },
+        { text: document.getElementById('inputFieldDocumento').value, fontSize: 10, bold: false },
+      ],
+    }
+    // utilizando a lib pdfmake para gerar o pdf e converter em base64.
+    const pdfDocGenerator = pdfMake.createPdf(docDefinition);
+    pdfDocGenerator.open();
+  }
+
+  // subir documento a ser assinado para a plataforma PlugSign.
+  const uploadFile = () => {
+    const docDefinition = {
+      pageSize: 'A4',
+      pageOrientation: 'portrait',
+      pageMargins: [40, 150, 40, 120],
+      header: {
+        stack: [
+          {
+            columns: [
+              {
+                image: cliente.logo,
+                width: 75,
+                alignment: 'center',
+              },
+              {
+                stack: [
+                  { text: cliente.razao_social, alignment: 'left', fontSize: 10, width: 300 },
+                  { text: 'ENDEREÇO: ' + cliente.endereco, alignment: 'left', fontSize: 6, width: 300 },
+                  { text: 'TELEFONE: ' + cliente.telefone, alignment: 'left', fontSize: 6, width: 300 },
+                  { text: 'EMAIL: ' + cliente.email, alignment: 'left', fontSize: 6, width: 300 },
+                ],
+                width: '*'
+              },
+              { qr: cliente.qrcode, width: '40%', fit: 75, alignment: 'right', margin: [0, 0, 10, 0] },
+            ],
+            columnGap: 10,
+          },
+          {
+            "canvas": [{
+              "lineColor": "gray",
+              "type": "line",
+              "x1": 0,
+              "y1": 0,
+              "x2": 524,
+              "y2": 0,
+              "lineWidth": 1
+            }], margin: [0, 10, 0, 0], alignment: 'center',
+          },
+        ],
+        margin: [40, 40, 40, 40],
+      },
+      footer: function (currentPage, pageCount) {
+        return {
+          stack: [
+            {
+              "canvas": [{
+                "lineColor": "gray",
+                "type": "line",
+                "x1": 0,
+                "y1": 0,
+                "x2": 524,
+                "y2": 0,
+                "lineWidth": 1
+              }], margin: [0, 10, 0, 0], alignment: 'center',
+            },
+            {
+              columns: [
+                {
+                  stack: [
+                    { text: '_______________________________________________', alignment: 'center' },
+                    { text: localStorage.getItem("dono_documento"), width: '*', alignment: 'center' },
+                  ]
+                },
+                { text: currentPage.toString() + '/' + pageCount },
+                { text: ' - ', with: '60%' }
+              ],
+              margin: [40, 40, 40, 40], alignment: 'center',
+            },
+          ],
+        }
+      },
+      content: [
+        { text: tipodocumento, alignment: 'center', fontSize: 14, bold: true, margin: 10 },
+        { text: document.getElementById('inputFieldDocumento').value, fontSize: 10, bold: false },
+      ],
+    }
+
+    // utilizando a lib pdfmake para gerar o pdf e converter em base64.
+    const pdfDocGenerator = pdfMake.createPdf(docDefinition);
+    pdfDocGenerator.open();
+    getNumberPages(pdfDocGenerator);
+    pdfDocGenerator.getBase64((data) => {
+      console.log(data);
+      // enviando documento para a plataforma PlugSign.
+      const token = '6N5IUZRZEGI3Z0sfweB5keeL8jw0yhn5WIUlZbqotR5WAsNm0dmGeVgNlTOOAMeBt9i9jX6ozNHMN2XR11meWRyY2Ruywhy18qlKTdmxlQaYZxue130S9US2cbMeRWuWDlr6apmSQTGPxhpKiOR2S4pNt5ogaRoVyAEAjtQkfC7N8k11SBFboWzyn2ZKGDGK771KLw4URrG0NlMcc2XpW5JfXBEyT51jLErKErLM2I8u3cOOGyvAo3UnNUnwdV3kcFKU3IZoA3XKJFeqKsmlWO6eCHdRo4UuJKbz59zi5MWPItKIkDvxVhAXFOC6uM0HT9JiThDwXbixkKRWX'
+      const headers = {
+        'Authorization': token
+      }
+      let obj = {
+        name: 'documento ' + cliente.id_cliente + ' - ' + moment().format('DD/MM/YYYY - HH:mm'),
+        file: 'data:application/pdf;base64,' + data,
+      }
+      console.log(obj);
+      localStorage.setItem('document_name', 'documento ' + cliente.id_cliente + ' - ' + moment().format('DD/MM/YYYY - HH:mm'));
+      axios.post('https://app.plugsign.com.br/api/files/upload', obj, { headers: headers }).then(() => {
+        console.log('DOCUMENTO ENVIADO');
+
+        /*
+        Recuperando todos os documentos do cliente, para encontrar o documento recém-enviado pelo nome e recuperar dua document_key(id)...
+        Seria melhor aqui recuperar o objeto documento, e não todos...
+        */
+        getFilesFromPlugSign('sign');
+
+      })
+        .catch(err => console.error('ERRO: ' + err));
+    });
+  }
+
+  // recuperando todos os documentos do plugsign, para o usuário do token.
+  const getFilesFromPlugSign = (key) => {
+    const token = '6N5IUZRZEGI3Z0sfweB5keeL8jw0yhn5WIUlZbqotR5WAsNm0dmGeVgNlTOOAMeBt9i9jX6ozNHMN2XR11meWRyY2Ruywhy18qlKTdmxlQaYZxue130S9US2cbMeRWuWDlr6apmSQTGPxhpKiOR2S4pNt5ogaRoVyAEAjtQkfC7N8k11SBFboWzyn2ZKGDGK771KLw4URrG0NlMcc2XpW5JfXBEyT51jLErKErLM2I8u3cOOGyvAo3UnNUnwdV3kcFKU3IZoA3XKJFeqKsmlWO6eCHdRo4UuJKbz59zi5MWPItKIkDvxVhAXFOC6uM0HT9JiThDwXbixkKRWX'
+    const headers = {
+      'Authorization': token
+    }
+    axios.get('https://app.plugsign.com.br/api/docs', { headers: headers }).then((response) => {
+      let x = response.data;
+      console.log(x);
+      console.log(x.data);
+      let y = x.data;
+      let document_key = y.filter(item => item.name == localStorage.getItem('document_name')).map(item => item.document_key).pop();
+      console.log('KEY: ' + document_key);
+
+      if (key == 'sign') {
+        // assinando o documento identificado pela document_key.
+        signFile(document_key);
+      } else {
+        downloadDocumentoAssinado(document_key);
+      }
+    })
+  }
+
+  const token = '6N5IUZRZEGI3Z0sfweB5keeL8jw0yhn5WIUlZbqotR5WAsNm0dmGeVgNlTOOAMeBt9i9jX6ozNHMN2XR11meWRyY2Ruywhy18qlKTdmxlQaYZxue130S9US2cbMeRWuWDlr6apmSQTGPxhpKiOR2S4pNt5ogaRoVyAEAjtQkfC7N8k11SBFboWzyn2ZKGDGK771KLw4URrG0NlMcc2XpW5JfXBEyT51jLErKErLM2I8u3cOOGyvAo3UnNUnwdV3kcFKU3IZoA3XKJFeqKsmlWO6eCHdRo4UuJKbz59zi5MWPItKIkDvxVhAXFOC6uM0HT9JiThDwXbixkKRWX'
+  const signFile = (document_key) => {
+    const headers = {
+      'accept': 'aplication/json',
+      'content-type': 'application/json',
+      'Authorization': token
+    }
+    let obj = {
+      document_key: document_key,
+      page: parseInt(count_pages),
+      // user_id: onde obter?
+      xPos: 40,
+      yPos: 700,
+    }
+    console.log(obj);
+
+    axios.post('https://app.plugsign.com.br/api/files/sign', obj, { headers: headers }).then(() => {
+      console.log('DOCUMENTO ASSINADO');
+      // PENDENTE!
+      // fazer o download do arquivo assinado.
+      downloadDocumentoAssinado(document_key);
+    })
+      .catch(err => console.error('ERRO: ' + err));
+  }
+
+  const downloadDocumentoAssinado = (key) => {
+    const headers = {
+      'accept': 'aplication/json',
+      'content-type': 'application/json',
+      'Authorization': token
+    }
+    axios.get('https://app.plugsign.com.br/api/files/download/' + key, { headers: headers, responseType: 'blob' }).then((response) => {
+      console.log('DOCUMENTO BAIXADO.');
+      window.open(URL.createObjectURL(response.data));
     })
   }
 
@@ -503,7 +773,9 @@ function Documentos() {
       texto: texto,
       status: 0,
       tipo_documento: item.tipo_documento,
-      profissional: usuario.nome_usuario + '\n' + usuario.conselho + '\n' + usuario.n_conselho
+      profissional: usuario.nome_usuario,
+      conselho: usuario.conselho + ': ' + usuario.n_conselho,
+      id_profissional: usuario.id,
     }
     console.log(obj);
     axios.post(html + 'insert_documento', obj).then(() => {
@@ -580,6 +852,7 @@ function Documentos() {
               onClick={() => {
                 localStorage.setItem("documento", item.id);
                 setselecteddocumento(item);
+                localStorage.setItem('dono_documento', item.profissional + ' - ' + item.conselho);
                 setTimeout(() => {
                   if (item.id == localStorage.getItem("id")) {
                     document.getElementById("inputFieldDocumento").value = localStorage.getItem("texto");
@@ -594,7 +867,7 @@ function Documentos() {
               }}
               style={{
                 display: atendimentos.length > 0 ? 'flex' : 'none',
-                flexDirection: 'column', justifyContent: 'center', minHeight: 180,
+                flexDirection: 'column', justifyContent: 'center', minHeight: 220,
                 opacity: item.id_atendimento == atendimento ? 1 : 0.7
               }}
             >
@@ -621,7 +894,7 @@ function Documentos() {
                     style={{ width: 20, height: 20 }}
                   ></img>
                 </div>
-                <div id="botão para assinar documento"
+                <div id="botão para salvar documento"
                   className="button-green"
                   style={{
                     display: item.status == 0 ? 'flex' : 'none',
@@ -643,7 +916,7 @@ function Documentos() {
                 <div id="botão para copiar documento"
                   className="button-green"
                   style={{
-                    display: item.status == 1 ? 'flex' : 'none',
+                    display: item.status > 0 ? 'flex' : 'none',
                     alignSelf: 'center',
                     minHeight: 25, minWidth: 25, maxHeight: 24, maxWidth: 25, marginLeft: 0
                   }}
@@ -662,14 +935,15 @@ function Documentos() {
                 <div id="botão para imprimir documento"
                   className="button-green"
                   style={{
-                    display: item.status == 1 ? 'flex' : 'none',
+                    display: item.status > 0 ? 'flex' : 'none',
                     alignSelf: 'center',
                     minHeight: 25, minWidth: 25, maxHeight: 24, maxWidth: 25, marginLeft: 0, marginRight: 0,
                   }}
                   onClick={() => {
                     setselecteddocumento(item);
                     setTimeout(() => {
-                      printDiv(item.texto)
+                      // printDiv(item.texto)
+                      printFile();
                     }, 1000);
                   }}>
                   <img
@@ -679,9 +953,44 @@ function Documentos() {
                   ></img>
                 </div>
               </div>
-              <div>{tipodocumento}</div>
+              <div style={{ display: cliente.assinatura == 'sim' ? 'flex' : 'none' }}>
+                <div id="botão para assinar documento"
+                  className="button green"
+                  style={{
+                    display: item.status == 1 ? 'flex' : 'none',
+                    alignSelf: 'center',
+                    minHeight: 20, maxHeight: 20, paddingLeft: 10, paddingRight: 10,
+                    marginBottom: 15,
+                  }}
+                  onClick={() => {
+                    setselecteddocumento(item);
+                    setTimeout(() => {
+                      updateDocumento(item, document.getElementById("inputFieldDocumento").value.toUpperCase(), 2);
+                      setTimeout(() => {
+                        uploadFile(item);
+                      }, 200);
+
+                    }, 200);
+                  }}>
+                  ASSINAR
+                </div>
+                <div id="botão para baixar documento assinado"
+                  className="button green"
+                  style={{
+                    display: item.status == 2 ? 'flex' : 'none',
+                    alignSelf: 'center',
+                    minHeight: 20, maxHeight: 20, paddingLeft: 10, paddingRight: 10,
+                    marginBottom: 15,
+                  }}
+                  onClick={() => {
+                    getFilesFromPlugSign('download');
+                  }}>
+                  BAIXAR
+                </div>
+              </div>
+              <div style={{ fontSize: 14 }}>{tipodocumento}</div>
               <div style={{ fontSize: 12, marginTop: 10, whiteSpace: 'pre-wrap', marginBottom: 5 }}>{'DR(A) ' + item.profissional}</div>
-              <div style={{ fontSize: 12, marginBottom: 5 }}>
+              <div style={{ fontSize: 12, marginBottom: 5, marginTop: -10 }}>
                 {item.registro_profissional}
               </div>
               <div>{moment(item.data).format('DD/MM/YY')}</div>
@@ -783,8 +1092,8 @@ function Documentos() {
           }}
           onClick={() => setviewmenucolinha(0)}
           onChange={() => {
-            if (selecteddocumento.status == 1) {
-              toast(settoast, 'ESTE DOCUMENTO JÁ FOI ASSINADO E NÃO PODE SER ALTERADO', '#EC7063', 2000);
+            if (selecteddocumento.status > 0) {
+              toast(settoast, 'ESTE DOCUMENTO JÁ FOI FECHADO E NÃO PODE SER ALTERADO', '#EC7063', 2000);
               setTimeout(() => {
                 document.getElementById("inputFieldDocumento").value = selecteddocumento.texto;
                 selector("lista de documentos", 'documento ' + selecteddocumento.id, 100);
@@ -806,8 +1115,6 @@ function Documentos() {
           }}
 
           onKeyUp={(e) => {
-            let textarea = document.getElementById('inputFieldDocumento');
-            console.log(textarea.scrollTop);
             let texto = document.getElementById("inputFieldDocumento").value.toUpperCase();
             if (selecteddocumento.status == 0) {
               clearTimeout(timeout);
@@ -1042,173 +1349,6 @@ function Documentos() {
     )
   }
 
-  // IMPRESSÃO DO DOCUMENTO.
-  // const [arrayelementos, setarrayelementos] = useState([]);
-  /*
-  function printDivHard(texto) {
-    console.log('PREPARANDO DOCUMENTO PARA IMPRESSÃO');
-
-
-    // convertendo o texto em uma array, depois em conteúdo html.
-    let arraytexto = texto.split('\n');
-    let arrayhtml = [];
-    arraytexto.map(item => {
-      if (item.lenght > 100) {
-        let part_a = item.substring(0, 50);
-        let part_b = item.substring(52, item.lenght);
-        arrayhtml.push("<div>" + part_a + "</div>");
-        arrayhtml.push("<div>" + part_b + "</div>");
-      } else {
-        arrayhtml.push("<div>" + item + "</div>")
-      }
-      return null;
-    });
-
-    let iniciogrupo = 0;
-    let paginas = Math.ceil(arrayhtml.length / 15);
-    console.log('PÁGINAS: ' + paginas);
-
-    // gerando as páginas do documento.
-    let grupoelementos = [];
-    while (paginas > 0) {
-      // inserindo um grupo de 15 elementos.
-      grupoelementos.push(
-        {
-          pagina: paginas,
-          elementos: arrayhtml.slice(iniciogrupo, iniciogrupo + 15),
-        }
-      );
-      // atualizando grupo para os próximos 5 procedimentos, até o esgotamento das páginas.
-      iniciogrupo = iniciogrupo + 16;
-      paginas = paginas - 1;
-    }
-    // setarrayelementos(grupoelementos);
-
-    var opt = {
-      margin: 0.5,
-      filename: 'OI',
-      image: { type: 'jpeg', quality: 1 },
-      html2canvas: { scale: 2 },
-      jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' },
-    };
-
-    grupoelementos.map(item => {
-      document.getElementById('conteudo').innerHTML = item.elementos;
-      var element = document.getElementById('IMPRESSÃO - DIV').innerHTML;
-      html2pdf().set(opt).from(element).output('dataurlnewwindow');
-      return null;
-    })
-  }
-    */
-
-  function printDiv(texto) {
-
-    // document.getElementById('conteudo').innerHTML = arrayhtml;
-    let divContents = document.getElementById("IMPRESSÃO - TABELA").innerHTML;
-    var printWindow = window.open();
-    printWindow.document.write('<html><head>');
-    printWindow.document.write('<link rel="stylesheet" href="notionfield.css">');
-    printWindow.document.write('</head><body>');
-    printWindow.document.write(divContents);
-    printWindow.document.write('</body></html>');
-    printWindow.document.close();
-    printWindow.print();
-    printWindow.close();
-  }
-
-  /*
-  function PrintDocumento() {
-    return (
-      <div id="IMPRESSÃO - DIV"
-        className='print'
-        style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'space-between',
-        }}>
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column', justifyContent: 'flex-start',
-          marginTop: 10,
-        }}>
-          <Header></Header>
-          <div style={{ marginTop: 20 }}>
-            <Conteudo></Conteudo>
-          </div>
-        </div>
-        <Footer></Footer>
-      </div>
-    )
-  };
-  */
-
-  // Modelo de documento em forma de tabela (para repetição de cabeçalhos e rodapés. Não funciona).
-  function PrintTabela() {
-    return (
-      <div id="IMPRESSÃO - TABELA"
-        className='print'
-        style={{
-          display: 'flex',
-          flexDirection: 'column', justifyContent: 'center', width: 'calc(100% - 20px)'
-        }}>
-        <table>
-          <thead>
-            <tr>
-              <td>
-                <div className="header-space" style={{ height: 250, width: 'calc(100% - 20px)' }}>&nbsp;</div>
-              </td>
-            </tr>
-          </thead>
-          <tfoot>
-            <tr>
-              <td>
-                <div className="footer-space" style={{ height: 200, width: 'calc(100% - 20px)' }}>&nbsp;</div>
-              </td>
-            </tr>
-          </tfoot>
-          <tbody>
-            <tr>
-              <td>
-                <div className='content' style={{ width: 'calc(100% - 20px)' }}>
-                  <Conteudo></Conteudo>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-        <div className='header' style={{ height: 200, width: 'calc(100% - 20px)', position: 'fixed', top: 0 }}><Header></Header></div>
-        <div className='footer' style={{ height: 200, width: 'calc(100% - 20px)', position: 'fixed', bottom: 0 }}><Footer></Footer></div>
-      </div>
-    )
-  };
-
-  function Conteudo() {
-    return (
-      <div id='conteudo'
-        style={{
-          display: 'flex',
-          flexDirection: 'column', justifyContent: 'flex-start',
-          fontFamily: 'Helvetica',
-          whiteSpace: 'pre-wrap',
-          width: 'calc(100vw - 40px)',
-          alignSelf: 'center',
-        }}>
-        <div
-          className='notion_titulo'
-          style={{
-            display: 'flex',
-            fontFamily: 'Helvetica', fontWeight: 'bold', fontSize: 22, marginTop: 5, textAlign: 'center', alignSelf: 'center',
-            marginBottom: 20
-          }}>
-          {tipodocumento}
-        </div>
-        <div className='notion_p' style={{ whiteSpace: 'pre-wrap' }}>
-          {selecteddocumento.texto}
-        </div>
-      </div >
-    )
-  }
-
   var timeout = null;
   return (
     <div id="scroll-documentos"
@@ -1223,7 +1363,6 @@ function Documentos() {
         width: '100%',
         alignContent: 'flex-end',
         alignItems: 'flex-end',
-        // backgroundColor: 'blue',
       }}
     >
       <div style={{
@@ -1242,7 +1381,6 @@ function Documentos() {
         <FieldDocumento></FieldDocumento>
       </div>
       <ListaDeDocumentos></ListaDeDocumentos>
-      <PrintTabela></PrintTabela>
       <ViewSelectModelos></ViewSelectModelos>
       <ViewCreateModelo></ViewCreateModelo>
       <GadgetsParaAtestado></GadgetsParaAtestado>

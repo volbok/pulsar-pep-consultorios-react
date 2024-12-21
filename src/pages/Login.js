@@ -115,6 +115,10 @@ function Login() {
               document.getElementById('aplicacao').className = 'gray';
               updateTemaCor(cliente.id_cliente, 2);
               localStorage.setItem('temacores', 2);
+            } else if (localStorage.getItem('temacores') == 2) {
+              document.getElementById('aplicacao').className = 'pink';
+              updateTemaCor(cliente.id_cliente, 3);
+              localStorage.setItem('temacores', 3);
             } else {
               document.getElementById('aplicacao').className = 'teal';
               updateTemaCor(cliente.id_cliente, 0);

@@ -1038,7 +1038,7 @@ function Usuarios() {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', height: '100%', margin: 5 }}>
         <div className="text1" style={{ width: '100%' }}>{dia}</div>
-        <div className="scroll cor2" style={{ height: '100%', width: '15vw' }}>
+        <div className="cor2" style={{ borderRadius: 5, width: '15vw', padding: 5 }}>
           {agenda.filter(item => item.id_usuario == localStorage.getItem('id') && item.dia_semana == filtro).sort((a, b) => moment(a.hora_inicio, 'HH:mm') > moment(b.hora_inicio, 'HH:mm') ? 1 : -1).map(item => (
             <div className='button'
               style={{
