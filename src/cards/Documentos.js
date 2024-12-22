@@ -208,12 +208,12 @@ function Documentos() {
               columns: [
                 {
                   stack: [
-                    { text: '_______________________________________________', alignment: 'center' },
-                    { text: localStorage.getItem("dono_documento"), width: '*', alignment: 'center' },
-                  ]
+                    { text: '________________________________', alignment: 'center', width: 400 },
+                    { text: localStorage.getItem("dono_documento"), width: '*', alignment: 'center', fontSize: 8 },
+                  ], with: '30%',
                 },
-                { text: currentPage.toString() + '/' + pageCount },
-                { text: ' - ', with: '60%' }
+                { text: 'PÁGINA ' + currentPage.toString() + ' DE ' + pageCount, fontSize: 8 },
+                { text: '', width: '*' },
               ],
               margin: [40, 40, 40, 40], alignment: 'center',
             },
@@ -290,12 +290,12 @@ function Documentos() {
               columns: [
                 {
                   stack: [
-                    { text: '_______________________________________________', alignment: 'center' },
-                    { text: localStorage.getItem("dono_documento"), width: '*', alignment: 'center' },
-                  ]
+                    { text: '________________________________', alignment: 'center', width: 400 },
+                    { text: localStorage.getItem("dono_documento"), width: '*', alignment: 'center', fontSize: 8 },
+                  ], with: '30%',
                 },
-                { text: currentPage.toString() + '/' + pageCount },
-                { text: ' - ', with: '60%' }
+                { text: 'PÁGINA ' + currentPage.toString() + ' DE ' + pageCount, fontSize: 8 },
+                { text: '', width: '*' },
               ],
               margin: [40, 40, 40, 40], alignment: 'center',
             },
@@ -374,7 +374,7 @@ function Documentos() {
       page: parseInt(count_pages),
       // user_id: onde obter?
       xPos: 40,
-      yPos: 700,
+      yPos: 750,
     }
     console.log(obj);
 
@@ -983,6 +983,7 @@ function Documentos() {
                     marginBottom: 15,
                   }}
                   onClick={() => {
+                    localStorage.setItem('document_name', 'documento ' + cliente.id_cliente + ' - ' + moment(item.data).format('DD/MM/YYYY - HH:mm'));
                     getFilesFromPlugSign('download');
                   }}>
                   BAIXAR
@@ -1127,7 +1128,7 @@ function Documentos() {
                   updateDocumento(selecteddocumento, document.getElementById("inputFieldDocumento").value.toUpperCase(), 0);
                 }
                 e.stopPropagation();
-              }, 2000);
+              }, 1000);
             }
           }}
         >
