@@ -9,6 +9,7 @@ import VanillaCaret from 'vanilla-caret-js';
 import selector from '../functions/selector';
 // imagens.
 import print from '../images/imprimir.svg';
+import certify from '../images/certify.svg';
 import back from '../images/back.svg';
 import copiar from '../images/copiar.svg';
 import favorito_usar from '../images/favorito_usar.svg';
@@ -961,6 +962,7 @@ function Documentos() {
                     alignSelf: 'center',
                     minHeight: 20, maxHeight: 20, paddingLeft: 10, paddingRight: 10,
                     marginBottom: 15,
+                    position: 'relative',
                   }}
                   onClick={() => {
                     setselecteddocumento(item);
@@ -972,7 +974,16 @@ function Documentos() {
 
                     }, 200);
                   }}>
-                  ASSINAR
+                  <div>ASSINAR</div>
+                  <img
+                    alt=""
+                    src={certify}
+                    style={{
+                      width: 30, height: 30,
+                      position: 'absolute',
+                      top: 15, left: -12
+                    }}
+                  ></img>
                 </div>
                 <div id="botão para baixar documento assinado"
                   className="button green"
@@ -981,12 +992,22 @@ function Documentos() {
                     alignSelf: 'center',
                     minHeight: 20, maxHeight: 20, paddingLeft: 10, paddingRight: 10,
                     marginBottom: 15,
+                    position: 'relative',
                   }}
                   onClick={() => {
                     localStorage.setItem('document_name', 'documento ' + cliente.id_cliente + ' - ' + moment(item.data).format('DD/MM/YYYY - HH:mm'));
                     getFilesFromPlugSign('download');
                   }}>
-                  BAIXAR
+                  <div>BAIXAR</div>
+                  <img
+                    alt=""
+                    src={certify}
+                    style={{
+                      width: 30, height: 30,
+                      position: 'absolute',
+                      top: 15, left: -12
+                    }}
+                  ></img>
                 </div>
               </div>
               <div style={{ fontSize: 14 }}>{tipodocumento}</div>
