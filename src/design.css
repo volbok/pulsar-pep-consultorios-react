@@ -1765,6 +1765,31 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   transition: 200ms ease-in-out;
 }
 
+.button-true-green {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #ffffff;
+  font-weight: bold;
+  min-width: 50px;
+  min-height: 50px;
+  background-color: #28b463;
+  border: none;
+  border-color: transparent;
+  border-radius: 5px;
+  outline: 0px;
+  margin: 5px;
+  padding: 5px;
+  cursor: default;
+  transition: 200ms ease-in-out;
+}
+
+.button-true-green:hover {
+  background-color: #58d68d;
+  transition: 200ms ease-in-out;
+}
+
 .button-yellow {
   display: flex;
   justify-content: center;

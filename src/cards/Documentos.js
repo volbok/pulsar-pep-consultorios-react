@@ -65,6 +65,7 @@ function Documentos() {
   }
 
   useEffect(() => {
+    getFilesFromPlugSign('showlist');
     loadAllModelos();
     if (card == 'card-documento-admissao') {
       settipodocumento('ADMISSÃO');
@@ -90,7 +91,7 @@ function Documentos() {
     } else if (card == 'card-documento-relatorio') {
       settipodocumento('RELATÓRIO');
       preparaDocumentos();
-      console.log(tipodocumento);
+      // console.log(tipodocumento);
     }
     // eslint-disable-next-line
   }, [card, paciente, atendimentos, atendimento]);
@@ -137,10 +138,10 @@ function Documentos() {
   const getNumberPages = (pdf) => {
     pdf.getBlob((blob) => {
       blob.arrayBuffer().then((blobbuffer) => {
-        console.log(blobbuffer);
+        // console.log(blobbuffer);
         PDFDocument.load(blobbuffer).then((result) => {
           const pages = result.getPages()
-          console.log(pages.length);
+          // console.log(pages.length);
           count_pages = pages.length;
         });
       })
@@ -232,7 +233,7 @@ function Documentos() {
   }
 
   // subir documento a ser assinado para a plataforma PlugSign.
-  const uploadFile = () => {
+  const uploadFile = (item) => {
     const docDefinition = {
       pageSize: 'A4',
       pageOrientation: 'portrait',
@@ -311,21 +312,21 @@ function Documentos() {
 
     // utilizando a lib pdfmake para gerar o pdf e converter em base64.
     const pdfDocGenerator = pdfMake.createPdf(docDefinition);
-    pdfDocGenerator.open();
+    // pdfDocGenerator.open();
     getNumberPages(pdfDocGenerator);
     pdfDocGenerator.getBase64((data) => {
-      console.log(data);
+      // console.log(data);
       // enviando documento para a plataforma PlugSign.
-      const token = '6N5IUZRZEGI3Z0sfweB5keeL8jw0yhn5WIUlZbqotR5WAsNm0dmGeVgNlTOOAMeBt9i9jX6ozNHMN2XR11meWRyY2Ruywhy18qlKTdmxlQaYZxue130S9US2cbMeRWuWDlr6apmSQTGPxhpKiOR2S4pNt5ogaRoVyAEAjtQkfC7N8k11SBFboWzyn2ZKGDGK771KLw4URrG0NlMcc2XpW5JfXBEyT51jLErKErLM2I8u3cOOGyvAo3UnNUnwdV3kcFKU3IZoA3XKJFeqKsmlWO6eCHdRo4UuJKbz59zi5MWPItKIkDvxVhAXFOC6uM0HT9JiThDwXbixkKRWX'
+      const token = cliente.token
       const headers = {
         'Authorization': token
       }
       let obj = {
-        name: 'documento ' + cliente.id_cliente + ' - ' + moment().format('DD/MM/YYYY - HH:mm'),
+        name: 'documento ' + cliente.id_cliente + ' - ' + moment(item.data).format('DD/MM/YYYY - HH:mm'),
         file: 'data:application/pdf;base64,' + data,
       }
-      console.log(obj);
-      localStorage.setItem('document_name', 'documento ' + cliente.id_cliente + ' - ' + moment().format('DD/MM/YYYY - HH:mm'));
+      // console.log(obj);
+      localStorage.setItem('document_name', 'documento ' + cliente.id_cliente + ' - ' + moment(item.data).format('DD/MM/YYYY - HH:mm'));
       axios.post('https://app.plugsign.com.br/api/files/upload', obj, { headers: headers }).then(() => {
         console.log('DOCUMENTO ENVIADO');
 
@@ -340,30 +341,69 @@ function Documentos() {
     });
   }
 
-  // recuperando todos os documentos do plugsign, para o usuário do token.
-  const getFilesFromPlugSign = (key) => {
-    const token = '6N5IUZRZEGI3Z0sfweB5keeL8jw0yhn5WIUlZbqotR5WAsNm0dmGeVgNlTOOAMeBt9i9jX6ozNHMN2XR11meWRyY2Ruywhy18qlKTdmxlQaYZxue130S9US2cbMeRWuWDlr6apmSQTGPxhpKiOR2S4pNt5ogaRoVyAEAjtQkfC7N8k11SBFboWzyn2ZKGDGK771KLw4URrG0NlMcc2XpW5JfXBEyT51jLErKErLM2I8u3cOOGyvAo3UnNUnwdV3kcFKU3IZoA3XKJFeqKsmlWO6eCHdRo4UuJKbz59zi5MWPItKIkDvxVhAXFOC6uM0HT9JiThDwXbixkKRWX'
+  const deleteFile = (item) => {
+    const token = cliente.token
     const headers = {
       'Authorization': token
     }
     axios.get('https://app.plugsign.com.br/api/docs', { headers: headers }).then((response) => {
       let x = response.data;
-      console.log(x);
-      console.log(x.data);
+      // console.log(x);
+      // console.log(x.data);
       let y = x.data;
-      let document_key = y.filter(item => item.name == localStorage.getItem('document_name')).map(item => item.document_key).pop();
-      console.log('KEY: ' + document_key);
+      let document_name = 'documento ' + cliente.id_cliente + ' - ' + moment(item.data).format('DD/MM/YYYY - HH:mm');
+      // console.log(document_name);
+      let document_id = y.filter(item => item.name == document_name).map(item => item.id).pop();
+      // console.log('ID: ' + document_id);
+      const data = {
+        'id': document_id
+      }
+      axios.delete('https://app.plugsign.com.br/api/docs', { data: data, headers: headers }).then(() => {
+        console.log('DOCUMENTO ASSINADO EXCLUÍDO');
+        getFilesFromPlugSign('showlist');
+        updateDocumento(item, item.texto, 1);
+      })
+        .catch(err => console.error('ERRO: ' + err));
+    });
+  }
+
+  // recuperando todos os documentos do plugsign, para o usuário do token.
+  const getFilesFromPlugSign = (key) => {
+    const token = cliente.token
+    const headers = {
+      'Authorization': token
+    }
+    axios.get('https://app.plugsign.com.br/api/docs', { headers: headers }).then((response) => {
+      let x = response.data;
+      // console.log(x);
+      // console.log(x.data);
+      let y = x.data;
 
       if (key == 'sign') {
         // assinando o documento identificado pela document_key.
+        let document_key = y.filter(item => item.name == localStorage.getItem('document_name')).map(item => item.document_key).pop();
+        console.log('KEY - ASSINATURA: ' + document_key);
         signFile(document_key);
-      } else {
+      } else if (key == 'download') {
+        // baixando um documento identificado pela document_key.
+        let document_key = y.filter(item => item.name == localStorage.getItem('document_name')).map(item => item.document_key).pop();
+        console.log('KEY - DOWNLOAD: ' + document_key);
         downloadDocumentoAssinado(document_key);
+      } else if (key == 'showlist') {
+        // listando documentos assinados.
+        let count_docs_assinados = y.filter(doc => doc.status == "Signed").length;
+        console.log('LISTANDO DOCUMENTOS ASSINADOS: ' + count_docs_assinados);
+        localStorage.setItem('count_docs_signed', count_docs_assinados);
+        if (cliente.total_docs - count_docs_assinados > 0) {
+          localStorage.setItem('allowsign', 'yes');
+        } else {
+          localStorage.setItem('allowsign', 'no');
+        }
       }
     })
   }
 
-  const token = '6N5IUZRZEGI3Z0sfweB5keeL8jw0yhn5WIUlZbqotR5WAsNm0dmGeVgNlTOOAMeBt9i9jX6ozNHMN2XR11meWRyY2Ruywhy18qlKTdmxlQaYZxue130S9US2cbMeRWuWDlr6apmSQTGPxhpKiOR2S4pNt5ogaRoVyAEAjtQkfC7N8k11SBFboWzyn2ZKGDGK771KLw4URrG0NlMcc2XpW5JfXBEyT51jLErKErLM2I8u3cOOGyvAo3UnNUnwdV3kcFKU3IZoA3XKJFeqKsmlWO6eCHdRo4UuJKbz59zi5MWPItKIkDvxVhAXFOC6uM0HT9JiThDwXbixkKRWX'
+  const token = cliente.token
   const signFile = (document_key) => {
     const headers = {
       'accept': 'aplication/json',
@@ -377,13 +417,11 @@ function Documentos() {
       xPos: 40,
       yPos: 750,
     }
-    console.log(obj);
+    // console.log(obj);
 
     axios.post('https://app.plugsign.com.br/api/files/sign', obj, { headers: headers }).then(() => {
       console.log('DOCUMENTO ASSINADO');
-      // PENDENTE!
-      // fazer o download do arquivo assinado.
-      downloadDocumentoAssinado(document_key);
+      getFilesFromPlugSign('showlist');
     })
       .catch(err => console.error('ERRO: ' + err));
   }
@@ -469,10 +507,10 @@ function Documentos() {
                   document.getElementById("inputCid10").focus();
                 }, 100);
               } else {
-                console.log(searchcid10);
+                // console.log(searchcid10);
                 setfiltercid10(searchcid10);
                 setTimeout(() => {
-                  console.log(filtercid10);
+                  // console.log(filtercid10);
                   setarraycid10(cid10.filter((item) => item.DESCRICAO.toUpperCase().includes(searchcid10) || item.DESCRICAO.includes(searchcid10)));
                   document.getElementById("inputCid10").value = searchcid10;
                   document.getElementById("inputCid10").focus();
@@ -755,8 +793,8 @@ function Documentos() {
       conselho: usuario.conselho + ': ' + usuario.n_conselho,
       id_profissional: usuario.id,
     }
-    console.log(obj);
-    console.log(usuario);
+    // console.log(obj);
+    // console.log(usuario);
     axios.post(html + 'insert_documento', obj).then(() => {
       loadDocumentos();
       setselecteddocumento([]);
@@ -778,7 +816,7 @@ function Documentos() {
       conselho: usuario.conselho + ': ' + usuario.n_conselho,
       id_profissional: usuario.id,
     }
-    console.log(obj);
+    // console.log(obj);
     axios.post(html + 'insert_documento', obj).then(() => {
       loadDocumentos();
       setselecteddocumento([]);
@@ -836,6 +874,11 @@ function Documentos() {
             ></img>
           </div>
         </div>
+        <div className={localStorage.getItem('allowsign') == 'no' ? 'button red' : 'button green'}
+          style={{ height: 50, marginBottom: 10, borderStyle: 'solid', borderWidth: 3, borderColor: 'white' }}
+        >
+          {'TOTAL DE DOCUMENTOS ASSINADOS: ' + localStorage.getItem('count_docs_signed') + '/' + cliente.total_docs}
+        </div>
         <div
           id="lista de documentos"
           className='scroll'
@@ -843,7 +886,7 @@ function Documentos() {
             display: 'flex',
             backgroundColor: 'white',
             borderColor: 'white',
-            height: 'calc(100vh - 200px)',
+            height: 'calc(100vh - 280px)',
             width: 'calc(100% - 15px)',
           }}
         >
@@ -956,29 +999,34 @@ function Documentos() {
               </div>
               <div style={{ display: cliente.assinatura == 'sim' ? 'flex' : 'none' }}>
                 <div id="botão para assinar documento"
-                  className="button green"
+                  className="button blue"
                   style={{
                     display: item.status == 1 ? 'flex' : 'none',
                     alignSelf: 'center',
-                    minHeight: 20, maxHeight: 20, paddingLeft: 10, paddingRight: 10,
+                    minHeight: 30, maxHeight: 30, paddingLeft: 10, paddingRight: 10,
                     marginBottom: 15,
                     position: 'relative',
+                    opacity: localStorage.getItem('allowsign') == 'yes' ? 1 : 0.3,
                   }}
                   onClick={() => {
-                    setselecteddocumento(item);
-                    setTimeout(() => {
-                      updateDocumento(item, document.getElementById("inputFieldDocumento").value.toUpperCase(), 2);
+                    if (localStorage.getItem('allowsign') == 'yes') {
+                      setselecteddocumento(item);
                       setTimeout(() => {
                         uploadFile(item);
                       }, 200);
-
-                    }, 200);
+                      setTimeout(() => {
+                        updateDocumento(item, item.texto, 2);
+                      }, 1000);
+                    } else {
+                      toast(settoast, 'COTA DE ASSINATURAS ATINGIDA.', '#EC7063', 1000);
+                    }
                   }}>
                   <div>ASSINAR</div>
                   <img
                     alt=""
                     src={certify}
                     style={{
+                      display: 'none',
                       width: 30, height: 30,
                       position: 'absolute',
                       top: 15, left: -12
@@ -986,11 +1034,12 @@ function Documentos() {
                   ></img>
                 </div>
                 <div id="botão para baixar documento assinado"
-                  className="button green"
+                  className="button-true-green"
                   style={{
                     display: item.status == 2 ? 'flex' : 'none',
+                    flexDirection: 'row',
                     alignSelf: 'center',
-                    minHeight: 20, maxHeight: 20, paddingLeft: 10, paddingRight: 10,
+                    minHeight: 30, maxHeight: 30, paddingLeft: 20, paddingRight: 0,
                     marginBottom: 15,
                     position: 'relative',
                   }}
@@ -999,6 +1048,23 @@ function Documentos() {
                     getFilesFromPlugSign('download');
                   }}>
                   <div>BAIXAR</div>
+                  <div id="botão para deletar documento assinado"
+                    className="button red"
+                    style={{
+                      display: item.id_profissional == usuario.id ? 'flex' : 'none',
+                      alignSelf: 'center',
+                      minHeight: 20, minWidth: 20, maxHeight: 20, maxWidth: 20, marginLeft: 20,
+                    }}
+                    onClick={(e) => {
+                      modal(setdialogo, 'TEM CERTEZA QUE DESEJA DELETAR O DOCUMENTO ASSINADO?', deleteFile, item);
+                      e.stopPropagation();
+                    }}>
+                    <img
+                      alt=""
+                      src={deletar}
+                      style={{ width: 20, height: 20 }}
+                    ></img>
+                  </div>
                   <img
                     alt=""
                     src={certify}
@@ -1036,15 +1102,15 @@ function Documentos() {
               setviewmenucolinha(0);
               let element = document.getElementById("inputFieldDocumento");
               let corte = localStorage.getItem('caret');
-              console.log(corte);
+              // console.log(corte);
               let texto = element.value;
-              console.log(texto);
+              // console.log(texto);
               let text_before = texto.slice(0, corte);
               let text_after = texto.slice(corte, texto.length);
               element.value = text_before + ' ' + dado + ' ' + text_after;
               let caret = new VanillaCaret(document.getElementById("inputFieldDocumento"));
               let novocorte = parseInt(corte) + parseInt(dado.length) + 1;
-              console.log(novocorte);
+              // console.log(novocorte);
               element.focus();
               caret.setPos(parseInt(novocorte));
             }
@@ -1128,7 +1194,7 @@ function Documentos() {
             if (e.key == "|") { // tecla de barra invertida >> "\" (para o menucolinhas!).
               e.preventDefault();
               let caret = new VanillaCaret(document.getElementById(document.activeElement.id));
-              console.log(caret.getPos());
+              // console.log(caret.getPos());
               localStorage.setItem('caret', caret.getPos());
               setviewmenucolinha(1);
             } else if (e.keyCode == 27) { // tecla esc
@@ -1145,7 +1211,7 @@ function Documentos() {
                   texto = document.getElementById("inputFieldDocumento").value.toUpperCase();
                   localStorage.setItem("id", selecteddocumento.id);
                   localStorage.setItem("texto", texto);
-                  console.log('ID:' + localStorage.getItem("id"));
+                  // console.log('ID:' + localStorage.getItem("id"));
                   updateDocumento(selecteddocumento, document.getElementById("inputFieldDocumento").value.toUpperCase(), 0);
                 }
                 e.stopPropagation();
@@ -1161,7 +1227,7 @@ function Documentos() {
 
   function voiceField(texto) {
     let valor = texto.toString();
-    console.log(valor);
+    // console.log(valor);
     document.getElementById("inputFieldDocumento").value = valor;
     localStorage.setItem('texto', texto);
   }
