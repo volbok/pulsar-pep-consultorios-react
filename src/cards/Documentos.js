@@ -91,7 +91,9 @@ function Documentos() {
     } else if (card == 'card-documento-relatorio') {
       settipodocumento('RELATÓRIO');
       preparaDocumentos();
-      // console.log(tipodocumento);
+    } else if (card == 'card-documento-recibo') {
+      settipodocumento('RECIBO');
+      preparaDocumentos();
     }
     // eslint-disable-next-line
   }, [card, paciente, atendimentos, atendimento]);
@@ -999,7 +1001,7 @@ function Documentos() {
               </div>
               <div style={{ display: cliente.assinatura == 'sim' ? 'flex' : 'none' }}>
                 <div id="botão para assinar documento"
-                  className="button blue"
+                  className="button-true-blue"
                   style={{
                     display: item.status == 1 ? 'flex' : 'none',
                     alignSelf: 'center',
@@ -1022,16 +1024,6 @@ function Documentos() {
                     }
                   }}>
                   <div>ASSINAR</div>
-                  <img
-                    alt=""
-                    src={certify}
-                    style={{
-                      display: 'none',
-                      width: 30, height: 30,
-                      position: 'absolute',
-                      top: 15, left: -12
-                    }}
-                  ></img>
                 </div>
                 <div id="botão para baixar documento assinado"
                   className="button-true-green"

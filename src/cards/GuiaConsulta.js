@@ -175,7 +175,7 @@ function GuiaConsulta() {
           placeholder={titulo}
           onFocus={(e) => (e.target.placeholder = "")}
           onBlur={(e) => (e.target.placeholder = { titulo })}
-          defaultValue={valor != null && valor.length > 55 ? valor.toUpperCase().slice(0, 55) + '...' : valor}
+          defaultValue={valor != null && valor.length > 55 ? valor.toUpperCase().slice(0, 55) + '...' : valor != null && valor.length < 56 ? valor : ''}
           style={{ backgroundColor: 'transparent', margin: 0, marginTop: 2, marginLeft: -2.5, padding: 0 }}
         >
         </input>
@@ -408,7 +408,9 @@ function GuiaConsulta() {
                 <img alt="" src={logo}
                   style={{
                     display: logo == '' ? 'none' : 'flex',
-                    width: 270, height: 100
+                    height: 80,
+                    borderRadius: 5,
+                    marginBottom: 5,
                   }}>
                 </img>
                 <div style={{ fontSize: 16, fontWeight: 'bold', textAlign: 'center', width: 500 }}>

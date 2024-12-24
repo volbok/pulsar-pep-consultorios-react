@@ -118,7 +118,7 @@
 
   --cor0: white !important;
   --cor1: #B3C8CF !important;
-  --cor1hover: #89A8B2 !important;
+  --cor1hover: #60b6d3 !important;
   --cor1opaque: #647c84 !important;
 
   --cor3: var(--pallete8);
@@ -1774,7 +1774,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   font-weight: bold;
   min-width: 50px;
   min-height: 50px;
-  background-color: #28b463;
+  background-color: #52be80;
   border: none;
   border-color: transparent;
   border-radius: 5px;
@@ -1786,7 +1786,82 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .button-true-green:hover {
-  background-color: #58d68d;
+  background-color: #7dcea0 ;
+  transition: 200ms ease-in-out;
+}
+
+.button-true-red {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #ffffff;
+  font-weight: bold;
+  min-width: 50px;
+  min-height: 50px;
+  background-color: #ec7063;
+  border: none;
+  border-color: transparent;
+  border-radius: 5px;
+  outline: 0px;
+  margin: 5px;
+  padding: 5px;
+  cursor: default;
+  transition: 200ms ease-in-out;
+}
+
+.button-true-red:hover {
+  background-color: #f1948a ;
+  transition: 200ms ease-in-out;
+}
+
+.button-true-yellow {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #ffffff;
+  font-weight: bold;
+  min-width: 50px;
+  min-height: 50px;
+  background-color: #f7dc6f;
+  border: none;
+  border-color: transparent;
+  border-radius: 5px;
+  outline: 0px;
+  margin: 5px;
+  padding: 5px;
+  cursor: default;
+  transition: 200ms ease-in-out;
+}
+
+.button-true-yellow:hover {
+  background-color: #f9e79f;
+  transition: 200ms ease-in-out;
+}
+
+.button-true-blue {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  color: #ffffff;
+  font-weight: bold;
+  min-width: 50px;
+  min-height: 50px;
+  background-color: #5dade2;
+  border: none;
+  border-color: transparent;
+  border-radius: 5px;
+  outline: 0px;
+  margin: 5px;
+  padding: 5px;
+  cursor: default;
+  transition: 200ms ease-in-out;
+}
+
+.button-true-blue:hover {
+  background-color: #85c1e9;
   transition: 200ms ease-in-out;
 }
 

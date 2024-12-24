@@ -480,12 +480,11 @@ function Consultas() {
                         margin: 5, marginBottom: 0
                       }}>
                         <div
-                          className="button-opaque"
+                          className="button-true-red"
                           style={{
                             display: 'flex',
                             margin: 2.5, marginRight: 0,
                             minHeight: 20, maxHeight: 20, minWidth: 20, maxWidth: 20,
-                            backgroundColor: 'rgba(231, 76, 60, 0.8)',
                             borderTopRightRadius: 0,
                             borderBottomRightRadius: 0,
                           }}
@@ -666,7 +665,7 @@ function Consultas() {
                       >
                         <div
                           id="botão encerrar"
-                          className="button"
+                          className="button-true-green"
                           title="ENCERRAR CONSULTA"
                           onClick={() => {
                             modal(setdialogo, 'TEM CERTEZA QUE DESEJA FINALIZAR A CONSULTA?', updateConsulta, [item, 4]);
@@ -674,7 +673,7 @@ function Consultas() {
                           style={{
                             display: "flex",
                             borderColor: "#f2f2f2",
-                            backgroundColor: "rgb(82, 190, 128, 1)",
+                            // backgroundColor: "rgb(82, 190, 128, 1)",
                             width: 20,
                             minWidth: 20,
                             height: 20,
@@ -687,7 +686,7 @@ function Consultas() {
                         </div>
                         <div
                           id="botão encerrar"
-                          className="button"
+                          className="button-true-red"
                           title="CANCELAR CONSULTA"
                           onClick={() => {
                             modal(setdialogo, 'TEM CERTEZA QUE DESEJA CANCELAR A CONSULTA?', updateConsulta, [item, 5]);
@@ -695,7 +694,7 @@ function Consultas() {
                           style={{
                             display: "flex",
                             borderColor: "#f2f2f2",
-                            backgroundColor: "#EC7063",
+                            // backgroundColor: "#EC7063",
                             width: 20,
                             minWidth: 20,
                             height: 20,
@@ -708,7 +707,7 @@ function Consultas() {
                         </div>
                         <div
                           id="botão agendar nova consulta"
-                          className="button"
+                          className="button-true-green"
                           title="AGENDAR NOVA CONSULTA"
                           onClick={() => {
                             setpaciente(pacientes.filter(valor => valor.id_paciente == item.id_paciente).pop());
@@ -721,7 +720,7 @@ function Consultas() {
                           style={{
                             display: "flex",
                             borderColor: "#f2f2f2",
-                            backgroundColor: "rgb(82, 190, 128, 1)",
+                            // backgroundColor: "rgb(82, 190, 128, 1)",
                             width: 20,
                             minWidth: 20,
                             height: 20,
@@ -910,6 +909,7 @@ function Consultas() {
             {cartao(null, 'EXAMES', 'exames')}
             {cartao(null, 'LAUDOS', 'card-documento-laudo')}
             {cartao(null, 'RELATÓRIOS', 'card-documento-relatorio')}
+            {cartao(null, 'RECIBOS', 'card-documento-recibo')}
             {cartao(null, 'EDITOR', 'card-notion')}
           </div>
           <div id="conteúdo cheio (componentes)"
