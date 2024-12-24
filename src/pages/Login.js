@@ -934,24 +934,20 @@ function Login() {
         >
           <Logo height={100} width={100} color1={logocor}></Logo>
         </div>
-        <div style={{
-          display: cliente.logo != undefined ? "flex" : "none",
-          flexDirection: 'column',
-          justifyContent: 'center',
-          backgroundColor: 'white', padding: 10, borderRadius: 5,
-          width: 0.3 * 1074, height: 0.3 * 539,
-          alignSelf: 'center',
-          margin: 20,
-        }}>
-          <img
-            alt=""
-            src={cliente.logo}
-            style={{
-              width: 0.3 * 1074, height: 0.3 * 539,
-              alignSelf: 'center'
-            }}
-          ></img>
-        </div>
+        <img
+          alt=""
+          src={cliente.logo}
+          style={{
+            display: cliente.logo != undefined ? "flex" : "none",
+            height: 0.3 * 539,
+            alignSelf: 'center',
+            borderStyle: 'solid',
+            borderWidth: 3,
+            borderRadius: 5,
+            borderColor: 'white',
+            margin: 20,
+          }}
+        ></img>
         <div
           className="text2"
           style={{
@@ -1023,6 +1019,7 @@ function Login() {
           onClick={() => {
             setusuario({});
             setacessos([]);
+            setcliente('');
             setviewlistaunidades(0);
             setviewalterarsenha(0);
             setviewinputs(1);
