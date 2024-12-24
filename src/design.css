@@ -76,71 +76,44 @@
   --placeholder: #a6acaf;
 }
 
-.bw {
+.grey {
   --pallete1: white;
-  --pallete2: #c3c3c3;
-  --pallete3: white;
+  --pallete2: #dbdddd;
+  --pallete3: #d7d8d8;
   --pallete4: white;
-  --pallete5: #d0d3d4;
-  --pallete6: #b8b8b8;
+  --pallete5: #f2f3f4;
+  --pallete6: #f2f3f4;
   --pallete7: #01c3ea;
-  --pallete8: #b6b6b6;
+  --pallete8: #e9ebeb;
 
-  --login2: #dedede;
-  --login1: #737373;
+  --login2: #548b9d;
+  --login1: #9eadb1;
 
   --cor0: white !important;
-  --cor1: #89A8B2 !important;
-  --cor1hover: #B3C8CF !important;
-  --cor1opaque: #89A8B2 !important;
+  --cor1: #7f9da7 !important;
+  --cor1hover: #bfd0d4 !important;
+  --cor1opaque: #7f9da7 !important;
 
   --cor3: var(--pallete8);
   --cor5: var(--pallete5);
 
   --texto1: black !important;
   --texto2: #ffffff;
-  --texto3: #424949 !important;
-  --placeholder: #a6acaf;
-}
-
-.gray {
-  --pallete1: white;
-  --pallete2: #E5E1DA;
-  --pallete3: white;
-  --pallete4: white;
-  --pallete5: #F1F0E8;
-  --pallete6: #F1F0E8;
-  --pallete7: #01c3ea;
-  --pallete8: #b6b6b6;
-
-  --login2: #9aacb3;
-  --login1: #52676e;
-
-  --cor0: white !important;
-  --cor1: #B3C8CF !important;
-  --cor1hover: #60b6d3 !important;
-  --cor1opaque: #647c84 !important;
-
-  --cor3: var(--pallete8);
-  --cor5: var(--pallete5);
-
-  --texto1: black !important;
-  --texto2: #ffffff;
-  --texto3: #424949 !important;
+  --texto3: #3a4040 !important;
   --placeholder: #a6acaf;
 }
 
 .pink {
   --pallete1: white;
-  --pallete2: #F2F9FF;
-  --pallete3: white;
+  --pallete2: #E195AB;
+  --pallete3: #dfafbc;
   --pallete4: white;
   --pallete5: #F2F9FF;
   --pallete6: #F2F9FF;
-  --pallete7: #cdba83;
-  --pallete8: #FFF5D7;
+  --pallete7: #f79383;
+  --pallete8: #fbe6eb;
 
-  --login2: #FFF5D7;
+  --login2: #ff6a53;
   --login1: #E195AB;
 
   --cor0: white !important;
@@ -1786,7 +1759,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .button-true-green:hover {
-  background-color: #7dcea0 ;
+  background-color: #7dcea0;
   transition: 200ms ease-in-out;
 }
 
@@ -1811,7 +1784,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
 }
 
 .button-true-red:hover {
-  background-color: #f1948a ;
+  background-color: #f1948a;
   transition: 200ms ease-in-out;
 }
 

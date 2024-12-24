@@ -83,7 +83,8 @@ function Login() {
       tema: temacor,
     }
     axios.post(html + 'update_cliente/' + id, obj).then(() => {
-      console.log('TEMA ATUALIZADO COM SUCESSO.')
+      console.log('TEMA ATUALIZADO COM SUCESSO.');
+      loadTemaCores(temacor);
     })
   }
 
@@ -106,23 +107,14 @@ function Login() {
             borderColor: 'white', borderWidth: 2.5, borderStyle: 'solid'
           }}
           onClick={() => {
-            console.log('ANTERIOR: ' + localStorage.getItem('temacores'));
-            if (localStorage.getItem('temacores') == 0) {
-              document.getElementById('aplicacao').className = 'blue';
-              updateTemaCor(cliente.id_cliente, 1);
-              localStorage.setItem('temacores', 1);
-            } else if (localStorage.getItem('temacores') == 1) {
-              document.getElementById('aplicacao').className = 'gray';
-              updateTemaCor(cliente.id_cliente, 2);
-              localStorage.setItem('temacores', 2);
-            } else if (localStorage.getItem('temacores') == 2) {
-              document.getElementById('aplicacao').className = 'pink';
-              updateTemaCor(cliente.id_cliente, 3);
-              localStorage.setItem('temacores', 3);
-            } else {
-              document.getElementById('aplicacao').className = 'teal';
-              updateTemaCor(cliente.id_cliente, 0);
-              localStorage.setItem('temacores', 0);
+            if (localStorage.getItem('temacores') == 'teal') {
+              updateTemaCor(cliente.id_cliente, 'blue');
+            } else if (localStorage.getItem('temacores') == 'blue') {
+              updateTemaCor(cliente.id_cliente, 'grey');
+            } else if (localStorage.getItem('temacores') == 'grey') {
+              updateTemaCor(cliente.id_cliente, 'pink');
+            } else if (localStorage.getItem('temacores') == 'pink') {
+              updateTemaCor(cliente.id_cliente, 'teal');
             }
             setTimeout(() => {
               setlogocor(window.getComputedStyle(document.getElementById('aplicacao')).getPropertyValue('--pallete2'));
@@ -651,6 +643,11 @@ function Login() {
     })
   }
 
+  const loadTemaCores = (tema) => {
+    document.getElementById('aplicacao').className = tema;
+    localStorage.setItem('temacores', tema);
+  }
+
   function ClienteSelector() {
     return (
       <div style={{ display: acessos.length > 0 && usuario != {} && viewlistaunidades == 0 ? 'flex' : 'none', alignSelf: 'center' }}>
@@ -662,18 +659,11 @@ function Login() {
               setcliente(clientes.filter(valor => valor.id_cliente == item.id_cliente).pop());
               sethospital(clientes.filter(valor => valor.id_cliente == item.id_cliente).map(item => item.id_cliente).pop());
               setviewlistaunidades(1);
+              // updateTemaCor(clientes.filter(valor => valor.id_cliente == item.id_cliente).map(item => item.tema));
 
               // aplicando tema de cores do cliente.
-              localStorage.setItem('temacores', clientes.filter(valor => valor.id_cliente == item.id_cliente).map(item => item.tema).pop());
-
-              if (localStorage.getItem('temacores') == 0) {
-                document.getElementById('aplicacao').className = 'teal';
-              } else if (localStorage.getItem('temacores') == 1) {
-                document.getElementById('aplicacao').className = 'blue';
-              } else {
-                document.getElementById('aplicacao').className = 'gray';
-              }
-
+              let tema = clientes.filter(valor => valor.id_cliente == item.id_cliente).map(item => item.tema).pop();
+              loadTemaCores(tema);
             }}
           >
             {clientes.filter(valor => valor.id_cliente == item.id_cliente).map(item => item.razao_social)}
