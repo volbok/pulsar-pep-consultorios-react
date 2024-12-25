@@ -37,6 +37,7 @@ function Usuarios() {
     usuario,
     arrayespecialidades,
     agenda, setagenda,
+    cliente,
   } = useContext(Context);
 
   // history (router).
@@ -60,6 +61,7 @@ function Usuarios() {
       setselectedusuario(0);
       loadUsuarios();
       loadAgenda();
+      loadAcessos();
     }
     // eslint-disable-next-line
   }, [pagina]);
@@ -74,6 +76,61 @@ function Usuarios() {
       .then((response) => {
         setusuarios(response.data.rows);
         setarrayusuarios(response.data.rows);
+      })
+      .catch(function (error) {
+        if (error.response == undefined) {
+          toast(
+            settoast,
+            "ERRO AO CARREGAR USUÁRIOS, REINICIANDO APLICAÇÃO.",
+            "black",
+            3000
+          );
+          setTimeout(() => {
+            setpagina(0);
+            history.push("/");
+          }, 3000);
+        } else {
+          toast(
+            settoast,
+            error.response.data.message + " REINICIANDO APLICAÇÃO.",
+            "black",
+            3000
+          );
+          setTimeout(() => {
+            setpagina(0);
+            history.push("/");
+          }, 3000);
+        }
+      });
+  };
+
+  const loadUsuarioAndInsertAcesso = (nome_usuario, cpf_usuario) => {
+    console.log(nome_usuario);
+    console.log(cpf_usuario);
+    axios
+      .get(html + "list_usuarios")
+      .then((response) => {
+        setusuarios(response.data.rows);
+        setarrayusuarios(response.data.rows);
+        let x = response.data.rows;
+        console.log(x);
+        let usuarionovo = x.filter(item => item.nome_usuario == nome_usuario && item.cpf_usuario == cpf_usuario).map(item => item.id_usuario).pop();
+        console.log(usuarionovo);
+        // insertAcesso(cliente.id_cliente, usuarionovo);
+
+        var obj = {
+          id_cliente: hospital,
+          id_unidade: 3,
+          id_usuario: usuarionovo,
+          boss: null,
+        };
+        axios
+          .post(html + "insert_acesso", obj)
+          .then(() => {
+            console.log('ACESSO INSERIDO COM SUCESSO');
+            loadAcessos();
+          })
+
       })
       .catch(function (error) {
         if (error.response == undefined) {
@@ -120,10 +177,12 @@ function Usuarios() {
       uf_conselho: document.getElementById("inputUf").value.toUpperCase(),
       codigo_cbo: document.getElementById("inputCodigoCbo").value.toUpperCase(),
     };
+    let nome = obj.nome_usuario;
+    let cpf = obj.cpf_usuario;
     axios
       .post(html + "inserir_usuario", obj)
       .then(() => {
-        loadUsuarios();
+        loadUsuarioAndInsertAcesso(nome, cpf);
         setselectedusuario(0);
         setviewnewusuario(0);
         toast(
@@ -242,6 +301,15 @@ function Usuarios() {
             1500
           );
           limpaCampos();
+          // PENDENTE!
+          // função para deletar acesso às unidades de atendimento.
+          console.log(usuario);
+          console.log(todosacessos.filter((valor) => valor.id_usuario == usuario));
+          arrayacessos.filter((valor) => valor.id_usuario == usuario).map(item => {
+            deleteAcesso(item.id_acesso);
+            return null;
+          });
+
           setselectedusuario(0);
         })
         .catch(function () {
@@ -258,6 +326,12 @@ function Usuarios() {
         });
     }
   };
+
+  const deleteAcesso = (item) => {
+    axios.get(html + 'delete_acesso/' + item).then(() => {
+      console.log('ACESSO EXCLUÍDO COM SUCESSO');
+    })
+  }
 
   // componente para inserir novo usuário.
   const [viewnewusuario, setviewnewusuario] = useState(0);
@@ -470,7 +544,7 @@ function Usuarios() {
                 id="inputUf"
                 onFocus={(e) => (e.target.placeholder = "")}
                 onBlur={(e) => (e.target.placeholder = "UF DO CONSELHO")}
-                defaultValue={localStorage.getItem('uf_conselho') == null ? '-x-' : localStorage.getItem('uf_conselho')}
+                defaultValue={localStorage.getItem('uf_conselho') == null || localStorage.getItem('uf_conselho') == '' ? '-x-' : localStorage.getItem('uf_conselho')}
                 style={{
                   flexDirection: "center",
                   justifyContent: "center",
@@ -488,7 +562,7 @@ function Usuarios() {
                 id="inputCodigoCbo"
                 onFocus={(e) => (e.target.placeholder = "")}
                 onBlur={(e) => (e.target.placeholder = "CÓDIGO CBO")}
-                defaultValue={localStorage.getItem('codigo_cbo')}
+                defaultValue={localStorage.getItem('codigo_cbo') == null || localStorage.getItem('codigo_cbo') == '' ? '-x-' : localStorage.getItem('codigo_cbo')}
                 style={{
                   flexDirection: "center",
                   justifyContent: "center",
@@ -496,11 +570,17 @@ function Usuarios() {
                   width: 200,
                 }}
               ></input>
-
-
-
             </div>
             <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', marginTop: 20 }}>
+              <div className={especialidade == 'ADMINISTRATIVO' ? "button-selected" : "button"}
+                style={{ width: 150, maxWidth: 150, alignSelf: 'center' }}
+                onClick={() => {
+                  localStorage.setItem('especialidade', 'ADMINISTRATIVO');
+                  setespecialidade('ADMINISTRATIVO');
+                }}
+              >
+                ADMINISTRATIVO
+              </div>
               <div className="text1"
                 style={{ display: especialidade != null || especialidade != '' ? 'flex' : 'none' }}>
                 {'ESPECIALIDADE: ' + especialidade}
@@ -646,6 +726,7 @@ function Usuarios() {
     );
   }
 
+  const [acessos_cliente, setacessos_cliente] = useState([]);
   const ListaDeUsuarios = useCallback(() => {
     return (
       <div
@@ -657,109 +738,114 @@ function Usuarios() {
           width: 'calc(100% - 15px)',
         }}
       >
-        {arrayusuarios
-          .sort((a, b) => (a.nome_usuario > b.nome_usuario ? 1 : -1))
-          .map((item) => (
-            <div
-              key={"usuarios " + Math.random()}
-              style={{
-                display: arrayusuarios.length > 0 ? "flex" : "none",
-                flexDirection: "column",
-                justifyContent: "center",
-              }}
-            >
-              <div
-                className="button"
-                id={"usuario " + item.id_usuario}
-                onClick={() => {
-                  localStorage.setItem("selecteduser", JSON.stringify(item));
-                  setselectedusuario(item);
-                  console.log(selectedusuario.id_usuario);
-                  localStorage.setItem('id', item.id_usuario);
-                  localStorage.setItem('nome', item.nome_usuario);
-                  localStorage.setItem('dn', item.dn_usuario);
-                  localStorage.setItem('cpf', item.cpf_usuario);
-                  localStorage.setItem('contato', item.contato_usuario);
-                  localStorage.setItem('conselho', item.conselho);
-                  localStorage.setItem('n_conselho', item.n_conselho);
-                  localStorage.setItem('uf_conselho', item.uf_conselho);
-                  localStorage.setItem('codigo_cbo', item.codigo_cbo);
-                  localStorage.setItem('especialidade', item.tipo_usuario);
-                  // acessos.
-                  localStorage.setItem('farmacia', item.farmacia);
-                  localStorage.setItem('faturamento', item.faturamento);
-                  localStorage.setItem('laboratorio', item.laboratorio);
-                  localStorage.setItem('paciente', item.paciente);
-                  localStorage.setItem('prontuario', item.prontuario);
-                  localStorage.setItem('usuarios', item.usuarios);
-
-                  loadTodosAcessos(item.id_usuario);
-                  selector("scroll usuários", "usuario " + item.id_usuario, 300);
-                }}
-                style={{
-                  justifyContent: "space-between",
-                  paddingLeft: 10,
-                  textAlign: 'left'
-                }}
-              >
-                {item.nome_usuario.length < 26 ? item.nome_usuario : item.nome_usuario.substring(0, 25) + '...'}
+        {acessos_cliente.map(acesso => (
+          <div>
+            {arrayusuarios
+              .filter(item => item.id_usuario == acesso.id_usuario)
+              .sort((a, b) => (a.nome_usuario > b.nome_usuario ? 1 : -1))
+              .map((item) => (
                 <div
+                  key={"usuarios " + Math.random()}
                   style={{
                     display: "flex",
-                    flexDirection: "row",
+                    flexDirection: "column",
                     justifyContent: "center",
                   }}
                 >
                   <div
-                    id="btn-edit"
-                    className="button-yellow"
-                    style={{ width: 50, height: 50 }}
+                    className="button"
+                    id={"usuario " + item.id_usuario}
                     onClick={() => {
+                      localStorage.setItem("selecteduser", JSON.stringify(item));
                       setselectedusuario(item);
-                      setviewnewusuario(2);
+                      console.log(selectedusuario.id_usuario);
+                      localStorage.setItem('id', item.id_usuario);
+                      localStorage.setItem('nome', item.nome_usuario);
+                      localStorage.setItem('dn', item.dn_usuario);
+                      localStorage.setItem('cpf', item.cpf_usuario);
+                      localStorage.setItem('contato', item.contato_usuario);
+                      localStorage.setItem('conselho', item.conselho);
+                      localStorage.setItem('n_conselho', item.n_conselho);
+                      localStorage.setItem('uf_conselho', item.uf_conselho);
+                      localStorage.setItem('codigo_cbo', item.codigo_cbo);
+                      localStorage.setItem('especialidade', item.tipo_usuario);
+                      // acessos.
+                      localStorage.setItem('farmacia', item.farmacia);
+                      localStorage.setItem('faturamento', item.faturamento);
+                      localStorage.setItem('laboratorio', item.laboratorio);
+                      localStorage.setItem('paciente', item.paciente);
+                      localStorage.setItem('prontuario', item.prontuario);
+                      localStorage.setItem('usuarios', item.usuarios);
+
+                      loadTodosAcessos(item.id_usuario);
+                      selector("scroll usuários", "usuario " + item.id_usuario, 300);
                     }}
-                  >
-                    <img
-                      alt=""
-                      src={editar}
-                      style={{
-                        margin: 10,
-                        height: 30,
-                        width: 30,
-                      }}
-                    ></img>
-                  </div>
-                  <div
-                    id="btn-delete"
-                    className="button-yellow"
                     style={{
-                      display: item.id_usuario == usuario.id ? "none" : "flex",
-                      width: 50,
-                      height: 50,
-                    }}
-                    onClick={() => {
-                      modal(
-                        setdialogo,
-                        "EXCLUIR O USUÁRIO " + item.nome_usuario + "?",
-                        deleteUsuario,
-                        [item.id_usuario]
-                      );
+                      justifyContent: "space-between",
+                      paddingLeft: 10,
+                      textAlign: 'left'
                     }}
                   >
-                    <img
-                      alt=""
-                      src={deletar}
+                    {item.nome_usuario.length < 26 ? item.nome_usuario : item.nome_usuario.substring(0, 25) + '...'}
+                    <div
                       style={{
-                        margin: 10,
-                        height: 30,
-                        width: 30,
+                        display: "flex",
+                        flexDirection: "row",
+                        justifyContent: "center",
                       }}
-                    ></img>
+                    >
+                      <div
+                        id="btn-edit"
+                        className="button-yellow"
+                        style={{ width: 50, height: 50 }}
+                        onClick={() => {
+                          setselectedusuario(item);
+                          setviewnewusuario(2);
+                        }}
+                      >
+                        <img
+                          alt=""
+                          src={editar}
+                          style={{
+                            margin: 10,
+                            height: 30,
+                            width: 30,
+                          }}
+                        ></img>
+                      </div>
+                      <div
+                        id="btn-delete"
+                        className="button-yellow"
+                        style={{
+                          display: item.id_usuario == usuario.id ? "none" : "flex",
+                          width: 50,
+                          height: 50,
+                        }}
+                        onClick={() => {
+                          modal(
+                            setdialogo,
+                            "EXCLUIR O USUÁRIO " + item.nome_usuario + "?",
+                            deleteUsuario,
+                            item.id_usuario
+                          );
+                        }}
+                      >
+                        <img
+                          alt=""
+                          src={deletar}
+                          style={{
+                            margin: 10,
+                            height: 30,
+                            width: 30,
+                          }}
+                        ></img>
+                      </div>
+                    </div>
                   </div>
                 </div>
-              </div>
-            </div>
-          ))}
+              ))}
+          </div>
+        ))}
         <div
           className="text1"
           style={{
@@ -772,11 +858,20 @@ function Usuarios() {
       </div>
     );
     // eslint-disable-next-line
-  }, [usuarios, arrayusuarios]);
+  }, [usuarios, arrayusuarios, acessos_cliente]);
 
   // ## ACESSOS ##
   // eslint-disable-next-line
   const [arrayacessos, setarrayacessos] = useState([]);
+  const loadAcessos = () => {
+    axios
+      .get(html + "list_todos_acessos")
+      .then((response) => {
+        let x = response.data.rows;
+        setacessos_cliente(x.filter(item => item.id_cliente == cliente.id_cliente));
+        console.log(x.filter(item => item.id_cliente == cliente.id_cliente));
+      });
+  }
 
   // recuperando todos os acessos da base (necessário para gerenciar a exclusão segura de usuários).
   const [todosacessos, settodosacessos] = useState([]);

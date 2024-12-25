@@ -754,7 +754,7 @@ function Documentos() {
 
   // inserindo um documento.
   const montaTexto = () => {
-    console.log(tipodocumento);
+    // console.log(tipodocumento);
     if (tipodocumento == 'EVOLUÇÃO') {
       // recuperando alergias.
       let tag_alergias = '';
@@ -1219,7 +1219,6 @@ function Documentos() {
 
   function voiceField(texto) {
     let valor = texto.toString();
-    // console.log(valor);
     document.getElementById("inputFieldDocumento").value = valor;
     localStorage.setItem('texto', texto);
   }

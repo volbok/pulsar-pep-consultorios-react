@@ -1155,6 +1155,7 @@ function Cadastro() {
                   height: 75,
                   minHeight: 75,
                   maxHeight: 75,
+                  marginTop: 15,
                 }}
               ></textarea>
 
@@ -1328,7 +1329,7 @@ function Cadastro() {
                 ></textarea>
               </div>
             </div>
-            <div className="button" style={{ paddingLeft: 15, paddingRight: 15 }}
+            <div className="button" style={{ paddingLeft: 15, paddingRight: 15, marginTop: 15 }}
               onClick={() => {
                 if (viewoperadoraselector == 1) {
                   setviewoperadoraselector(0);
@@ -1462,10 +1463,10 @@ function Cadastro() {
               }}
             >
               <div className="text1">TELEFONE</div>
-              <input
+              <textarea
                 autoComplete="off"
                 placeholder="TELEFONE"
-                className="input"
+                className="textarea"
                 type="text"
                 id="inputEditTelefone"
                 onFocus={(e) => (e.target.placeholder = "")}
@@ -1484,7 +1485,7 @@ function Cadastro() {
                   minHeight: 20,
                   maxHeight: 20,
                 }}
-              ></input>
+              ></textarea>
             </div>
             <div id="email"
               style={{

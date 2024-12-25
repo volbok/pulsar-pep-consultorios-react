@@ -12,8 +12,8 @@ const maskoptions = (timeout, id, tamanho, array) => {
         string: item,
       })
     );
-    console.log(x);
-    console.log(validatearray.filter((item) => item.boolean === true).length);
+    // console.log(x);
+    // console.log(validatearray.filter((item) => item.boolean === true).length);
 
     if (validatearray.filter((item) => item.boolean === true).length === 1) {
       document.getElementById(id).value = validatearray

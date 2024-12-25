@@ -43,6 +43,7 @@ function Agendamento() {
       loadUsuarios();
       loadPacientes();
       loadAgenda();
+      loadAcessos();
       currentMonth();
       setTimeout(() => {
         loadModdedAtendimentos(moment().format('DD/MM/YYYY'));
@@ -53,6 +54,16 @@ function Agendamento() {
     }
     // eslint-disable-next-line
   }, [pagina]);
+
+  const [acessos_cliente, setacessos_cliente] = useState([]);
+  const loadAcessos = () => {
+    axios
+      .get(html + "list_todos_acessos")
+      .then((response) => {
+        let x = response.data.rows;
+        setacessos_cliente(x.filter(item => item.id_cliente == cliente.id_cliente));
+      });
+  }
 
   // history (router).
   let history = useHistory();
@@ -455,46 +466,50 @@ function Agendamento() {
         }}
         onClick={(e) => e.stopPropagation(e)}
       >
-        {arrayespecialistas.filter(item => item.tipo_usuario != null && item.tipo_usuario != '')
-          .sort((a, b) => (a.nome_usuario > b.nome_usuario ? 1 : -1))
-          .map((item) => (
-            <div
-              key={"usuarios " + Math.random()}
-              style={{
-                display: arrayespecialistas.length > 0 ? "flex" : "none",
-                flexDirection: 'column',
-                justifyContent: 'flex-start',
-                alignItems: 'flex-start',
-                height: 200,
-              }}
-              className="button"
-              id={"usuario " + item.id_usuario}
-              onClick={() => {
-                setselectedespecialista(item);
-                setviewconsultas(1);
-              }}
-            >
-              <div
-                className='button-green'
-                style={{ width: 'calc(100% - 20px)', backgroundColor: '#004c4c80' }}
-              >
-                {item.tipo_usuario}
-              </div>
-              <div style={{ margin: 5, marginTop: 10, marginBottom: 0, textAlign: 'left', opacity: 0.6 }}>
-                {'PROFISSIONAL:'}
-              </div>
-              <div style={{ margin: 5, marginTop: 0, textAlign: 'left' }}>
-                {item.nome_usuario.length > 25 ? item.nome_usuario.slice(0, 25) + '...' : item.nome_usuario}
-              </div>
-              <div style={{ margin: 5, marginTop: 5, marginBottom: 0, textAlign: 'left', opacity: 0.6 }}>
-                {'CONSELHO:'}
-              </div>
-              <div style={{ margin: 5, marginTop: 0, textAlign: 'left' }}>
-                {item.conselho + ' - ' + item.n_conselho}
-              </div>
-            </div>
-          ))
-        }
+        {acessos_cliente.map(acesso => (
+          <div>
+            {arrayespecialistas.filter(item => item.tipo_usuario != 'ADMINISTRATIVO' && item.id_usuario == acesso.id_usuario)
+              .sort((a, b) => (a.nome_usuario > b.nome_usuario ? 1 : -1))
+              .map((item) => (
+                <div
+                  key={"usuarios " + Math.random()}
+                  style={{
+                    display: arrayespecialistas.length > 0 ? "flex" : "none",
+                    flexDirection: 'column',
+                    justifyContent: 'flex-start',
+                    alignItems: 'flex-start',
+                    height: 200,
+                  }}
+                  className="button"
+                  id={"usuario " + item.id_usuario}
+                  onClick={() => {
+                    setselectedespecialista(item);
+                    setviewconsultas(1);
+                  }}
+                >
+                  <div
+                    className='button-green'
+                    style={{ width: 'calc(100% - 20px)', backgroundColor: '#004c4c80' }}
+                  >
+                    {item.tipo_usuario}
+                  </div>
+                  <div style={{ margin: 5, marginTop: 10, marginBottom: 0, textAlign: 'left', opacity: 0.6 }}>
+                    {'PROFISSIONAL:'}
+                  </div>
+                  <div style={{ margin: 5, marginTop: 0, textAlign: 'left' }}>
+                    {item.nome_usuario.length > 25 ? item.nome_usuario.slice(0, 25) + '...' : item.nome_usuario}
+                  </div>
+                  <div style={{ margin: 5, marginTop: 5, marginBottom: 0, textAlign: 'left', opacity: 0.6 }}>
+                    {'CONSELHO:'}
+                  </div>
+                  <div style={{ margin: 5, marginTop: 0, textAlign: 'left' }}>
+                    {item.conselho + ' - ' + item.n_conselho}
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        ))}
         <div
           className="text1"
           style={{

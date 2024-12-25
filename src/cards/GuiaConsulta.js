@@ -20,14 +20,12 @@ function GuiaConsulta() {
 
   let operadora = [];
   useEffect(() => {
-    console.log('GUIA CONSULTA CARREGADA');
     if (card == 'guia-consulta') {
       if (localStorage.getItem('PARTICULAR') != 'PARTICULAR') {
         setn_carteira(objpaciente.convenio_carteira);
         setvalidade_carteira(objpaciente.validade_carteira);
         setnome(objpaciente.nome_paciente);
         setcns(objpaciente.cns != undefined ? objpaciente.cns : '');
-        console.log(dono_documento);
       } else {
         setn_carteira('');
         setvalidade_carteira('');
@@ -35,11 +33,8 @@ function GuiaConsulta() {
         setcns('');
       }
 
-      console.log(operadoras);
       // eslint-disable-next-line
       operadora = operadoras.filter(valor => valor.id == objpaciente.convenio_codigo).pop();
-      console.log(objpaciente.convenio_codigo);
-      console.log('OPERADORA: ' + operadora);
 
       if (localStorage.getItem('PARTICULAR') != 'PARTICULAR') {
         setlogo(operadora.logo_operadora);
@@ -66,8 +61,6 @@ function GuiaConsulta() {
       }
 
       settipoconsulta(localStorage.getItem('tipo_consulta'));
-      console.log(dono_documento);
-      console.log(cliente);
     }
     // eslint-disable-next-line
   }, [card, objpaciente, operadora, dono_documento]);
@@ -99,10 +92,55 @@ function GuiaConsulta() {
   const [tabela, settabela] = useState('04'); // consulta - obtido da tabela de domínio 50.
   const [codigo_procedimento, setcodigo_procedimento] = useState('?');
   const [valor_procedimento, setvalor_procedimento] = useState('R$ 300');
+  const [observacao, setobservacao] = useState('CONSULTA MÉDICA');
 
   // campos para edição da guia.
   let timeout = null;
-  const editcampo = (titulo, valor, setvalor, tamanho, grow) => {
+  const editcampo = (titulo, valor, setvalor, tamanho, grow, height) => {
+    return (
+      <div id="versão para edição"
+        style={{
+          display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
+          position: 'relative',
+          borderStyle: 'solid', borderWidth: 1, borderColor: 'black', borderRadius: 2.5,
+          margin: 2, padding: 5,
+          width: grow == 1 ? '' : tamanho,
+          flexGrow: grow,
+          minHeight: height == null ? 20 : height,
+          maxHeight: height == null ? 20 : height,
+          fontSize: 10, textAlign: 'left',
+        }}>
+        <div style={{
+          position: 'absolute', top: -2.5, left: 5,
+          backgroundColor: 'white',
+          fontSize: 7,
+          minHeight: 15, maxHeight: 15,
+          paddingLeft: 2.5, paddingRight: 2.5,
+        }}>
+          {titulo}
+        </div>
+        <input
+          id={'input ' + titulo}
+          className='tiss_textarea'
+          autoComplete="off"
+          placeholder={titulo}
+          onFocus={(e) => (e.target.placeholder = "")}
+          onBlur={(e) => (e.target.placeholder = "")}
+          // defaultValue={valor.length > 55 ? valor.toUpperCase().slice(0, 55) + '...' : valor.toUpperCase()}
+          defaultValue={valor != null && valor.length > 50 ? valor.toUpperCase().slice(0, 55) + '...' : valor != null && valor.length < 51 ? valor.toUpperCase() : ''}
+          style={{ backgroundColor: 'transparent', margin: 0, marginTop: 2, marginLeft: -2.5, padding: 0 }}
+          onKeyUp={() => {
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+              setvalor(document.getElementById('input ' + titulo).value);
+            }, 2000);
+          }}
+        >
+        </input>
+      </div>
+    )
+  }
+  const editcampovalor = (titulo, valor, tamanho, grow) => {
     return (
       <div id="versão para edição"
         style={{
@@ -130,53 +168,9 @@ function GuiaConsulta() {
           autoComplete="off"
           placeholder={titulo}
           onFocus={(e) => (e.target.placeholder = "")}
-          onBlur={(e) => (e.target.placeholder = { titulo })}
-          // defaultValue={valor.length > 55 ? valor.toUpperCase().slice(0, 55) + '...' : valor.toUpperCase()}
-          defaultValue={valor != null && valor.length > 50 ? valor.toUpperCase().slice(0, 55) + '...' : valor != null && valor.length < 51 ? valor.toUpperCase() : ''}
-          style={{ backgroundColor: 'transparent', margin: 0, marginTop: 2, marginLeft: -2.5, padding: 0 }}
-          onKeyUp={() => {
-            clearTimeout(timeout);
-            timeout = setTimeout(() => {
-              console.log(valor.toString())
-              setvalor(document.getElementById('input ' + titulo).value);
-            }, 2000);
-          }}
-        >
-        </input>
-      </div>
-    )
-  }
-  const editcampovalor = (titulo, valor, tamanho, grow) => {
-    return (
-      <div id="versão para edição"
-        style={{
-          display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
-          position: 'relative',
-          borderStyle: 'solid', borderWidth: 1, borderColor: 'black', borderRadius: 2.5,
-          margin: 2, padding: 5,
-          width: grow == 1 ? '' : tamanho,
-          flexGrow: grow,
-          minHeight: 20, maxHeight: 20,
-          fontSize: 10, textAlign: 'left',
-        }}>
-        <div style={{
-          position: 'absolute', top: -5, left: 5,
-          backgroundColor: 'white',
-          fontSize: 7,
-          minHeight: 15, maxHeight: 15,
-          paddingLeft: 2.5, paddingRight: 2.5,
-        }}>
-          {titulo}
-        </div>
-        <input
-          id={'input ' + titulo}
-          className='tiss_textarea'
-          autoComplete="off"
-          placeholder={titulo}
-          onFocus={(e) => (e.target.placeholder = "")}
-          onBlur={(e) => (e.target.placeholder = { titulo })}
+          onBlur={(e) => (e.target.placeholder = "")}
           defaultValue={valor != null && valor.length > 55 ? valor.toUpperCase().slice(0, 55) + '...' : valor != null && valor.length < 56 ? valor : ''}
-          style={{ backgroundColor: 'transparent', margin: 0, marginTop: 2, marginLeft: -2.5, padding: 0 }}
+          style={{ backgroundColor: 'transparent', margin: 0, marginTop: -2.5, marginLeft: -2.5, padding: 0 }}
         >
         </input>
       </div>
@@ -184,7 +178,7 @@ function GuiaConsulta() {
   }
 
   // campo para impressão da guia.
-  const pdfcampo = (titulo, valor, flex) => {
+  const pdfcampo = (titulo, valor, flex, height) => {
     return (
       <div id="versão para impressão" className='noprint'
         style={{
@@ -194,7 +188,8 @@ function GuiaConsulta() {
           margin: 1, marginTop: 5,
           padding: 1.5,
           flex: flex,
-          minHeight: 15, maxHeight: 15,
+          minHeight: height == null ? 15 : height,
+          maxHeight: height == null ? 15 : height,
           fontSize: 8, textAlign: 'left',
           fontFamily: 'Helvetica'
         }}>
@@ -340,7 +335,7 @@ function GuiaConsulta() {
                 {editcampo('16 - CÓDIGO CBO', codigo_cbo, setcodigo_cbo, 100, 0)}
               </div>
               <div className='grupo'>{'DADOS DO ATENDIMENTO / PROCEDIMENTO  REALIZADO'}</div>
-              {editcampovalor('17 - INDICAÇÃO DE ACIDENTE (ACIDENTE OU DOENÇA RELACIONADA)', '9', 200, 0)}
+              {editcampovalor('17 - INDICAÇÃO DE ACIDENTE (ACIDENTE OU DOENÇA RELACIONADA)', '9', 400, 0)}
               <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
                 {editcampo('18 - DATA DO ATENDIMENTO', data_atendimento, setdata_atendimento, 250, 0)}
                 {editcampo('19 - TIPO DE CONSULTA', tipoconsulta, settipoconsulta, 50, 0)}
@@ -348,17 +343,7 @@ function GuiaConsulta() {
                 {editcampo('21 - CÓDIGO DO PROCEDIMENTO', codigo_procedimento, setcodigo_procedimento, 300, 0)}
                 {editcampo('22 - VALOR DO PROCEDIMENTO', valor_procedimento, setvalor_procedimento, 300, 0)}
               </div>
-              <div className='fonte_titulo_header' style={{
-                display: 'flex', flexDirection: 'row',
-                height: 50, backgroundColor: '#B2BEBE',
-                position: 'relative', width: '100%',
-                borderRadius: 2.5,
-                marginTop: 2.5, marginBottom: 2.5,
-              }}>
-                <div style={{ position: 'absolute', top: 5, left: 5 }}>
-                  {'23 - OBSERVAÇÃO/JUSTIFICATIVA'}
-                </div>
-              </div>
+              {editcampo('23 - OBSERVAÇÃO / JUSTIFICATIVA', observacao, setobservacao, '100%', 1, 100)}
               <div
                 style={{
                   display: 'flex', flexDirection: 'column',
@@ -367,7 +352,7 @@ function GuiaConsulta() {
                   borderWidth: 1,
                   borderRadius: 2.5,
                   padding: 2.5,
-                  margin: 2.5,
+                  margin: 2,
                 }}
               >
                 <div id='cabeçalho do grupo'
@@ -375,21 +360,18 @@ function GuiaConsulta() {
                     display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
                     width: '100%',
                   }}>
-                  <div className='fonte_titulo_header' style={{ minWidth: 300, maxWidth: 300 }}>
-                    {'24 - ASSINATURA DO PROFISSIONAL EXECUTANTE'}
+                  <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div className='fonte_titulo_header' style={{ minWidth: 300, maxWidth: 300 }}>
+                      {'24 - ASSINATURA DO PROFISSIONAL EXECUTANTE'}
+                    </div>
+                    <div className='fonte_titulo_header' style={{ minWidth: 400, width: 400, marginTop: 10 }}>{'__________________________________________________________'}</div>
                   </div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 300, maxWidth: 300 }}>
-                    {'25 - ASSINATURA DO BENEFICIÁRIO OU RESPONSÁVEL'}
+                  <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div className='fonte_titulo_header' style={{ minWidth: 300, maxWidth: 300 }}>
+                      {'25 - ASSINATURA DO BENEFICIÁRIO OU RESPONSÁVEL'}
+                    </div>
+                    <div className='fonte_titulo_header' style={{ minWidth: 400, width: 400, marginTop: 10 }}>{'__________________________________________________________'}</div>
                   </div>
-                </div>
-                <div
-                  style={{
-                    display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
-                    width: '100%',
-                  }}
-                >
-                  <div className='fonte_titulo_header' style={{ minWidth: 200, width: 200 }}>{'__________________________________________'}</div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 200, width: 200 }}>{'__________________________________________'}</div>
                 </div>
               </div>
             </div>
@@ -476,7 +458,7 @@ function GuiaConsulta() {
               >
                 {'DADOS DO ATENDIMENTO / PROCEDIMENTO  REALIZADO'}
               </div>
-              <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row', width: 300 }}>
+              <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row', width: 400 }}>
                 {pdfcampo('17 - INDICAÇÃO DE ACIDENTE (ACIDENTE OU DOENÇA RELACIONADA)', '9', 1)}
               </div>
               <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
@@ -486,18 +468,7 @@ function GuiaConsulta() {
                 {pdfcampo('21 - CÓDIGO DO PROCEDIMENTO', codigo_procedimento, 1)}
                 {pdfcampo('22 - VALOR DO PROCEDIMENTO', valor_procedimento, 1)}
               </div>
-
-              <div className='fonte_titulo_header' style={{
-                display: 'flex', flexDirection: 'row',
-                height: 50, backgroundColor: '#B2BEBE',
-                position: 'relative', width: '100%',
-                borderRadius: 2.5,
-                marginTop: 2.5, marginBottom: 2.5,
-              }}>
-                <div style={{ position: 'absolute', top: 5, left: 5, fontFamily: 'Helvetica', fontSize: 8 }}>
-                  {'23 - OBSERVAÇÃO/JUSTIFICATIVA'}
-                </div>
-              </div>
+              {pdfcampo('23 - OBSERVAÇÃO / JUSTIFICATIVA', observacao, 1, 200)}
               <div
                 style={{
                   display: 'flex', flexDirection: 'column',
@@ -507,6 +478,7 @@ function GuiaConsulta() {
                   borderRadius: 2.5,
                   padding: 2.5,
                   margin: 1,
+                  marginTop: 5,
                 }}
               >
                 <div id='cabeçalho do grupo'
@@ -514,32 +486,18 @@ function GuiaConsulta() {
                     display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
                     width: '100%',
                   }}>
-                  <div className='fonte_titulo_header'
-                    style={{
-                      minWidth: 300, maxWidth: 300,
-                      fontFamily: 'Helvetica',
-                      fontSize: 8,
-                    }}>
-                    {'24 - ASSINATURA DO PROFISSIONAL EXECUTANTE'}
+                  <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div className='fonte_titulo_header' style={{ minWidth: 300, maxWidth: 300 }}>
+                      {'24 - ASSINATURA DO PROFISSIONAL EXECUTANTE'}
+                    </div>
+                    <div className='fonte_titulo_header' style={{ minWidth: 400, width: 400, marginTop: 10 }}>{'__________________________________________________________'}</div>
                   </div>
-                  <div className='fonte_titulo_header'
-                    style={{
-                      minWidth: 300, maxWidth: 300,
-                      fontFamily: 'Helvetica',
-                      fontSize: 8,
-                    }}
-                  >
-                    {'25 - ASSINATURA DO BENEFICIÁRIO OU RESPONSÁVEL'}
+                  <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                    <div className='fonte_titulo_header' style={{ minWidth: 300, maxWidth: 300 }}>
+                      {'25 - ASSINATURA DO BENEFICIÁRIO OU RESPONSÁVEL'}
+                    </div>
+                    <div className='fonte_titulo_header' style={{ minWidth: 400, width: 400, marginTop: 10 }}>{'__________________________________________________________'}</div>
                   </div>
-                </div>
-                <div
-                  style={{
-                    display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
-                    width: '100%',
-                  }}
-                >
-                  <div className='fonte_titulo_header' style={{ minWidth: 300, width: 300 }}>{'______________________________________'}</div>
-                  <div className='fonte_titulo_header' style={{ minWidth: 300, width: 300 }}>{'______________________________________'}</div>
                 </div>
               </div>
             </div>
@@ -562,51 +520,5 @@ function GuiaConsulta() {
     )
   }
 }
-
-/*
-const stock = () => {
-  return (
-    <div>
-      <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
-        {pdfcampo('1- REGISTRO ANS', registro_ans, 2)}
-        {editcampovalor('3 - NÚMERO DA GUIA PRINCIPAL', 2)}
-      </div>
-      <div className='grupo'>{'DADOS DO BENEFICIÁRIO'}</div>
-      <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
-        {pdfcampo('4 - Nº DA CARTEIRA', n_carteira, 3)}
-        {pdfcampo('5 - VALIDADE DA CARTEIRA', validade_carteira, 2)}
-        {pdfcampo('6 - ATENDIMENTO A RN', rn, 1)}
-
-        {pdfcampo('7 - NOME', nome, 5)}
-        {pdfcampo('8 - CARTÃO NACIONAL DE SAÚDE', cns, 2)}
-      </div>
-      <div className='grupo'>{'DADOS DO CONTRATADO'}</div>
-      <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
-        {pdfcampo('9 - CÓDIGO NA OPERADORA', codigo_prestador, 2)}
-        {pdfcampo('10 - NOME DO CONTRATADO', nome_contratado, 5)}
-        {pdfcampo('11 - CÓDIGO CNES', cliente.cnes, 2)}
-      </div>
-      <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
-        {pdfcampo('12 - NOME DO PROFISSIONAL EXECUTANTE', nome_solicitante, 6)}
-        {pdfcampo('13 - CONSELHO PROFISSIONAL', conselho_solicitante, 3)}
-        {pdfcampo('14 - NÚMERO NO CONSELHO', n_conselho_solicitante, 3)}
-        {pdfcampo('15 - UF', uf_solicitante, 1)}
-        {pdfcampo('16 - CÓDIGO CBO', codigo_cbo, 2)}
-      </div>
-      <div className='grupo'>{'DADOS DO ATENDIMENTO / PROCEDIMENTO  REALIZADO'}</div>
-      <div style={{ witdh: 300 }}>
-        {pdfcampo('17 - INDICAÇÃO DE ACIDENTE (ACIDENTE OU DOENÇA RELACIONADA)', '9', 1)}
-      </div>
-      <div id='linha comum da guia' style={{ display: 'flex', flexDirection: 'row' }}>
-        {pdfcampo('18 - DATA DO ATENDIMENTO', data_atendimento, 2)}
-        {pdfcampo('19 - TIPO DE CONSULTA', tipoconsulta, 1)}
-        {pdfcampo('20 - TABELA', tabela, 1)}
-        {pdfcampo('21 - CÓDIGO DO PROCEDIMENTO', codigo_procedimento, 2)}
-        {pdfcampo('22 - VALOR DO PROCEDIMENTO', valor_procedimento, 2)}
-      </div>
-    </div>
-  )
-}
-*/
 
 export default GuiaConsulta;
