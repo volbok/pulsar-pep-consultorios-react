@@ -67,6 +67,7 @@ function Consultas() {
     setidprescricao,
 
     setdialogo,
+    cliente,
 
   } = useContext(Context);
 
@@ -356,7 +357,7 @@ function Consultas() {
     const message =
       'Olá, ' + objpaciente.nome_paciente + '!\n' +
       'Você tem uma consulta agendada pelo seu médico, Dr(a). ' + usuario.nome_usuario + ', ' + usuario.tipo_usuario + ',\n' +
-      'para o dia ' + inicio + ', na CLÍNICA POMERODE.'
+      'para o dia ' + inicio + ', na CLÍNICA ' + cliente.razao_social + '.'
 
     const rawphone = pacientes.filter(valor => valor.id_paciente == objpaciente.id_paciente).map(item => item.telefone).pop();
     let cleanphone = rawphone.replace("(", "");

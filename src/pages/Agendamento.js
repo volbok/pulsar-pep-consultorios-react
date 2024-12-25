@@ -156,17 +156,22 @@ function Agendamento() {
   };
 
   // ENVIO DE MENSAGENS DE AGENDAMENTO DA CONSULTA PELO WHATSAPP.
-  /*
-  function geraWhatsapp(inicio) {
+
+  function geraWhatsapp(id, inicio) {
+
+    let paciente = pacientes.filter(item => item.id_paciente == id).pop();
+    console.log(paciente);
 
     const gzappy_url_envia_mensagem = "https://api.gzappy.com/v1/message/send-message/";
     const instance_id = 'L05K3GC2YX03DGWYLDKZQW5L';
     const instance_token = '2d763c00-4b6d-4842-99d7-cb32ea357a80';
     const USER_TOKEN_ID = '3a1d021d-ad34-473e-9255-b9a3e6577cf9';
+    const GZAPPY_API_TOKEN = 'bfd2b508d013fbbde6ae4765bbc4eaf83b5514201a7970ae46ff91ade3b2b1a032fe9c8a961a7c572a547b52d745e433f317bd825eb471d0f609c1e843e3d0a9';
+
     const message =
       'Olá, ' + paciente.nome_paciente + '!\n' +
-      'Você tem uma consulta agendada com o Dr(a). ' + selectedespecialista.nome_usuario + ', ' + selectedespecialista.tipo_usuario + ',\n' +
-      'para o dia ' + inicio + ', na clínica POMERODE.'
+      'Você tem uma consulta agendada pelo seu médico, Dr(a). ' + usuario.nome_usuario + ', ' + usuario.tipo_usuario + ',\n' +
+      'para o dia ' + inicio + ', na CLÍNICA ' + cliente.razao_social + '.'
 
     const rawphone = paciente.telefone;
     console.log(rawphone);
@@ -181,7 +186,8 @@ function Agendamento() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'user_token_id': USER_TOKEN_ID
+        'user_token_id': USER_TOKEN_ID,
+        'Authorization': `Bearer ${GZAPPY_API_TOKEN}`
       },
       body: JSON.stringify({
         instance_id: instance_id,
@@ -191,7 +197,6 @@ function Agendamento() {
       })
     })
   }
-  */
 
   // checando se há consultas já agendadas para o horário selecionado para inserir atendimento.
   const checkConsultas = (data_inicio) => {
@@ -252,46 +257,6 @@ function Agendamento() {
     } else {
       insertAtendimento(inicio);
     }
-
-    /*
-    if (localStorage.getItem('PARTICULAR') == 'PARTICULAR') {
-      poolatendimentos = arrayatendimentos.filter(item =>
-        item.id_paciente == paciente.id_paciente
-        &&
-        item.id_profissional == selectedespecialista.id_usuario
-        &&
-        (
-          moment(inicio, 'DD/MM/YYYY - HH:mm') > moment(item.data_inicio).subtract(cliente.tempo_consulta_particular, 'minutes')
-          &&
-          moment(inicio, 'DD/MM/YYYY - HH:mm') < moment(item.data_termino)
-        )
-      )
-    } else {
-      poolatendimentos = arrayatendimentos.filter(item =>
-        item.id_paciente == paciente.id_paciente
-        &&
-        item.id_profissional == selectedespecialista.id_usuario
-        &&
-        (
-          moment(inicio, 'DD/MM/YYYY - HH:mm') > moment(item.data_inicio).subtract(cliente.tempo_consulta_convenio, 'minutes')
-          &&
-          moment(inicio, 'DD/MM/YYYY - HH:mm') < moment(item.data_termino)
-        )
-      )
-    }
-    
-    console.log(poolatendimentos.length);
-    
-    if (poolatendimentos.length > 0) {
-      // modal...
-      console.log(poolatendimentos);
-      console.log('CONSULTA JÁ AGENDADA NESTE PERÍODO.');
-      modal(setdialogo, 'JÁ EXISTE UMA CONSULTA AGENDADA PARA ESTE HORÁRIO, CONFIRMAR ESTE NOVO AGENDAMENTO?', insertAtendimento, inicio);
-    } else {
-      insertAtendimento(inicio);
-  }
-  */
-
   }
 
 
@@ -378,7 +343,7 @@ function Agendamento() {
         console.log('AGENDAMENTO DE CONSULTA INSERIDO COM SUCESSO')
         // loadAtendimentos();
         loadModdedAtendimentos(selectdate);
-        // geraWhatsapp(inicio);
+        geraWhatsapp(paciente.id_paciente, moment(inicio, 'DD/MM/YYYY - HH:mm'));
       });
   };
 
@@ -408,7 +373,7 @@ function Agendamento() {
         console.log('AGENDAMENTO DE CONSULTA ATUALIZADO COM SUCESSO')
         // loadAtendimentos();
         loadModdedAtendimentos(selectdate);
-        // geraWhatsapp(inicio);
+        geraWhatsapp(item.id_paciente, inicio);
       });
   };
 
@@ -974,6 +939,24 @@ function Agendamento() {
                             }}
                           ></img>
                         </div>
+                        <div id="btn lembrar consulta"
+                          title="LEMBRAR CONSULTA PARA O CLIENTE"
+                          className="button-true-green"
+                          onClick={() => {
+                            geraWhatsapp(item.id_paciente, moment(item.data_inicio).format('DD/MM/YYYY - HH:mm'));
+                          }}
+                          style={{ width: 50, height: 50, alignSelf: 'flex-end' }}
+                        >
+                          <img
+                            alt=""
+                            src={imprimir}
+                            style={{
+                              margin: 10,
+                              height: 30,
+                              width: 30,
+                            }}
+                          ></img>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -1315,6 +1298,24 @@ function Agendamento() {
                           <img
                             alt=""
                             src={deletar}
+                            style={{
+                              margin: 10,
+                              height: 30,
+                              width: 30,
+                            }}
+                          ></img>
+                        </div>
+                        <div id="btn lembrar consulta"
+                          title="LEMBRAR CONSULTA PARA O CLIENTE"
+                          className="button-true-green"
+                          onClick={() => {
+                            geraWhatsapp(item.id_paciente, moment(item.data_inicio).format('DD/MM/YYYY - HH:mm'));
+                          }}
+                          style={{ width: 50, height: 50, alignSelf: 'flex-end' }}
+                        >
+                          <img
+                            alt=""
+                            src={imprimir}
                             style={{
                               margin: 10,
                               height: 30,
