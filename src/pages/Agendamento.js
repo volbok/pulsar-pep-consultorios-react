@@ -8,6 +8,7 @@ import back from '../images/back.svg';
 import moment from "moment";
 import lupa from '../images/lupa_cinza.svg';
 import imprimir from '../images/imprimir.svg';
+import whatsapp from '../images/whatsapp.svg';
 import salvar from '../images/salvar.svg';
 // funções.
 import maskdate from "../functions/maskdate";
@@ -949,7 +950,7 @@ function Agendamento() {
                         >
                           <img
                             alt=""
-                            src={imprimir}
+                            src={whatsapp}
                             style={{
                               margin: 10,
                               height: 30,
@@ -1315,7 +1316,7 @@ function Agendamento() {
                         >
                           <img
                             alt=""
-                            src={imprimir}
+                            src={whatsapp}
                             style={{
                               margin: 10,
                               height: 30,
