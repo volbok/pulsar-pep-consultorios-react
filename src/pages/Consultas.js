@@ -337,6 +337,9 @@ function Consultas() {
       id_cliente: item.id_cliente,
       classificacao: item.classificacao,
       id_profissional: item.id_profissional,
+      convenio_id: item.convenio_codigo,
+      convenio_carteira: item.convenio_carteira,
+      faturamento_codigo_procedimento: item.faturamento_codigo_procedimento,
     };
     axios
       .post(html + "update_atendimento/" + item.id_atendimento, obj)
