@@ -158,7 +158,7 @@ function Agendamento() {
 
   // ENVIO DE MENSAGENS DE AGENDAMENTO DA CONSULTA PELO WHATSAPP.
 
-  function geraWhatsapp(id, inicio) {
+  function geraWhatsapp(id, inicio, especialista) {
 
     let paciente = pacientes.filter(item => item.id_paciente == id).pop();
     console.log(paciente);
@@ -171,7 +171,7 @@ function Agendamento() {
 
     const message =
       'Olá, ' + paciente.nome_paciente + '!\n' +
-      'Você tem uma consulta agendada pelo seu médico, Dr(a). ' + usuario.nome_usuario + ', ' + usuario.tipo_usuario + ',\n' +
+      'Você tem uma consulta agendada pelo seu médico, Dr(a). ' + especialista.nome_usuario + ', ' + especialista.tipo_usuario + ',\n' +
       'para o dia ' + inicio + ', na CLÍNICA ' + cliente.razao_social + '.'
 
     const rawphone = paciente.telefone;
@@ -344,7 +344,7 @@ function Agendamento() {
         console.log('AGENDAMENTO DE CONSULTA INSERIDO COM SUCESSO')
         // loadAtendimentos();
         loadModdedAtendimentos(selectdate);
-        geraWhatsapp(paciente.id_paciente, inicio);
+        // geraWhatsapp(paciente.id_paciente, inicio, selectedespecialista);
       });
   };
 
@@ -375,7 +375,7 @@ function Agendamento() {
         console.log('AGENDAMENTO DE CONSULTA ATUALIZADO COM SUCESSO')
         // loadAtendimentos();
         loadModdedAtendimentos(selectdate);
-        geraWhatsapp(item.id_paciente, inicio);
+        // geraWhatsapp(item.id_paciente, inicio, selectedespecialista);
       });
   };
 
@@ -956,7 +956,7 @@ function Agendamento() {
                           title="LEMBRAR CONSULTA PARA O CLIENTE"
                           className="button-green"
                           onClick={() => {
-                            geraWhatsapp(item.id_paciente, moment(item.data_inicio).format('DD/MM/YYYY - HH:mm'));
+                            geraWhatsapp(item.id_paciente, moment(item.data_inicio).format('DD/MM/YYYY - HH:mm'), selectedespecialista);
                           }}
                           style={{ width: 50, height: 50, alignSelf: 'flex-end' }}
                         >
@@ -1334,7 +1334,7 @@ function Agendamento() {
                           title="LEMBRAR CONSULTA PARA O CLIENTE"
                           className="button-green"
                           onClick={() => {
-                            geraWhatsapp(item.id_paciente, moment(item.data_inicio).format('DD/MM/YYYY - HH:mm'));
+                            geraWhatsapp(item.id_paciente, moment(item.data_inicio).format('DD/MM/YYYY - HH:mm'), especialistas.filter(valor => valor.id_usuario == item.id_profissional).pop());
                           }}
                           style={{ width: 50, height: 50, alignSelf: 'flex-end' }}
                         >
