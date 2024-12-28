@@ -7,7 +7,7 @@
 	<meta name="viewport" content="width=device-width, shrink-to-fit=no">
 	<meta name="description" content="">
 	<meta name="author" content="PULSAR SAÚDE LTDA">
-	<title>Conheça o Pulsar Saúde - Prontuário Eletrônico!</title>
+	<title>Pulsar PEP - Prontuário Eletrônico!</title>
 	<link rel="shortcut icon" type="image/png" href="webpage_files/icones/logo.png">
 	</link>
 	<link href="https://fonts.googleapis.com/css?family=Source+Code+Pro:300,400,600" rel="stylesheet">
@@ -16,308 +16,253 @@
 	<link href="webpage_files/styles.css" rel="stylesheet">
 </head>
 
-<body class="fade">
-	<!-- menu -->
-	<div id="menu" class="menu">
-		<div class="panel">
-			<div style="display: flex; flex-direction: row; justify-content: center; margin-top: 20px;">
-				<img src="webpage_files/logo.svg" alt="Pulsar"></img>
-				<p
-					style="left: 150px; bottom: 50px; color: white; align-self: center; font-size: 36px; font-weight: bold; margin: 0px; padding: 0px;">
-					PULSAR SAÚDE - PRONTUÁRIO ELETRÔNICO
-				</p>
+<body class="content fade">
+
+	<div class="panel-top" id="menu">
+		<div class="header">
+			<div style="display: flex; flex-direction: row; justify-content: center; align-self: center;">
+				<img src="webpage_files/logo.svg" alt="Pulsar" style="height: 150px;"></img>
+				<div
+					style="display: flex; flex-direction: column; align-self: center; justify-content: flex-start; align-items: flex-start;">
+					<p class="titulo"
+						style="display: flex; color: white; align-self: flex-start; font-size: 42px; font-weight: bolder; text-align: left; padding-top: 20px;">
+						PULSAR PRONTUÁRIO ELETRÔNICO
+					</p>
+					<p class="titulo" style="display: flex; color: white; align-self: flex-start; font-size: 24px; font-weight: bold; text-align: left;
+						margin-left: 7px !important; margin-top: -20px !important;">
+						Faz o que interessa. Limpo, prático e rápido.
+					</p>
+				</div>
 			</div>
-			<div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-evenly;">
-				<p href="#gap1" id='btn1' class="btn" onclick="click1()">INTRODUÇÃO</p>
-				<p href="#gap2" id='btn2' class="btn" onclick="click2()">MÓDULOS DISPONÍVEIS</p>
-				<p href="#gap3" id='btn3' class="btn" onclick="click3()">CORRIDA DE LEITO</p>
-				<p href="#gap4" id='btn3' class="btn" onclick="click4()">PREÇOS</p>
-				<p href="#gap5" id='btn4' class="btn" onclick="click5()">TELAS</p>
-				<p href="#gap6" id='btn5' class="btn" onclick="click6()">CONTATO</p>
+			<div
+				style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: space-evenly; margin-top: 10px; width: 100%;">
+				<div href="#gap1" id='btn1' class="btn" onclick="click1()">INTRODUÇÃO</div>
+				<div href="#gap2" id='btn2' class="btn" onclick="click2()">RECURSOS</div>
+				<div href="#gap3" id='btn3' class="btn" onclick="click3()">FEATURES</div>
+				<div href="#gap4" id='btn3' class="btn" onclick="click4()">PREÇOS</div>
+				<div href="#gap6" id='btn5' class="btn" onclick="click6()">CONTATO</div>
 			</div>
 		</div>
 	</div>
 
-	<!-- conteúdo -->
-	<div class="onlymobile">
-		<img style="align-self: center; margin-top: 25px;" src="webpage_files/logo.svg" alt="Pulsar" width="100%"></img>
-		<p
-			style="color: white; align-self: center; font-size: 36px; font-weight: bold; margin: 0px; margin-top: 5px; margin-bottom: 20px; text-align: center;">
-			PULSAR SAÚDE
-		</p>
-	</div>
-	<div id="conteudo" class="content">
+	<!-- página -->
+	<div class="content" id="conteudo">
 
-		<h1>UM PRONTUÁRIO ELETRÔNICO PRÁTICO E RÁPIDO.</h1>
-		<p style="text-align: center;">
-			PULSAR SAÚDE - Uma solução inovadora, simples, leve e barata, que vai melhorar a assistência dos seus
-			pacientes e trazer
-			praticidade ao trabalho da equipe multiprofissional.
-		</p>
-		<img class="imagem slide" src="webpage_files/mockup.png" alt="Pulsar"></img>
-		<img class="imagem scroll-animation"
-			style="align-self: center; margin-top: 25px; border-radius: 5px; margin-bottom: 20px;"
-			src="webpage_files/banner_claro.png" alt="Pulsar" width="100%">
-		<video class="video scroll-pop" controls autoplay style="margin-top: 40px; margin-bottom: 40px;">
-			<source src="webpage_files/videos/video.mp4" type="video/mp4">
-			SEU BROWSER NÃO SUPORTA VÍDEOS! É... VOCÊ PRECISA DE NÓS.
+		<video class="video" style="width: 70vw; border-radius: 5px; margin: 50px;" controls autoplay muted loop>
+			<source src="webpage_files/videos/chamada.mp4" type="video/mp4" style="margin: 0px">
+			SEU BROWSER NÃO SUPORTA VÍDEOS!
 		</video>
 
 		<div id="gap1">
-			</img>
-			<h1>INTRODUÇÃO</h1>
-			<p>
-				Os prontuários eletrônicos atuais no mercado estão em sua maioria defasados. São caros, lentos, com
-				interface pouco amigável e nada intuitiva. Pulsar é a solução criada com a mais atual tecnologia Web e
-				Mobile, destinada a tornar menos sofrido o
-				seu dia-a-dia no hospital e no atendimento de seus clientes.
-			</p>
-			<p>
-				A um custo surpreendentemente baixo, é possível substituir papéis e tabelas improvisadas por uma
-				ferramenta moderna, rápida, de belo design e que garante a persistência e a segurança das
-				informações registradas.
-			</p>
-			<p>
-				E o melhor de tudo: você não precisa montar infraestrutura de rede ou servidor. Tudo fica disponível na
-				nuvem. Basta ter computadores conectados à internet e impressoras.
-			</p>
-		</div>
-
-		<div style="background-color: #66b2b2; width: 100%;">
-			<div id="gap2" class="scroll-animation">
-				<h1 style="color: white;">MÓDULOS DISPONÍVEIS NO PACOTE BÁSICO</h1>
-				<div class="grid">
-					<div class="card">
-						<img style="align-self: center; margin: 5px;" src="webpage_files/icones/gestao.png" alt="Pulsar"
-							width="80px"></img>
-						<h3 class="card_title">GESTÃO DE PACIENTES</h3>
-						<p class="card_text">
-							Em poucos cliques, é possível movimentar pacientes internados no hospital entre os diversos
-							setores
-							assistenciais.
+			<div class='scroll-animation-forward'>
+				<div class='scroll-card'>
+					<img style="align-self: center; margin: 5px; border-radius: 5px;" src="webpage_files/fotinha1.png"
+						alt="Pulsar" width="40%"></img>
+					<div
+						style='display: flex; flex-direction: column; justify-content: flex-start; margin-left: 20px; align-self: center;'>
+						<h1 style="text-align: left; font-weight: bolder;">UM PRONTUÁRIO ELETRÔNICO
+							ACESSÍVEL E COMPLETO
+						</h1>
+						<p style="text-align: flex-start;">
+							Pulsar PEP é uma solução inovadora pela simplicidade, intuitividade, custo baixo e rapidez,
+							idealizada e desenvolvida por um médico com o objetivo de facilitar o trabalho de seus
+							clientes, focando no que é importante.
 						</p>
-					</div>
-					<div class="card">
-						<img style="align-self: center; margin: 5px;" src="webpage_files/icones/documentos.png"
-							alt="Pulsar" width="80px"></img>
-						<h3 class="card_title">DOCUMENTOS ELETRÔNICOS</h3>
-						<p class="card_text">
-							Crie evoluções multidisciplinares, relatórios, sumários de alta, receitas, atestados e
-							quasiquer
-							outros documentos necessários, sendo possível gravar e utilizar modelos personalizados dos
-							seus
-							principais documentos, dinamizando sua rotina de
-							trabalho.
-						</p>
-					</div>
-					<div class="card">
-						<img style="align-self: center; margin: 5px;" src="webpage_files/icones/esteto.svg" alt="Pulsar"
-							width="80px"></img>
-						<h3 class="card_title">PRESCRIÇÃO</h3>
-						<p class="card_text">
-							Inspirados no melhor modelo de prescrição existente no mercado, criamos um módulo de
-							prescrição
-							rápido e
-							extremamente prático. Nele também é possível
-							copiar os itens de prescrição e seus componentes, bem como criar modelos pessoais de
-							prescrição.
-						</p>
-					</div>
-					<div class="card">
-						<img style="align-self: center; margin: 5px;" src="webpage_files/icones/laboratorio.png"
-							alt="Pulsar" width="80px"></img>
-						<h3 class="card_title">LABORATÓRIO E IMAGEM</h3>
-						<p class="card_text">
-							Solicite exames laboratoriais e de imagem fazendo uso de packs/combos que aceleram todo o
-							processo.
-							A depender da disponibilidade do cliente, o sistema Pulsar pode ser integrado ao
-							equipamentos de
-							laboratório (exigindo desenvolvimento à parte).
-						</p>
-					</div>
-					<div class="card">
-						<img style="align-self: center; margin: 5px;" src="webpage_files/icones/farmacia.png"
-							alt="Pulsar" width="80px"></img>
-						<h3 class="card_title">FARMÁCIA</h3>
-						<p class="card_text">
-							O módulo da farmácia já é integrado à prescrição, permitindo à equipe a separação ordenada
-							das
-							medicações a serem dispensadas.
-						</p>
-					</div>
-					<div class="card">
-						<img style="align-self: center; margin: 5px;" src="webpage_files/icones/agendamento.png"
-							alt="Pulsar" width="80px"></img>
-						<h3 class="card_title">AGENDAMENTO DE CONSULTAS AMBULATORIAIS</h3>
-						<p class="card_text">
-							A aplicação Pulsar permite o fácil agendamento de consultas para cada profissional e
-							especialidade
-							médica cadastrada.
-							O profissional pode acessar de casa sua agenda de consultas e o
-							prontuário dos pacientes para atendimento.
-						</p>
-					</div>
-					<div class="card">
-						<img style="align-self: center; margin: 5px;" src="webpage_files/icones/triagem.png"
-							alt="Pulsar" width="80px"></img>
-						<h3 class="card_title">TRIAGEM PARA PRONTO-ATENDIMENTO E CHAMADA EM TELA</h3>
-						<p class="card_text">
-							Pulsar tem o módulo de triagem com modelo de
-							classificação de risco já embutido. As chamadas para triagem e para atendimento nos
-							consultórios
-							é feita em tela de chamadas, com alerta sonoro e voz informando o nome do paciente.
+						<p style="text-align: flex-start">
+							Aplicação desenvolvida em uma empresa enxuta, que oferece suporte por Whatsapp diretamente
+							com o time de desenvolvimento.
 						</p>
 					</div>
 				</div>
 			</div>
+
+			<div class="scroll-animation-reverse">
+				<img src="webpage_files/mockup.png" alt="Pulsar" style="width: 80%"></img>
+			</div>
+
+			<div style="display: flex; flex-direction: column; justify-content: center; width: 100vw">
+				<div class="telas">
+					<img style="border-radius: 5px;" src="webpage_files/telas/tela1.png" alt="Pulsar"></img>
+				</div>
+				<div class="telas">
+					<img style="border-radius: 5px;" src="webpage_files/telas/tela2.png" alt="Pulsar"></img>
+				</div>
+				<div class="telas">
+					<img style="border-radius: 5px;" src="webpage_files/telas/tela3.png" alt="Pulsar"></img>
+				</div>
+			</div>
+
+			<div class='scroll-animation-forward'>
+				<div class='scroll-card'>
+					<div
+						style='display: flex; flex-direction: column; justify-content: flex-start; align-self: center;'>
+						<h1 style="text-align: left; font-weight: bolder;">
+							O VALOR DO PRONTUÁRIO ELETRÔNICO
+						</h1>
+						<p style="text-align: flex-start;">
+							Um sistema de prontuário eletrônico é essencial para a gestão de documentos em qualquer
+							consultório.
+							Com ele você cria evoluções, receitas médicas, laudos e vários outros tipos de
+							documentos, com a possibilidade de assiná-los digitalmente e armazená-los em um banco de
+							dados na nuvem, disponível 24h por dia e à prova de perdas.
+						</p>
+					</div>
+					<img style="align-self: center; margin: 5px; border-radius: 5px;" src="webpage_files/fotinha2.png"
+						alt="Pulsar" width="50%">
+					</img>
+				</div>
+			</div>
 		</div>
 
-		<div id="gap3">
-			<h1>FEATURE EM DESTAQUE: CORRIDA DE LEITO</h1>
-			<div class="corrida scroll-reveal">
-				<img class="imagem" src="webpage_files/corrida_de_leitos.jpg" alt="Pulsar">
-				</img>
-				<div class='corrida_card'>
-					<p>
-						Utilizando a versão mobile da aplicação, para celular e tablet, é possível fazer a corrida beira
-						leito
-						no CTI e demais unidades de informação.
-						As informações inputadas ficarão disponíveis para uso no preenchimento dos documentos
-						eletrônicos, e
-						alertas também são gerados a partir das mesmas (sepse, uso prolongado de dispositivos invasivos,
-						tempo
-						de antibioticoterapia, riscos, medidas de precaução), auxiliando na segurança da assistência ao
-						paciente!
-						Veja abaixo o que pode ser gerido na corrida de leitos:
+		<div id="gap2" class="scroll-pop">
+			<h1>RECURSOS DISPONÍVEIS</h1>
+			<div class="grid">
+				<div class="card">
+					<img style="align-self: center; margin: 5px;" src="webpage_files/icones/documentos.png" alt="Pulsar"
+						width="80px">
+					</img>
+					<h3 class="card_title">DOCUMENTOS E RECEITAS ASSINADOS COM CERTIFICADO DIGITAL</h3>
+					<p class="card_text">
+						Crie anamneses, evoluções, relatórios, receitas médicas, atestados e outros
+						documentos, salvando modelos para reutilização em novos atendimentos.
 					</p>
-					<div class="grid">
-						<div class="minicards">
-							TEMPO DE INTERNAÇÃO
-						</div>
-						<div class="minicards">
-							ALERGIAS
-						</div>
-						<div class="minicards">
-							PROPOSTAS
-						</div>
-						<div class="minicards">
-							PRECAUÇÕES
-						</div>
-						<div class="minicards">
-							RISCOS
-						</div>
-						<div class="minicards">
-							ALERTAS
-						</div>
-						<div class="minicards">
-							SINAIS VITAIS
-						</div>
-						<div class="minicards">
-							INVASÕES E LESÕES
-						</div>
-						<div class="minicards">
-							VENTILAÇÃO MECÂNICA
-						</div>
-						<div class="minicards">
-							INFUSÕES
-						</div>
-						<div class="minicards">
-							DIETA
-						</div>
-						<div class="minicards">
-							CULTURAS
-						</div>
-						<div class="minicards">
-							ANTIBIÓTICOS
-						</div>
-						<div class="minicards">
-							INTERCONSULTAS
-						</div>
+				</div>
+				<div class="card">
+					<img style="align-self: center; margin: 5px;" src="webpage_files/icones/laboratorio.png"
+						alt="Pulsar" width="80px"></img>
+					<h3 class="card_title">EXAMES LABORATORIAIS E DE IMAGEM COM EMISSÃO DE GUIAS TISS</h3>
+					<p class="card_text">
+						Selecione exames laboratoriais ou de imagem disponíveis no rol de procedimentos da tabela
+						TUSS e gere guias SADT com a logo da operadora do cliente.
+					</p>
+				</div>
+				<div class="card">
+					<img style="align-self: center; margin: 5px;" src="webpage_files/icones/agendamento.png"
+						alt="Pulsar" width="80px"></img>
+					<h3 class="card_title">AGENDAMENTO DE CONSULTAS COM CONFIRMAÇÃO VIA WHATSAPP</h3>
+					<p class="card_text">
+						Agende de forma fácil as consultas, gerando lembretes e pedidos de confirmação por Whatsapp
+						para seus pacientes.
+					</p>
+				</div>
+				<div class="card">
+					<img style="align-self: center; margin: 5px;" src="webpage_files/icones/triagem.png" alt="Pulsar"
+						width="80px"></img>
+					<h3 class="card_title">CHAMADA PARA ATENDIMENTO EM TELA</h3>
+					<p class="card_text">
+						Instale um monitor na sala de espera plugado ao sistema e faça a chamada do paciente para
+						atendimento em seu consultório com um clique.
+					</p>
+				</div>
+			</div>
+		</div>
+
+		<div id="gap3" class="scroll-animation-reverse">
+			<div class='scroll-card' style="flex-direction: column; align-items: center;">
+				<img src="webpage_files/fotinha3.png" style="border-radius: 5px;" alt="Pulsar" width="100%">
+				</img>
+				<h1>FEATURES EM DESTAQUE:</h1>
+				<div class="grid">
+					<div class="minicards">
+						REGISTRO DE QUALQUER DOCUMENTO POR VOZ
+					</div>
+					<div class="minicards">
+						CRIAÇÃO INTELIGENTE DE RECEITAS MÉDICAS
+					</div>
+					<div class="minicards">
+						ASSINATURA ELETRÔNICA DISPONÍVEL JÁ NO PLANO BÁSICO
+					</div>
+					<div class="minicards">
+						CRIAÇÃO DE MODELOS PARA QUALQUER DOCUMENTO
+					</div>
+					<div class="minicards">
+						EMISSÃO DE GUIAS TISS PARA CONSULTAS E SADT
+					</div>
+					<div class="minicards">
+						EMISSÃO DE RECIBOS E NOTA FISCAL ELETRÔNICA
+					</div>
+					<div class="minicards">
+						GADGETS PARA RÁPIDA EDIÇÃO DE DOCUMENTOS
+					</div>
+					<div class="minicards">
+						EDITOR QUE PERMITE INSERIR FOTOS E TEXTO FORMATADO
 					</div>
 				</div>
 			</div>
 		</div>
 
-		<div id="gap4"
-			style="display: flex; flex-direction: column; justify-content: center; align-items: center; align-self: center;">
-			<h1>PREÇOS</h1>
+		<div id="gap4" class="scroll-pop"
+			style="display: flex; flex-direction: column; justify-content: center; align-items: center; align-self: center; background-color: transparent;">
+			<h1 style="color: rgb(31, 122, 140, 1); margin-bottom: 20px;">PREÇOS</h1>
 			<div class="pricegrid">
-				<div class="pricecard" style="background-color: #82E0AA;">
-					<div style="font-size: 28px; margin: 20px">PACOTE LIGHT</div>
-					<div style="font-size: 20px; margin: 5px">USO EM PEQUENOS CONSULTÓRIOS</div>
-					<div style="font-size: 20px; margin: 5px">ATÉ 100 ATENDIMENTOS POR DIA, DOIS PROFISSIONAIS DE SAÚDE
-						(USO SIMULTÂNEO)</div>
-					<div style="font-size: 28px; margin: 10px;">R$ 200/MÊS</div>
+				<div class="pricecard" class="scroll-pop" style="background-color: #82E0AA;">
+					<div class="pricetitle">PACOTE LITE</div>
+					<div class="priceitem">USO EM PEQUENOS CONSULTÓRIOS</div>
+					<div class="priceitem">ATÉ 50 ATENDIMENTOS POR DIA, ATÉ 2 ACESSOS SIMULTÂNEOS</div>
+					<div class="priceitem">ATÉ 50 DOCUMENTOS ASSINADOS POR MÊS</div>
+					<div class="priceitem">APENAS AVISOS DE CONSULTA PELO WHATSAPP ILIMITADOS E SEM LOGO DA
+						EMPRESA
+					</div>
+					<div class="pricetitle">R$ 200/MÊS</div>
 				</div>
-				<div class="pricecard" style="background-color: #82E0AA;">
-					<div style="font-size: 28px; margin: 20px">PACOTE MEDIUM</div>
-					<div style="font-size: 20px; margin: 5px">USO EM CLÍNICAS MAIORES</div>
-					<div style="font-size: 20px; margin: 5px">ATÉ 500 ATENDIMENTOS POR DIA, ATÉ 5 PROFISSIONAIS DE
-						SAÚDE (USO SIMULTÂNEO)</div>
-					<div style="font-size: 28px; margin: 10px;">R$ 1.000/MÊS</div>
+				<div class="pricecard" class="scroll-pop" style="background-color: #82E0AA;">
+					<div class="pricetitle">PACOTE STANDARD</div>
+					<div class="priceitem">USO EM CONSULTÓRIOS INTERMEDIÁRIOS</div>
+					<div class="priceitem">ATÉ 100 ATENDIMENTOS POR DIA, ATÉ 4 ACESSOS SIMULTÂNEOS</div>
+					<div class="priceitem">ATÉ 100 DOCUMENTOS ASSINADOS POR MÊS</div>
+					<div class="priceitem">APENAS AVISOS DE CONSULTA PELO WHATSAPP ILIMITADOS, COM LOGO DA EMPRESA
+					</div>
+					<div class="pricetitle">R$ 400/MÊS</div>
 				</div>
-				<div class="pricecard" style="background-color: #82E0AA;">
-					<div style="font-size: 28px; margin: 20px">PACOTE HEAVY</div>
-					<div style="font-size: 20px; margin: 5px">USO EM POLICLÍNICAS E HOSPITAIS</div>
-					<div style="font-size: 20px; margin: 5px">ATÉ 5000 ATENDIMENTOS POR DIA, ATÉ 20 PROFISSIONAIS DE
-						SAÚDE (USO SIMULTÂNEO)</div>
-					<div style="font-size: 28px; margin: 10px;">R$ 10.000/MÊS</div>
+				<div class="pricecard" class="scroll-pop" style="background-color: #82E0AA;">
+					<div class="pricetitle">PACOTE PRO</div>
+					<div class="priceitem">USO EM CONSULTÓRIOS MAIORES E PEQUENAS CLÍNICAS</div>
+					<div class="priceitem">ATÉ 200 ATENDIMENTOS POR DIA, 6 ACESSOS SIMULTÂNEOS</div>
+					<div class="priceitem">ATÉ 200 DOCUMENTOS ASSINADOS POR MÊS</div>
+					<div class="priceitem">AVISOS E CONFIRMAÇÃO DE CONSULTA PELO WHATSAPP ILIMITADOS E COM LOGO
+						(CHATBOT)</div>
+					<div class="pricetitle">R$ 1000/MÊS</div>
 				</div>
 			</div>
 		</div>
 
-		<div id="gap5" style="display: flex; flex-direction: column; justify-content: center;">
-			<h1>ALGUMAS TELAS</h1>
-			<div style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center;">
-				<img class='telas' src="webpage_files/telas/tela inicial.png" alt="Tela inicial"></img>
-				<img class='telas' src="webpage_files/telas/tela principal.png"
-					alt="Tela principal do prontuário"></img>
-				<img class='telas' src="webpage_files/telas/gestão de leitos.png" alt="Tela gestão de leitos"></img>
-				<img class='telas' src="webpage_files/telas/tela de chamada.png" alt="Tela de chamada"></img>
-				<img class='telas' src="webpage_files/telas/evolução.png" alt="Evolucao livre"></img>
-				<img class='telas' src="webpage_files/telas/prescrição.png" alt="Prescrição"></img>
-				<img class='telas' src="webpage_files/telas/propostas.png" alt="Propostas"></img>
-				<img class='telas' src="webpage_files/telas/controles.png" alt="Controles"></img>
-				<img class='telas' src="webpage_files/telas/invasoes.png" alt="Invasoes"></img>
-				<img class='telas' src="webpage_files/telas/vm.png" alt="VM"></img>
-				<img class='telas' src="webpage_files/telas/infusoes.png" alt="Infusoes"></img>
-				<img class='telas' style="margin-bottom: 30px;" src="webpage_files/telas/culturas.png"
-					alt="Culturas"></img>
-			</div>
-		</div>
-
-		<div id="gap6" style="margin-bottom: 20px; justify-content: center; text-align: center;">
-			<h1>CONVERSE COM NOSSO TIME!</h1>
-			<p>
-				Mande uma mensagem pelo Whatsapp, em poucas horas podemos disponibilizar a solução para
-				você!
-			</p>
-			<div
-				style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-self: center;">
-				<p class="card" style="color: white; padding: 20px;">WhatsApp: (31) 99226-6268</p>
-				<p class="card" style="color: white; padding: 20px;">contato@pulsarsaude.net</p>
-			</div>
-			<div style="display: none;">
-				<a href="https://api.whatsapp.com/send?phone=5531992266268&text=Quero mais informações!" target="_blank"
-					style="position:fixed;bottom:20px;right:30px;">
-					<svg enable-background="new 0 0 512 512" width="50" height="50" version="1.1" viewBox="0 0 512 512"
-						xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
-						<path
-							d="M256.064,0h-0.128l0,0C114.784,0,0,114.816,0,256c0,56,18.048,107.904,48.736,150.048l-31.904,95.104  l98.4-31.456C155.712,496.512,204,512,256.064,512C397.216,512,512,397.152,512,256S397.216,0,256.064,0z"
-							fill="#4CAF50" />
-						<path
-							d="m405.02 361.5c-6.176 17.44-30.688 31.904-50.24 36.128-13.376 2.848-30.848 5.12-89.664-19.264-75.232-31.168-123.68-107.62-127.46-112.58-3.616-4.96-30.4-40.48-30.4-77.216s18.656-54.624 26.176-62.304c6.176-6.304 16.384-9.184 26.176-9.184 3.168 0 6.016 0.16 8.576 0.288 7.52 0.32 11.296 0.768 16.256 12.64 6.176 14.88 21.216 51.616 23.008 55.392 1.824 3.776 3.648 8.896 1.088 13.856-2.4 5.12-4.512 7.392-8.288 11.744s-7.36 7.68-11.136 12.352c-3.456 4.064-7.36 8.416-3.008 15.936 4.352 7.36 19.392 31.904 41.536 51.616 28.576 25.44 51.744 33.568 60.032 37.024 6.176 2.56 13.536 1.952 18.048-2.848 5.728-6.176 12.8-16.416 20-26.496 5.12-7.232 11.584-8.128 18.368-5.568 6.912 2.4 43.488 20.48 51.008 24.224 7.52 3.776 12.48 5.568 14.304 8.736 1.792 3.168 1.792 18.048-4.384 35.52z"
-							fill="#FAFAFA" />
-					</svg>
-				</a>
+		<div id="gap5" class="panel-bottom">
+			<div class="footer">
+				<h1>CONVERSE COM NOSSO TIME!</h1>
+				<p style="color: white; text-align: center;">
+					Mande uma mensagem pelo Whatsapp, em poucas horas podemos disponibilizar a solução para
+					você!
+				</p>
+				<div
+					style="display: flex; flex-direction: row; flex-wrap: wrap; justify-content: center; align-self: center;">
+					<p class="card" style="background-color: #66b2b2; color: white; padding: 20px;">WhatsApp: (31)
+						99226-6268</p>
+					<p class="card" style="background-color: #66b2b2; color: white; padding: 20px;">
+						contato@pulsarsaude.net</p>
+				</div>
+				<p style="color: white; text-align: center; font-size: 14px;">
+					Pulsar Saúde LTDA - CNPJ: 54.241.474/0001-54 - Praça Santo Antônio, nº 226, apto 502, bairro
+					Aeroporto, CEP: 31270-860 - Belo Horizonte/MG.
+				</p>
+				<div style="display: flex;">
+					<a href="https://api.whatsapp.com/send?phone=5531992266268&text=Quero mais informações!"
+						target="_blank" style="position:fixed;bottom:25px;right:30px;">
+						<svg enable-background="new 0 0 512 512" width="75" height="75" version="1.1"
+							viewBox="0 0 512 512" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
+							<path
+								d="M256.064,0h-0.128l0,0C114.784,0,0,114.816,0,256c0,56,18.048,107.904,48.736,150.048l-31.904,95.104  l98.4-31.456C155.712,496.512,204,512,256.064,512C397.216,512,512,397.152,512,256S397.216,0,256.064,0z"
+								fill="#4CAF50" />
+							<path
+								d="m405.02 361.5c-6.176 17.44-30.688 31.904-50.24 36.128-13.376 2.848-30.848 5.12-89.664-19.264-75.232-31.168-123.68-107.62-127.46-112.58-3.616-4.96-30.4-40.48-30.4-77.216s18.656-54.624 26.176-62.304c6.176-6.304 16.384-9.184 26.176-9.184 3.168 0 6.016 0.16 8.576 0.288 7.52 0.32 11.296 0.768 16.256 12.64 6.176 14.88 21.216 51.616 23.008 55.392 1.824 3.776 3.648 8.896 1.088 13.856-2.4 5.12-4.512 7.392-8.288 11.744s-7.36 7.68-11.136 12.352c-3.456 4.064-7.36 8.416-3.008 15.936 4.352 7.36 19.392 31.904 41.536 51.616 28.576 25.44 51.744 33.568 60.032 37.024 6.176 2.56 13.536 1.952 18.048-2.848 5.728-6.176 12.8-16.416 20-26.496 5.12-7.232 11.584-8.128 18.368-5.568 6.912 2.4 43.488 20.48 51.008 24.224 7.52 3.776 12.48 5.568 14.304 8.736 1.792 3.168 1.792 18.048-4.384 35.52z"
+								fill="#FAFAFA" />
+						</svg>
+					</a>
+				</div>
 			</div>
 		</div>
 	</div>
-
-
 	<!-- javascript -->
 	<script>
-
 		function animateMenu() {
 			var prevScrollPos = window.pageYOffset;
 			window.onscroll = () => {
@@ -325,21 +270,17 @@
 				if (prevScrollPos > currentScrollPos) {
 					document.getElementById("menu").style.top = "0";
 				} else {
-					document.getElementById("menu").style.top = "-500px";
+					document.getElementById("menu").style.top = "-200px";
 				}
 				prevScrollPos = currentScrollPos;
 			}
 		}
-
 		animateMenu();
-
 		var step1 = document.getElementById("gap1");
 		var step2 = document.getElementById("gap2");
 		var step3 = document.getElementById("gap3");
 		var step4 = document.getElementById("gap4");
 		var step5 = document.getElementById("gap5");
-		var step6 = document.getElementById("gap6");
-
 		function click1() {
 			step1.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
 		}
@@ -355,8 +296,8 @@
 		function click5() {
 			step5.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
 		}
-		function click6() {
-			step6.scrollIntoView({ behavior: "smooth", block: "start", inline: "nearest" });
+		function showhide(element) {
+			document.getElementById(element).classList.toggle('hide_off');
 		}
 	</script>
 </body>

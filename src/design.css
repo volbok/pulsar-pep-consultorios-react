@@ -1602,7 +1602,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   border-color: transparent;
   border-radius: 5px;
   outline: none;
-  margin: 5px;
+  margin: 5px !important;
   cursor: default;
 }
 
@@ -1985,6 +1985,7 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   padding: 10px;
   border-radius: 5px;
   transition: 500ms, 300ms ease-in-out;
+  background-color: red;
 }
 
 .card-fechado {

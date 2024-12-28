@@ -6,42 +6,23 @@ body {
 p {
   font: 24px/1.8em "Open Sans", sans-serif;
   color: rgb(31, 122, 140, 1);
-  margin: 20px;
-  margin-left: 50px !important;
-  margin-right: 50px !important;
+  margin: 5px;
+  padding: 5px;
+  font-weight: bold;
 }
 
 h1 {
-  font: 36px "Open Sans", sans-serif;
+  font-size: 36px;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   font-weight: bolder;
   text-align: center;
-  margin: 30px;
-  color: rgb(31, 122, 140, 1);
+  margin: 5px;
+  padding: 5px;
+  color: white;
 }
 
-.panel {
-  position: fixed;
-  top: 5px;
-  left: 5px;
-  bottom: 5px;
-  margin: 0px;
-  background-color: #66b2b2;
-  border-radius: 5px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-
-.video {
-  margin: 10px;
-  border-radius: 5px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-self: center;
-  width: 90vw;
+.titulo {
+  margin: 5px !important;
 }
 
 .title {
@@ -73,6 +54,7 @@ h1 {
   flex-direction: column;
   justify-content: center;
   height: 50px;
+  width: 15%;
   margin: 5px;
   padding: 0px;
   padding-left: 10px;
@@ -82,33 +64,48 @@ h1 {
 
 .btn:hover {
   display: flex;
-  background-color: #66b2b2;
+  background-color: #03aacd;
   color: #ffffff;
   transition: 0.5s;
 }
 
 .btn:active {
   display: flex;
-  background-color: #66b2b2;
+  background-color: #03aacd;
   color: #ffffff !important;
   transition: 0.5s;
 }
 
 .telas {
-  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   margin: 10px;
-  width: 70vw;
-  align-self: center;
-  transition-duration: 500ms;
+  padding: 10px;
+  border-radius: 5px !important;
+  width: 50vw !important;
+  align-self: center !important;
+  transition-duration: 1s;
+  border-style: solid;
+  border-color: #b2d8d8;
+  background-color: #b2d8d8;
+  border-width: 5px;
 }
 
 .telas:hover {
-  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  border-radius: 5px !important;
   margin: 10px;
-  width: 90vw;
-  align-self: center;
-  transition: 500ms;
-  animation-delay: 2000ms;
+  padding: 10px;
+  width: 80vw !important;
+  align-self: center !important;
+  transition-duration: 1s;
+  border-style: solid;
+  border-color: #b2d8d8;
+  background-color: #b2d8d8;
+  border-width: 5px;
 }
 
 /* Transições. */
@@ -145,77 +142,6 @@ h1 {
   color: #ffffff !important
 }
 
-.pricecard {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  text-align: center;
-  border-radius: 5px;
-  margin: 10px;
-  padding: 30px;
-  background-color: rgb(31, 122, 140, 0.5);
-  color: #ffffff;
-  font-weight: bold;
-  width: auto;
-  height: auto;
-}
-
-.imagem {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-self: center;
-  margin: 5px;
-  border-radius: 5px;
-  width: 90vw;
-}
-
-.corrida {
-  align-items: center;
-  align-content: center;
-  align-self: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  width: 95vw;
-}
-
-.corrida_card {
-  margin-top: -100px;
-  border-radius: 5px;
-  background-color: #FCF3CF;
-  padding: 10px;
-}
-
-.minicards {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  text-align: center;
-  border-radius: 5px;
-  margin: 10px;
-  padding: 10px;
-  background-color: #F9E79F;
-  color: rgb(31, 122, 140, 1);
-  font-weight: bolder;
-  font-size: 24px;
-  height: 200px;
-  width: '100%';
-  align-self: center;
-}
-
-@keyframes slide {
-  0% {
-    transform: translateX(100%);
-    opacity: 0;
-  }
-
-  100% {
-    transform: translateX(0%);
-    opacity: 1;
-  }
-}
-
 .fade {
   animation: 0.7s fade;
   opacity: 1;
@@ -231,39 +157,59 @@ h1 {
   }
 }
 
-.expand {
-  animation: 0.7s expand;
-  align-self: center;
-}
-
-@keyframes expand {
-  0% {
-    transform: scale(1);
-  }
-
-  100% {
-    transform: scale(5);
-  }
-}
-
-.video {
-  width: 90vw
-}
-
 .onlymobile {
   display: none;
 }
 
-.scroll-animation {
+.scroll-card {
+  display: flex;
+  flex-direction: row;
+  background-color: #b2d8d8;
+  border-radius: 5px;
+  width: 90%;
+  padding: 20px;
+  align-self: center !important;
+}
+
+.scroll-animation-forward {
   opacity: 0;
-  animation: scroll-animation linear forwards;
+  animation: scroll-animation-forward linear forwards;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-self: center;
+  margin: 50px;
   animation-timeline: view();
   animation-range: 200px 500px;
 }
 
-@keyframes scroll-animation {
+@keyframes scroll-animation-forward {
   from {
     transform: translateX(100%);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateX(0%);
+    opacity: 1;
+  }
+}
+
+.scroll-animation-reverse {
+  opacity: 0;
+  animation: scroll-animation-reverse linear forwards;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-self: center;
+  margin: 50px;
+  animation-timeline: view();
+  animation-range: 200px 500px;
+}
+
+@keyframes scroll-animation-reverse {
+  from {
+    transform: translateX(-100%);
     opacity: 0;
   }
 
@@ -276,6 +222,14 @@ h1 {
 .scroll-pop {
   opacity: 0;
   animation: scroll-pop linear forwards;
+  display: flex;
+  flex-direction: column;
+  border-radius: 5px;
+  justify-content: center;
+  margin: 20px;
+  padding: 20px;
+  width: 90%;
+  background-color: #66b2b2;
   animation-timeline: view();
   animation-range: 200px 500px;
 }
@@ -292,55 +246,125 @@ h1 {
   }
 }
 
-.scroll-reveal {
-  opacity: 0;
-  animation: scroll-reveal linear forwards;
-  animation-timeline: view();
-  animation-range: 200px 500px;
-}
-
-@keyframes scroll-reveal {
-  from {
-    transform: scale(80%);
-    opacity: 0;
-  }
-
-  to {
-    transform: scale(100%);
-    opacity: 1;
-  }
-}
-
 .grid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 
+.minicards {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  border-radius: 5px;
+  margin: 10px;
+  padding: 10px;
+  background-color: rgb(31, 122, 140, 0.5);
+  color: white !important;
+  font-weight: bolder;
+  font-size: 18px;
+  height: 200px;
+  width: '100%';
+  align-self: center;
+}
+
 .pricegrid {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
+  width: 90vw;
 }
 
-.menu {
+.pricecard {
   display: flex;
   flex-direction: column;
-  position: sticky;
-  top: 0px;
-  left: 0px;
-  right: 0px;
-  opacity: 1;
-  background-image: linear-gradient(white, white, transparent);
-  z-index: 1000;
-  transition: all 1s ease !important;
+  justify-content: center;
+  padding: 10px;
+  margin: 5px;
+  align-content: center !important;
+  align-self: flex-start;
+  background-color: #004c4c;
+  border-radius: 5px;
 }
 
-.panel {
+.pricetitle {
   display: flex;
-  position: inherit;
+  flex-direction: column;
+  justify-content: center;
+  margin: 10px;
+  align-content: flex-start !important;
+  text-align: center;
+  align-self: center;
+  font-size: 28px;
+  font-weight: bold;
+  color: white;
+  height: 100px;
+  background-color: rgb(31, 122, 140, 0.5);
+  border-radius: 5px;
+  width: calc(100% - 20px);
+}
+
+.priceitem {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  margin: 2.5px;
+  padding: 0px;
+  align-content: flex-start !important;
+  text-align: center;
+  font-size: 20px;
+  margin: 5px;
+  font-weight: bold;
+  color: white;
+  height: 100px;
+}
+
+.panel-top {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  position: sticky;
+  top: 0px;
+  padding: 20px;
+  transition: 500ms, 500ms ease-in-out;
+  align-self: center;
+  background-color: transparent;
+  z-index: 1000;
+  box-shadow: none;
+  width: calc(100vw - 5px);
+}
+
+.header {
   background-color: #1f7a8c;
   border-radius: 5px;
-  margin: 10px;
-  padding-bottom: 20px;
+  padding-left: 50px;
+  padding-right: 50px;
+  padding-top: 15px;
+  align-self: center;
+  width: 100%;
+}
+
+.panel-bottom {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 20px;
+  transition: 500ms, 500ms ease-in-out;
+  align-self: center;
+  background-color: transparent;
+  z-index: 1000;
+  box-shadow: none;
+  width: calc(100vw - 5px);
+}
+
+.footer {
+  background-color: #1f7a8c;
+  border-radius: 5px;
+  padding: 10px;
+  padding-left: 50px;
+  padding-right: 50px;
+  padding-bottom: 15px;
+  align-self: center;
+  width: 100%;
 }
 
 body::-webkit-scrollbar {
@@ -376,7 +400,10 @@ body::-webkit-scrollbar-thumb:hover {
   transition: 500ms, 500ms ease-in-out;
 }
 
-
+.spam {
+  font-weight: bold;
+  color: yellow;
+}
 
 /* CELULARES */
 @media only screen and (max-width: 800px) {
@@ -385,8 +412,8 @@ body::-webkit-scrollbar-thumb:hover {
     overflow-x: hidden;
     font: 400 15px/1.8em "Open Sans", sans-serif;
     width: auto;
-    align-items: center!;
-    align-content: center!;
+    align-items: center !;
+    align-content: center !;
   }
 
   .content {
@@ -397,23 +424,6 @@ body::-webkit-scrollbar-thumb:hover {
     align-content: center;
     align-items: center;
     margin: 0px;
-  }
-
-  .menu {
-    display: none;
-  }
-
-  .panel {
-    display: none;
-    top: 5px;
-    left: 5px;
-    bottom: 5px;
-    margin: 0px;
-    background-color: #66b2b2;
-    border-radius: 5px;
-    flex-direction: column;
-    justify-content: center;
-    z-index: 1000;
   }
 
   .title {
@@ -439,22 +449,6 @@ body::-webkit-scrollbar-thumb:hover {
   .pricegrid {
     display: grid;
     grid-template-columns: 1fr;
-  }
-
-  .telas {
-    border-radius: 5px;
-    margin: 10px;
-    width: 80vw;
-    align-self: center;
-    transition-duration: 1s;
-  }
-
-  .telas:hover {
-    border-radius: 5px;
-    margin: 10px;
-    width: 90vw;
-    align-self: center;
-    transition: 500ms;
   }
 
   .onlymobile {
@@ -500,8 +494,9 @@ body::-webkit-scrollbar-thumb:hover {
     margin-left: 20px;
     margin-right: 20px;
     border-radius: 5px;
-    background-color: #FCF3CF;
+    background-color: #b2d8d8;
     padding: 10px;
+    color: white !important;
   }
 
   .card {
@@ -513,7 +508,7 @@ body::-webkit-scrollbar-thumb:hover {
     margin: 10px;
     padding: 10px;
     background-color: rgb(31, 122, 140, 1);
-    color: #ffffff;
+    color: white !important;
     font-weight: bold;
     width: auto;
     height: auto;
@@ -527,8 +522,7 @@ body::-webkit-scrollbar-thumb:hover {
     border-radius: 5px;
     margin: 10px;
     padding: 10px;
-    background-color: #F9E79F;
-    color: rgb(31, 122, 140, 1);
+    background-color: rgb(31, 122, 140, 1);
     font-size: 16px;
     font-weight: bolder;
     width: '100%';
@@ -538,5 +532,10 @@ body::-webkit-scrollbar-thumb:hover {
   ul {
     list-style-type: none;
     padding-left: 15px;
+  }
+
+  .spam {
+    font-weight: bold;
+    color: yellow;
   }
 }
