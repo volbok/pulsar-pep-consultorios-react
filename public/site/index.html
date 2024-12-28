@@ -16,7 +16,7 @@
 	<link href="webpage_files/styles.css" rel="stylesheet">
 </head>
 
-<body class="content fade">
+<body class="fade">
 
 	<div class="panel-top" id="menu">
 		<div class="header">
@@ -40,15 +40,20 @@
 				<div href="#gap2" id='btn2' class="btn" onclick="click2()">RECURSOS</div>
 				<div href="#gap3" id='btn3' class="btn" onclick="click3()">FEATURES</div>
 				<div href="#gap4" id='btn3' class="btn" onclick="click4()">PREÇOS</div>
-				<div href="#gap6" id='btn5' class="btn" onclick="click6()">CONTATO</div>
+				<div href="#gap6" id='btn5' class="btn" onclick="click5()">CONTATO</div>
 			</div>
 		</div>
+	</div>
+
+	<div class="onlymobile mobilepanel">
+		<img src="webpage_files/logo.svg" alt="Pulsar" style="height: 150px;"></img>
+		<h1>PULSAR PEP</h1>
 	</div>
 
 	<!-- página -->
 	<div class="content" id="conteudo">
 
-		<video class="video" style="width: 70vw; border-radius: 5px; margin: 50px;" controls autoplay muted loop>
+		<video class="video" autoplay muted loop>
 			<source src="webpage_files/videos/chamada.mp4" type="video/mp4" style="margin: 0px">
 			SEU BROWSER NÃO SUPORTA VÍDEOS!
 		</video>
@@ -56,8 +61,8 @@
 		<div id="gap1">
 			<div class='scroll-animation-forward'>
 				<div class='scroll-card'>
-					<img style="align-self: center; margin: 5px; border-radius: 5px;" src="webpage_files/fotinha1.png"
-						alt="Pulsar" width="40%"></img>
+					<img class="foto" src="webpage_files/fotinha1.png" alt="Pulsar">
+					</img>
 					<div
 						style='display: flex; flex-direction: column; justify-content: flex-start; margin-left: 20px; align-self: center;'>
 						<h1 style="text-align: left; font-weight: bolder;">UM PRONTUÁRIO ELETRÔNICO
@@ -77,10 +82,10 @@
 			</div>
 
 			<div class="scroll-animation-reverse">
-				<img src="webpage_files/mockup.png" alt="Pulsar" style="width: 80%"></img>
+				<img class="foto" src="webpage_files/mockup.png" alt="Pulsar"></img>
 			</div>
 
-			<div style="display: flex; flex-direction: column; justify-content: center; width: 100vw">
+			<div style="display: flex; flex-direction: column; justify-content: center;">
 				<div class="telas">
 					<img style="border-radius: 5px;" src="webpage_files/telas/tela1.png" alt="Pulsar"></img>
 				</div>
@@ -107,8 +112,7 @@
 							dados na nuvem, disponível 24h por dia e à prova de perdas.
 						</p>
 					</div>
-					<img style="align-self: center; margin: 5px; border-radius: 5px;" src="webpage_files/fotinha2.png"
-						alt="Pulsar" width="50%">
+					<img class="foto" src="webpage_files/fotinha2.png" alt="Pulsar">
 					</img>
 				</div>
 			</div>
