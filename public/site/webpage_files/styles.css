@@ -6,7 +6,7 @@ body {
   font: 400 15px/1.8em "Open Sans", sans-serif;
   align-content: center;
   align-self: center;
-  overflow-x: auto;
+  overflow-x: hidden;
   width: '90vw'
 }
 
@@ -141,6 +141,11 @@ h1 {
 .onlymobile {
   display: none;
   visibility: hidden;
+}
+
+.onlydesktop {
+  display: flex;
+  visibility: visible;
 }
 
 .fade {
@@ -437,6 +442,11 @@ body::-webkit-scrollbar-thumb:hover {
   .onlymobile {
     display: flex;
     visibility: visible;
+  }
+
+  .onlydesktop {
+    display: none;
+    visibility: hidden;
   }
 
   .mobilepanel {
