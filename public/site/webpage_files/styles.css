@@ -3,12 +3,11 @@ body {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  overflow-x: hidden;
   font: 400 15px/1.8em "Open Sans", sans-serif;
-  width: 100vw;
   align-content: center;
   align-self: center;
-  padding-right: 10px;
+  overflow-x: auto;
+  width: '90vw'
 }
 
 p {
@@ -49,27 +48,27 @@ h1 {
   padding: 0px;
   padding-left: 10px;
   padding-right: 10px;
-  transition: 0.5s;
+  transition: all 500ms;
 }
 
 .btn:hover {
   display: flex;
   background-color: #03aacd;
   color: #ffffff;
-  transition: 0.5s;
+  transition: all 500ms;
 }
 
 .btn:active {
   display: flex;
   background-color: #03aacd;
   color: #ffffff !important;
-  transition: 0.5s;
+  transition: all 500ms;
 }
 
 .video {
   width: 60vw;
   border-radius: 5px;
-  margin: 10px;
+  margin: 5px;
 }
 
 .foto {
@@ -166,7 +165,7 @@ h1 {
   flex-direction: row;
   justify-content: center;
   align-self: center;
-  margin: 50px;
+  margin: 20px;
   animation-timeline: view();
   animation-range: 200px 500px;
 }
@@ -190,7 +189,7 @@ h1 {
   flex-direction: row;
   justify-content: center;
   align-self: center;
-  margin: 50px;
+  margin: 20px;
   animation-timeline: view();
   animation-range: 200px 500px;
 }
@@ -330,7 +329,7 @@ h1 {
   position: sticky;
   top: 0px;
   padding: 20px;
-  transition: 500ms, 500ms ease-in-out;
+  transition: all 500ms, 500ms ease-in-out;
   align-self: center;
   background-color: transparent;
   z-index: 1000;
@@ -353,7 +352,7 @@ h1 {
   flex-direction: column;
   justify-content: center;
   padding: 20px;
-  transition: 500ms, 500ms ease-in-out;
+  transition: all 500ms, 500ms ease-in-out;
   align-self: center;
   background-color: transparent;
   z-index: 1000;
@@ -396,13 +395,13 @@ body::-webkit-scrollbar-corner {
 body::-webkit-scrollbar-thumb {
   background-color: #1f7a8c;
   border-radius: 5px;
-  transition: 500ms, 500ms ease-in-out;
+  transition: all 500ms, 500ms ease-in-out;
 }
 
 body::-webkit-scrollbar-thumb:hover {
   background-color: var(--cor1hover);
   border-radius: 5px;
-  transition: 500ms, 500ms ease-in-out;
+  transition: all 500ms, 500ms ease-in-out;
 }
 
 .spam {
@@ -412,24 +411,17 @@ body::-webkit-scrollbar-thumb:hover {
 
 /* CELULARES */
 @media only screen and (max-width: 500px) {
+
   body {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    overflow-x: hidden;
-    font: 400 15px/1.8em "Open Sans", sans-serif;
-    width: 100vw;
-    align-content: center;
-    align-self: center;
-    padding-right: 2px;
+    overflow-x: auto;
   }
 
   .content {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: center;
-    align-content: center;
+    align-items: center !important;
+    align-content: center !important;
     align-self: center !important;
   }
 
@@ -467,9 +459,9 @@ body::-webkit-scrollbar-thumb:hover {
   }
 
   .video {
-    width: 90vw;
+    width: 80vw;
     border-radius: 5px;
-    margin: 10px;
+    margin: 5px;
   }
 
   .foto {
@@ -480,8 +472,8 @@ body::-webkit-scrollbar-thumb:hover {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    margin: 10px;
-    padding: 10px;
+    margin: 5px;
+    padding: 5px;
     border-radius: 5px !important;
     width: 70vw !important;
     align-self: center !important;
@@ -497,9 +489,9 @@ body::-webkit-scrollbar-thumb:hover {
     flex-direction: column;
     justify-content: center;
     border-radius: 5px !important;
-    margin: 10px;
-    padding: 10px;
-    width: 90vw !important;
+    margin: 5px;
+    padding: 5px;
+    width: 85vw !important;
     align-self: center !important;
     transition-duration: 1s;
     border-style: solid;
@@ -537,9 +529,9 @@ body::-webkit-scrollbar-thumb:hover {
     flex-direction: column;
     border-radius: 5px;
     justify-content: center;
-    margin: 20px;
+    margin: 5px;
     padding: 20px;
-    width: 80%;
+    width: 90vw;
     background-color: #66b2b2;
     animation-timeline: view();
     animation-range: 200px 500px;
