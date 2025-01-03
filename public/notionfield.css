@@ -14,8 +14,6 @@
   text-wrap: wrap !important;
   line-break: normal !important;
   word-wrap: break-word;
-  width: 200px !important;
-  min-width: 200px !important;
   height: auto !important;
   overflow: auto !important;
 }
@@ -68,7 +66,6 @@
   word-wrap: break-word;
   overflow: auto !important;
   height: auto !important;
-  width: 300px;
   align-self: center;
   background-color: #e5e8e8;
 }
@@ -125,8 +122,6 @@
     text-wrap: wrap !important;
     line-break: normal !important;
     word-wrap: break-word;
-    width: 200px !important;
-    min-width: 200px !important;
     height: auto !important;
     overflow: auto !important;
   }
@@ -137,9 +132,9 @@
     flex-wrap: wrap;
     justify-content: center;
     align-self: center !important;
-    margin: 2.5px !important;
-    margin-top: 2.5px !important;
-    margin-bottom: 2.5px !important;
+    margin: 5px !important;
+    margin-top: 5px !important;
+    margin-bottom: 5px !important;
     padding: 2.5px !important;
     border-radius: 2.5px;
     transition: 500ms, 500ms ease-in-out;
@@ -166,7 +161,6 @@
     word-wrap: break-word;
     overflow: auto !important;
     height: auto !important;
-    width: 300px;
     align-self: center;
     background-color: #e5e8e8;
   }
@@ -193,23 +187,7 @@
   }
 
   .notion_img_button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    color: #ffffff;
-    font-weight: bold;
-    min-width: 50px;
-    width: 100px;
-    min-height: 50px;
-    background-color: var(--cor1opaque);
-    border: none;
-    border-color: transparent;
-    border-radius: 5px;
-    outline: 0px;
-    margin: 5px;
-    padding: 5px;
-    cursor: default;
+    display: none;
   }
-  
+
 }

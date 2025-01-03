@@ -49,6 +49,7 @@ function Documentos() {
     alergias,
     mobilewidth,
     objpaciente,
+    objatendimento,
 
     cliente,
 
@@ -96,7 +97,7 @@ function Documentos() {
       preparaDocumentos();
     }
     // eslint-disable-next-line
-  }, [card, paciente, atendimentos, atendimento]);
+  }, [card, paciente, atendimentos, atendimento, objatendimento]);
 
   const preparaDocumentos = () => {
     loadModelos();
@@ -179,6 +180,7 @@ function Documentos() {
             ],
             columnGap: 10,
           },
+          { text: objatendimento != undefined ? 'CLIENTE: ' + objatendimento.nome_paciente : '', alignment: 'left', fontSize: 14, margin: [0, 10, 0, 20] },
           {
             "canvas": [{
               "lineColor": "gray",
@@ -262,6 +264,7 @@ function Documentos() {
             ],
             columnGap: 10,
           },
+          { text: objatendimento != undefined ? 'CLIENTE: ' + objatendimento.nome_paciente : '' },
           {
             "canvas": [{
               "lineColor": "gray",
@@ -896,6 +899,7 @@ function Documentos() {
             <div id={'documento ' + item.id}
               className='button'
               onClick={() => {
+                console.log(objatendimento);
                 localStorage.setItem("documento", item.id);
                 setselecteddocumento(item);
                 localStorage.setItem('dono_documento', item.profissional + ' - ' + item.conselho);
@@ -1081,7 +1085,7 @@ function Documentos() {
       </div >
     )
     // eslint-disable-next-line
-  }, [documentos]);
+  }, [documentos, objatendimento]);
 
   function FieldDocumento() {
     // menu de atalho, com informações importantes para inserção no texto.

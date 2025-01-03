@@ -199,7 +199,7 @@ function Consultas() {
           width: '100%',
         }}>
         <div className="text3"
-          style={{ alignSelf: 'center', margin: 0, color: 'white', fontSize: 16 }}>{'USUÁRIO: ' + usuario.nome_usuario.split(' ', 1)}</div>
+          style={{ alignSelf: 'center', margin: 0, marginTop: -2.5, color: 'white', fontSize: 16 }}>{'USUÁRIO: ' + usuario.nome_usuario.split(' ', 1)}</div>
         <div
           style={{
             display: "flex",
@@ -417,7 +417,6 @@ function Consultas() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "flex-start",
-          height: 200,
           flexGrow: 1,
         }}
       >
