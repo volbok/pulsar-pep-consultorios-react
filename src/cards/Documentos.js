@@ -181,8 +181,8 @@ function Documentos() {
             columnGap: 10,
           },
           { text: objatendimento != undefined ? 'CLIENTE: ' + objatendimento.nome_paciente : '', alignment: 'left', fontSize: 14, margin: [0, 10, 0, 0] },
-          { text: objatendimento != undefined ? 'NOME DA MÃE: ' + objpaciente.nome_mae_paciente: '', alignment: 'left', fontSize: 10, margin: [0, 5, 0, 5] },
-          { text: objatendimento != undefined ? 'DN: ' + moment(objatendimento.dn_paciente).format('DD/MM/YYYY') : '', alignment: 'left', fontSize: 10, margin: [0, 0, 0, 10] },
+          { text: objpaciente.nome_mae_paciente != null && objpaciente.nome_mae_paciente != '' ? 'NOME DA MÃE: ' + objpaciente.nome_mae_paciente : '', alignment: 'left', fontSize: 10, margin: [0, 5, 0, 5] },
+          { text: objpaciente.dn_paciente != null && objpaciente.dn_paciente != '' ? 'DN: ' + moment(objpaciente.dn_paciente).format('DD/MM/YYYY') : '', alignment: 'left', fontSize: 10, margin: [0, 0, 0, 10] },
           {
             "canvas": [{
               "lineColor": "gray",
@@ -267,6 +267,8 @@ function Documentos() {
             columnGap: 10,
           },
           { text: objatendimento != undefined ? 'CLIENTE: ' + objatendimento.nome_paciente : '' },
+          { text: objpaciente.nome_mae_paciente != null && objpaciente.nome_mae_paciente != '' ? 'NOME DA MÃE: ' + objpaciente.nome_mae_paciente : '', alignment: 'left', fontSize: 10, margin: [0, 5, 0, 5] },
+          { text: objpaciente.dn_paciente != null && objpaciente.dn_paciente != '' ? 'DN: ' + moment(objpaciente.dn_paciente).format('DD/MM/YYYY') : '', alignment: 'left', fontSize: 10, margin: [0, 0, 0, 10] },
           {
             "canvas": [{
               "lineColor": "gray",
