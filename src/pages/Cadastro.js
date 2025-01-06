@@ -1586,6 +1586,24 @@ function Cadastro() {
                   }}
                 ></img>
               </div>
+              <div id="botão de voltar (sair da tela de edição do paciente)"
+                className="button-yellow"
+                style={{ margin: 0, marginLeft: 5, width: 50, height: 50, alignSelf: 'center' }}
+                title={"SAIR DA TELA DE EDIÇÃO DO PACIENTE"}
+                onClick={() => {
+                  setvieweditpaciente(0);
+                }}
+              >
+                <img
+                  alt=""
+                  src={back}
+                  style={{
+                    margin: 0,
+                    height: 30,
+                    width: 30,
+                  }}
+                ></img>
+              </div>
             </div>
           </div>
           <SelecionaConvenioPaciente></SelecionaConvenioPaciente>
