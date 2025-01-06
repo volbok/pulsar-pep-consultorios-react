@@ -13,7 +13,7 @@ function Painel() {
   // context.
   const {
     html,
-    unidade,
+    cliente,
     pagina,
     setpagina,
     setusuario,
@@ -39,7 +39,7 @@ function Painel() {
   let qtde = 0;
   const [chamadas, setchamadas] = useState([]);
   const loadChamadas = () => {
-    axios.get(html + 'list_chamada/' + unidade).then((response) => {
+    axios.get(html + 'list_chamada/' + cliente.id_cliente).then((response) => {
       var x = response.data.rows;
       setchamadas(x.sort((a, b) => moment(a.data) < moment(b.data) ? 1 : -1));
       qtde = x.length;
@@ -48,7 +48,7 @@ function Painel() {
   }
   const checkChamadas = () => {
     console.log('CHECANDO CHAMADAS');
-    axios.get(html + 'list_chamada/' + unidade).then((response) => {
+    axios.get(html + 'list_chamada/' + cliente.id_cliente).then((response) => {
       var x = response.data.rows;
       setchamadas(x);
       if (x.length > qtde) {
@@ -73,8 +73,8 @@ function Painel() {
   }
 
   useEffect(() => {
-    if (pagina == 40) {
-      console.log(unidade);
+    if (pagina == 'PAINEL') {
+      console.log(cliente);
       loadChamadas();
       setInterval(() => {
         checkChamadas();
@@ -172,7 +172,7 @@ function Painel() {
     <div
       className="main fadein"
       style={{
-        display: pagina == 40 ? "flex" : "none",
+        display: pagina == 'PAINEL' ? "flex" : "none",
         flexDirection: "column",
         justifyContent: "center",
         width: "100vw",

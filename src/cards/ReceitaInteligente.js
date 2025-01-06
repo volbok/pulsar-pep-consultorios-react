@@ -25,7 +25,7 @@ import htmlToPdfmake from 'html-to-pdfmake';
 pdfMake.addVirtualFileSystem(pdfFonts);
 
 
-function NotionField() {
+function ReceitaInteligente() {
 
   // context.
   const {
@@ -44,17 +44,17 @@ function NotionField() {
   } = useContext(Context);
 
   useEffect(() => {
-    if (card == 'card-notion') {
-      settipodocumento('NOTION');
-      loadNotionDocs();
+    if (card == 'card-receita-inteligente') {
+      settipodocumento('RECEITA-INTELIGENTE');
+      loadReceitaInteligente();
     }
     // eslint-disable-next-line
   }, [card]);
 
-  const loadNotionDocs = () => {
+  const loadReceitaInteligente = () => {
     axios.get(html + "list_documentos/" + atendimento).then((response) => {
       var x = response.data.rows;
-      setdocumentos(x.filter(item => item.tipo_documento == 'NOTION').sort((a, b) => moment(a.data) < moment(b.data) ? 1 : -1));
+      setdocumentos(x.filter(item => item.tipo_documento == 'RECEITA-INTELIGENTE').sort((a, b) => moment(a.data) < moment(b.data) ? 1 : -1));
       setselecteddocumento([]);
     })
   }
@@ -76,9 +76,9 @@ function NotionField() {
     // console.log(obj);
     // console.log(usuario);
     axios.post(html + 'insert_documento', obj).then(() => {
-      loadNotionDocs();
+      loadReceitaInteligente();
       setselecteddocumento([]);
-      localStorage.setItem("documento_notion", 0);
+      localStorage.setItem("documento_receita_inteligente", 0);
       localStorage.setItem("texto_notion", '');
       document.getElementById("notionfield").innerHTML = '';
     })
@@ -1031,7 +1031,7 @@ function NotionField() {
             </div>
           </div>
         </div>
-        <div id='notionfield' // porra!
+        <div id='receitafield' // porra!
           className='scroll'
           style={{
             display: 'flex',
@@ -1072,4 +1072,4 @@ function NotionField() {
   )
 }
 
-export default NotionField;
+export default ReceitaInteligente;

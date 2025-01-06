@@ -626,10 +626,10 @@ function Login() {
             "FATURAMENTO"
           )}
           {montaModuloDeApoio(
-            "FINANCEIRO",
+            "PAINEL",
             usuario.faturamento,
-            "/financeiro",
-            "FINANCEIRO"
+            "/painel",
+            "PAINEL"
           )}
         </div>
       </div>

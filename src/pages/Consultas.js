@@ -29,7 +29,6 @@ function Consultas() {
   // context.
   const {
     html,
-    unidade,
     unidades,
     usuario,
     setusuario,
@@ -297,7 +296,7 @@ function Consultas() {
   const callPaciente = (item) => {
     if (consultorio != 'SELECIONAR SALA') {
       var obj = {
-        id_unidade: unidade,
+        id_unidade: cliente.id_cliente,
         id_paciente: item.id_paciente,
         nome_paciente: item.nome_paciente,
         id_atendimento: item.id_atendimento,
@@ -305,7 +304,7 @@ function Consultas() {
         data: moment()
       }
       axios.post(html + 'insert_chamada/', obj).then(() => {
-        axios.get(html + 'list_chamada/' + unidade).then((response) => {
+        axios.get(html + 'list_chamada/' + cliente.id_cliente).then((response) => {
           let x = response.data.rows;
           let y = x.filter(valor => valor.id_atendimento == item.id_atendimento);
           setchamadas(response.data.rows);
@@ -417,6 +416,7 @@ function Consultas() {
           display: "flex",
           flexDirection: "column",
           justifyContent: "flex-start",
+          marginTop: 1,
           flexGrow: 1,
         }}
       >

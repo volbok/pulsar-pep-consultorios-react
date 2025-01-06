@@ -180,7 +180,9 @@ function Documentos() {
             ],
             columnGap: 10,
           },
-          { text: objatendimento != undefined ? 'CLIENTE: ' + objatendimento.nome_paciente : '', alignment: 'left', fontSize: 14, margin: [0, 10, 0, 20] },
+          { text: objatendimento != undefined ? 'CLIENTE: ' + objatendimento.nome_paciente : '', alignment: 'left', fontSize: 14, margin: [0, 10, 0, 0] },
+          { text: objatendimento != undefined ? 'NOME DA MÃE: ' + objpaciente.nome_mae_paciente: '', alignment: 'left', fontSize: 10, margin: [0, 5, 0, 5] },
+          { text: objatendimento != undefined ? 'DN: ' + moment(objatendimento.dn_paciente).format('DD/MM/YYYY') : '', alignment: 'left', fontSize: 10, margin: [0, 0, 0, 10] },
           {
             "canvas": [{
               "lineColor": "gray",
@@ -1151,7 +1153,8 @@ function Documentos() {
       <div style={{
         display: 'flex',
         flexDirection: 'column',
-        height: 'calc(100%)', position: 'relative'
+        position: 'relative',
+        height: '100%',
       }}>
         <textarea
           id="inputFieldDocumento"
