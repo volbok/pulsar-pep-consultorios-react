@@ -3,7 +3,7 @@ import React, { useContext } from 'react';
 import Context from '../pages/Context';
 import moment from 'moment';
 // imagens.
-import back from '../images/back.svg';
+import back from '../images/back.png';
 
 function Alertas() {
 

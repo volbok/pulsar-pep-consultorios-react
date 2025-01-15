@@ -5,8 +5,8 @@ import axios from 'axios';
 // import moment from "moment";
 
 // imagens.
-import back from '../images/back.svg';
-import imprimir from '../images/imprimir.svg';
+import back from '../images/back.png';
+import imprimir from '../images/imprimir.png';
 import html2pdf from 'html2pdf.js'
 
 function GuiaSadt() {

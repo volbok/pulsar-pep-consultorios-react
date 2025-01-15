@@ -16,12 +16,12 @@ import maskphone from "../functions/maskphone";
 import modal from "../functions/modal";
 import selector from "../functions/selector";
 // imagens.
-import deletar from "../images/deletar.svg";
-import back from "../images/back.svg";
-import novo from "../images/novo.svg";
-import salvar from "../images/salvar.svg";
-import editar from "../images/editar.svg";
-import lupa from '../images/lupa.svg';
+import deletar from "../images/deletar.png";
+import back from "../images/back.png";
+import novo from "../images/novo.png";
+import salvar from "../images/salvar.png";
+import editar from "../images/editar.png";
+import lupa from '../images/lupa.png';
 
 function Usuarios() {
   // context.

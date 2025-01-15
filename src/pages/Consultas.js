@@ -5,11 +5,11 @@ import Context from "./Context";
 import moment from "moment";
 // imagens.
 // import power from "../images/power.svg";
-import back from "../images/back.svg";
-import flag from "../images/white_flag.svg";
-import lupa from '../images/lupa.svg';
-import call from "../images/call.svg";
-import clock from "../images/clock.svg";
+import back from "../images/back.png";
+import flag from "../images/white_flag.png";
+import lupa from '../images/lupa.png';
+import call from "../images/call.png";
+import clock from "../images/clock.png";
 // funções.
 import toast from "../functions/toast";
 import modal from "../functions/modal";

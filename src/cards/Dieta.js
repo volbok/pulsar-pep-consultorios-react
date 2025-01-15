@@ -8,9 +8,9 @@ import modal from '../functions/modal';
 import toast from '../functions/toast';
 import checkinput from '../functions/checkinput';
 // imagens.
-import deletar from '../images/deletar.svg';
-import salvar from '../images/salvar.svg';
-import back from '../images/back.svg';
+import deletar from '../images/deletar.png';
+import salvar from '../images/salvar.png';
+import back from '../images/back.png';
 
 function Dieta() {
 

@@ -4,18 +4,18 @@ import axios from "axios";
 import Context from "./Context";
 import moment from "moment";
 // imagens.
-import power from "../images/power.svg";
-import back from "../images/back.svg";
-import body from "../images/body.svg";
-import refresh from "../images/refresh.svg";
-import prec_padrao from "../images/prec_padrao.svg";
-import prec_contato from "../images/prec_contato.svg";
-import prec_respiratorio from "../images/prec_respiratorio.svg";
-import lupa from '../images/lupa.svg';
-import lupa_cinza from '../images/lupa_cinza.svg';
-import esteto from "../images/esteto.svg";
-import call from "../images/call.svg";
-import dots_teal from "../images/dots_teal.svg";
+import power from "../images/power.png";
+import back from "../images/back.png";
+import body from "../images/body.png";
+import refresh from "../images/refresh.png";
+import prec_padrao from "../images/prec_padrao.png";
+import prec_contato from "../images/prec_contato.png";
+import prec_respiratorio from "../images/prec_respiratorio.png";
+import lupa from '../images/lupa.png';
+import lupa_cinza from '../images/lupa.png';
+import esteto from "../images/esteto.png";
+import call from "../images/call.png";
+import dots_teal from "../images/dots_teal.png";
 // funções.
 import toast from "../functions/toast";
 // router.

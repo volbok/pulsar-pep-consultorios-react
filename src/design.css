@@ -2019,6 +2019,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   justify-content: space-evenly;
 }
 
+.chat-unhide {
+  display: flex;
+  visibility: visible;
+}
+
+.chat-hide {
+  display: none;
+  visibility: hidden;
+}
 
 /* CARDS */
 .card {

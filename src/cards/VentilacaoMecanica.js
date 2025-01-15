@@ -7,10 +7,10 @@ import moment from 'moment';
 import modal from '../functions/modal';
 import checkinput from '../functions/checkinput';
 // imagens.
-import deletar from '../images/deletar.svg';
-import salvar from '../images/salvar.svg';
-import novo from '../images/novo.svg';
-import back from '../images/back.svg';
+import deletar from '../images/deletar.png';
+import salvar from '../images/salvar.png';
+import novo from '../images/novo.png';
+import back from '../images/back.png';
 // componentes.
 import GravadorMulti from '../components/GravadorMulti';
 

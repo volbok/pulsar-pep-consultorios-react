@@ -5,14 +5,17 @@ import Context from "./Context";
 // funções.
 import toast from "../functions/toast";
 // imagens.
-import power from "../images/power.svg";
-import salvar from "../images/salvar.svg";
-import back from "../images/back.svg";
+import power from "../images/power.png";
+import salvar from "../images/salvar.png";
+import back from "../images/back.png";
 
 // componentes.
 import Logo from "../components/Logo";
 // router.
 import { useHistory } from "react-router-dom";
+
+// websocket (socket.io)
+import { io } from 'socket.io-client';
 
 var bcrypt = require('bcryptjs');
 var salt = bcrypt.genSaltSync(5);
@@ -38,6 +41,8 @@ function Login() {
     setpaciente,
     logocor,
     setlogocor,
+    setsocket,
+    setchat,
   } = useContext(Context);
 
   // history (router).
@@ -461,6 +466,11 @@ function Login() {
         localStorage.setItem('obj_usuario', JSON.stringify(obj));
         localStorage.setItem('usuario', x.id);
         localStorage.setItem('senha', x.senha);
+
+        // habilitando chat.
+        setsocket(io.connect('http://localhost:4000'));
+        setchat(1);
+
         if (x.id == undefined) {
           document.getElementById("inputSenha").style.opacity = 0.3;
           document.getElementById("inputSenha").style.pointerEvents = 'none';

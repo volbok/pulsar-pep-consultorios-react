@@ -4,12 +4,12 @@ import Context from '../pages/Context';
 import moment from 'moment';
 import axios from 'axios';
 // imagens.
-import back from '../images/back.svg';
-import print from '../images/imprimir.svg';
-import copiar from '../images/copiar.svg';
-import novo from '../images/novo.svg';
-import salvar from '../images/salvar.svg';
-import deletar from '../images/deletar.svg';
+import back from '../images/back.png';
+import print from '../images/imprimir.png';
+import copiar from '../images/copiar.png';
+import novo from '../images/novo.png';
+import salvar from '../images/salvar.png';
+import deletar from '../images/deletar.png';
 // funções.
 import selector from '../functions/selector';
 // componentes.

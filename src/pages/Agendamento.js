@@ -3,13 +3,13 @@ import React, { useContext, useEffect, useState, useCallback } from 'react';
 import Context from './Context';
 import axios from 'axios';
 // imagens.
-import deletar from '../images/deletar.svg';
-import back from '../images/back.svg';
+import deletar from '../images/deletar.png';
+import back from '../images/back.png';
 import moment from "moment";
-import lupa from '../images/lupa_cinza.svg';
-import imprimir from '../images/imprimir.svg';
-import whatsapp from '../images/whatsapp.svg';
-import salvar from '../images/salvar.svg';
+import lupa from '../images/lupa.png';
+import imprimir from '../images/imprimir.png';
+import whatsapp from '../images/whatsapp.png';
+import salvar from '../images/salvar.png';
 // funções.
 import maskdate from "../functions/maskdate";
 // router.

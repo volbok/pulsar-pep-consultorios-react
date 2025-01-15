@@ -1,9 +1,9 @@
 /* eslint eqeqeq: "off" */
 import React, { useState } from 'react';
 
-import microfone from '../images/microfone.svg';
-import salvar from '../images/salvar.svg';
-import deletar from '../images/deletar.svg';
+import microfone from '../images/microfone.png';
+import salvar from '../images/salvar.png';
+import deletar from '../images/deletar.png';
 
 import SpeechRecognition, { useSpeechRecognition } from 'react-speech-recognition'
 

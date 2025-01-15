@@ -6,9 +6,9 @@ import moment from "moment";
 // funções.
 import maskdate from "../functions/maskdate";
 // imagens.
-import back from '../images/back.svg';
-import novo from "../images/novo.svg";
-import salvar from "../images/salvar.svg";
+import back from '../images/back.png';
+import novo from "../images/novo.png";
+import salvar from "../images/salvar.png";
 
 // router.
 import { useHistory } from "react-router-dom";

@@ -4,9 +4,9 @@ import axios from "axios";
 import Context from "./Context";
 import moment from "moment";
 // imagens.
-import power from '../images/power.svg';
-import refresh from "../images/refresh.svg";
-import salvar from "../images/salvar.svg";
+import power from '../images/power.png';
+import refresh from "../images/refresh.png";
+import salvar from "../images/salvar.png";
 import "moment/locale/pt-br";
 // router.
 import { useHistory } from "react-router-dom";

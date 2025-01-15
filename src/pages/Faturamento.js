@@ -3,11 +3,11 @@ import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import Context from "./Context";
 // imagens.
-import salvar from '../images/salvar.svg';
-import novo from '../images/novo.svg';
-import deletar from '../images/deletar.svg';
-import editar from '../images/editar.svg';
-import back from '../images/back.svg';
+import salvar from '../images/salvar.png';
+import novo from '../images/novo.png';
+import deletar from '../images/deletar.png';
+import editar from '../images/editar.png';
+import back from '../images/back.png';
 // import salvar from "../images/salvar.svg";
 import "moment/locale/pt-br";
 import modal from "../functions/modal";

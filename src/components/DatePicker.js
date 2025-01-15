@@ -4,8 +4,8 @@ import { useEffect } from 'react';
 import moment from 'moment';
 import Context from '../pages/Context';
 // imagens.
-import salvar from '../images/salvar.svg';
-import back from '../images/back.svg';
+import salvar from '../images/salvar.png';
+import back from '../images/back.png';
 
 function DatePicker() {
 

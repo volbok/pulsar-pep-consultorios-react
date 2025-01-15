@@ -4,11 +4,11 @@ import axios from "axios";
 import Context from "./Context";
 import moment from "moment";
 // imagens.
-import back from "../images/back.svg";
-import refresh from "../images/refresh.svg";
-import lupa from '../images/lupa.svg';
-import call from "../images/call.svg";
-import deletar from '../images/deletar.svg';
+import back from "../images/back.png";
+import refresh from "../images/refresh.png";
+import lupa from '../images/lupa.png';
+import call from "../images/call.png";
+import deletar from '../images/deletar.png';
 // funções.
 import toast from "../functions/toast";
 import modal from "../functions/modal";

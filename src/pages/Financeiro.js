@@ -7,10 +7,10 @@ import moment from "moment";
 // componentes.
 import DatePicker from '../components/DatePicker';
 // imagens.
-import novo from '../images/novo.svg';
-import salvar from '../images/salvar.svg';
-import deletar from '../images/deletar.svg';
-import back from '../images/back.svg';
+import novo from '../images/novo.png';
+import salvar from '../images/salvar.png';
+import deletar from '../images/deletar.png';
+import back from '../images/back.png';
 
 function Financeiro() {
 

@@ -11,10 +11,10 @@ import Gravador from '../components/Gravador';
 // import toast from '../functions/toast';
 import checkinput from '../functions/checkinput';
 // imagens.
-import salvar from '../images/salvar.svg';
-import novo from '../images/novo.svg';
-import power from '../images/power.svg';
-import back from '../images/back.svg';
+import salvar from '../images/salvar.png';
+import novo from '../images/novo.png';
+import power from '../images/power.png';
+import back from '../images/back.png';
 
 function Infusoes() {
 

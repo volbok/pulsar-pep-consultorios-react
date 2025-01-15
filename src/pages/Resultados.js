@@ -7,12 +7,12 @@ import toast from "../functions/toast";
 import moment from "moment";
 import selector from "../functions/selector";
 // imagens.
-import power from "../images/power.svg";
-import lab_green from "../images/lab_green.svg";
-import lab_red from "../images/lab_red.svg";
-import lab_yellow from "../images/lab_yellow.svg";
-import logo from '../images/logo.svg';
-import zoio from '../images/zoio.svg';
+import power from "../images/power.png";
+import lab_green from "../images/lab_green.png";
+import lab_red from "../images/lab_red.png";
+import lab_yellow from "../images/lab_yellow.png";
+import logo from '../images/logo.png';
+import zoio from '../images/zoio.png';
 
 // html2pdf
 // import { Preview, print } from 'react-html2pdf';

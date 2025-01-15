@@ -18,6 +18,7 @@ import Almoxarifado from "./pages/Almoxarifado";
 import Faturamento from "./pages/Faturamento";
 import Financeiro from "./pages/Financeiro";
 import Resultados from "./pages/Resultados";
+import Chat from "./pages/Chat";
 // componentes.
 import Toast from "./components/Toast";
 import Modal from "./components/Modal";
@@ -156,6 +157,9 @@ function App() {
   const [selectedprocedimento, setselectedprocedimento] = useState(0);
   const [guiasconsulta, setguiasconsulta] = useState([]);
   const [selectedguiaconsulta, setselectedguiaconsulta] = useState([]);
+
+  const [chat, setchat] = useState(0);
+  const [socket, setsocket] = useState(null);
 
   const [agenda, setagenda] = useState([]);
 
@@ -332,6 +336,8 @@ function App() {
         selectedprocedimento, setselectedprocedimento,
         guiasconsulta, setguiasconsulta,
         selectedguiaconsulta, setselectedguiaconsulta,
+        chat, setchat,
+        socket, setsocket,
         agenda, setagenda,
 
         temacor, settemacor,
@@ -387,6 +393,7 @@ function App() {
         </Router>
         <Toast></Toast>
         <Modal></Modal>
+        <Chat></Chat>
         <DatePicker></DatePicker>
       </div>
     </Context.Provider>

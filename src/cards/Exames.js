@@ -5,13 +5,13 @@ import axios from 'axios';
 import moment from "moment";
 import GuiaSadt from './GuiaSadt';
 // imagens.
-import novo from '../images/novo.svg';
-import deletar from '../images/deletar.svg';
-import print from '../images/imprimir.svg';
+import novo from '../images/novo.png';
+import deletar from '../images/deletar.png';
+import print from '../images/imprimir.png';
 import selector from '../functions/selector';
-import salvar from "../images/salvar.svg";
-import favorito_salvar from '../images/favorito_salvar.svg';
-import favorito_usar from '../images/favorito_usar.svg';
+import salvar from "../images/salvar.png";
+import favorito_salvar from '../images/favorito_salvar.png';
+import favorito_usar from '../images/favorito_usar.png';
 // router.
 import Filter from '../components/Filter';
 // funções.

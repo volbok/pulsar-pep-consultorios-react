@@ -6,13 +6,13 @@ import moment from 'moment';
 // funções.
 import toast from '../functions/toast';
 // imagens.
-import salvar from '../images/salvar.svg';
-import refresh from '../images/refresh.svg';
-import back from '../images/back.svg';
-import body from '../images/body.svg';
-import dorso from '../images/dorso.svg';
-import calendario from '../images/calendario.svg';
-import deletar from '../images/deletar.svg';
+import salvar from '../images/salvar.png';
+import refresh from '../images/refresh.png';
+import back from '../images/back.png';
+import body from '../images/body.png';
+import dorso from '../images/dorso.png';
+import calendario from '../images/calendario.png';
+import deletar from '../images/deletar.png';
 
 function Boneco() {
 

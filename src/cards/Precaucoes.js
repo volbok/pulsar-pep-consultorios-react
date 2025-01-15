@@ -6,9 +6,9 @@ import moment from 'moment';
 // funções.
 import modal from '../functions/modal';
 // imagens.
-import deletar from '../images/deletar.svg';
-import novo from '../images/novo.svg';
-import back from '../images/back.svg';
+import deletar from '../images/deletar.png';
+import novo from '../images/novo.png';
+import back from '../images/back.png';
 
 function Precaucoes() {
 

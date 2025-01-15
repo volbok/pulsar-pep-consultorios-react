@@ -8,15 +8,15 @@ import VanillaCaret from 'vanilla-caret-js';
 // funções.
 import selector from '../functions/selector';
 // imagens.
-import print from '../images/imprimir.svg';
-import certify from '../images/certify.svg';
-import back from '../images/back.svg';
-import copiar from '../images/copiar.svg';
-import favorito_usar from '../images/favorito_usar.svg';
-import favorito_salvar from '../images/favorito_salvar.svg';
-import salvar from '../images/salvar.svg';
-import novo from '../images/novo.svg';
-import deletar from '../images/deletar.svg';
+import print from '../images/imprimir.png';
+import certify from '../images/certify.png';
+import back from '../images/back.png';
+import copiar from '../images/copiar.png';
+import favorito_usar from '../images/favorito_usar.png';
+import favorito_salvar from '../images/favorito_salvar.png';
+import salvar from '../images/salvar.png';
+import novo from '../images/novo.png';
+import deletar from '../images/deletar.png';
 import checkinput from '../functions/checkinput';
 // componentes.
 import Cid10 from '../functions/cid10';

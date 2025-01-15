@@ -10,16 +10,16 @@ import { useHistory } from 'react-router-dom';
 import toast from '../functions/toast';
 import selector from '../functions/selector';
 // imagens.
-import salvar from '../images/salvar.svg';
-import deletar from '../images/deletar.svg';
-import back from '../images/back.svg';
-import novo from '../images/novo.svg';
-import favorito_usar from '../images/favorito_usar.svg';
-import favorito_salvar from '../images/favorito_salvar.svg';
-import refresh from '../images/refresh.svg';
-import print from '../images/imprimir.svg';
-import copiar from '../images/copiar.svg';
-import preferencias from '../images/preferencias.svg';
+import salvar from '../images/salvar.png';
+import deletar from '../images/deletar.png';
+import back from '../images/back.png';
+import novo from '../images/novo.png';
+import favorito_usar from '../images/favorito_usar.png';
+import favorito_salvar from '../images/favorito_salvar.png';
+import refresh from '../images/refresh.png';
+import print from '../images/imprimir.png';
+import copiar from '../images/copiar.png';
+import preferencias from '../images/preferencias.png';
 // componentes.
 import Header from '../components/Header';
 import Footer from '../components/Footer';

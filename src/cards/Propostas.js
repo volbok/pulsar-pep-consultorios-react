@@ -8,12 +8,12 @@ import toast from '../functions/toast';
 import modal from '../functions/modal';
 import checkinput from '../functions/checkinput';
 // imagens.
-import deletar from '../images/deletar.svg';
-import salvar from '../images/salvar.svg';
-import novo from '../images/novo.svg';
-import flag from '../images/flag.svg';
-import fail from '../images/fail.svg';
-import back from '../images/back.svg';
+import deletar from '../images/deletar.png';
+import salvar from '../images/salvar.png';
+import novo from '../images/novo.png';
+import flag from '../images/flag_green.png';
+import fail from '../images/flag_red.png';
+import back from '../images/back.png';
 // componentes.
 import Gravador from '../components/Gravador';
 

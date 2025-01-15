@@ -9,13 +9,13 @@ import modal from '../functions/modal';
 import Header from '../components/Header';
 import Footer from '../components/Footer';
 // imagens.
-import back from '../images/back.svg';
-import print from '../images/imprimir.svg';
-import copiar from '../images/copiar.svg';
-import favorito_usar from '../images/favorito_usar.svg';
-import salvar from '../images/salvar.svg';
-import novo from '../images/novo.svg';
-import deletar from '../images/deletar.svg';
+import back from '../images/back.png';
+import print from '../images/imprimir.png';
+import copiar from '../images/copiar.png';
+import favorito_usar from '../images/favorito_usar.png';
+import salvar from '../images/salvar.png';
+import novo from '../images/novo.png';
+import deletar from '../images/deletar.png';
 import VanillaCaret from 'vanilla-caret-js';
 import toast from '../functions/toast';
 

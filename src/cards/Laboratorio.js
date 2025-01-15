@@ -3,15 +3,15 @@ import React, { useContext, useState, useEffect, useCallback } from 'react';
 import Context from '../pages/Context';
 import axios from 'axios';
 // imagens.
-import deletar from '../images/deletar.svg';
-import salvar from '../images/salvar.svg';
-import novo from '../images/novo.svg';
-import back from '../images/back.svg';
+import deletar from '../images/deletar.png';
+import salvar from '../images/salvar.png';
+import novo from '../images/novo.png';
+import back from '../images/back.png';
 import moment from "moment";
-import print from '../images/imprimir.svg';
-import lupa from '../images/lupa_cinza.svg';
-import dots_teal from '../images/dots_teal.svg';
-import alerta from '../images/alerta.svg';
+import print from '../images/imprimir.png';
+import lupa from '../images/lupa.png';
+import dots_teal from '../images/dots_teal.png';
+import alerta from '../images/alerta.png';
 // funções.
 import selector from '../functions/selector';
 // componentes.

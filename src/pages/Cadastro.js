@@ -12,10 +12,10 @@ import toast from "../functions/toast";
 import maskdate from "../functions/maskdate";
 import maskphone from "../functions/maskphone";
 // imagens.
-import salvar from "../images/salvar.svg";
-import deletar from "../images/deletar.svg";
-import back from "../images/back.svg";
-import novo from "../images/novo.svg";
+import salvar from "../images/salvar.png";
+import deletar from "../images/deletar.png";
+import back from "../images/back.png";
+import novo from "../images/novo.png";
 import modal from "../functions/modal";
 import Filter from "../components/Filter";
 
@@ -652,7 +652,7 @@ function Cadastro() {
     return (
       <div
         className="fundo"
-        style={{ display: (vieweditpaciente == 1 || vieweditpaciente == 2) && atendimento != null && paciente != null ? "flex" : "none" }}
+        style={{ display: vieweditpaciente == 2 || (vieweditpaciente == 1 && atendimento != null && paciente != null) ? "flex" : "none" }}
         onClick={() => setvieweditpaciente(0)}
       >
         <div
