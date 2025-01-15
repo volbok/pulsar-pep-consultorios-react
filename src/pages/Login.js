@@ -468,8 +468,8 @@ function Login() {
         localStorage.setItem('senha', x.senha);
 
         // habilitando chat.
-        setsocket(io.connect('http://localhost:4000'));
-        setchat(1);
+        // setsocket(io.connect('http://localhost:4000'));
+        setchat(0);
 
         if (x.id == undefined) {
           document.getElementById("inputSenha").style.opacity = 0.3;
