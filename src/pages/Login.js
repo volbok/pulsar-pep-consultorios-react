@@ -15,7 +15,7 @@ import Logo from "../components/Logo";
 import { useHistory } from "react-router-dom";
 
 // websocket (socket.io)
-import { io } from 'socket.io-client';
+// import { io } from 'socket.io-client';
 
 var bcrypt = require('bcryptjs');
 var salt = bcrypt.genSaltSync(5);
@@ -41,7 +41,7 @@ function Login() {
     setpaciente,
     logocor,
     setlogocor,
-    setsocket,
+    // setsocket,
     setchat,
   } = useContext(Context);
 
