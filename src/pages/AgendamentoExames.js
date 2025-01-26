@@ -1029,10 +1029,10 @@ function AgendamentoExames() {
                 onClick={() => {
                   console.log('ABRIR GUIA SADT');
                   setoperadora(operadora);
-                  document.getElementById("guia-sadt").style.display = 'flex';
-                  document.getElementById("guia-sadt").style.visibility = 'visible';
-                  setviewinsereagendamento(0);
-                  setcard('guia-sadt');
+                  // document.getElementById("guia-sadt").style.display = 'flex';
+                  // document.getElementById("guia-sadt").style.visibility = 'visible';
+                  // setviewinsereagendamento(0);
+                  // setcard('guia-sadt');
                 }}
               >
                 GUIA SADT
@@ -1311,7 +1311,6 @@ function AgendamentoExames() {
         </div>
         <ViewOpcoesHorarios></ViewOpcoesHorarios>
         <GuiaConsulta></GuiaConsulta>
-        <GuiaSadt></GuiaSadt>
         <InsereAgendamento></InsereAgendamento>
         <UpdateAgendamento></UpdateAgendamento>
         <ReciboNomePagador></ReciboNomePagador>
