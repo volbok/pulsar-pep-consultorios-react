@@ -99,7 +99,7 @@ function GuiaSadt() {
   const loadExames = () => {
     let id_paciente = localStorage.getItem('item_exame');
     console.log(id_paciente);
-    axios.get(html + 'atendimento_laboratorio_idpaciente/' + id_paciente).then((response) => {
+    axios.get(html + 'atendimento_laboratorio/' + atendimento).then((response) => {
       var x = response.data.rows;
       var y = []
       setlaboratorio(x.filter(item => item.random == localStorage.getItem('random')));
