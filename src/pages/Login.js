@@ -468,7 +468,7 @@ function Login() {
         localStorage.setItem('senha', x.senha);
 
         // habilitando chat.
-        setsocket(io.connect('https://pulsar-pep-chat-server.up.railway.app:4000'));
+        setsocket(io.connect('https://pulsar-pep-chat-server.up.railway.app'));
         setchat(1);
 
         if (x.id == undefined) {
