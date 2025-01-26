@@ -6,7 +6,7 @@ import Context from "./Context";
 import play from "../images/play.png";
 import chatimage from "../images/chat.png";
 import chatsound from "../sounds/chat.mp3";
-
+import deletar from "../images/deletar.png";
 
 function Chat() {
   // context.
@@ -40,11 +40,13 @@ function Chat() {
         zIndex: 200, position: 'absolute', right: 15, bottom: 0,
         flexDirection: 'column',
       }}>
-      <div id="chat_of"
+      <div id="chat_off"
         className="button-green chat-unhide"
         onClick={() => {
-          document.getElementById('chat_of').className = 'button-green chat-hide';
-          document.getElementById('chat_on').className = 'button chat-unhide';
+          document.getElementById('chat_off').className = 'button-green chat-hide';
+          document.getElementById('contador_chat_off').className = 'button red chat-hide';
+          document.getElementById('chat_on').className = 'button-opaque chat-unhide';
+          document.getElementById('contador_chat_on').className = 'button red chat-unhide';
         }}
         style={{
           width: 20, maxWidth: 20,
@@ -65,22 +67,47 @@ function Chat() {
           }}
         ></img>
       </div>
+      <div className="button red chat-unhide"
+        id={'contador_chat_off'}
+        style={{
+          minWidth: 15, maxWidth: 15, minHeight: 15, maxHeight: 15,
+          alignSelf: 'center',
+          borderRadius: 50,
+          position: 'absolute', top: -80, right: 10
+        }}
+        onClick={() => {
+          let obj = {
+            usuario: usuario.nome_usuario.split(" ",)[0],
+            texto: document.getElementById("inputChat").value.toUpperCase()
+          }
+          socket.emit("income_message", obj);
+          console.log('MENSAGEM ENVIADA');
+          setTimeout(() => {
+            document.getElementById("scrollchat").scrollTop = document.getElementById("scrollchat").scrollHeight;
+            document.getElementById("inputChat").value = '';
+          }, 1000);
+        }}
+      >
+        {arraymessage.length}
+      </div>
       <div id="chat_on"
         className="button chat-hide"
         style={{
-          // display: 'flex',
+          position: 'relative',
           flexDirection: 'column',
         }}
       >
         <div
           className="button-green"
           onClick={() => {
-            document.getElementById('chat_of').className = 'button-green chat-unhide';
+            document.getElementById('chat_off').className = 'button-green chat-unhide';
+            document.getElementById('contador_chat_off').className = 'button red chat-unhide';
             document.getElementById('chat_on').className = 'button chat-hide';
+            document.getElementById('contador_chat_on').className = 'button red chat-hide';
           }}
           style={{
             width: 20, maxWidth: 20, height: 20, maxHeight: 20, padding: 0,
-            position: 'absolute', top: -40
+            position: 'absolute', top: -40,
           }}
         >
           <img
@@ -92,9 +119,54 @@ function Chat() {
             }}
           ></img>
         </div>
-        <div id='scrollchat' className="janela scroll cor2"
-          style={{ width: 200, height: 300 }}
+        <div className="button red"
+          id={'contador_chat_on'}
+          style={{
+            minWidth: 15, maxWidth: 15, minHeight: 15, maxHeight: 15,
+            alignSelf: 'center',
+            borderRadius: 50,
+            position: 'absolute', top: -52, right: 80
+          }}
+          onClick={() => {
+            let obj = {
+              usuario: usuario.nome_usuario.split(" ",)[0],
+              texto: document.getElementById("inputChat").value.toUpperCase()
+            }
+            socket.emit("income_message", obj);
+            console.log('MENSAGEM ENVIADA');
+            setTimeout(() => {
+              document.getElementById("scrollchat").scrollTop = document.getElementById("scrollchat").scrollHeight;
+              document.getElementById("inputChat").value = '';
+            }, 1000);
+          }}
         >
+          {arraymessage.length}
+        </div>
+        <div id='scrollchat' className="janela scroll cor2"
+          style={{ width: 200, height: 300, }}
+        >
+          <div className="button red"
+            title="LIMPAR O CHAT"
+            style={{
+              minWidth: 15, maxWidth: 15, minHeight: 15, maxHeight: 15,
+              alignSelf: 'center',
+              marginLeft: -15, marginRight: 0, marginBottom: 0,
+              position: 'absolute', right: 25, top: 5,
+            }}
+            onClick={() => {
+              setarraymessage([]);
+              socket.emit("limpa_chat");
+            }}
+          >
+            <img
+              alt=""
+              src={deletar}
+              style={{
+                height: 18,
+                width: 18,
+              }}
+            ></img>
+          </div>
           {arraymessage.map(item => (
             <div
               key={item + Math.random()}
@@ -117,6 +189,21 @@ function Chat() {
             id={"inputChat"}
             onFocus={(e) => (e.target.placeholder = "")}
             onBlur={(e) => (e.target.placeholder = "ESCREVA AQUI...")}
+            onKeyDown={(e) => {
+              if (e.keyCode == 13) { // tecla enter
+                e.preventDefault();
+                let obj = {
+                  usuario: usuario.nome_usuario.split(" ",)[0],
+                  texto: document.getElementById("inputChat").value.toUpperCase()
+                }
+                socket.emit("income_message", obj);
+                console.log('MENSAGEM ENVIADA');
+                setTimeout(() => {
+                  document.getElementById("scrollchat").scrollTop = document.getElementById("scrollchat").scrollHeight;
+                  document.getElementById("inputChat").value = '';
+                }, 1000);
+              }
+            }}
             style={{
               flexDirection: "center",
               justifyContent: "center",
@@ -131,7 +218,7 @@ function Chat() {
           ></textarea>
           <div className="button green"
             style={{
-              minWidth: 10, maxWidth: 10, minHeight: 10, maxHeight: 10,
+              minWidth: 15, maxWidth: 15, minHeight: 15, maxHeight: 15,
               alignSelf: 'center',
               marginLeft: -15, marginRight: 0, marginBottom: 0,
               position: 'absolute', right: 5, bottom: 5,
@@ -145,6 +232,7 @@ function Chat() {
               console.log('MENSAGEM ENVIADA');
               setTimeout(() => {
                 document.getElementById("scrollchat").scrollTop = document.getElementById("scrollchat").scrollHeight;
+                document.getElementById("inputChat").value = '';
               }, 1000);
             }}
           >
@@ -152,8 +240,8 @@ function Chat() {
               alt=""
               src={play}
               style={{
-                height: 10,
-                width: 10,
+                height: 18,
+                width: 18,
               }}
             ></img>
             <audio id="chat">

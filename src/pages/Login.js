@@ -469,6 +469,7 @@ function Login() {
 
         // habilitando chat.
         setsocket(io.connect('https://pulsar-pep-chat-server.up.railway.app'));
+        // setsocket(io.connect('http://localhost:4000'));
         setchat(1);
 
         if (x.id == undefined) {
