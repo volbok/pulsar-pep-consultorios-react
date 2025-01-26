@@ -23,7 +23,6 @@ import selector from '../functions/selector';
 
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
-import GuiaSadt from '../cards/GuiaSadt';
 pdfMake.addVirtualFileSystem(pdfFonts);
 
 
