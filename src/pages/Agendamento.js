@@ -260,7 +260,6 @@ function Agendamento() {
     }
   }
 
-
   const checkUpdateConsultas = (item, data_inicio) => {
     console.log(item); // obj ok.
 
@@ -728,7 +727,8 @@ function Agendamento() {
           alignSelf: 'center',
         }}
       >
-        <div id="scroll atendimentos com pacientes"
+        <div
+          id="scroll atendimentos com pacientes"
           className='scroll'
           style={{
             display: arrayatendimentos.filter(item => moment(item.data_inicio).format('DD/MM/YYYY') == selectdate && (item.situacao > 2 || item.situacao == 'AGENDAMENTO') && item.id_profissional == selectedespecialista.id_usuario).length > 0 ? "flex" : "none",

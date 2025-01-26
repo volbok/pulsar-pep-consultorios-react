@@ -15,7 +15,7 @@ import Logo from "../components/Logo";
 import { useHistory } from "react-router-dom";
 
 // websocket (socket.io)
-// import { io } from 'socket.io-client';
+import { io } from 'socket.io-client';
 
 var bcrypt = require('bcryptjs');
 var salt = bcrypt.genSaltSync(5);
@@ -41,7 +41,7 @@ function Login() {
     setpaciente,
     logocor,
     setlogocor,
-    // setsocket,
+    setsocket,
     setchat,
   } = useContext(Context);
 
@@ -468,8 +468,8 @@ function Login() {
         localStorage.setItem('senha', x.senha);
 
         // habilitando chat.
-        // setsocket(io.connect('http://localhost:4000'));
-        setchat(0);
+        setsocket(io.connect('http://pulsar-pep-chat-server.up.railway.app:4000'));
+        setchat(1);
 
         if (x.id == undefined) {
           document.getElementById("inputSenha").style.opacity = 0.3;
@@ -618,7 +618,7 @@ function Login() {
           }}
         >
           {montaModuloDeApoio(
-            "CADASTRO DE PACIENTES E MARCAÇÃO DE CONSULTAS",
+            "CADASTRO DE PACIENTES E MARCAÇÃO DE CONSULTAS E EXAMES",
             usuario.paciente,
             "/cadastro",
             2
@@ -634,6 +634,12 @@ function Login() {
             usuario.faturamento,
             "/faturamento",
             "FATURAMENTO"
+          )}
+          {montaModuloDeApoio(
+            "CADASTRO DE PROCEDIMENTOS",
+            usuario.faturamento,
+            "/cadastro-procedimentos",
+            "FATURAMENTO-CLINICA-PROCEDIMENTOS"
           )}
           {montaModuloDeApoio(
             "PAINEL",
@@ -703,7 +709,7 @@ function Login() {
             flexDirection: "row",
             justifyContent: "center",
             flexWrap: "wrap",
-            width: window.innerWidth < mobilewidth ? "80vw" : "45vw",
+            width: window.innerWidth < mobilewidth ? "80vw" : "90vw",
           }}
         >
           <div
@@ -729,6 +735,26 @@ function Login() {
           <div
             className="button"
             style={{
+              display: window.innerWidth < mobilewidth ? "none" : "flex",
+              padding: 10,
+              margin: 5,
+              minWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+              maxWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+              height: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+              minHeight: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+              maxHeight: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+              color: 'white',
+            }}
+            onClick={() => {
+              setpagina('PROCEDIMENTOS');
+              history.push("/procedimentos");
+            }}
+          >
+            EXAMES E PROCEDIMENTOS
+          </div>
+          <div
+            className="button"
+            style={{
               // display: window.innerWidth < mobilewidth ? "flex" : "none",
               display: 'flex',
               padding: 10,
@@ -747,7 +773,7 @@ function Login() {
               history.push("/agendamento");
             }}
           >
-            AGENDAMENTOS
+            AGENDAMENTOS DE CONSULTAS
           </div>
         </div>
       </div>

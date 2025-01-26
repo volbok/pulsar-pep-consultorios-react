@@ -13,9 +13,11 @@ import Usuarios from "./pages/Usuarios";
 import Triagem from "./pages/Triagem";
 import Painel from "./pages/Painel";
 import Agendamento from "./pages/Agendamento";
+import AgendamentoExames from "./pages/AgendamentoExames";
 import Farmacia from "./pages/Farmacia";
 import Almoxarifado from "./pages/Almoxarifado";
 import Faturamento from "./pages/Faturamento";
+import FaturamentoClinicaProcedimentos from "./pages/FaturamentoClinicasProcedimentos";
 import Financeiro from "./pages/Financeiro";
 import Resultados from "./pages/Resultados";
 import Chat from "./pages/Chat";
@@ -33,6 +35,7 @@ import {
   Switch,
   Route,
 } from "react-router-dom";
+import ProcedimentosExames from "./cards/ProcedimentosExames";
 
 function App() {
   var html = "https://pulsar-pep-consultorios-server.up.railway.app/";
@@ -162,6 +165,7 @@ function App() {
   const [socket, setsocket] = useState(null);
 
   const [agenda, setagenda] = useState([]);
+  const [agendaexame, setagendaexame] = useState([]);
 
   // tema de cores.
   const [temacor, settemacor] = useState(0);
@@ -339,6 +343,7 @@ function App() {
         chat, setchat,
         socket, setsocket,
         agenda, setagenda,
+        agendaexame, setagendaexame,
 
         temacor, settemacor,
         logocor, setlogocor,
@@ -358,6 +363,9 @@ function App() {
             </Route>
             <Route path="/consultas">
               <Consultas></Consultas>
+            </Route>
+            <Route path="/procedimentos">
+              <ProcedimentosExames></ProcedimentosExames>
             </Route>
             <Route path="/cadastro">
               <Cadastro></Cadastro>
@@ -380,6 +388,9 @@ function App() {
             <Route path="/faturamento">
               <Faturamento></Faturamento>
             </Route>
+            <Route path="/cadastro-procedimentos">
+              <FaturamentoClinicaProcedimentos></FaturamentoClinicaProcedimentos>
+            </Route>
             <Route path="/financeiro">
               <Financeiro></Financeiro>
             </Route>
@@ -388,6 +399,9 @@ function App() {
             </Route>
             <Route path="/agendamento">
               <Agendamento></Agendamento>
+            </Route>
+            <Route path="/agendamento-exames">
+              <AgendamentoExames></AgendamentoExames>
             </Route>
           </Switch>
         </Router>

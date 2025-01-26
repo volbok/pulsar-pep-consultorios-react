@@ -5,6 +5,7 @@ import Context from "./Context";
 // imagens.
 import play from "../images/play.png";
 import chatimage from "../images/chat.png";
+import chatsound from "../sounds/chat.mp3";
 
 
 function Chat() {
@@ -21,6 +22,9 @@ function Chat() {
     if (chat == 1) {
       // criando o socket para o chat.
       socket.on('outcome_message', (result) => {
+        // som da mensagem recebida.
+        var audio = document.getElementById("chat");
+        audio.play();
         console.log(result);
         setarraymessage(result);
       });
@@ -32,6 +36,7 @@ function Chat() {
     <div
       style={{
         display: chat == 1 ? 'flex' : 'none',
+        visibility: chat == 1 ? 'visible' : 'hidden',
         zIndex: 200, position: 'absolute', right: 15, bottom: 0,
         flexDirection: 'column',
       }}>
@@ -45,7 +50,10 @@ function Chat() {
           width: 20, maxWidth: 20,
           height: 20, maxHeight: 20,
           padding: 0,
-          position: 'absolute', bottom: 5, right: 5
+          position: 'absolute', bottom: 5, right: 5,
+          borderStyle: 'solid',
+          borderWidth: 2.5,
+          borderColor: 'white',
         }}
       >
         <img
@@ -60,7 +68,7 @@ function Chat() {
       <div id="chat_on"
         className="button chat-hide"
         style={{
-          display: 'flex',
+          // display: 'flex',
           flexDirection: 'column',
         }}
       >
@@ -148,6 +156,9 @@ function Chat() {
                 width: 10,
               }}
             ></img>
+            <audio id="chat">
+              <source src={chatsound} type="audio/mpeg"></source>
+            </audio>
           </div>
         </div>
       </div>

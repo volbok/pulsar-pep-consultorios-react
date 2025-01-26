@@ -910,6 +910,7 @@ function Consultas() {
             {cartao(null, "RECEITA MÉDICA", "card-documento-receita", null, 1)}
             {cartao(null, "ATESTADO", "card-documento-atestado", null, 1)}
             {cartao(null, 'EXAMES', 'exames')}
+            {cartao(null, 'EXAMES DE IMAGEM E PROCEDIMENTOS', 'card-documento-procedimentos')}
             {cartao(null, 'LAUDOS', 'card-documento-laudo')}
             {cartao(null, 'RELATÓRIOS', 'card-documento-relatorio')}
             {cartao(null, 'RECIBOS', 'card-documento-recibo')}

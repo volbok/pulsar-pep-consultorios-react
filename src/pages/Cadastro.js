@@ -1623,6 +1623,19 @@ function Cadastro() {
           >
             AGENDAR CONSULTA
           </div>
+          <div id="botão para agendar consulta"
+            className="button"
+            style={{
+              display: vieweditpaciente == 2 ? 'none' : 'flex',
+              width: 100, height: 100, alignSelf: 'center'
+            }}
+            onClick={() => {
+              setpagina('AGENDAMENTO-EXAMES');
+              history.push("/agendamento-exames");
+            }}
+          >
+            AGENDAR EXAME
+          </div>
         </div>
       </div>
     );

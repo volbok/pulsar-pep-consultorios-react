@@ -75,8 +75,6 @@ function GuiaSadt() {
   const [uf_solicitante, setuf_solicitante] = useState('');
   const [codigo_cbo, setcodigo_cbo] = useState('');
 
-
-
   const loadOperadoras = () => {
     axios.get(html + 'all_operadoras').then((response) => {
       var y = [];
@@ -99,7 +97,9 @@ function GuiaSadt() {
   }
 
   const loadExames = () => {
-    axios.get(html + 'atendimento_laboratorio/' + atendimento).then((response) => {
+    let id_paciente = localStorage.getItem('item_exame');
+    console.log(id_paciente);
+    axios.get(html + 'atendimento_laboratorio_idpaciente/' + id_paciente).then((response) => {
       var x = response.data.rows;
       var y = []
       setlaboratorio(x.filter(item => item.random == localStorage.getItem('random')));
