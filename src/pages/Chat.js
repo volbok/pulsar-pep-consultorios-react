@@ -14,6 +14,7 @@ function Chat() {
     usuario,
     chat,
     socket,
+    cliente,
   } = useContext(Context);
 
   const [arraymessage, setarraymessage] = useState([]);
@@ -75,20 +76,8 @@ function Chat() {
           borderRadius: 50,
           position: 'absolute', top: -80, right: 10
         }}
-        onClick={() => {
-          let obj = {
-            usuario: usuario.nome_usuario.split(" ",)[0],
-            texto: document.getElementById("inputChat").value.toUpperCase()
-          }
-          socket.emit("income_message", obj);
-          console.log('MENSAGEM ENVIADA');
-          setTimeout(() => {
-            document.getElementById("scrollchat").scrollTop = document.getElementById("scrollchat").scrollHeight;
-            document.getElementById("inputChat").value = '';
-          }, 1000);
-        }}
       >
-        {arraymessage.length}
+        {arraymessage.filter(valor => valor.cliente == cliente.id_cliente).length}
       </div>
       <div id="chat_on"
         className="button chat-hide"
@@ -129,6 +118,7 @@ function Chat() {
           }}
           onClick={() => {
             let obj = {
+              cliente: cliente.id_cliente,
               usuario: usuario.nome_usuario.split(" ",)[0],
               texto: document.getElementById("inputChat").value.toUpperCase()
             }
@@ -140,7 +130,7 @@ function Chat() {
             }, 1000);
           }}
         >
-          {arraymessage.length}
+          {arraymessage.filter(valor => valor.cliente == cliente.id_cliente).length}
         </div>
         <div id='scrollchat' className="janela scroll cor2"
           style={{ width: 200, height: 300, }}
@@ -167,7 +157,7 @@ function Chat() {
               }}
             ></img>
           </div>
-          {arraymessage.map(item => (
+          {arraymessage.filter(item => item.cliente == cliente.id_cliente).map(item => (
             <div
               key={item + Math.random()}
               className="text1" style={{
@@ -176,7 +166,7 @@ function Chat() {
                 borderRadius: 5,
                 alignSelf: 'flex-start',
               }}>
-              {item}
+              {item.message}
             </div>
           ))}
         </div>
@@ -193,6 +183,7 @@ function Chat() {
               if (e.keyCode == 13) { // tecla enter
                 e.preventDefault();
                 let obj = {
+                  cliente: cliente.id_cliente,
                   usuario: usuario.nome_usuario.split(" ",)[0],
                   texto: document.getElementById("inputChat").value.toUpperCase()
                 }
@@ -225,6 +216,7 @@ function Chat() {
             }}
             onClick={() => {
               let obj = {
+                cliente: cliente.id_cliente,
                 usuario: usuario.nome_usuario.split(" ",)[0],
                 texto: document.getElementById("inputChat").value.toUpperCase()
               }

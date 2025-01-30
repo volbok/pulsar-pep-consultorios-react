@@ -260,7 +260,7 @@ function Consultas() {
   }
 
   // seleção de consultório para chamada de pacientes (aplicável ao PA).
-  let salas = ['SALA 01', 'SALA 02', 'SALA 03', 'SALA 04', 'SALA 05']
+  let salas = ['SALA 01', 'SALA 02']
   const [viewsalaselector, setviewsalaselector] = useState(0);
   function SalaSelector() {
     return (

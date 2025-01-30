@@ -53,7 +53,7 @@ function App() {
   const [pickdate2, setpickdate2] = useState();
 
   // DEVE SER CONFIGURADO PARA CADA CLIENTE.
-  const [cliente, setcliente] = useState({});
+  const [cliente, setcliente] = useState({ id_unidade: 0 });
 
   const [unidades, setunidades] = useState([]);
   const [hospital, sethospital] = useState([]);
