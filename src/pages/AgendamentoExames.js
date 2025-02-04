@@ -1,30 +1,27 @@
 /* eslint eqeqeq: "off" */
-import React, { useCallback, useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Context from './Context';
 import axios from 'axios';
 // imagens.
 import deletar from '../images/deletar.png';
 import back from '../images/back.png';
 import moment from "moment";
-// import lupa from '../images/lupa.png';
-// import imprimir from '../images/imprimir.png';
-// import whatsapp from '../images/whatsapp.png';
+import whatsapp from '../images/whatsapp.png';
 import salvar from '../images/salvar.png';
-// funções.
-// import maskdate from "../functions/maskdate";
+// cards.
+import GuiaConsulta from '../cards/GuiaConsulta';
+// components.
+import Pagamento from '../components/Pagamento';
 // router.
 import { useHistory } from "react-router-dom";
-// import modal from '../functions/modal';
-import GuiaConsulta from '../cards/GuiaConsulta';
+// funções.
 import mountage from '../functions/mountage';
 import toast from '../functions/toast';
 import modal from '../functions/modal';
-import selector from '../functions/selector';
-
+// criação dos documentos PDF.
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 pdfMake.addVirtualFileSystem(pdfFonts);
-
 
 function AgendamentoExames() {
 
@@ -32,19 +29,13 @@ function AgendamentoExames() {
   const {
     pagina, setpagina,
     html,
-    // hospital,
-    // pacientes,
-    // setpacientes,
     paciente, setpaciente,
-    // setobjpaciente,
     setdialogo,
-    // setcard,
-    // setdono_documento,
-    objpaciente,
     cliente,
     settoast,
     agendaexame, setagendaexame,
-    setcard,
+    setpagamento,
+    faturamento, setfaturamento,
   } = useContext(Context);
 
   // history (router).
@@ -54,26 +45,13 @@ function AgendamentoExames() {
     // eslint-disable-next-line
     if (pagina == 'AGENDAMENTO-EXAMES') {
       setselectdate(moment().format('DD/MM/YYYY'));
-      loadFaturamentoClinicaProcedimentos();
+      loadFaturamentos();
+      loadProcedimentos();
       loadAgendaExames();
       currentMonth();
     }
     // eslint-disable-next-line
   }, [pagina]);
-
-  /*
-  const loadOperadoras = () => {
-    let exame = JSON.parse(localStorage.getItem('item_exame'));
-    axios.get(html + 'all_operadoras').then((response) => {
-      var y = [];
-      var x = response.data.rows;
-      y = x.filter(item => parseInt(item.id) == parseInt(exame.codigo_operadora));
-      let operadora = y.pop();
-      setoperadora(operadora);
-      console.log(operadora);
-    })
-  }
- */
 
   const loadAgendaExames = () => {
     axios.get(html + 'list_agenda_exames/' + cliente.id_cliente).then((response) => {
@@ -82,61 +60,26 @@ function AgendamentoExames() {
     })
   }
 
-  const [operadora, setoperadora] = useState(null);
+  const loadFaturamentos = () => {
+    axios.get(html + 'list_faturamento_clinicas/' + cliente.id_cliente).then((response) => {
+      let x = response.data.rows;
+      setfaturamento(x);
+      console.log(x);
+      console.log('LISTA DE FATURAMENTOS CARREGADA');
+    })
+  }
+
   // carregando registros de procedimentos realizados para o cliente.
-  const [procedimentos_cliente, setprocedimentos_cliente] = useState([]);
-  const loadFaturamentoClinicaProcedimentos = () => {
-    console.log(cliente.id_cliente);
+  const [allprocedimentos, setallprocedimentos] = useState([]);
+  const loadProcedimentos = () => {
     axios
-      .get(html + "list_faturamento_clinicas_procedimentos/" + cliente.id_cliente)
+      .get(html + "all_procedimentos")
       .then((response) => {
-        setprocedimentos_cliente(response.data.rows);
+        setallprocedimentos(response.data.rows);
       });
   };
 
-  // ENVIO DE MENSAGENS DE AGENDAMENTO DA CONSULTA PELO WHATSAPP.
-  /*
-  function geraWhatsapp(id, inicio, especialista) {
 
-    let paciente = pacientes.filter(item => item.id_paciente == id).pop();
-    console.log(paciente);
-
-    const gzappy_url_envia_mensagem = "https://api.gzappy.com/v1/message/send-message/";
-    const instance_id = 'L05K3GC2YX03DGWYLDKZQW5L';
-    const instance_token = '2d763c00-4b6d-4842-99d7-cb32ea357a80';
-    const USER_TOKEN_ID = '3a1d021d-ad34-473e-9255-b9a3e6577cf9';
-    const GZAPPY_API_TOKEN = 'bfd2b508d013fbbde6ae4765bbc4eaf83b5514201a7970ae46ff91ade3b2b1a032fe9c8a961a7c572a547b52d745e433f317bd825eb471d0f609c1e843e3d0a9';
-
-    const message =
-      'Olá, ' + paciente.nome_paciente + '!\n' +
-      'Você tem uma consulta agendada pelo seu médico, Dr(a). ' + especialista.nome_usuario + ', ' + especialista.tipo_usuario + ',\n' +
-      'para o dia ' + inicio + ', na CLÍNICA ' + cliente.razao_social + '.'
-
-    const rawphone = paciente.telefone;
-    console.log(rawphone);
-    let cleanphone = rawphone.replace("(", "");
-    cleanphone = cleanphone.replace(")", "");
-    cleanphone = cleanphone.replace("-", "");
-    cleanphone = cleanphone.replace(" ", "");
-    cleanphone = "55" + cleanphone;
-    console.log(cleanphone);
-
-    fetch(gzappy_url_envia_mensagem, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'user_token_id': USER_TOKEN_ID,
-        'Authorization': `Bearer ${GZAPPY_API_TOKEN}`
-      },
-      body: JSON.stringify({
-        instance_id: instance_id,
-        instance_token: instance_token,
-        message: [message],
-        phone: [cleanphone]
-      })
-    })
-  }
-  */
 
   const [selecionaexame, setselecionaexame] = useState(1);
   function SelecionaExame() {
@@ -156,19 +99,19 @@ function AgendamentoExames() {
               alignContent: 'flex-start',
             }}
           >
-            {procedimentos_cliente.map(item => (
+            {allprocedimentos.map(item => (
               <div
                 key={'exame: ' + item.id}
                 className='button' style={{ width: 200, height: 120, paddingLeft: 20, paddingRight: 20 }}
                 onClick={() => {
-                  localStorage.setItem('procedimento', item.nome_procedimento);
-                  localStorage.setItem('codigo_tuss', item.codigo_tuss);
-                  localStorage.setItem('valor_convenio', item.valor_convenio);
-                  localStorage.setItem('valor_particular', item.valor_particular);
+                  localStorage.setItem('procedimento', item.tuss_rol_ans_descricao);
+                  localStorage.setItem('codigo_tuss', item.tuss_codigo);
+                  localStorage.setItem('valor_convenio', item.valor);
+                  localStorage.setItem('valor_particular', item.valor_part);
                   setselecionaexame(0);
                 }}
               >
-                {item.nome_procedimento}
+                {item.tuss_rol_ans_descricao}
               </div>
             ))}
           </div>
@@ -394,11 +337,12 @@ function AgendamentoExames() {
           id_profisisonal_executante: item.id_profissional_executante,
           nome_profissional_executante: item.nome_profissional_executante,
           conselho: item.n_conselho_profissional_executante,
+          id_paciente: item.id_paciente,
           nome_paciente: item.nome_paciente,
           dn_paciente: item.dn_paciente,
-          valor_particular: item.valor_particular,
-          valor_convenio: item.valor_convenio,
           status: item.status,
+          codigo_operadora: item.codigo_operadora,
+          codigo_tuss: item.codigo_tuss,
         }
         localarrayexames.push(obj);
         return null;
@@ -429,7 +373,7 @@ function AgendamentoExames() {
     if (lista.filter(item => item.nome_exame == localStorage.getItem("procedimento") && item.data_exame == data_inicio).length > 0) {
       toast(settoast, 'JÁ EXISTE UM AGENDAMENTO PARA ESTE EXAME NESTE HORÁRIO', 3000);
     } else {
-      insertExameAgendado(0, 1, forma_pagamento, data_inicio);
+      insertExameAgendado(0, 1, data_inicio);
     }
   }
 
@@ -578,17 +522,14 @@ function AgendamentoExames() {
     });
   }
 
-  const insertExameAgendado = (particular, convenio, pagamento, data) => {
+  const insertExameAgendado = (particular, convenio, data) => {
     let obj = {
       id_exame: null,
       nome_exame: localStorage.getItem('procedimento'),
       codigo_tuss: localStorage.getItem('codigo_tuss'),
-      valor_particular: document.getElementById("inputValorParticular").value,
-      valor_convenio: document.getElementById("inputValorConvenio").value,
       particular: particular,
       convenio: convenio,
       codigo_operadora: paciente.convenio_codigo,
-      forma_pagamento: pagamento,
       id_paciente: paciente.id_paciente,
       nome_paciente: paciente.nome_paciente,
       dn_paciente: moment(paciente.dn_paciente).format('DD/MM/YYYY'),
@@ -610,46 +551,6 @@ function AgendamentoExames() {
     })
   }
 
-  const updateExameAgendado = (item, particular, convenio, valor_particular, valor_convenio, pagamento, status) => {
-
-    console.log(valor_convenio);
-    console.log(valor_particular);
-    let exame = [];
-    axios.get(html + 'list_exames_clinicas/' + cliente.id_cliente).then((response) => {
-      var x = [];
-      x = response.data.rows;
-      exame = x.filter(valor => valor.id == item.id).pop();
-      console.log('ID: ' + exame.id);
-      let obj = {
-        id_exame: null,
-        nome_exame: exame.nome_exame,
-        codigo_tuss: exame.codigo_tuss,
-        valor_particular: valor_particular,
-        valor_convenio: valor_convenio,
-        particular: particular,
-        convenio: convenio,
-        codigo_operadora: exame.codigo_operadora,
-        forma_pagamento: pagamento,
-        id_paciente: exame.id_paciente,
-        nome_paciente: exame.nome_paciente,
-        dn_paciente: exame.dn_paciente,
-        id_profissional_executante: exame.id_profissional_executante,
-        nome_profissional_executante: exame.nome_profissional_executante,
-        conselho_profissional_executante: exame.conselho_profissional_executante,
-        n_conselho_profissional_executante: exame.n_conselho_profissional_executante,
-        status: status, // 0 = solicitado, 1 = executado, 2 = cancelado, 3 = desistência.
-        laudohtml: exame.laudohtml,
-        id_cliente: exame.id_cliente,
-        data_exame: exame.data_exame,
-      }
-      console.log(obj);
-      axios.post(html + 'update_exames_clinicas/' + exame.id, obj).then(() => {
-        console.log('ITEM DE AGENDAMENTO DE EXAME ATUALIZADO COM SUCESSO');
-        montaArrayAgenda(selectdate);
-      });
-    });
-  }
-
   const deleteExameAgendado = (id) => {
     axios.get(html + 'delete_exames_clinicas/' + id).then(() => {
       console.log('ITEM DE EXAME AGENDADO EXCLUÍDO');
@@ -657,7 +558,43 @@ function AgendamentoExames() {
     })
   }
 
-  const [selecteditemagendado, setselecteditemagendado] = useState(null);
+  // ENVIO DE MENSAGENS DE AGENDAMENTO DA CONSULTA PELO WHATSAPP.
+  function geraWhatsappExame(item) {
+    const gzappy_url_envia_mensagem = "https://api.gzappy.com/v1/message/send-message/";
+    const instance_id = 'L05K3GC2YX03DGWYLDKZQW5L';
+    const instance_token = '2d763c00-4b6d-4842-99d7-cb32ea357a80';
+    const USER_TOKEN_ID = '3a1d021d-ad34-473e-9255-b9a3e6577cf9';
+    const GZAPPY_API_TOKEN = 'bfd2b508d013fbbde6ae4765bbc4eaf83b5514201a7970ae46ff91ade3b2b1a032fe9c8a961a7c572a547b52d745e433f317bd825eb471d0f609c1e843e3d0a9';
+
+    const message =
+      'Olá, ' + item.nome_paciente + '!\n' +
+      'Você tem o exame/procedimento ' + item.nome_exame + ', agendado na CLÍNICA ' + cliente.razao_social + ', para o dia ' + item.data_exame + ' a ser realizado pelo Dr(a). ' + item.nome_profissional_executante + '.'
+
+    const rawphone = paciente.telefone;
+    console.log(rawphone);
+    let cleanphone = rawphone.replace("(", "");
+    cleanphone = cleanphone.replace(")", "");
+    cleanphone = cleanphone.replace("-", "");
+    cleanphone = cleanphone.replace(" ", "");
+    cleanphone = "55" + cleanphone;
+    console.log(cleanphone);
+
+    fetch(gzappy_url_envia_mensagem, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'user_token_id': USER_TOKEN_ID,
+        'Authorization': `Bearer ${GZAPPY_API_TOKEN}`
+      },
+      body: JSON.stringify({
+        instance_id: instance_id,
+        instance_token: instance_token,
+        message: [message],
+        phone: [cleanphone]
+      })
+    })
+  }
+
   function ListaDeExamesAgendados() {
     return (
       <div
@@ -675,69 +612,150 @@ function AgendamentoExames() {
         {arrayexames.filter(item => item.nome_exame == localStorage.getItem("procedimento")).sort((a, b) => (moment(a.data_exame, 'DD/MM/HHHH - HH:mm') > moment(b.data_exame, 'DD/MM/HHHH - HH:mm') ? 1 : -1)).map(item => (
           <div
             key={'item - ' + Math.random()}
-            className={item.nome_paciente == null ? 'button cor3' : 'button'}
-            style={{ width: 'calc(100% - 20px)' }}
           >
-            <div
+            <div id="horário ocupado."
               style={{
                 display: item.nome_paciente != null ? 'flex' : 'none',
-                flexDirection: 'row', justifyContent: 'flex-start', width: '100%'
+                flexDirection: 'row', justifyContent: 'flex-start', width: '100%', height: '100%',
               }}
               onClick={() => {
-                localStorage.setItem('item_exame', JSON.stringify(item));
-                setselecteditemagendado(item);
-                localStorage.setItem('valor_particular', item.valor_particular);
-                localStorage.setItem('valor_convenio', item.valor_convenio);
-                setviewinsereagendamento(2)
-                setTimeout(() => {
-                  document.getElementById('inputUpdateValorParticular').value = item.valor_particular;
-                  document.getElementById('inputUpdateValorConvenio').value = item.valor_convenio;
-                }, 500);
-              }
-              }
+                localStorage.setItem('exame', JSON.stringify(item));
+              }}
             >
-              <div className='button green' style={{ display: 'flex', flexDirection: 'column', width: 120, maxWidth: 120, minWidth: 120 }}>
+              <div
+                className='button'
+                style={{
+                  marginRight: 0,
+                  padding: 10,
+                  borderTopRightRadius: 0,
+                  borderBottomRightRadius: 0,
+                  opacity: 0.9,
+                  alignSelf: 'center',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  height: 'calc(100% - 30px)',
+                  width: 120
+                }}>
                 <div>{item.data_exame.slice(0, 10)}</div>
                 <div>{item.data_exame.slice(13, 18)}</div>
               </div>
-              <div style={{
-                display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
-                alignContent: 'flex-start', width: '100%', textAlign: 'left', marginLeft: 5,
-              }}>
-                <div>{item.nome_exame}</div>
-                <div>{'PACIENTE: ' + item.nome_paciente}</div>
-                <div>{'DN: ' + moment(item.dn_paciente).format('DD/MM/YYYY')}</div>
-                <div>{'MÉDICO(A): ' + item.nome_profissional_executante}</div>
-              </div>
-              <div id="btnDeleteAgendamento"
-                title="EXCLUIR AGENDAMENTO"
-                className="button-yellow"
-                onClick={(e) => {
-                  modal(
-                    setdialogo,
-                    "TEM CERTEZA QUE DESEJA EXCLUIR ESTE AGENDAMENTO?",
-                    deleteExameAgendado, item.id
-                  );
-                  montaArrayAgenda(selectdate);
-                  e.stopPropagation();
+              <div className={item.nome_paciente == null ? 'button cor3' : 'button'}
+                style={{
+                  borderTopLeftRadius: 0, borderBottomLeftRadius: 0, marginLeft: 0,
+                  display: 'flex', flexDirection: 'column',
+                  width: '100%'
                 }}
-                style={{ display: item.status > 0 ? 'none' : 'flex', width: 50, height: 50, alignSelf: "center" }}
               >
-                <img
-                  alt=""
-                  src={deletar}
-                  style={{
-                    margin: 10,
-                    height: 30,
-                    width: 30,
-                  }}
-                ></img>
+                <div style={{
+                  display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
+                  alignContent: 'flex-start', width: '100%', textAlign: 'left', marginLeft: 5,
+                }}>
+                  <div>{item.nome_exame}</div>
+                  <div>{'PACIENTE: ' + item.nome_paciente}</div>
+                  <div>{'DN: ' + moment(item.dn_paciente).format('DD/MM/YYYY')}</div>
+                  <div>{'MÉDICO(A): ' + item.nome_profissional_executante}</div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
+                  <div className='button'
+                    style={{
+                      display: 'flex',
+                      backgroundColor: item.status == 0 ? '#f4d03f' : item.situacao == 1 ? '#52be80' : '#EC7063', width: 150, minWidth: 150, height: 30, minHeight: 30, maxHeight: 30,
+                      alignSelf: 'flex-end'
+                    }}
+                  >
+                    {item.status == 0 ? 'AGENDADO' : item.situacao == 1 ? 'EXECUTADO' : item.situacao == 2 ? 'CANCELADO' : 'DESISTÊNCIA'}
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'row' }}>
+                    <div id='botão para cobrar faturamento'
+                      className='button red'
+                      style={{
+                        display: faturamento.filter(fat => fat.procedimento_id == item.id).length > 0 ? 'none' : 'flex',
+                        minHeight: 30, maxHeight: 30,
+                        width: 150, alignSelf: 'flex-end'
+                      }}
+                      onClick={(e) => {
+                        let procedimento = [];
+                        procedimento = allprocedimentos.filter(proc => proc.tuss_codigo == item.codigo_tuss).pop();
+                        console.log('## PROCEDIMENTO ##');
+                        console.log(procedimento);
+                        localStorage.setItem('tipo_faturamento', 'PROCEDIMENTO');
+                        localStorage.setItem('obj_procedimento', JSON.stringify(procedimento));
+                        localStorage.setItem('obj_agendado', JSON.stringify(item));
+                        setpagamento(1);
+                        setTimeout(() => {
+                          document.getElementById('inputValorParticular').value = procedimento.valor_part;
+                          document.getElementById('inputValorConvenio').value = procedimento.valor;
+                        }, 1000);
+                        e.stopPropagation();
+                      }}
+                    >
+                      FATURAR
+                    </div>
+                    <div id='botão para cobrar faturamento'
+                      className='button green'
+                      style={{
+                        display: faturamento.filter(fat => fat.procedimento_id == item.id).length > 0 ? 'flex' : 'none',
+                        minHeight: 30, maxHeight: 30, width: 150, alignSelf: 'flex-end'
+                      }}
+                      onClick={(e) => {
+                        console.log('CRIAR COMPONENTE COM O RESUMO DO FATURAMENTO');
+                        // PENDENTE!
+                      }}
+                    >
+                      FATURADO
+                    </div>
+                    <div id="btnDeleteAgendamento"
+                      title="EXCLUIR AGENDAMENTO"
+                      className="button-yellow"
+                      onClick={(e) => {
+                        modal(
+                          setdialogo,
+                          "TEM CERTEZA QUE DESEJA EXCLUIR ESTE AGENDAMENTO?",
+                          deleteExameAgendado, item.id
+                        );
+                        montaArrayAgenda(selectdate);
+                        e.stopPropagation();
+                      }}
+                      style={{ display: item.status > 0 ? 'none' : 'flex', width: 50, height: 50, alignSelf: "center" }}
+                    >
+                      <img
+                        alt=""
+                        src={deletar}
+                        style={{
+                          margin: 10,
+                          height: 30,
+                          width: 30,
+                        }}
+                      ></img>
+                    </div>
+                    <div id="btn lembrar exame"
+                      title="LEMBRAR CONSULTA PARA O CLIENTE"
+                      className="button-green"
+                      onClick={(e) => {
+                        geraWhatsappExame(item);
+                        e.stopPropagation();
+                      }}
+                      style={{ display: item.status > 1 ? 'none' : 'flex', width: 50, height: 50, alignSelf: 'flex-end' }}
+                    >
+                      <img
+                        alt=""
+                        src={whatsapp}
+                        style={{
+                          margin: 10,
+                          height: 30,
+                          width: 30,
+                        }}
+                      ></img>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
-            <div
+            <div id="horário livre."
+              className='button cor3'
               style={{
                 display: item.nome_paciente == null ? 'flex' : 'none',
-                flexDirection: 'row', justifyContent: 'flex-start', width: '100%',
+                flexDirection: 'row', justifyContent: 'flex-start',
               }}>
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <div className='button green' style={{ display: 'flex', flexDirection: 'column', width: 120, maxWidth: 120, minWidth: 120 }}>
@@ -748,7 +766,7 @@ function AgendamentoExames() {
               <div style={{
                 display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
                 alignContent: 'flex-start', width: '100%', textAlign: 'left', marginLeft: 5,
-                marginTop: 0
+                alignSelf: 'center',
               }}>
                 <div>HORÁRIO DISPONÍVEL!</div>
                 <div>{item.nome_exame}</div>
@@ -757,10 +775,8 @@ function AgendamentoExames() {
               <div className='button-green'
                 style={{ maxHeight: 50, width: 150, alignSelf: 'flex-end' }}
                 onClick={(e) => {
-                  setviewinsereagendamento(1);
-                  localStorage.setItem('data_agendamento_exame', item.data_exame);
-                  localStorage.setItem('profissional', item.nome_profissional_executante);
-                  localStorage.setItem('id_profissional', item.id_profissional_executante);
+                  localStorage.setItem('obj_agendado', JSON.stringify(item));
+                  insertExameAgendado(1, 0, item.data_exame);
                   e.stopPropagation();
                 }}
               >
@@ -770,484 +786,6 @@ function AgendamentoExames() {
           </div>
         ))
         }
-      </div >
-    )
-  }
-
-  let arrayformaspagamento = [
-    {
-      forma: 'PIX',
-      lancamentos: 1,
-    },
-    {
-      forma: 'DÉBITO',
-      lancamentos: 1,
-    },
-    {
-      forma: 'CRÉDITO 1X',
-      lancamentos: 1,
-    },
-    {
-      forma: 'CRÉDITO 2X',
-      lancamentos: 2,
-    },
-    {
-      forma: 'CRÉDITO 3X',
-      lancamentos: 3,
-    },
-    {
-      forma: 'CRÉDITO 4X',
-      lancamentos: 4,
-    },
-    {
-      forma: 'CRÉDITO 5X',
-      lancamentos: 5,
-    },
-    {
-      forma: 'CRÉDITO 6X',
-      lancamentos: 6,
-    },
-  ]
-  const formapagamento = (situacao) => {
-    // lancamentos = quantas vezes um registro de faturamento/pagamento deve ser lançado.
-    return (
-      <div id={'lista de formas de pagamento ' + situacao}
-        style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap' }}>
-        {arrayformaspagamento.map(item => (
-          <div
-            className='button'
-            style={{ width: 150 }}
-            id={'forma_pgto ' + situacao + item.forma}
-            key={'forma_pgto ' + situacao + item.forma}
-            onClick={() => {
-              selector('lista de formas de pagamento ' + situacao, 'forma_pgto ' + situacao + item.forma, 300);
-              for (let step = 0; step < item.lancamentos; step++) {
-                lancafaturamento();
-                localStorage.setItem('forma_pagamento', item.forma);
-                localStorage.setItem('parcelas', item.lancamentos);
-                let valor_total = document.getElementById('inputValorParticular').value
-                let valor_parcela = valor_total / parseInt(item.lancamentos);
-                localStorage.setItem('valor_total', valor_total);
-                localStorage.setItem('valor_parcela', valor_parcela);
-                localStorage.setItem('pagador', objpaciente.nome_paciente);
-                localStorage.setItem('doc_pagador', objpaciente.tipo_documento + ': ' + objpaciente.numero_documento);
-              }
-            }}
-          >
-            {item.forma}
-          </div>
-        ))}
-      </div>
-    )
-  }
-
-  // impressão de recibo de pagamento.
-  // ## CRIAÇÃO DE RECIBOS EM PDFMAKE ## //
-  const printFile = () => {
-    const docDefinition = {
-      pageSize: 'A4',
-      pageOrientation: 'portrait',
-      pageMargins: [40, 200, 40, 120],
-      header: {
-        stack: [
-          {
-            columns: [
-              {
-                image: cliente.logo,
-                width: 75,
-                alignment: 'center',
-              },
-              {
-                stack: [
-                  { text: cliente.razao_social, alignment: 'left', fontSize: 10, width: 300 },
-                  { text: 'ENDEREÇO: ' + cliente.endereco, alignment: 'left', fontSize: 6, width: 300 },
-                  { text: 'TELEFONE: ' + cliente.telefone, alignment: 'left', fontSize: 6, width: 300 },
-                  { text: 'EMAIL: ' + cliente.email, alignment: 'left', fontSize: 6, width: 300 },
-                ],
-                width: '*'
-              },
-              { qr: cliente.qrcode, width: '40%', fit: 75, alignment: 'right', margin: [0, 0, 10, 0] },
-            ],
-            columnGap: 10,
-          },
-          {
-            "canvas": [{
-              "lineColor": "gray",
-              "type": "line",
-              "x1": 0,
-              "y1": 0,
-              "x2": 524,
-              "y2": 0,
-              "lineWidth": 1
-            }], margin: [0, 10, 0, 0], alignment: 'center',
-          },
-
-        ],
-        margin: [40, 40, 40, 40],
-      },
-      footer: function (currentPage, pageCount) {
-        return {
-          stack: [
-            {
-              "canvas": [{
-                "lineColor": "gray",
-                "type": "line",
-                "x1": 0,
-                "y1": 0,
-                "x2": 524,
-                "y2": 0,
-                "lineWidth": 1
-              }], margin: [0, 10, 0, 0], alignment: 'center',
-            },
-            {
-              columns: [
-                {
-                  stack: [
-                    { text: '________________________________', alignment: 'center', width: 400 },
-                    { text: 'DEPARTAMENTO FINANCEIRO', width: '*', alignment: 'center', fontSize: 8 },
-                  ], with: '30%',
-                },
-                { text: 'PÁGINA ' + currentPage.toString() + ' DE ' + pageCount, fontSize: 8 },
-                { text: '', width: '*' },
-              ],
-              margin: [40, 40, 40, 40], alignment: 'center',
-            },
-          ],
-        }
-      },
-      content: [
-        { text: 'RECIBO DE PAGAMENTO', alignment: 'center', fontSize: 14, bold: true, margin: 10 },
-        { text: localStorage.getItem('texto_recibo'), fontSize: 10, bold: false },
-        { text: '---x---', fontSize: 10, bold: true, color: '#ffffff' },
-        { text: 'INFORMAÇÕES DO RECEBEDOR:', fontSize: 10, bold: true },
-        { text: 'CNPJ: ' + cliente.cnpj, fontSize: 10, bold: false },
-        { text: 'RAZÃO SOCIAL: ' + cliente.razao_social, fontSize: 10, bold: false },
-        { text: 'ENDEREÇO: ' + cliente.endereco, fontSize: 10, bold: false },
-      ],
-    }
-    // utilizando a lib pdfmake para gerar o pdf e converter em base64.
-    const pdfDocGenerator = pdfMake.createPdf(docDefinition);
-    pdfDocGenerator.open();
-  }
-
-  const lancafaturamento = () => {
-    // modal para confirmar forma de pagamento e inserir o agendamento.
-    console.log('CHEGAREMOS LÁ EM BREVE...');
-  }
-
-  const [viewinsereagendamento, setviewinsereagendamento] = useState(0);
-  function InsereAgendamento() {
-    return (
-      <div
-        className="fundo"
-        style={{ display: viewinsereagendamento == 1 ? "flex" : "none" }}
-        onClick={() => { setviewinsereagendamento(0) }}
-      >
-        <div className="janela scroll cor2" style={{ height: '80vh' }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <div className='button cor1'
-              style={{ width: 350, minWidth: 350, maxWidth: 350, flexDirection: 'column', justifyContent: 'flex-start' }}>
-              <div style={{ padding: 20, fontSize: 20 }}>PARTICULAR</div>
-              <div style={{ opacity: 0.6 }}>{'VALOR (R$)'}</div>
-              <input id="inputValorParticular"
-                autoComplete="off"
-                placeholder="VALOR PART..."
-                className="input"
-                type="text"
-                onFocus={(e) => (e.target.placeholder = "")}
-                onBlur={(e) => (e.target.placeholder = "VALOR PART...")}
-                defaultValue={localStorage.getItem('valor_particular')}
-                style={{
-                  flexDirection: "center",
-                  justifyContent: "center",
-                  alignSelf: "center",
-                  textAlign: "center",
-                  width: 200,
-                  padding: 15,
-                  height: 20,
-                  minHeight: 20,
-                  maxHeight: 20,
-                }}
-              ></input>
-              <div style={{ opacity: 0.6, marginTop: 20 }}>{'FORMA DE PAGAMENTO'}</div>
-              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap' }}>
-                {formapagamento(1)}
-              </div>
-              <div style={{ opacity: 0.6, marginTop: 5 }}>{'EMISSÕES PARA O CLIENTE'}</div>
-              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', margin: 10, marginTop: 0 }}>
-                <div className='button'
-                  onClick={() => {
-                    localStorage.setItem('valor_total', document.getElementById('inputValorParticular').value);
-                    setreciboform(1);
-                  }}
-                  style={{ width: 100 }}>
-                  RECIBO
-                </div>
-                <div className='button' style={{ width: 100 }}>NFE</div>
-              </div>
-              <div className='button green'
-                style={{ width: 200 }}
-                onClick={() => {
-                  insertExameAgendado(1, 0, localStorage.getItem('forma_pagamento'), localStorage.getItem('data_agendamento_exame'))
-                  setviewinsereagendamento(0);
-                }}
-              >
-                CONCLUIR AGENDAMENTO
-              </div>
-            </div>
-            <div className='button cor1'
-              style={{ width: 350, minWidth: 350, maxWidth: 350, flexDirection: 'column', justifyContent: 'flex-start' }}>
-              <div style={{ padding: 20, paddingBottom: 5, fontSize: 20 }}>CONVÊNIO</div>
-              <div style={{ marginTop: 0, color: '#52be80' }}>{paciente.convenio_nome}</div>
-              <div style={{ marginTop: 20, opacity: 0.6 }}>{'VALOR (R$)'}</div>
-              <input id="inputValorConvenio"
-                autoComplete="off"
-                placeholder="VALOR CONV..."
-                className="input"
-                type="text"
-                onFocus={(e) => (e.target.placeholder = "")}
-                onBlur={(e) => (e.target.placeholder = "VALOR CONV...")}
-                defaultValue={localStorage.getItem('valor_convenio')}
-                style={{
-                  flexDirection: "center",
-                  justifyContent: "center",
-                  alignSelf: "center",
-                  textAlign: "center",
-                  width: 200,
-                  padding: 15,
-                  height: 20,
-                  minHeight: 20,
-                  maxHeight: 20,
-                }}
-              ></input>
-              <div style={{ opacity: 0.6, marginTop: 5 }}>{'EMISSÕES PARA O CLIENTE'}</div>
-              <div
-                className='button' style={{ width: 100 }}
-                onClick={() => {
-                  console.log('ABRIR GUIA SADT');
-                  setoperadora(operadora);
-                  // document.getElementById("guia-sadt").style.display = 'flex';
-                  // document.getElementById("guia-sadt").style.visibility = 'visible';
-                  // setviewinsereagendamento(0);
-                  // setcard('guia-sadt');
-                }}
-              >
-                GUIA SADT
-              </div>
-              <div className='button green'
-                style={{ width: 200 }}
-                onClick={() => {
-                  insertExameAgendado(0, 1, null, localStorage.getItem('data_agendamento_exame'))
-                  setviewinsereagendamento(0);
-                }}
-              >
-                CONCLUIR AGENDAMENTO
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-  const UpdateAgendamento = useCallback(() => {
-    return (
-      <div
-        className="fundo"
-        style={{ display: viewinsereagendamento == 2 ? "flex" : "none" }}
-        onClick={() => { setviewinsereagendamento(0) }}
-      >
-        <div className="janela scroll cor2" style={{ height: '80vh' }}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-            <div className='button cor1'
-              style={{ width: 350, minWidth: 350, maxWidth: 350, flexDirection: 'column', justifyContent: 'flex-start' }}>
-              <div style={{ padding: 20, fontSize: 20 }}>PARTICULAR</div>
-              <div style={{ opacity: 0.6 }}>{'VALOR (R$)'}</div>
-              <input id="inputUpdateValorParticular"
-                autoComplete="off"
-                placeholder="VALOR PART..."
-                className="input"
-                type="text"
-                onFocus={(e) => (e.target.placeholder = "")}
-                onBlur={(e) => (e.target.placeholder = "VALOR PART...")}
-                defaultValue={selecteditemagendado != null && selecteditemagendado != null ? selecteditemagendado.valor_particular : ''}
-
-                style={{
-                  flexDirection: "center",
-                  justifyContent: "center",
-                  alignSelf: "center",
-                  textAlign: "center",
-                  width: 200,
-                  padding: 15,
-                  height: 20,
-                  minHeight: 20,
-                  maxHeight: 20,
-                  pointerEvents: selecteditemagendado != null && selecteditemagendado.status > 0 ? 'none' : 'auto',
-                  opacity: selecteditemagendado != null && selecteditemagendado.status > 0 ? 0.5 : 1,
-                }}
-              ></input>
-              <div style={{ opacity: 0.6, marginTop: 20 }}>{'FORMA DE PAGAMENTO'}</div>
-              <div style={{
-                display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap',
-                pointerEvents: selecteditemagendado != null && selecteditemagendado.status > 0 ? 'none' : 'auto',
-                opacity: selecteditemagendado != null && selecteditemagendado.status > 0 ? 0.5 : 1,
-              }}>
-                {formapagamento(2)}
-              </div>
-              <div style={{ opacity: 0.6, marginTop: 5 }}>{'EMISSÕES PARA O CLIENTE'}</div>
-              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', margin: 10, marginTop: 0 }}>
-                <div className='button'
-                  onClick={() => {
-                    localStorage.setItem('valor_total', document.getElementById('inputUpdateValorParticular').value);
-                    setreciboform(1);
-                  }}
-                  style={{ width: 100 }}>
-                  RECIBO
-                </div>
-                <div className='button' style={{ width: 100 }}>NFE</div>
-              </div>
-              <div className='button green'
-                style={{ display: selecteditemagendado != null && selecteditemagendado.status > 0 ? 'none' : 'flex', width: 200 }}
-                onClick={() => {
-                  updateExameAgendado(selecteditemagendado, 1, 0, document.getElementById('inputUpdateValorParticular').value, null, localStorage.getItem('forma_pagamento'), 0);
-                  setviewinsereagendamento(0);
-                }}
-              >
-                ATUALIZAR AGENDAMENTO
-              </div>
-            </div>
-            <div className='button'
-              style={{ width: 350, minWidth: 350, maxWidth: 350, flexDirection: 'column', justifyContent: 'flex-start' }}>
-              <div style={{ padding: 20, paddingBottom: 5, fontSize: 20 }}>CONVÊNIO</div>
-              <div style={{ marginTop: 0, color: '#52be80' }}>{paciente.convenio_nome}</div>
-              <div style={{ marginTop: 20, opacity: 0.6 }}>{'VALOR (R$)'}</div>
-              <input id="inputUpdateValorConvenio"
-                autoComplete="off"
-                placeholder="VALOR CONV..."
-                className="input"
-                type="text"
-                onFocus={(e) => (e.target.placeholder = "")}
-                onBlur={(e) => (e.target.placeholder = "VALOR CONV...")}
-                defaultValue={selecteditemagendado != null ? selecteditemagendado.valor_convenio : ''}
-                style={{
-                  flexDirection: "center",
-                  justifyContent: "center",
-                  alignSelf: "center",
-                  textAlign: "center",
-                  width: 200,
-                  padding: 15,
-                  height: 20,
-                  minHeight: 20,
-                  maxHeight: 20,
-                  pointerEvents: selecteditemagendado != null && selecteditemagendado.status > 0 ? 'none' : 'auto',
-                  opacity: selecteditemagendado != null && selecteditemagendado.status > 0 ? 0.5 : 1,
-                }}
-              ></input>
-              <div style={{ opacity: 0.6, marginTop: 5 }}>{'EMISSÕES PARA O CLIENTE'}</div>
-              <div className='button'
-                style={{ width: 100 }}
-                onClick={() => {
-                  console.log('ABRIR GUIA SADT');
-                  setoperadora(paciente.convenio_nome);
-                  document.getElementById("guia-sadt").style.display = 'flex';
-                  document.getElementById("guia-sadt").style.visibility = 'visible';
-                  setcard('guia-sadt');
-                }}
-              >
-                GUIA SADT
-              </div>
-              <div className='button green'
-                style={{
-                  width: 200,
-                  pointerEvents: selecteditemagendado != null && selecteditemagendado.status > 0 ? 'none' : 'auto',
-                  opacity: selecteditemagendado != null && selecteditemagendado.status > 0 ? 0.5 : 1,
-                }}
-                onClick={() => {
-                  updateExameAgendado(selecteditemagendado, 0, 1, null, document.getElementById('inputUpdateValorConvenio').value, localStorage.getItem('forma_pagamento'), 0);
-                  setviewinsereagendamento(0);
-                }}
-              >
-                ATUALIZAR AGENDAMENTO
-              </div>
-            </div>
-          </div>
-        </div>
-      </div >
-    )
-    // eslint-disable-next-line
-  }, [selecteditemagendado, viewinsereagendamento]);
-
-  const [reciboform, setreciboform] = useState(0);
-  function ReciboNomePagador() {
-    return (
-      <div
-        className="fundo"
-        style={{ display: reciboform == 1 ? "flex" : "none" }}
-        onClick={() => { setreciboform(0) }}
-      >
-        <div className="janela scroll cor2" onClick={(e) => e.stopPropagation()}>
-          <div className='text1'>NOME DO PAGADOR</div>
-          <input id="inputNomePagador"
-            autoComplete="off"
-            placeholder="NOME DO PAGADOR..."
-            className="input"
-            type="text"
-            onFocus={(e) => (e.target.placeholder = "")}
-            onBlur={(e) => (e.target.placeholder = "NOME DO PAGADOR...")}
-            defaultValue={objpaciente.nome_paciente}
-            style={{
-              flexDirection: "center",
-              justifyContent: "center",
-              alignSelf: "center",
-              textAlign: "center",
-              width: 400,
-              padding: 15,
-              height: 20,
-              minHeight: 20,
-              maxHeight: 20,
-            }}
-          ></input>
-          <div className='text1'>DOCUMENTO DO PAGADOR</div>
-          <input id="inputDocumentoPagador"
-            autoComplete="off"
-            placeholder="DOCUMENTO DO PAGADOR..."
-            className="input"
-            type="text"
-            onFocus={(e) => (e.target.placeholder = "")}
-            onBlur={(e) => (e.target.placeholder = "DOCUMENTO DO PAGADOR...")}
-            defaultValue={objpaciente.tipo_documento + ': ' + objpaciente.numero_documento}
-            style={{
-              flexDirection: "center",
-              justifyContent: "center",
-              alignSelf: "center",
-              textAlign: "center",
-              width: 400,
-              padding: 15,
-              height: 20,
-              minHeight: 20,
-              maxHeight: 20,
-            }}
-          ></input>
-          <div className='button green'
-            style={{ width: 200 }}
-            onClick={() => {
-              if (localStorage.getItem('parcelas') < 2) {
-                let texto = 'RECEBEMOS DE ' + document.getElementById('inputNomePagador').value.toUpperCase() + ', ' + document.getElementById('inputDocumentoPagador').value + ', A IMPORTÂNCIA DE R$' + localStorage.getItem('valor_total') + ', REFERENTE À REALIZAÇÃO DO EXAME/PROCEDIMENTO ' + localStorage.getItem('procedimento');
-                localStorage.setItem('texto_recibo', texto);
-              } else {
-                let texto = 'PAGAMENTO PARCELADO'
-                localStorage.setItem('texto_recibo', texto); // PENDENTE
-              }
-              printFile();
-              setreciboform(0);
-            }}
-          >
-            IMPRIMIR RECIBO
-          </div>
-        </div>
       </div >
     )
   }
@@ -1292,7 +830,7 @@ function AgendamentoExames() {
             margin: 0,
             alignSelf: 'center',
           }}>
-            {'AGENDAMENTO DE EXAME PARA ' + paciente.nome_paciente + ' - DN: ' + moment(paciente.dn_paciente).format('DD/MM/YYYY - ') + mountage(moment(paciente.dn_paciente).format('DD/MM/YYYY'))}
+            {'AGENDAMENTO DE ' + localStorage.getItem('procedimento') + ' PARA ' + paciente.nome_paciente + ' - DN: ' + moment(paciente.dn_paciente).format('DD/MM/YYYY - ') + mountage(moment(paciente.dn_paciente).format('DD/MM/YYYY'))}
           </div>
         </div>
         <SelecionaExame></SelecionaExame>
@@ -1308,11 +846,9 @@ function AgendamentoExames() {
             <ListaDeExamesAgendados></ListaDeExamesAgendados>
           </div>
         </div>
+        <Pagamento></Pagamento>
         <ViewOpcoesHorarios></ViewOpcoesHorarios>
         <GuiaConsulta></GuiaConsulta>
-        <InsereAgendamento></InsereAgendamento>
-        <UpdateAgendamento></UpdateAgendamento>
-        <ReciboNomePagador></ReciboNomePagador>
       </div>
     </div>
   )

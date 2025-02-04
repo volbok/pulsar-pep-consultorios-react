@@ -12,7 +12,7 @@ import Consultas from "./pages/Consultas";
 import Usuarios from "./pages/Usuarios";
 import Triagem from "./pages/Triagem";
 import Painel from "./pages/Painel";
-import Agendamento from "./pages/Agendamento";
+import AgendamentoConsultas from "./pages/AgendamentoConsultas";
 import AgendamentoExames from "./pages/AgendamentoExames";
 import Farmacia from "./pages/Farmacia";
 import Almoxarifado from "./pages/Almoxarifado";
@@ -20,7 +20,9 @@ import Faturamento from "./pages/Faturamento";
 import FaturamentoClinicaProcedimentos from "./pages/FaturamentoClinicasProcedimentos";
 import Financeiro from "./pages/Financeiro";
 import Resultados from "./pages/Resultados";
+import ProcedimentosExames from "./cards/ProcedimentosExames";
 import Chat from "./pages/Chat";
+import Dashboard from "./pages/Dashboard";
 // componentes.
 import Toast from "./components/Toast";
 import Modal from "./components/Modal";
@@ -35,7 +37,7 @@ import {
   Switch,
   Route,
 } from "react-router-dom";
-import ProcedimentosExames from "./cards/ProcedimentosExames";
+import MapaDeAgendamentos from "./pages/MapaDeAgendamentos";
 
 function App() {
   var html = "https://pulsar-pep-consultorios-server.up.railway.app/";
@@ -166,6 +168,11 @@ function App() {
 
   const [agenda, setagenda] = useState([]);
   const [agendaexame, setagendaexame] = useState([]);
+
+  // componente para pagamentos (faturamento).
+  const [pagamento, setpagamento] = useState(0);
+  const [faturamento, setfaturamento] = useState([]);
+  const [arrayatendimentos, setarrayatendimentos] = useState([]);
 
   // tema de cores.
   const [temacor, settemacor] = useState(0);
@@ -344,6 +351,9 @@ function App() {
         socket, setsocket,
         agenda, setagenda,
         agendaexame, setagendaexame,
+        pagamento, setpagamento,
+        faturamento, setfaturamento,
+        arrayatendimentos, setarrayatendimentos,
 
         temacor, settemacor,
         logocor, setlogocor,
@@ -397,11 +407,17 @@ function App() {
             <Route path="/resultados">
               <Resultados></Resultados>
             </Route>
-            <Route path="/agendamento">
-              <Agendamento></Agendamento>
+            <Route path="/agendamento-consultas">
+              <AgendamentoConsultas></AgendamentoConsultas>
             </Route>
             <Route path="/agendamento-exames">
               <AgendamentoExames></AgendamentoExames>
+            </Route>
+            <Route path="/mapa-agendamentos">
+              <MapaDeAgendamentos></MapaDeAgendamentos>
+            </Route>
+            <Route path="/dashboard">
+              <Dashboard></Dashboard>
             </Route>
           </Switch>
         </Router>

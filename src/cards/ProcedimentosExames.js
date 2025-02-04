@@ -1306,7 +1306,11 @@ function ProcedimentosExames() {
             <div className='button'
               id={'botão exame agendado ' + item.id}
               key={'botão exame agendado ' + item.id}
-              style={{ position: 'relative', marginBottom: 35, justifyContent: 'flex-start' }}
+              style={{
+                position: 'relative',
+                marginBottom: item.status == 0 ? 35 : 5,
+                justifyContent: 'flex-start'
+              }}
               onClick={() => {
                 localStorage.setItem('exame_selecionado', JSON.stringify(item));
                 axios.get(html + "list_documentos_idpct/" + item.id_paciente).then((response) => {

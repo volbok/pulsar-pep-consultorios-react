@@ -1736,8 +1736,8 @@ function Cadastro() {
   }
 
   const disparaconsulta = () => {
-    setpagina(20);
-    history.push("/agendamento");
+    setpagina('AGENDAMENTO DE CONSULTAS');
+    history.push("/agendamento-consultas");
   }
 
   // atualizando um novo paciente.

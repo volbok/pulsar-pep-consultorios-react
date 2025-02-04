@@ -12,6 +12,7 @@ import back from '../images/back.png';
 import "moment/locale/pt-br";
 import modal from "../functions/modal";
 import { useHistory } from "react-router-dom";
+import Filter from "../components/Filter";
 
 function Faturamento() {
 
@@ -27,6 +28,7 @@ function Faturamento() {
     procedimentos, setprocedimentos,
     selectedprocedimento, setselectedprocedimento,
     setdialogo,
+    cliente,
   } = useContext(Context);
 
   // history (router).
@@ -67,11 +69,13 @@ function Faturamento() {
 
   // FATURAMENTO - OPERADORAS DE SAÚDE //
   // carregando procedimentos da tabela TUSS.
+  const [listatuss, setlistatuss] = useState([]);
   const [arraylistatuss, setarraylistatuss] = useState([]);
   const loadTuss = () => {
     axios.get(html + 'all_tabela_tuss').then((response) => {
       var x = response.data.rows;
       setarraylistatuss(response.data.rows);
+      setlistatuss(response.data.rows);
       console.log(x.length);
     })
   };
@@ -94,7 +98,8 @@ function Faturamento() {
     }
     axios.post(html + 'insert_operadora', obj).then(() => {
       console.log('OPERADORA REGISTRADA COM SUCESSO.');
-      // loadOperadoras();
+      loadOperadoras();
+      loadProcedimentos();
       setformoperadora(0);
     })
   }
@@ -140,8 +145,10 @@ function Faturamento() {
           <div className="button" style={{ width: '10vw', backgroundColor: 'transparent' }}>{'TELEFONE'}</div>
           <div className="button" style={{ width: '10vw', backgroundColor: 'transparent' }}>{'E-MAIL'}</div>
           <div className="button" style={{ width: '10vw', backgroundColor: 'transparent' }}>{'CÓDIGO DO PRESTADOR'}</div>
-          <div className="button" style={{ width: 50, backgroundColor: 'transparent' }}>{''}</div>
-          <div className="button" style={{ width: 50, backgroundColor: 'transparent' }}>{''}</div>
+          <div style={{ display: 'flex', flexDirection: 'row' }}>
+            <div className="button" style={{ width: 50, backgroundColor: 'transparent' }}>{''}</div>
+            <div className="button" style={{ width: 50, backgroundColor: 'transparent' }}>{''}</div>
+          </div>
         </div>
         {operadoras.map(item => (
           <div
@@ -167,44 +174,46 @@ function Faturamento() {
             <div className="button" style={{ width: '10vw', backgroundColor: 'transparent' }}>{item.telefone}</div>
             <div className="button" style={{ width: '10vw', backgroundColor: 'transparent' }}>{item.email}</div>
             <div className="button" style={{ width: '10vw', backgroundColor: 'transparent' }}>{item.codigo_prestador}</div>
-            <div className="button green" style={{ width: 50 }}
-              onClick={() => {
-                setselectedoperadora(item);
-                setformoperadora(2);
-                setTimeout(() => {
-                  const img = new Image();
-                  img.src = item.logo_operadora;
-                  img.onload = function () {
-                    console.log('image uploaded');
-                    console.log(img.height);
-                    let canvas = document.getElementById('canvas');
-                    canvas.style.backgroundColor = 'white';
-                    canvas.height = img.height;
-                    canvas.width = img.width;
-                    setTimeout(() => {
-                      canvas.getContext('2d').drawImage(img, 0, 0);
-                    }, 2000);
-                  }
-                }, 1000);
-              }}
-            >
-              <img
-                alt=""
-                src={editar}
-                style={{ width: 25, height: 25 }}
-              ></img>
-            </div>
-            <div className="button red" style={{ width: 50 }}
-              onClick={(e) => {
-                modal(setdialogo, 'TEM CERTEZA QUE DESEJA EXCLUIR A OPERADORA ' + item.nome_operadora + '?', deleteOperadora, item);
-                e.stopPropagation();
-              }}
-            >
-              <img
-                alt=""
-                src={deletar}
-                style={{ width: 25, height: 25 }}
-              ></img>
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+              <div className="button green" style={{ width: 50 }}
+                onClick={() => {
+                  setselectedoperadora(item);
+                  setformoperadora(2);
+                  setTimeout(() => {
+                    const img = new Image();
+                    img.src = item.logo_operadora;
+                    img.onload = function () {
+                      console.log('image uploaded');
+                      console.log(img.height);
+                      let canvas = document.getElementById('canvas');
+                      canvas.style.backgroundColor = 'white';
+                      canvas.height = img.height;
+                      canvas.width = img.width;
+                      setTimeout(() => {
+                        canvas.getContext('2d').drawImage(img, 0, 0);
+                      }, 2000);
+                    }
+                  }, 1000);
+                }}
+              >
+                <img
+                  alt=""
+                  src={editar}
+                  style={{ width: 25, height: 25 }}
+                ></img>
+              </div>
+              <div className="button red" style={{ width: 50 }}
+                onClick={(e) => {
+                  modal(setdialogo, 'TEM CERTEZA QUE DESEJA EXCLUIR A OPERADORA ' + item.nome_operadora + '?', deleteOperadora, item);
+                  e.stopPropagation();
+                }}
+              >
+                <img
+                  alt=""
+                  src={deletar}
+                  style={{ width: 25, height: 25 }}
+                ></img>
+              </div>
             </div>
           </div>
         ))}
@@ -272,7 +281,7 @@ function Faturamento() {
         style={{ display: formoperadora != 0 ? 'flex' : 'none', flexDirection: 'column', justifyContent: 'center' }}
         onClick={() => setformoperadora(0)}
       >
-        <div className="janela scroll"
+        <div className="janela scroll cor2"
           style={{ height: '90vh' }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -404,7 +413,7 @@ function Faturamento() {
   // cadastro de operadoras de saúde.
   const loadProcedimentos = () => {
     axios.get(html + 'all_procedimentos').then((response) => {
-      setprocedimentos(response.data.rows);
+      setprocedimentos(response.data.rows); 
       console.log(response.data.rows);
     })
   };
@@ -423,6 +432,8 @@ function Faturamento() {
       valor_absoluto_aumento: document.getElementById("inputValorAbsolutoAumento").value,
       valor_absoluto_reducao: document.getElementById("inputValorAbsolutoReducao").value,
       obs: document.getElementById("inputObs").value.toUpperCase(),
+      id_cliente: cliente.id_cliente,
+      valor_part: document.getElementById("inputValorPart").value,
     }
     axios.post(html + 'insert_procedimento', obj).then(() => {
       console.log('PROCEDIMENTO REGISTRADO COM SUCESSO.');
@@ -445,6 +456,8 @@ function Faturamento() {
       valor_absoluto_aumento: document.getElementById("inputValorAbsolutoAumento").value,
       valor_absoluto_reducao: document.getElementById("inputValorAbsolutoReducao").value,
       obs: document.getElementById("inputObs").value.toUpperCase(),
+      id_cliente: cliente.id_cliente,
+      valor_part: document.getElementById("inputValorPart").value,
     }
     axios.post(html + 'update_procedimento/' + item.id, obj).then(() => {
       console.log('PROCEDIMENTO ATUALIZADO COM SUCESSO.');
@@ -474,8 +487,11 @@ function Faturamento() {
           <div className='text2' style={{ width: '10vw' }}>{'CÓDIGO TUSS'}</div>
           <div className='text2' style={{ width: '25vw' }}>{'TERMINOLOGIA'}</div>
           <div className='text2' style={{ width: '25vw' }}>{'DESCRIÇÃO'}</div>
-          <div className='text2' style={{ width: 50 }}>{''}</div>
-          <div className='text2' style={{ width: 50 }}>{''}</div>
+          <div style={{ display: 'flex', flexDirection: 'row' }}>
+            <div className='text2' style={{ width: 50 }}>{''}</div>
+            <div className='text2' style={{ width: 50 }}>{''}</div>
+          </div>
+
         </div>
         {procedimentos.filter(item => item.id_operadora == selectedoperadora.id).map(item => (
           <div
@@ -490,30 +506,32 @@ function Faturamento() {
             <div className='text2' style={{ width: '10vw' }}>{item.tuss_codigo}</div>
             <div className='text2' style={{ width: '25vw' }}>{item.tuss_terminologia.toUpperCase()}</div>
             <div className='text2' style={{ width: '25vw' }}>{item.rol_ans_descricao}</div>
-            <div className="button green" style={{ width: 50 }}
-              onClick={(e) => {
-                setselectedprocedimento(item);
-                setformprocedimento(2);
-                e.stopPropagation();
-              }}
-            >
-              <img
-                alt=""
-                src={editar}
-                style={{ width: 25, height: 25 }}
-              ></img>
-            </div>
-            <div className="button red" style={{ width: 50 }}
-              onClick={(e) => {
-                modal(setdialogo, 'TEM CERTEZA QUE DESEJA EXCLUIR O PROCEDIMENTO ' + item.rol_ans_descricao + '?', deleteProcedimento, item);
-                e.stopPropagation();
-              }}
-            >
-              <img
-                alt=""
-                src={deletar}
-                style={{ width: 25, height: 25 }}
-              ></img>
+            <div style={{ display: 'flex', flexDirection: 'row' }}>
+              <div className="button green" style={{ width: 50 }}
+                onClick={(e) => {
+                  setselectedprocedimento(item);
+                  setformprocedimento(2);
+                  e.stopPropagation();
+                }}
+              >
+                <img
+                  alt=""
+                  src={editar}
+                  style={{ width: 25, height: 25 }}
+                ></img>
+              </div>
+              <div className="button red" style={{ width: 50 }}
+                onClick={(e) => {
+                  modal(setdialogo, 'TEM CERTEZA QUE DESEJA EXCLUIR O PROCEDIMENTO ' + item.rol_ans_descricao + '?', deleteProcedimento, item);
+                  e.stopPropagation();
+                }}
+              >
+                <img
+                  alt=""
+                  src={deletar}
+                  style={{ width: 25, height: 25 }}
+                ></img>
+              </div>
             </div>
           </div>
         ))}
@@ -553,27 +571,11 @@ function Faturamento() {
         }}
         onClick={() => setviewtussselector(0)}
       >
-        <div className="janela scroll"
+        <div className="janela scroll cor2"
           style={{ height: '90vh', width: '80vw' }}
           onClick={(e) => e.stopPropagation()}
         >
-          <input
-            className="input"
-            autoComplete="off"
-            placeholder={
-              "BUSCAR..."
-            }
-            onFocus={(e) => (e.target.placeholder = "")}
-            onBlur={(e) =>
-              "BUSCAR..."
-            }
-            // onKeyUp={() => filterProcedimento()}
-            type="text"
-            id="filtrarProcedimento"
-            // defaultValue={filterprocedimento}
-            maxLength={100}
-            style={{ width: 'calc(100% - 20px)', backgroundColor: 'white' }}
-          ></input>
+          {Filter("filtrarProcedimento", setarraylistatuss, listatuss, 'item.rol_ans_descricao')}
           {arraylistatuss.map(item => (
             <div
               className="button"
@@ -605,7 +607,7 @@ function Faturamento() {
         style={{ display: formprocedimento != 0 ? 'flex' : 'none', flexDirection: 'column', justifyContent: 'center' }}
         onClick={() => setformprocedimento(0)}
       >
-        <div className="janela scroll"
+        <div className="janela scroll cor2"
           style={{ height: '90vh' }}
           onClick={(e) => e.stopPropagation()}
         >
@@ -668,7 +670,7 @@ function Faturamento() {
               maxLength={200}
               style={{ margin: 5, width: window.innerWidth < 426 ? "100%" : "30vw", alignSelf: 'center' }}
             ></input>
-            <div className="text1">VALOR</div>
+            <div className="text1">VALOR PELO CONVÊNIO</div>
             <input
               className="input"
               autoComplete="off"
@@ -740,6 +742,19 @@ function Faturamento() {
               style={{ margin: 5, width: window.innerWidth < 426 ? "100%" : "30vw", alignSelf: 'center' }}
             ></input>
           </div>
+          <div className="text1">VALOR PARTICULAR</div>
+          <input
+            className="input"
+            autoComplete="off"
+            placeholder="VALOR"
+            onFocus={(e) => (e.target.placeholder = "")}
+            onBlur={(e) => (e.target.placeholder = "VALOR (R$)")}
+            type="text"
+            id="inputValorPart"
+            defaultValue={formprocedimento == 2 ? selectedprocedimento.valor_part : ''}
+            maxLength={200}
+            style={{ margin: 5, width: window.innerWidth < 426 ? "100%" : "30vw", alignSelf: 'center' }}
+          ></input>
           <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
             <div className="text1">OBSERVAÇÕES</div>
             <input

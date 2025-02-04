@@ -3,6 +3,7 @@ import React, { useCallback, useContext, useEffect, useState } from "react";
 import axios from "axios";
 import Context from "./Context";
 // funções.
+import moment from "moment";
 import toast from "../functions/toast";
 // imagens.
 import power from "../images/power.png";
@@ -38,11 +39,11 @@ function Login() {
     sethospital,
     mobilewidth,
     setoperadoras,
-    setpaciente,
     logocor,
     setlogocor,
     setsocket,
     setchat,
+    setpaciente,
   } = useContext(Context);
 
   // history (router).
@@ -55,13 +56,12 @@ function Login() {
       setviewalterarsenha(0);
       setviewlistaunidades(0);
       loadOperadoras();
+      localStorage.setItem('selectdate', moment().format('DD/MM/YYYY'))
       if (usuario.id != undefined) {
         setviewinputs(0);
         document.getElementById("login").className = "main login_color_2"
         document.getElementById("conteudo_login").className = "chassi login_align_2 login_color_2"
-
         setviewlistaunidades(1);
-
         loadUnidades();
       } else {
         setviewlistaunidades(0);
@@ -631,16 +631,10 @@ function Login() {
             5
           )}
           {montaModuloDeApoio(
-            "FATURAMENTO",
+            "OPERADORAS E PROCEDIMENTOS",
             usuario.faturamento,
             "/faturamento",
             "FATURAMENTO"
-          )}
-          {montaModuloDeApoio(
-            "CADASTRO DE PROCEDIMENTOS",
-            usuario.faturamento,
-            "/cadastro-procedimentos",
-            "FATURAMENTO-CLINICA-PROCEDIMENTOS"
           )}
           {montaModuloDeApoio(
             "PAINEL",
@@ -691,6 +685,36 @@ function Login() {
   }
 
   // lista de unidades disponiveis para o usuário logado.
+
+  const montaModuloAssistencial = (pagina, endereco, titulo) => {
+    return (
+      <div
+        className="button"
+        style={{
+          display: window.innerWidth < mobilewidth ? "none" : "flex",
+          padding: 10,
+          margin: 5,
+          minWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+          maxWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+          height: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+          minHeight: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+          maxHeight: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+          color: 'white',
+        }}
+        onClick={() => {
+          setpagina(pagina);
+          history.push(endereco);
+          if (pagina == 'AGENDAMENTO DE EXAMES') {
+            localStorage.setItem('AGENDAMENTO', 'DIRETO');
+            setpaciente(null);
+          }
+        }}
+      >
+        {titulo}
+      </div >
+    )
+  }
+
   function ListaDeUnidadesAssistenciais() {
     return (
       <div
@@ -713,69 +737,10 @@ function Login() {
             width: window.innerWidth < mobilewidth ? "80vw" : "90vw",
           }}
         >
-          <div
-            className="button"
-            style={{
-              display: window.innerWidth < mobilewidth ? "none" : "flex",
-              padding: 10,
-              margin: 5,
-              minWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
-              maxWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
-              height: window.innerWidth < mobilewidth ? "30vw" : "15vw",
-              minHeight: window.innerWidth < mobilewidth ? "30vw" : "15vw",
-              maxHeight: window.innerWidth < mobilewidth ? "30vw" : "15vw",
-              color: 'white',
-            }}
-            onClick={() => {
-              setpagina(-2);
-              history.push("/consultas");
-            }}
-          >
-            CONSULTAS
-          </div>
-          <div
-            className="button"
-            style={{
-              display: window.innerWidth < mobilewidth ? "none" : "flex",
-              padding: 10,
-              margin: 5,
-              minWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
-              maxWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
-              height: window.innerWidth < mobilewidth ? "30vw" : "15vw",
-              minHeight: window.innerWidth < mobilewidth ? "30vw" : "15vw",
-              maxHeight: window.innerWidth < mobilewidth ? "30vw" : "15vw",
-              color: 'white',
-            }}
-            onClick={() => {
-              setpagina('PROCEDIMENTOS');
-              history.push("/procedimentos");
-            }}
-          >
-            EXAMES E PROCEDIMENTOS
-          </div>
-          <div
-            className="button"
-            style={{
-              // display: window.innerWidth < mobilewidth ? "flex" : "none",
-              display: 'flex',
-              padding: 10,
-              margin: 5,
-              minWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
-              maxWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
-              height: window.innerWidth < mobilewidth ? "30vw" : "15vw",
-              minHeight: window.innerWidth < mobilewidth ? "30vw" : "15vw",
-              maxHeight: window.innerWidth < mobilewidth ? "30vw" : "15vw",
-              color: 'white',
-            }}
-            onClick={() => {
-              setpaciente(null);
-              setpagina(20);
-              localStorage.setItem('AGENDAMENTO', 'DIRETO');
-              history.push("/agendamento");
-            }}
-          >
-            AGENDAMENTOS DE CONSULTAS
-          </div>
+          {montaModuloAssistencial(-2, '/consultas', 'REALIZAR CONSULTAS')}
+          {montaModuloAssistencial('PROCEDIMENTOS', '/procedimentos', 'REALIZAR EXAMES')}
+          {montaModuloAssistencial('MAPA DE AGENDAMENTOS', '/mapa-agendamentos', 'MAPA DE AGENDAMENTOS (CONSULTAS E EXAMES)')}
+          {montaModuloAssistencial('DASHBOARD', '/dashboard', 'DASHBOARD')}
         </div>
       </div>
     );
