@@ -661,7 +661,11 @@ function Login() {
 
   function ClienteSelector() {
     return (
-      <div style={{ display: acessos.length > 0 && usuario != {} && viewlistaunidades == 0 ? 'flex' : 'none', alignSelf: 'center' }}>
+      <div style={{
+        display: acessos.length > 0 && usuario != {} && viewlistaunidades == 0 ? 'flex' : 'none',
+        flexDirection: 'row', justifyContent: 'center',
+        alignSelf: 'center', flexWrap: 'wrap'
+      }}>
         {acessos.map(item => (
           <div
             key={'cliente_selector: ' + item.id_cliente}
@@ -691,14 +695,14 @@ function Login() {
       <div
         className="button"
         style={{
-          display: window.innerWidth < mobilewidth ? "none" : "flex",
+          display: window.innerWidth < mobilewidth && pagina != 'MAPA DE AGENDAMENTOS' ? "none" : "flex",
           padding: 10,
           margin: 5,
-          minWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
-          maxWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
-          height: window.innerWidth < mobilewidth ? "30vw" : "15vw",
-          minHeight: window.innerWidth < mobilewidth ? "30vw" : "15vw",
-          maxHeight: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+          minWidth: window.innerWidth < mobilewidth ? "40vw" : "15vw",
+          maxWidth: window.innerWidth < mobilewidth ? "40vw" : "15vw",
+          height: window.innerWidth < mobilewidth ? "40vw" : "15vw",
+          minHeight: window.innerWidth < mobilewidth ? "40vw" : "15vw",
+          maxHeight: window.innerWidth < mobilewidth ? "40vw" : "15vw",
           color: 'white',
         }}
         onClick={() => {

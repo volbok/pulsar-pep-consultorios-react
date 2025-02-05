@@ -746,14 +746,17 @@ function MapaDeAgendamentos() {
                       </div>
                       <div className='button'
                         style={{
-                          display: 'flex',
+                          display: window.innerWidth < mobilewidth ? 'none' : 'flex',
                           backgroundColor: item.situacao == 3 ? '#f4d03f' : item.situacao == 4 ? '#52be80' : '#EC7063', width: 150, minWidth: 150, height: 30, minHeight: 30, maxHeight: 30,
                           alignSelf: 'flex-end'
                         }}
                       >
                         {item.situacao == 3 ? 'ATIVA' : item.situacao == 4 ? 'FINALIZADA' : 'CANCELADA'}
                       </div>
-                      <div style={{ display: 'flex', flexDirection: 'row' }}>
+                      <div style={{
+                        display: window.innerWidth < mobilewidth ? 'none' : 'flex',
+                        flexDirection: 'row'
+                      }}>
                         <div id="btn imprimir guia tiss"
                           title="IMPRIMIR GUIA TISS"
                           className="button-yellow"
@@ -1202,7 +1205,10 @@ function MapaDeAgendamentos() {
                     <div>{'DN: ' + moment(item.dn_paciente).format('DD/MM/YYYY')}</div>
                     <div>{'MÉDICO(A): ' + item.nome_profissional_executante}</div>
                   </div>
-                  <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
+                  <div style={{
+                    display: window.innerWidth < mobilewidth ? 'none' : 'flex',
+                    flexDirection: 'row', justifyContent: 'space-between', width: '100%'
+                  }}>
                     <div className='button'
                       style={{
                         display: 'flex',
@@ -1273,13 +1279,18 @@ function MapaDeAgendamentos() {
       style={{
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'center',
+        justifyContent: window.innerWidth < mobilewidth ? 'flex-start' : 'center',
         alignContent: 'center',
         alignSelf: 'center',
         borderColor: 'white',
         backgroundColor: 'white',
       }}>
-      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignContent: 'center' }}>
+      <div style={{
+        display: 'flex',
+        flexDirection: window.innerWidth < mobilewidth ? 'column' : 'row',
+        justifyContent: 'flex-start',
+        alignContent: 'center', flexWrap: 'wrap',
+      }}>
         <div id="botão para sair da tela de agendamento"
           className="button-yellow"
           style={{
@@ -1299,7 +1310,11 @@ function MapaDeAgendamentos() {
         <div className={agendamento == 'EXAMES' ? 'button-selected' : 'button'} style={{ width: 200 }} onClick={() => setagendamento('EXAMES')}>EXAMES</div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+      <div style={{
+        display: 'flex',
+        flexDirection: window.innerWidth < mobilewidth ? 'column' : 'row',
+        justifyContent: window.innerWidth < mobilewidth ? 'flex-start' : 'center',
+      }}>
         <div id="datepicker"
           className='cor2'
           style={{
