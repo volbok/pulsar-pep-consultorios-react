@@ -134,16 +134,9 @@ function Pagamento() {
     )
   }
 
-  let timeout = null;
   const gerarfaturamento = (obj) => {
     axios.post(html + 'insert_faturamento_clinicas', obj).then(() => {
-      clearTimeout(timeout);
-      console.log('CANCELA!')
       console.log('REGISTRO DE FATURAMENTO RECEBIDO COM SUCESSO');
-      timeout = setTimeout(() => {
-        loadFaturamentos();
-        console.log('CARREGANDO TUDO AGORA.')
-      }, 500);
     });
   }
 
@@ -313,7 +306,7 @@ function Pagamento() {
       .then((response) => {
         var x = response.data.rows;
         var y = x.filter(item => item.id_unidade == 5);
-          carregaHorarioslivres(y);
+        carregaHorarioslivres(y);
       });
   };
 
@@ -484,6 +477,7 @@ function Pagamento() {
                       botoes.item(i).className = "button";
                     }
                     arrayfaturas.map(item => gerarfaturamento(item));
+                    loadFaturamentos();
                   } else {
                     toast(
                       settoast,

@@ -147,8 +147,6 @@ function AgendamentoConsultas() {
     let array = array_origin;
     agenda.filter(item => item.id_usuario == selectedespecialista.id_usuario &&
       item.dia_semana == moment(data, 'DD/MM/YYYY').format('dddd').toUpperCase()).map(item => {
-        //console.log('pega horário da agenda...')
-        //console.log(moment(data + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm').diff(moment(data + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'), 'minutes'));
         array.push(
           {
             situacao: 'AGENDAMENTO',
@@ -183,8 +181,7 @@ function AgendamentoConsultas() {
   function geraWhatsapp(id, inicio, especialista) {
 
     let paciente = pacientes.filter(item => item.id_paciente == id).pop();
-    console.log(paciente);
-
+    
     const gzappy_url_envia_mensagem = "https://api.gzappy.com/v1/message/send-message/";
     const instance_id = 'L05K3GC2YX03DGWYLDKZQW5L';
     const instance_token = '2d763c00-4b6d-4842-99d7-cb32ea357a80';
@@ -197,14 +194,12 @@ function AgendamentoConsultas() {
       'para o dia ' + inicio + ', na CLÍNICA ' + cliente.razao_social + '.'
 
     const rawphone = paciente.telefone;
-    console.log(rawphone);
     let cleanphone = rawphone.replace("(", "");
     cleanphone = cleanphone.replace(")", "");
     cleanphone = cleanphone.replace("-", "");
     cleanphone = cleanphone.replace(" ", "");
     cleanphone = "55" + cleanphone;
-    console.log(cleanphone);
-
+    
     fetch(gzappy_url_envia_mensagem, {
       method: 'POST',
       headers: {
@@ -232,11 +227,6 @@ function AgendamentoConsultas() {
       termino = moment(inicio).add(cliente.tempo_consulta_convenio, 'minutes');
     }
 
-    console.log('INICIO: ' + moment(inicio).format('DD/MM/YY - HH:mm'));
-    console.log('TERMINO: ' + moment(termino).format('DD/MM/YY - HH:mm'));
-
-    console.log(selectedespecialista);
-
     let count = arrayatendimentos.filter(valor =>
       valor.situacao == 3
       &&
@@ -272,8 +262,6 @@ function AgendamentoConsultas() {
         )
       )
     ).length;
-
-    console.log('COUNT: ' + count);
 
     if (count > 0) {
       modal(setdialogo, 'JÁ EXISTE UMA CONSULTA AGENDADA PARA ESTE HORÁRIO, CONFIRMAR ESTE NOVO AGENDAMENTO?', insertAtendimento, inicio);
@@ -283,8 +271,7 @@ function AgendamentoConsultas() {
   }
 
   const checkUpdateConsultas = (item, data_inicio) => {
-    console.log(item); // obj ok.
-
+    
     let inicio = moment(data_inicio, 'DD/MM/YYYY - HH:mm');
     let termino = null;
     if (localStorage.getItem('PARTICULAR') == 'PARTICULAR') {
@@ -292,9 +279,6 @@ function AgendamentoConsultas() {
     } else {
       termino = moment(inicio).add(cliente.tempo_consulta_convenio, 'minutes');
     }
-
-    console.log('INICIO: ' + moment(inicio).format('DD/MM/YY - HH:mm'));
-    console.log('TERMINO: ' + moment(termino).format('DD/MM/YY - HH:mm'));
 
     let count = arrayatendimentos.filter(valor =>
       valor.situacao == 3
@@ -331,8 +315,6 @@ function AgendamentoConsultas() {
         )
       )
     ).length;
-
-    console.log('COUNT: ' + count);
 
     if (count > 0) {
       modal(setdialogo, 'JÁ EXISTE UMA CONSULTA AGENDADA PARA ESTE HORÁRIO, CONFIRMAR ESTE NOVO AGENDAMENTO?', updateAtendimento, [item, inicio]);
@@ -358,19 +340,16 @@ function AgendamentoConsultas() {
       convenio_carteira: paciente.convenio_carteira,
       faturamento_codigo_procedimento: localStorage.getItem('PARTICULAR'),
     };
-    console.log(obj);
     axios
       .post(html + "insert_consulta", obj)
       .then(() => {
         console.log('AGENDAMENTO DE CONSULTA INSERIDO COM SUCESSO')
-        // loadAtendimentos();
         loadModdedAtendimentos(selectdate);
         // geraWhatsapp(paciente.id_paciente, inicio, selectedespecialista);
       });
   };
 
   const insertBloqueioAtendimento = (inicio) => {
-    // console.log(moment(inicio, 'DD/MM/YYYY - HH:mm'));
     var obj = {
       data_inicio: moment(inicio, 'DD/MM/YYYY - HH:mm'),
       data_termino: localStorage.getItem('PARTICULAR') == 'PARTICULAR' ? moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_particular, 'minutes') : moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_convenio, 'minutes'),
@@ -387,7 +366,6 @@ function AgendamentoConsultas() {
       convenio_carteira: null,
       faturamento_codigo_procedimento: null,
     };
-    // console.log(obj);
     axios
       .post(html + "insert_consulta", obj)
       .then(() => {
@@ -397,9 +375,6 @@ function AgendamentoConsultas() {
   };
 
   const updateAtendimento = ([item, inicio]) => {
-    console.log(item);
-    console.log(inicio);
-
     var obj = {
       data_inicio: moment(inicio, 'DD/MM/YYYY - HH:mm'),
       data_termino: item.faturamento_codigo_procedimento == 'PARTICULAR' ? moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_particular, 'minutes') : moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_convenio, 'minutes'),
@@ -416,12 +391,10 @@ function AgendamentoConsultas() {
       convenio_carteira: item.convenio_carteira,
       faturamento_codigo_procedimento: item.faturamento_codigo_procedimento,
     };
-    console.log(obj);
     axios
       .post(html + "update_atendimento/" + item.id_atendimento, obj)
       .then(() => {
         console.log('AGENDAMENTO DE CONSULTA ATUALIZADO COM SUCESSO')
-        // loadAtendimentos();
         loadModdedAtendimentos(selectdate);
         // geraWhatsapp(item.id_paciente, inicio, selectedespecialista);
       });
@@ -444,12 +417,10 @@ function AgendamentoConsultas() {
       convenio_carteira: item.convenio_carteira,
       faturamento_codigo_procedimento: item.faturamento_codigo_procedimento,
     };
-    console.log(obj);
     axios
       .post(html + "update_atendimento/" + item.id_atendimento, obj)
       .then(() => {
         console.log('AGENDAMENTO DE CONSULTA ATUALIZADO COM SUCESSO')
-        // loadAtendimentos();
         loadModdedAtendimentos(selectdate);
       });
   };
@@ -464,7 +435,6 @@ function AgendamentoConsultas() {
   const deleteAtendimento = (id) => {
     axios.get(html + "delete_atendimento/" + id).then(() => {
       console.log('DELETANDO AGENDAMENTO DE CONSULTA');
-      // loadAtendimentos();
       loadModdedAtendimentos(selectdate);
     });
   };
@@ -498,7 +468,6 @@ function AgendamentoConsultas() {
               onClick={() => {
                 setselectedespecialista(item);
                 localStorage.setItem('id_especialista', item.id_usuario);
-                console.log(localStorage.getItem('id_especialista'));
                 setviewconsultas(1);
               }}
             >
@@ -692,7 +661,6 @@ function AgendamentoConsultas() {
                 className={selectdate == item ? "button-selected" : "button"}
                 onClick={(e) => {
                   setselectdate(item);
-                  console.log(item);
                   localStorage.setItem('selectdate', item);
                   carregaHorarioslivres(agenda, item);
                   loadModdedAtendimentos(item);
@@ -938,7 +906,6 @@ function AgendamentoConsultas() {
                           onClick={(e) => {
                             let procedimento = [];
                             procedimento = allprocedimentos.filter(proc => proc.tuss_codigo == '10101012').pop();
-                            console.log(procedimento);
                             console.log('## ATENDIMENTO ##');
                             console.log(item);
                             localStorage.setItem('tipo_faturamento', 'ATENDIMENTO');
@@ -1268,7 +1235,6 @@ function AgendamentoConsultas() {
             onClick={() => {
               let hora = localStorage.getItem('hora');
               let min = localStorage.getItem('min');
-              console.log(selectdate + ' - ' + hora + ':' + min);
               let inputHour = document.getElementById("inputMin").value;
               let inputMin = document.getElementById("inputHour").value;
               if (inputHour != '' && inputMin != '') {
@@ -1414,7 +1380,6 @@ function AgendamentoConsultas() {
               let nova_data = document.getElementById("inputEditDataConsulta " + item.id_atendimento).value;
               let nova_hora = document.getElementById("inputEditHour " + item.id_atendimento).value;
               let novo_minuto = document.getElementById("inputEditMin " + item.id_atendimento).value;
-              console.log(selectdate + ' - ' + nova_hora + ':' + novo_minuto);
               checkUpdateConsultas(item, nova_data + ' - ' + nova_hora + ':' + novo_minuto);
               // updateAtendimento([item, nova_data + ' - ' + nova_hora + ':' + novo_minuto]);
               document.getElementById('viewupdateatendimento ' + item.id_atendimento).style.display = 'none';
@@ -1483,7 +1448,6 @@ function AgendamentoConsultas() {
     axios.get(html + 'list_faturamento_clinicas/' + cliente.id_cliente).then((response) => {
       let x = response.data.rows;
       setfaturamento(x);
-      console.log(x);
       console.log('LISTA DE FATURAMENTOS CARREGADA');
     })
   }

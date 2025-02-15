@@ -81,7 +81,6 @@ function MapaDeAgendamentos() {
     axios.get(html + 'list_faturamento_clinicas/' + cliente.id_cliente).then((response) => {
       let x = response.data.rows;
       setfaturamento(x);
-      console.log(x);
       console.log('LISTA DE FATURAMENTOS CARREGADA');
     })
   }
@@ -112,10 +111,7 @@ function MapaDeAgendamentos() {
 
   // ENVIO DE MENSAGENS DE AGENDAMENTO DA CONSULTA PELO WHATSAPP.
   function geraWhatsapp(id, inicio, especialista) {
-
     let paciente = pacientes.filter(item => item.id_paciente == id).pop();
-    console.log(paciente);
-
     const gzappy_url_envia_mensagem = "https://api.gzappy.com/v1/message/send-message/";
     const instance_id = 'L05K3GC2YX03DGWYLDKZQW5L';
     const instance_token = '2d763c00-4b6d-4842-99d7-cb32ea357a80';
@@ -128,13 +124,11 @@ function MapaDeAgendamentos() {
       'para o dia ' + inicio + ', na CLÍNICA ' + cliente.razao_social + '.'
 
     const rawphone = paciente.telefone;
-    console.log(rawphone);
     let cleanphone = rawphone.replace("(", "");
     cleanphone = cleanphone.replace(")", "");
     cleanphone = cleanphone.replace("-", "");
     cleanphone = cleanphone.replace(" ", "");
     cleanphone = "55" + cleanphone;
-    console.log(cleanphone);
 
     fetch(gzappy_url_envia_mensagem, {
       method: 'POST',
@@ -153,10 +147,7 @@ function MapaDeAgendamentos() {
   }
 
   function geraWhatsappExame(id, item) {
-
     let paciente = pacientes.filter(item => item.id_paciente == id).pop();
-    console.log(paciente);
-
     const gzappy_url_envia_mensagem = "https://api.gzappy.com/v1/message/send-message/";
     const instance_id = 'L05K3GC2YX03DGWYLDKZQW5L';
     const instance_token = '2d763c00-4b6d-4842-99d7-cb32ea357a80';
@@ -168,14 +159,11 @@ function MapaDeAgendamentos() {
       'Você tem o exame/procedimento ' + item.nome_exame + ', agendado na CLÍNICA ' + cliente.razao_social + ', para o dia ' + item.data_exame + ' a ser realizado pelo Dr(a). ' + item.nome_profissional_executante + '.'
 
     const rawphone = paciente.telefone;
-    console.log(rawphone);
     let cleanphone = rawphone.replace("(", "");
     cleanphone = cleanphone.replace(")", "");
     cleanphone = cleanphone.replace("-", "");
     cleanphone = cleanphone.replace(" ", "");
     cleanphone = "55" + cleanphone;
-    console.log(cleanphone);
-
     fetch(gzappy_url_envia_mensagem, {
       method: 'POST',
       headers: {
@@ -193,8 +181,6 @@ function MapaDeAgendamentos() {
   }
 
   const checkUpdateConsultas = (item, data_inicio) => {
-    console.log(item); // obj ok.
-
     let inicio = moment(data_inicio, 'DD/MM/YYYY - HH:mm');
     let termino = null;
     if (localStorage.getItem('PARTICULAR') == 'PARTICULAR') {
@@ -202,10 +188,6 @@ function MapaDeAgendamentos() {
     } else {
       termino = moment(inicio).add(cliente.tempo_consulta_convenio, 'minutes');
     }
-
-    console.log('INICIO: ' + moment(inicio).format('DD/MM/YY - HH:mm'));
-    console.log('TERMINO: ' + moment(termino).format('DD/MM/YY - HH:mm'));
-
     let count = arrayatendimentos.filter(valor =>
       valor.situacao == 3
       &&
@@ -241,9 +223,6 @@ function MapaDeAgendamentos() {
         )
       )
     ).length;
-
-    console.log('COUNT: ' + count);
-
     if (count > 0) {
       modal(setdialogo, 'JÁ EXISTE UMA CONSULTA AGENDADA PARA ESTE HORÁRIO, CONFIRMAR ESTE NOVO AGENDAMENTO?', updateAtendimento, [item, inicio]);
     } else {
@@ -252,7 +231,6 @@ function MapaDeAgendamentos() {
   }
 
   const insertAtendimento = (paciente, registro) => {
-    console.log(registro.data_inicio);
     var obj = {
       data_inicio: registro.data_inicio,
       data_termino: registro.faturamento_codigo_procedimento == 'PARTICULAR' ? moment(registro.data_inicio).add(cliente.tempo_consulta_particular, 'minutes') : moment(registro.data_inicio).add(cliente.tempo_consulta_convenio, 'minutes'),
@@ -269,35 +247,32 @@ function MapaDeAgendamentos() {
       convenio_carteira: paciente.convenio_carteira,
       faturamento_codigo_procedimento: registro.faturamento_codigo_procedimento,
     };
-    console.log(obj);
     axios
       .post(html + "insert_consulta", obj)
       .then(() => {
         console.log('AGENDAMENTO DE CONSULTA INSERIDO COM SUCESSO')
-        // loadAgendaConsultas();
         loadModdedAtendimentos(selectdate);
       });
   };
 
-  const insertBloqueioAtendimento = (inicio) => {
-    // console.log(moment(inicio, 'DD/MM/YYYY - HH:mm'));
+  const insertBloqueioAtendimento = (profissional, inicio) => {
     var obj = {
       data_inicio: moment(inicio, 'DD/MM/YYYY - HH:mm'),
       data_termino: localStorage.getItem('PARTICULAR') == 'PARTICULAR' ? moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_particular, 'minutes') : moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_convenio, 'minutes'),
       problemas: null,
       id_paciente: null,
       id_unidade: 5, // ATENÇÃO: 5 é o ID da unidade ambulatorial.
-      nome_paciente: null,
+      nome_paciente: 'HORÁRIO BLOQUEADO!',
       leito: null,
       situacao: 10, // 10 = horário bloqueado para consulta.
       id_cliente: hospital,
       classificacao: null,
-      id_profissional: selectedespecialista.id_usuario,
+      id_profissional: profissional,
       convenio_id: null,
       convenio_carteira: null,
       faturamento_codigo_procedimento: null,
     };
-    // console.log(obj);
+    console.log(obj);
     axios
       .post(html + "insert_consulta", obj)
       .then(() => {
@@ -307,9 +282,6 @@ function MapaDeAgendamentos() {
   };
 
   const updateAtendimento = ([item, inicio]) => {
-    console.log(item);
-    console.log(inicio);
-
     var obj = {
       data_inicio: moment(inicio, 'DD/MM/YYYY - HH:mm'),
       data_termino: item.faturamento_codigo_procedimento == 'PARTICULAR' ? moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_particular, 'minutes') : moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_convenio, 'minutes'),
@@ -326,12 +298,10 @@ function MapaDeAgendamentos() {
       convenio_carteira: item.convenio_carteira,
       faturamento_codigo_procedimento: item.faturamento_codigo_procedimento,
     };
-    console.log(obj);
     axios
       .post(html + "update_atendimento/" + item.id_atendimento, obj)
       .then(() => {
         console.log('AGENDAMENTO DE CONSULTA ATUALIZADO COM SUCESSO')
-        // loadAgendaConsultas();
         loadModdedAtendimentos(selectdate);
       });
   };
@@ -353,12 +323,10 @@ function MapaDeAgendamentos() {
       convenio_carteira: item.convenio_carteira,
       faturamento_codigo_procedimento: item.faturamento_codigo_procedimento,
     };
-    console.log(obj);
     axios
       .post(html + "update_atendimento/" + item.id_atendimento, obj)
       .then(() => {
         console.log('AGENDAMENTO DE CONSULTA ATUALIZADO COM SUCESSO')
-        // loadAgendaConsultas();
         loadModdedAtendimentos(selectdate);
       });
   };
@@ -384,7 +352,6 @@ function MapaDeAgendamentos() {
       id_cliente: cliente.id_cliente,
       data_exame: registro.data_exame,
     }
-    console.log(obj);
     axios.post(html + 'insert_exames_clinicas', obj).then(() => {
       console.log('EXAME OU PROCEDIMENTO AGENDADO COM SUCESSO.');
       montaArrayAgenda(selectdate);
@@ -401,7 +368,6 @@ function MapaDeAgendamentos() {
   const deleteAtendimento = (id) => {
     axios.get(html + "delete_atendimento/" + id).then(() => {
       console.log('DELETANDO AGENDAMENTO DE CONSULTA');
-      // loadAgendaConsultas();
       loadModdedAtendimentos(selectdate);
     });
   };
@@ -599,31 +565,25 @@ function MapaDeAgendamentos() {
       .get(html + "list_consultas/" + 5) // 5 corresponde ao id da unidade "AMBULATÓRIO".
       .then((response) => {
         var x = response.data.rows;
-        console.log(item);
         var y = x.filter(item => item.id_unidade == 5 && item.id_cliente == cliente.id_cliente);
-        console.log(y.length);
         carregaHorarioslivres(y, item);
       });
   }
 
   const carregaHorarioslivres = (array_origin, data) => {
     let array = array_origin;
-    agenda.filter(item =>
-      item.dia_semana == moment(data, 'DD/MM/YYYY').format('dddd').toUpperCase()).map(item => {
-        console.log(agenda.length);
-        //console.log(moment(data + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm').diff(moment(data + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'), 'minutes'));
-        array.push(
-          {
-            situacao: 'AGENDAMENTO',
-            id_profissional: item.id_usuario,
-            data_inicio: moment(data + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'),
-            data_termino: moment(data + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm'),
-            faturamento_codigo_procedimento: moment(data + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm').diff(moment(data + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'), 'minutes') == cliente.tempo_consulta_convenio ? 'CONVÊNIO' : 'PARTICULAR',
-          }
-        );
-        return null;
-      });
-    console.log(array);
+    agenda.filter(item => item.dia_semana == moment(data, 'DD/MM/YYYY').format('dddd').toUpperCase()).map(item => {
+      array.push(
+        {
+          situacao: 'AGENDAMENTO',
+          id_profissional: item.id_usuario,
+          data_inicio: moment(data + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'),
+          data_termino: moment(data + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm'),
+          faturamento_codigo_procedimento: moment(data + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm').diff(moment(data + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'), 'minutes') == cliente.tempo_consulta_convenio ? 'CONVÊNIO' : 'PARTICULAR',
+        }
+      );
+      return null;
+    });
     setarrayatendimentos(array);
   }
 
@@ -838,9 +798,7 @@ function MapaDeAgendamentos() {
                           onClick={(e) => {
                             let procedimento = [];
                             procedimento = allprocedimentos.filter(proc => proc.tuss_codigo == '10101012').pop();
-                            console.log(procedimento);
                             console.log('## ATENDIMENTO ##');
-                            console.log(item);
                             localStorage.setItem('tipo_faturamento', 'ATENDIMENTO');
                             localStorage.setItem('obj_procedimento', JSON.stringify(procedimento)); // registro de procedimento TUSS relacionado ao procedimento/consulta agendado.
                             localStorage.setItem('obj_agendado', JSON.stringify(item));
@@ -956,6 +914,8 @@ function MapaDeAgendamentos() {
                         arrayatendimentos.filter(valor =>
                           (valor.situacao == 3 || valor.situacao == 10)
                           &&
+                          valor.id_profissional == item.id_profisisonal
+                          &&
                           (
                             // situação 0
                             moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') == moment(item.data_inicio).format('DD/MM/YYYY - HH:mm')
@@ -995,7 +955,6 @@ function MapaDeAgendamentos() {
                       justifyContent: 'space-between',
                     }}>
                     <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
-
                       <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'center', alignSelf: 'center' }}>
                         <div style={{
                           display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignContent: 'flex-start',
@@ -1033,7 +992,10 @@ function MapaDeAgendamentos() {
                         <div style={{ display: 'flex', flexDirection: 'row' }}>
                           <div
                             className='button-red'
-                            onClick={() => insertBloqueioAtendimento(moment(item.data_inicio).format('DD/MM/YYYY - HH:mm'))}
+                            onClick={() => {
+                              console.log(item.id_profissional);
+                              insertBloqueioAtendimento(item.id_profissional, moment(item.data_inicio).format('DD/MM/YYYY - HH:mm'));
+                            }}
                             style={{
                               padding: 2.5, paddingLeft: 15, paddingRight: 15,
                               maxHeight: 30, minHeight: 30,
@@ -1193,9 +1155,7 @@ function MapaDeAgendamentos() {
               let nova_data = document.getElementById("inputEditDataConsulta " + item.id_atendimento).value;
               let nova_hora = document.getElementById("inputEditHour " + item.id_atendimento).value;
               let novo_minuto = document.getElementById("inputEditMin " + item.id_atendimento).value;
-              console.log(selectdate + ' - ' + nova_hora + ':' + novo_minuto);
               checkUpdateConsultas(item, nova_data + ' - ' + nova_hora + ':' + novo_minuto);
-              // updateAtendimento([item, nova_data + ' - ' + nova_hora + ':' + novo_minuto]);
               document.getElementById('viewupdateatendimento ' + item.id_atendimento).style.display = 'none';
               document.getElementById('viewupdateatendimento ' + item.id_atendimento).style.visibility = 'hidden';
             }}
