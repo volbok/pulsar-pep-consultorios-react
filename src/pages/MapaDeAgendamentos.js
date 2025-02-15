@@ -1037,7 +1037,6 @@ function MapaDeAgendamentos() {
                             style={{
                               padding: 2.5, paddingLeft: 15, paddingRight: 15,
                               maxHeight: 30, minHeight: 30,
-                              marginRight: window.innerWidth < mobilewidth ? 3 : 2.5,
                             }}>
                             BLOQUEAR
                           </div>
