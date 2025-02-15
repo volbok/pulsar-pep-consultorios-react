@@ -914,7 +914,7 @@ function MapaDeAgendamentos() {
                         arrayatendimentos.filter(valor =>
                           (valor.situacao == 3 || valor.situacao == 10)
                           &&
-                          valor.id_profissional == item.id_profisisonal
+                          valor.id_profissional == item.id_profissional
                           &&
                           (
                             // situação 0
@@ -962,7 +962,7 @@ function MapaDeAgendamentos() {
                           marginLeft: 5
                         }}>
                           <div style={{ alignSelf: 'flex-start', textAlign: 'left' }}>
-                            {'HORÁRIO VAGO: ' + moment(item.data_inicio).format('HH:mm')}
+                            {'HORÁRIO VAGO: ' + moment(item.data_inicio).format('DD/MM/YY - HH:mm')}
                           </div>
                           <div style={{ alignSelf: 'flex-start', textAlign: 'left' }}>
                             {'PROFISSIONAL: ' + usuarios.filter(usuario => usuario.id_usuario == item.id_profissional).map(usuario => usuario.nome_usuario)}
@@ -1033,7 +1033,7 @@ function MapaDeAgendamentos() {
                     backgroundColor: '#f1948ab8'
                   }}>
                   <div style={{ alignSelf: 'center', textAlign: 'left' }}>
-                    {moment(item.data_inicio).format('HH:mm') + ': HORÁRIO BLOQUEADO PARA AGENDAMENTO'}
+                    {moment(item.data_inicio).format('DD/MM/YYYY - HH:mm') + ': HORÁRIO BLOQUEADO PARA AGENDAMENTO'}
                   </div>
                   <div id="btn desbloquear horário de consulta"
                     title="DESBLOQUEAR HORÁRIO"
