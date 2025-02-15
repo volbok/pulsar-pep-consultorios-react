@@ -9,6 +9,9 @@ import moment from "moment";
 import imprimir from '../images/imprimir.png';
 import whatsapp from '../images/whatsapp.png';
 import salvar from '../images/salvar.png';
+// componentes.
+import Pagamento from '../components/Pagamento';
+import Filter from '../components/Filter';
 // funções.
 import maskdate from "../functions/maskdate";
 // router.
@@ -25,22 +28,34 @@ function MapaDeAgendamentos() {
     html,
     hospital,
     pacientes, setpacientes,
-    paciente,
     setobjpaciente,
     setdialogo,
     setcard,
     setdono_documento,
     mobilewidth,
     cliente,
+    setpagamento,
+    faturamento, setfaturamento,
+    selectedespecialista,
+    arrayexames, setarrayexames,
+    agenda, setagenda,
+    arrayatendimentos, setarrayatendimentos,
+    usuarios,
+    agendaexame, setagendaexame,
   } = useContext(Context);
 
   useEffect(() => {
     // eslint-disable-next-line
     if (pagina == 'MAPA DE AGENDAMENTOS') {
+      localStorage.setItem('tela_agendamento', 'CONSULTAS');
       setselectdate(moment().format('DD/MM/YYYY'))
       loadUsuarios();
       loadPacientes();
-      loadAgendaConsultas();
+      loadAgenda();
+      loadProcedimentos();
+      loadFaturamentos();
+      //loadAgendaConsultas();
+      loadModdedAtendimentos(moment().format('DD/MM/YYYY'));
       loadAgendaExames();
       currentMonth();
     }
@@ -53,6 +68,33 @@ function MapaDeAgendamentos() {
   var timeout = null;
   const [especialistas, setespecialistas] = useState([]);
 
+  // agenda de consultas (horários predefinidos).
+  const loadAgenda = () => {
+    axios.get(html + "list_agenda").then((response) => {
+      let x = response.data.rows;
+      setagenda(x.filter(item => item.id_cliente == cliente.id_cliente));
+      setarrayatendimentos([]);
+    })
+  }
+
+  const loadFaturamentos = () => {
+    axios.get(html + 'list_faturamento_clinicas/' + cliente.id_cliente).then((response) => {
+      let x = response.data.rows;
+      setfaturamento(x);
+      console.log(x);
+      console.log('LISTA DE FATURAMENTOS CARREGADA');
+    })
+  }
+
+  // carregando registros de procedimentos realizados para o cliente.
+  const [allprocedimentos, setallprocedimentos] = useState([]);
+  const loadProcedimentos = () => {
+    axios
+      .get(html + "all_procedimentos")
+      .then((response) => {
+        setallprocedimentos(response.data.rows);
+      });
+  };
 
   const loadUsuarios = () => {
     axios.get(html + "list_usuarios").then((response) => {
@@ -150,67 +192,6 @@ function MapaDeAgendamentos() {
     })
   }
 
-  // checando se há consultas já agendadas para o horário selecionado para inserir atendimento.
-  const checkConsultas = (data_inicio) => {
-
-    let inicio = moment(data_inicio, 'DD/MM/YYYY - HH:mm');
-    let termino = null;
-    if (localStorage.getItem('PARTICULAR') == 'PARTICULAR') {
-      termino = moment(inicio).add(cliente.tempo_consulta_particular, 'minutes');
-    } else {
-      termino = moment(inicio).add(cliente.tempo_consulta_convenio, 'minutes');
-    }
-
-    console.log('INICIO: ' + moment(inicio).format('DD/MM/YY - HH:mm'));
-    console.log('TERMINO: ' + moment(termino).format('DD/MM/YY - HH:mm'));
-
-    console.log(selectedespecialista);
-
-    let count = arrayatendimentos.filter(valor =>
-      valor.situacao == 3
-      &&
-      valor.id_profissional == selectedespecialista.id_usuario
-      &&
-      (
-        (
-          // situação 0
-          moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') == moment(inicio).format('DD/MM/YYYY - HH:mm')
-          ||
-          moment(valor.data_termino).format('DD/MM/YYYY - HH:mm') == moment(termino).format('DD/MM/YYYY - HH:mm')
-          ||
-          // situação 1
-          (
-            moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') < moment(inicio).format('DD/MM/YYYY - HH:mm')
-            &&
-            moment(valor.data_termino).format('DD/MM/YYYY - HH:mm') > moment(inicio).format('DD/MM/YYYY - HH:mm')
-          )
-          ||
-          // situação 2
-          (
-            moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') > moment(inicio).format('DD/MM/YYYY - HH:mm')
-            &&
-            moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') < moment(termino).format('DD/MM/YYYY - HH:mm')
-          )
-          ||
-          // situação 3
-          (
-            moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') > moment(inicio).format('DD/MM/YYYY - HH:mm')
-            &&
-            moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') < moment(termino).format('DD/MM/YYYY - HH:mm')
-          )
-        )
-      )
-    ).length;
-
-    console.log('COUNT: ' + count);
-
-    if (count > 0) {
-      modal(setdialogo, 'JÁ EXISTE UMA CONSULTA AGENDADA PARA ESTE HORÁRIO, CONFIRMAR ESTE NOVO AGENDAMENTO?', insertAtendimento, inicio);
-    } else {
-      insertAtendimento(inicio);
-    }
-  }
-
   const checkUpdateConsultas = (item, data_inicio) => {
     console.log(item); // obj ok.
 
@@ -270,29 +251,58 @@ function MapaDeAgendamentos() {
     }
   }
 
-  const insertAtendimento = (inicio) => {
+  const insertAtendimento = (paciente, registro) => {
+    console.log(registro.data_inicio);
     var obj = {
-      data_inicio: moment(inicio, 'DD/MM/YYYY - HH:mm'),
-      data_termino: localStorage.getItem('PARTICULAR') == 'PARTICULAR' ? moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_particular, 'minutes') : moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_convenio, 'minutes'),
+      data_inicio: registro.data_inicio,
+      data_termino: registro.faturamento_codigo_procedimento == 'PARTICULAR' ? moment(registro.data_inicio).add(cliente.tempo_consulta_particular, 'minutes') : moment(registro.data_inicio).add(cliente.tempo_consulta_convenio, 'minutes'),
       problemas: null,
       id_paciente: paciente.id_paciente,
       id_unidade: 5, // ATENÇÃO: 5 é o ID da unidade ambulatorial.
       nome_paciente: paciente.nome_paciente,
       leito: null,
       situacao: 3, // 3 = atendimento ambulatorial (consulta).
-      id_cliente: hospital,
+      id_cliente: cliente.id_cliente,
       classificacao: null,
-      id_profissional: selectedespecialista.id_usuario,
+      id_profissional: registro.id_profissional,
       convenio_id: paciente.convenio_codigo,
       convenio_carteira: paciente.convenio_carteira,
-      faturamento_codigo_procedimento: localStorage.getItem('PARTICULAR'),
+      faturamento_codigo_procedimento: registro.faturamento_codigo_procedimento,
     };
     console.log(obj);
     axios
       .post(html + "insert_consulta", obj)
       .then(() => {
         console.log('AGENDAMENTO DE CONSULTA INSERIDO COM SUCESSO')
-        loadAgendaConsultas();
+        // loadAgendaConsultas();
+        loadModdedAtendimentos(selectdate);
+      });
+  };
+
+  const insertBloqueioAtendimento = (inicio) => {
+    // console.log(moment(inicio, 'DD/MM/YYYY - HH:mm'));
+    var obj = {
+      data_inicio: moment(inicio, 'DD/MM/YYYY - HH:mm'),
+      data_termino: localStorage.getItem('PARTICULAR') == 'PARTICULAR' ? moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_particular, 'minutes') : moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_convenio, 'minutes'),
+      problemas: null,
+      id_paciente: null,
+      id_unidade: 5, // ATENÇÃO: 5 é o ID da unidade ambulatorial.
+      nome_paciente: null,
+      leito: null,
+      situacao: 10, // 10 = horário bloqueado para consulta.
+      id_cliente: hospital,
+      classificacao: null,
+      id_profissional: selectedespecialista.id_usuario,
+      convenio_id: null,
+      convenio_carteira: null,
+      faturamento_codigo_procedimento: null,
+    };
+    // console.log(obj);
+    axios
+      .post(html + "insert_consulta", obj)
+      .then(() => {
+        console.log('BLOQUEIO DE HORÁRIO DE CONSULTA INSERIDO COM SUCESSO');
+        loadModdedAtendimentos(selectdate);
       });
   };
 
@@ -321,7 +331,8 @@ function MapaDeAgendamentos() {
       .post(html + "update_atendimento/" + item.id_atendimento, obj)
       .then(() => {
         console.log('AGENDAMENTO DE CONSULTA ATUALIZADO COM SUCESSO')
-        loadAgendaConsultas();
+        // loadAgendaConsultas();
+        loadModdedAtendimentos(selectdate);
       });
   };
 
@@ -347,9 +358,38 @@ function MapaDeAgendamentos() {
       .post(html + "update_atendimento/" + item.id_atendimento, obj)
       .then(() => {
         console.log('AGENDAMENTO DE CONSULTA ATUALIZADO COM SUCESSO')
-        loadAgendaConsultas();
+        // loadAgendaConsultas();
+        loadModdedAtendimentos(selectdate);
       });
   };
+
+  const insertProcedimento = (particular, convenio, paciente) => {
+    let registro = JSON.parse(localStorage.getItem('horario_procedimento'));
+    let obj = {
+      id_exame: null,
+      nome_exame: localStorage.getItem('procedimento'),
+      codigo_tuss: localStorage.getItem('codigo_tuss'),
+      particular: particular,
+      convenio: convenio,
+      codigo_operadora: paciente.convenio_codigo,
+      id_paciente: paciente.id_paciente,
+      nome_paciente: paciente.nome_paciente,
+      dn_paciente: moment(paciente.dn_paciente).format('DD/MM/YYYY'),
+      id_profissional_executante: registro.id_profissional_executante,
+      nome_profissional_executante: registro.nome_profissional_executante,
+      conselho_profissional_executante: registro.conselho_profissional_executante,
+      n_conselho_profissional_executante: registro.n_conselho_profissional_executante,
+      status: 0, // 0 = solicitado, 1 = executado, 2 = cancelado, 3 = desistência.
+      laudohtml: '',
+      id_cliente: cliente.id_cliente,
+      data_exame: registro.data_exame,
+    }
+    console.log(obj);
+    axios.post(html + 'insert_exames_clinicas', obj).then(() => {
+      console.log('EXAME OU PROCEDIMENTO AGENDADO COM SUCESSO.');
+      montaArrayAgenda(selectdate);
+    })
+  }
 
   const geraGuiaConsulta = () => {
     setcard('guia-consulta');
@@ -361,11 +401,10 @@ function MapaDeAgendamentos() {
   const deleteAtendimento = (id) => {
     axios.get(html + "delete_atendimento/" + id).then(() => {
       console.log('DELETANDO AGENDAMENTO DE CONSULTA');
-      loadAgendaConsultas();
+      // loadAgendaConsultas();
+      loadModdedAtendimentos(selectdate);
     });
   };
-
-  const [selectedespecialista] = useState([]);
 
   // DATEPICKER (CALENDÁRIO);
   // preparando a array com as datas.
@@ -522,6 +561,8 @@ function MapaDeAgendamentos() {
                 onClick={(e) => {
                   setselectdate(item);
                   localStorage.setItem('selectdate', item);
+                  loadModdedAtendimentos(item);
+                  montaArrayAgenda(item);
                   e.stopPropagation();
                 }}
                 style={{
@@ -551,16 +592,39 @@ function MapaDeAgendamentos() {
   5 = ATENDAMENTO CANCELADO.
   */
 
-  // agenda de consultas.
-  const [arrayatendimentos, setarrayatendimentos] = useState([]);
-  const loadAgendaConsultas = () => {
+  const loadModdedAtendimentos = (item) => {
+    // carregando os atendimentos já registrados.
+    setarrayatendimentos([]);
     axios
       .get(html + "list_consultas/" + 5) // 5 corresponde ao id da unidade "AMBULATÓRIO".
       .then((response) => {
         var x = response.data.rows;
+        console.log(item);
         var y = x.filter(item => item.id_unidade == 5 && item.id_cliente == cliente.id_cliente);
-        setarrayatendimentos(y);
+        console.log(y.length);
+        carregaHorarioslivres(y, item);
       });
+  }
+
+  const carregaHorarioslivres = (array_origin, data) => {
+    let array = array_origin;
+    agenda.filter(item =>
+      item.dia_semana == moment(data, 'DD/MM/YYYY').format('dddd').toUpperCase()).map(item => {
+        console.log(agenda.length);
+        //console.log(moment(data + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm').diff(moment(data + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'), 'minutes'));
+        array.push(
+          {
+            situacao: 'AGENDAMENTO',
+            id_profissional: item.id_usuario,
+            data_inicio: moment(data + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'),
+            data_termino: moment(data + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm'),
+            faturamento_codigo_procedimento: moment(data + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm').diff(moment(data + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'), 'minutes') == cliente.tempo_consulta_convenio ? 'CONVÊNIO' : 'PARTICULAR',
+          }
+        );
+        return null;
+      });
+    console.log(array);
+    setarrayatendimentos(array);
   }
 
   const ListaTodosAtendimentos = useCallback(() => {
@@ -582,48 +646,39 @@ function MapaDeAgendamentos() {
         >
           {'CONSULTAS AGENDADAS'}
         </div>
-        <div className='button'
-          style={{
-            display: window.innerWidth < mobilewidth ? 'none' : 'flex',
-            width: 200,
-            alignSelf: 'center',
-            marginBottom: 10,
-          }}
-          onClick={() => {
-            localStorage.setItem('selectdate', selectdate);
-            setpagina(2);
-            history.push("/cadastro");
-          }}
-        >
-          AGENDAR CONSULTA
-        </div>
         <div id="scroll atendimentos com pacientes - desktop"
           className='scroll'
           style={{
             display: 'flex',
             flexDirection: 'column',
             justifyContent: "flex-start",
-            height: '55vh',
-            width: window.innerWidth < mobilewidth ? '80vw' : '50vw',
+            height: '65vh',
+            width: window.innerWidth < mobilewidth ? '80vw' : '55vw',
           }}
         >
           {arrayatendimentos
-            .filter(item => item.situacao > 2 && moment(item.data_inicio).format('DD/MM/YYYY') == selectdate)
+            .filter(item => moment(item.data_inicio).format('DD/MM/YYYY') == selectdate && (item.situacao > 2 || item.situacao == 'AGENDAMENTO'))
             .sort((a, b) => (moment(a.data_inicio) > moment(b.data_inicio) ? 1 : -1))
             .map((item) => (
-              <div key={"pacientes" + item.id_atendimento}>
-                <div
+              <div
+                key={"pacientes" + Math.random()} style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  width: '100%'
+                }}>
+                <div id='atendimentos agendados'
                   style={{
-                    display: 'flex', flexDirection: 'row',
+                    display: item.situacao > 2 && item.situacao != 10 ? 'flex' : 'none',
+                    flexDirection: 'row',
                     position: "relative",
-                    margin: 2.5, padding: 0,
+                    margin: 0, padding: 0,
                   }}
                 >
                   <div
                     style={{
-                      display: item.faturamento_codigo_procedimento != null ? 'flex' : 'none',
+                      display: item.faturamento_codigo_procedimento == null ? 'none' : 'flex',
                       position: 'absolute',
-                      top: -2.5, left: -2.5,
+                      top: 0, left: 0,
                       padding: 2.5,
                       paddingLeft: 10, paddingRight: 10,
                       borderRadius: 5,
@@ -635,8 +690,7 @@ function MapaDeAgendamentos() {
                     {item.faturamento_codigo_procedimento}
                   </div>
                   {ViewUpdateAtendimento(item)}
-                  <div
-                    id={"btn_todos_atendimentos " + item.id_atendimento}
+                  <div id={"btn_lista_atendimento " + item.id_atendimento}
                     className="button"
                     onClick={() => {
                       document.getElementById('viewupdateatendimento ' + item.id_atendimento).style.display = 'flex';
@@ -647,12 +701,29 @@ function MapaDeAgendamentos() {
                       padding: 10,
                       borderTopRightRadius: 0,
                       borderBottomRightRadius: 0,
+                      position: 'relative',
                       opacity: 0.9,
                     }}>
                     {moment(item.data_inicio).format('HH:mm') + ' ÀS ' + moment(item.data_termino).format('HH:mm')}
+                    <div
+                      style={{
+                        display: item.faturamento_codigo_procedimento == null ? 'none' : 'flex',
+                        position: 'absolute',
+                        top: -5,
+                        left: -5,
+                        padding: 2.5,
+                        paddingLeft: 10, paddingRight: 10,
+                        borderRadius: 5,
+                        backgroundColor: item.faturamento_codigo_procedimento == 'PARTICULAR' ? 'rgb(82, 190, 128, 1)' : '#03aacd',
+                        color: 'white',
+                        fontWeight: 'bold',
+                        zIndex: 20,
+                      }}>
+                      {item.faturamento_codigo_procedimento}
+                    </div>
                   </div>
                   <div
-                    id={"todos_atendimentos " + item.id_atendimento}
+                    id={"lista_atendimento " + item.id_atendimento}
                     className="button"
                     style={{
                       flex: 3,
@@ -668,6 +739,7 @@ function MapaDeAgendamentos() {
                           justifyContent: "flex-start",
                           padding: 5,
                           alignSelf: 'center',
+                          position: 'relative',
                           width: '100%',
                         }}
                       >
@@ -677,13 +749,9 @@ function MapaDeAgendamentos() {
                           )
                             .map((valor) => valor.nome_paciente + ', ' + mountage(moment(valor.dn_paciente).format('DD/MM/YYYY')))}
                         </div>
-                        <div style={{
-                          display: window.innerWidth < mobilewidth ? 'none' : 'flex',
-                          textAlign: 'left'
-                        }}>
+                        <div style={{ textAlign: 'left' }}>
                           {especialistas.filter(valor => valor.id_usuario == item.id_profissional).map(item => 'DR(A). ' + item.nome_usuario + ' - ' + item.conselho + ' ' + item.n_conselho)}
                         </div>
-
                         <div id={'btn_seletor_observacoes ' + item.id_atendimento}
                           className='text2'
                           title="CLIQUE PARA VER OBSERVAÇÕES DO ATENDIMENTO."
@@ -744,18 +812,68 @@ function MapaDeAgendamentos() {
                           }}
                         ></textarea>
                       </div>
-                      <div className='button'
-                        style={{
-                          display: window.innerWidth < mobilewidth ? 'none' : 'flex',
-                          backgroundColor: item.situacao == 3 ? '#f4d03f' : item.situacao == 4 ? '#52be80' : '#EC7063', width: 150, minWidth: 150, height: 30, minHeight: 30, maxHeight: 30,
-                          alignSelf: 'flex-end'
-                        }}
-                      >
-                        {item.situacao == 3 ? 'ATIVA' : item.situacao == 4 ? 'FINALIZADA' : 'CANCELADA'}
+                      <div style={{ display: 'flex', flexDirection: 'row' }}>
+                        <div id="botão de status"
+                          className='button'
+                          style={{
+                            display: 'flex',
+                            backgroundColor: item.situacao == 3 ? '#f4d03f' : item.situacao == 4 ? '#52be80' : '#EC7063',
+                            width: window.innerWidth < mobilewidth ? 100 : 150,
+                            minWidth: window.innerWidth < mobilewidth ? 100 : 150,
+                            height: 30, minHeight: 30, maxHeight: 30,
+                            alignSelf: 'flex-end'
+                          }}
+                        >
+                          {item.situacao == 3 ? 'AGENDADO' : item.situacao == 4 ? 'FINALIZADA' : 'CANCELADA'}
+                        </div>
+                        <div id='botão para cobrar faturamento'
+                          className='button red'
+                          style={{
+                            display: window.innerWidth < mobilewidth || faturamento.filter(fat => fat.atendimento_id == item.id_atendimento && fat.codigo_tuss == '10101012').length > 0 ? 'none' : 'flex',
+                            minHeight: 30, maxHeight: 30,
+                            width: window.innerWidth < mobilewidth ? 50 : 150,
+                            minWidth: window.innerWidth < mobilewidth ? 50 : 150,
+                            alignSelf: 'flex-end'
+                          }}
+                          onClick={(e) => {
+                            let procedimento = [];
+                            procedimento = allprocedimentos.filter(proc => proc.tuss_codigo == '10101012').pop();
+                            console.log(procedimento);
+                            console.log('## ATENDIMENTO ##');
+                            console.log(item);
+                            localStorage.setItem('tipo_faturamento', 'ATENDIMENTO');
+                            localStorage.setItem('obj_procedimento', JSON.stringify(procedimento)); // registro de procedimento TUSS relacionado ao procedimento/consulta agendado.
+                            localStorage.setItem('obj_agendado', JSON.stringify(item));
+                            localStorage.setItem('forma_pagamento', '');
+                            setpagamento(1);
+                            localStorage.setItem('forma_pagamento', 'indefinida');
+                            setTimeout(() => {
+                              document.getElementById('inputValorParticular').value = procedimento.valor_part;
+                              document.getElementById('inputValorConvenio').value = procedimento.valor;
+                            }, 1000);
+                            e.stopPropagation();
+                          }}
+                        >
+                          FATURAR
+                        </div>
+                        <div id='botão para cobrar faturamento'
+                          className='button green'
+                          style={{
+                            display: window.innerWidth > mobilewidth && faturamento.filter(fat => fat.atendimento_id == item.id_atendimento && fat.codigo_tuss == '10101012').length > 0 ? 'flex' : 'none',
+                            minHeight: 30, maxHeight: 30, width: 150, alignSelf: 'flex-end'
+                          }}
+                          onClick={(e) => {
+                            console.log('CRIAR COMPONENTE COM O RESUMO DO FATURAMENTO');
+                            // PENDENTE!
+                          }}
+                        >
+                          FATURADO
+                        </div>
                       </div>
                       <div style={{
-                        display: window.innerWidth < mobilewidth ? 'none' : 'flex',
-                        flexDirection: 'row'
+                        display: 'flex',
+                        flexDirection: window.innerWidth < mobilewidth ? 'column' : 'row',
+                        alignSelf: 'center'
                       }}>
                         <div id="btn imprimir guia tiss"
                           title="IMPRIMIR GUIA TISS"
@@ -766,11 +884,9 @@ function MapaDeAgendamentos() {
                             setTimeout(() => {
                               geraGuiaConsulta();
                             }, 2000);
+
                           }}
-                          style={{
-                            display: item.situacao != 3 ? 'none' : 'flex',
-                            width: 50, height: 50, alignSelf: 'flex-end'
-                          }}
+                          style={{ display: item.situacao != 3 || window.innerWidth < mobilewidth ? 'none' : 'flex', width: 50, height: 50, alignSelf: 'flex-end' }}
                         >
                           <img
                             alt=""
@@ -794,8 +910,8 @@ function MapaDeAgendamentos() {
                             );
                           }}
                           style={{
-                            width: 50, height: 50, alignSelf: 'flex-end',
-                            display: window.innerWidth < mobilewidth ? 'none' : 'flex',
+                            display: faturamento.filter(fat => fat.atendimento_id == item.id_atendimento && fat.codigo_tuss == '10101012').length > 0 ? 'none' : 'flex',
+                            width: 50, height: 50, alignSelf: 'flex-end'
                           }}
                         >
                           <img
@@ -811,11 +927,10 @@ function MapaDeAgendamentos() {
                         <div id="btn lembrar consulta"
                           title="LEMBRAR CONSULTA PARA O CLIENTE"
                           className="button-green"
-                          onClick={(e) => {
-                            geraWhatsapp(item.id_paciente, moment(item.data_inicio).format('DD/MM/YYYY - HH:mm'), especialistas.filter(valor => valor.id_usuario == item.id_profissional).pop());
-                            e.stopPropagation();
+                          onClick={() => {
+                            geraWhatsapp(item.id_paciente, moment(item.data_inicio).format('DD/MM/YYYY - HH:mm'), selectedespecialista);
                           }}
-                          style={{ display: item.situacao != 3 ? 'none' : 'flex', width: 50, height: 50, alignSelf: 'flex-end' }}
+                          style={{ display: item.situacao != 3 || window.innerWidth < mobilewidth ? 'none' : 'flex', width: 50, height: 50, alignSelf: 'flex-end' }}
                         >
                           <img
                             alt=""
@@ -831,6 +946,146 @@ function MapaDeAgendamentos() {
                     </div>
                   </div>
                 </div>
+                <div id='horários predefinidos vagos'
+                  style={{
+                    display:
+                      moment(selectdate, 'DD/MM/YYYY') < moment().subtract(1, 'day')
+                        ||
+                        item.situacao != 'AGENDAMENTO'
+                        ||
+                        arrayatendimentos.filter(valor =>
+                          (valor.situacao == 3 || valor.situacao == 10)
+                          &&
+                          (
+                            // situação 0
+                            moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') == moment(item.data_inicio).format('DD/MM/YYYY - HH:mm')
+                            ||
+                            moment(valor.data_termino).format('DD/MM/YYYY - HH:mm') == moment(item.data_termino).format('DD/MM/YYYY - HH:mm')
+                            ||
+                            // situação 1
+                            (
+                              moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') < moment(item.data_inicio).format('DD/MM/YYYY - HH:mm')
+                              &&
+                              moment(valor.data_termino).format('DD/MM/YYYY - HH:mm') > moment(item.data_inicio).format('DD/MM/YYYY - HH:mm')
+                            )
+                            ||
+                            // situação 2
+                            (
+                              moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') > moment(item.data_inicio).format('DD/MM/YYYY - HH:mm')
+                              &&
+                              moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') < moment(item.data_termino).format('DD/MM/YYYY - HH:mm')
+                            )
+                            ||
+                            // situação 3
+                            (
+                              moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') > moment(item.data_inicio).format('DD/MM/YYYY - HH:mm')
+                              &&
+                              moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') < moment(item.data_termino).format('DD/MM/YYYY - HH:mm')
+                            )
+                          )
+                        ).length > 0
+                        ? 'none' : 'flex',
+                    margin: 0, padding: 0,
+                  }}>
+                  <div
+                    className='button cor3'
+                    style={{
+                      width: 'calc(100% - 20px)',
+                      display: 'flex', flexDirection: 'row',
+                      justifyContent: 'space-between',
+                    }}>
+                    <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
+
+                      <div style={{ display: 'flex', flexDirection: 'column', alignContent: 'center', alignSelf: 'center' }}>
+                        <div style={{
+                          display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', alignContent: 'flex-start',
+                          alignSelf: 'center',
+                          marginLeft: 5
+                        }}>
+                          <div style={{ alignSelf: 'flex-start', textAlign: 'left' }}>
+                            {'HORÁRIO VAGO: ' + moment(item.data_inicio).format('HH:mm')}
+                          </div>
+                          <div style={{ alignSelf: 'flex-start', textAlign: 'left' }}>
+                            {'PROFISSIONAL: ' + usuarios.filter(usuario => usuario.id_usuario == item.id_profissional).map(usuario => usuario.nome_usuario)}
+                          </div>
+                        </div>
+                      </div>
+                      <div style={{
+                        display: 'flex',
+                        flexDirection: window.innerWidth < mobilewidth ? 'column' : 'row',
+                        alignContent: 'flex-end'
+                      }}>
+                        <div
+                          className='button-red'
+                          style={{
+                            padding: 2.5,
+                            paddingLeft: 10, paddingRight: 10,
+                            marginLeft: 10,
+                            borderRadius: 5,
+                            maxHeight: 30, minHeight: 30,
+                            backgroundColor: item.faturamento_codigo_procedimento == 'PARTICULAR' ? 'rgb(82, 190, 128, 1)' : '#03aacd',
+                            color: 'white',
+                            fontWeight: 'bold',
+                            pointerEvents: 'none',
+                          }}>
+                          {item.faturamento_codigo_procedimento}
+                        </div>
+                        <div style={{ display: 'flex', flexDirection: 'row' }}>
+                          <div
+                            className='button-red'
+                            onClick={() => insertBloqueioAtendimento(moment(item.data_inicio).format('DD/MM/YYYY - HH:mm'))}
+                            style={{
+                              padding: 2.5, paddingLeft: 15, paddingRight: 15,
+                              maxHeight: 30, minHeight: 30,
+                              marginRight: window.innerWidth < mobilewidth ? 3 : 2.5,
+                            }}>
+                            BLOQUEAR
+                          </div>
+                          <div className='button'
+                            style={{
+                              display: window.innerWidth < mobilewidth ? 'none' : 'flex',
+                              maxHeight: 30, minHeight: 30,
+                              alignSelf: 'center',
+                              padding: 2.5,
+                              paddingLeft: 10, paddingRight: 10,
+                            }}
+                            onClick={() => {
+                              setviewlistapacientes(1);
+                              localStorage.setItem('horario_consulta', JSON.stringify(item));
+                            }}
+                          >
+                            AGENDAR CONSULTA
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+                <div id='horários bloqueados'
+                  className='button'
+                  style={{
+                    display: item.situacao == 10 ? 'flex' : 'none',
+                    flexDirection: window.innerWidth < mobilewidth ? 'column' : 'row',
+                    justifyContent: 'space-between',
+                    position: "relative",
+                    backgroundColor: '#f1948ab8'
+                  }}>
+                  <div style={{ alignSelf: 'center', textAlign: 'left' }}>
+                    {moment(item.data_inicio).format('HH:mm') + ': HORÁRIO BLOQUEADO PARA AGENDAMENTO'}
+                  </div>
+                  <div id="btn desbloquear horário de consulta"
+                    title="DESBLOQUEAR HORÁRIO"
+                    className="button-yellow"
+                    onClick={() => deleteAtendimento(item.id_atendimento)}
+                    style={{
+                      display: faturamento.filter(fat => fat.atendimento_id == item.id_atendimento && fat.codigo_tuss == '10101012').length > 0 ? 'none' : 'flex',
+                      minHeight: 30, height: 30, maxHeight: 30, paddingLeft: 10, paddingRight: 10, alignSelf: 'flex-end'
+                    }}
+                  >
+                    DESBLOQUEAR
+                  </div>
+                </div>
               </div>
             ))
           }
@@ -839,123 +1094,6 @@ function MapaDeAgendamentos() {
     );
     // eslint-disable-next-line
   }, [arrayatendimentos, selectdate, pacientes]);
-
-  const [viewopcoeshorarios, setviewopcoeshorarios] = useState(0);
-  const ViewOpcoesHorarios = () => {
-    function TimeComponent() {
-      var timeout = null;
-      const fixHour = (valor) => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
-          if (valor > 23 || valor < 0) {
-            document.getElementById("inputHour").value = '';
-            document.getElementById("inputHour").focus();
-          } else {
-            localStorage.setItem('hora', valor);
-          }
-        }, 100);
-      };
-      const fixMin = (valor) => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => {
-          if (valor > 59 || valor < 0) {
-            document.getElementById("inputMin").value = '';
-            document.getElementById("inputMin").focus();
-          } else {
-            localStorage.setItem('min', valor);
-          }
-        }, 100);
-      };
-      return (
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start' }}>
-          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
-            <input
-              autoComplete="off"
-              className="input"
-              placeholder="HH"
-              onFocus={(e) => (e.target.placeholder = '')}
-              onBlur={(e) => (e.target.placeholder = 'HH')}
-              onKeyUp={(e) => fixHour(e.target.value)}
-              title="HORAS."
-              maxLength={2}
-              style={{
-                width: 100,
-                height: 50,
-              }}
-              min={0}
-              max={23}
-              id="inputHour"
-            ></input>
-            <div className='text1'>{' : '}</div>
-            <input
-              autoComplete="off"
-              className="input"
-              placeholder="MM"
-              onFocus={(e) => (e.target.placeholder = '')}
-              onBlur={(e) => (e.target.placeholder = 'MM')}
-              onKeyUp={(e) => fixMin(e.target.value)}
-              title="MINUTOS."
-              maxLength={2}
-              style={{
-                width: 100,
-                height: 50,
-              }}
-              min={0}
-              max={59}
-              id="inputMin"
-            ></input>
-          </div>
-          <div id="btnAdd"
-            className="button-green"
-            title="CONFIRMAR DATA E HORA."
-            onClick={() => {
-              let hora = localStorage.getItem('hora');
-              let min = localStorage.getItem('min');
-              console.log(selectdate + ' - ' + hora + ':' + min);
-              let inputHour = document.getElementById("inputMin").value;
-              let inputMin = document.getElementById("inputHour").value;
-              if (inputHour != '' && inputMin != '') {
-                checkConsultas(selectdate + ' - ' + hora + ':' + min)
-                setviewopcoeshorarios(0);
-              }
-            }}
-            style={{ width: 50, maxWidth: 50, alignSelf: 'center', marginTop: 20 }}
-          >
-            <img
-              alt=""
-              src={salvar}
-              style={{
-                margin: 10,
-                height: 30,
-                width: 30,
-              }}
-            ></img>
-          </div>
-        </div>
-      )
-    }
-    return (
-      <div
-        className="fundo"
-        style={{ display: viewopcoeshorarios == 1 ? "flex" : "none" }}
-        onClick={() => {
-          setviewopcoeshorarios(0);
-        }}
-      >
-        <div className="janela"
-          style={{
-            display: 'flex', flexDirection: 'column', justifyItems: 'flex-start',
-            justifyContent: 'flex-start',
-            position: 'relative',
-            padding: 20,
-          }}
-          onClick={(e) => e.stopPropagation()}>
-          <div className='text1' style={{ fontSize: 18, marginBottom: 0 }}>HORÁRIO DA CONSULTA</div>
-          <TimeComponent></TimeComponent>
-        </div>
-      </div>
-    )
-  }
 
   const ViewUpdateAtendimento = (item) => {
     function TimeUpdateComponent() {
@@ -1102,25 +1240,195 @@ function MapaDeAgendamentos() {
     )
   }
 
+  // recuperando registros de pacientes cadastrados na aplicação.
+  const [arraypacientes, setarraypacientes] = useState([]);
+  const [viewlistapacientes, setviewlistapacientes] = useState(0);
+  function ListaDePacientes() {
+    return (
+      <div
+        className="fundo"
+        style={{ display: viewlistapacientes > 0 ? "flex" : "none" }}
+      >
+        <div className="main"
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'flex-start',
+            width: '100vw',
+            height: '100vh',
+          }}>
+          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+            <div id="botão de voltar (sair do cadastro)"
+              className="button-yellow"
+              style={{ margin: 0, marginRight: 10, width: 50, height: 50, alignSelf: 'center' }}
+              title={"VOLTAR PARA O LOGIN"}
+              onClick={() => {
+                setviewlistapacientes(0);
+              }}
+            >
+              <img
+                alt=""
+                src={back}
+                style={{
+                  margin: 0,
+                  height: 30,
+                  width: 30,
+                }}
+              ></img>
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '25vw' }}>
+              <div className="text2">FILTRAR POR NOME DO PACIENTE</div>
+              {Filter("inputFilterPacienteNome", setarraypacientes, pacientes, 'item.nome_paciente')}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '25vw' }}>
+              <div className="text2">FILTRAR POR NOME DA MÃE</div>
+              {Filter("inputFilterMaeNome", setarraypacientes, pacientes, 'item.nome_mae_paciente')}
+            </div>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '25vw' }}>
+              <div className="text2">FILTRAR POR Nº DE PRONTUÁRIO</div>
+              {Filter("inputFilterProntuario", setarraypacientes, pacientes, 'item.id_paciente.toString()')}
+            </div>
+          </div>
+          <div className="grid"
+            style={{
+              marginTop: 10,
+            }}
+          >
+            {arraypacientes
+              .sort((a, b) => (a.nome_paciente > b.nome_paciente ? 1 : -1))
+              .map((item) => (
+                <div
+                  className="button"
+                  key={"paciente " + item.id_paciente}
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    alignItems: 'flex-start',
+                    padding: 10,
+                  }}
+                  onClick={() => {
+                    if (viewlistapacientes == 1) {
+                      insertAtendimento(item, JSON.parse(localStorage.getItem('horario_consulta')));
+                    } else {
+                      localStorage.setItem('obj_paciente', JSON.stringify(item));
+                      setviewconvenioparticular(1);
+                      // insertProcedimento(0, 0, item);
+                    }
+                    setviewlistapacientes(0);
+                  }}
+                >
+                  <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
+                    <div style={{ fontSize: 10, alignSelf: 'flex-end' }}>{'PRONTUÁRIO: ' + item.id_paciente}</div>
+                    <div style={{
+                      display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
+                      height: '100%',
+                    }}>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <div className="texto_claro">
+                          {'NOME DO PACIENTE:'}
+                        </div>
+                        <div style={{ margin: 5, marginTop: 0, textAlign: 'left' }}>
+                          {item.nome_paciente.length > 25 ? item.nome_paciente.slice(0, 25) + '...' : item.nome_paciente}
+                        </div>
+                        <div className="texto_claro">
+                          {'DATA DE NASCIMENTO:'}
+                        </div>
+                        <div style={{ margin: 5, marginTop: 0, textAlign: 'left' }}>
+                          {moment(item.dn_paciente).format("DD/MM/YY")}
+                        </div>
+                        <div className="texto_claro">
+                          {'NOME DA MÃE DO PACIENTE:'}
+                        </div>
+                        <div style={{ margin: 5, marginTop: 0, textAlign: 'left' }}>
+                          {item.nome_mae_paciente.length > 25 ? item.nome_mae_paciente.slice(0, 25) + '...' : item.nome_mae_paciente}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </div>
+          <div
+            className="text1"
+            style={{
+              display: arraypacientes.length == 0 ? "flex" : "none",
+              width: "90vw",
+              opacity: 0.5,
+            }}
+          >
+            SEM PACIENTES CADASTRADOS NA APLICAÇÃO
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // ## AGENDA DE EXAMES E PROCEDIMENTOS ## /
-
   const loadAgendaExames = () => {
-    axios.get(html + 'list_exames_clinicas/' + cliente.id_cliente).then((response) => {
+    axios.get(html + 'list_agenda_exames/' + cliente.id_cliente).then((response) => {
       let x = response.data.rows;
-      setarrayexames(x);
-      console.log(x);
+      setagendaexame(x);
     })
   }
 
   const deleteExameAgendado = (id) => {
     axios.get(html + 'delete_exames_clinicas/' + id).then(() => {
       console.log('ITEM DE EXAME AGENDADO EXCLUÍDO');
-      loadAgendaExames();
+      montaArrayAgenda(selectdate);
     })
   }
 
-  const [arrayexames, setarrayexames] = useState([]);
+  const montaArrayAgenda = (data) => {
+    // atualizando lista de exames agendados.
+    axios.get(html + 'list_exames_clinicas/' + cliente.id_cliente).then((response) => {
+      var x = [];
+      x = response.data.rows;
+      console.log('MONTANDO AGENDA...');
+      let localarrayexames = []
+      // preenchendo a array com os exames já agendados.
+      let arrayexamesdodia = x.filter(item => item.id_cliente == cliente.id_cliente && moment(item.data_exame, 'DD/MM/YYYY - HH:mm').format('DD/MM/YYYY') == data);
+      arrayexamesdodia.map(item => {
+        let obj = {
+          id: item.id,
+          nome_exame: item.nome_exame,
+          data_exame: item.data_exame,
+          id_profisisonal_executante: item.id_profissional_executante,
+          nome_profissional_executante: item.nome_profissional_executante,
+          conselho: item.n_conselho_profissional_executante,
+          id_paciente: item.id_paciente,
+          nome_paciente: item.nome_paciente,
+          dn_paciente: item.dn_paciente,
+          status: item.status,
+          codigo_operadora: item.codigo_operadora,
+          codigo_tuss: item.codigo_tuss,
+          particular: item.particular,
+        }
+        localarrayexames.push(obj);
+        return null;
+      });
+      // preenchendo a array com os horários disponíveis para agendamento, excluindo os já agendados.
+      let arrayagendadodia = agendaexame.filter(item => item.id_cliente == cliente.id_cliente && item.dia_semana == moment(data, 'DD/MM/YYYY').format('dddd').toUpperCase());
+      arrayagendadodia.map(item => {
+        if (arrayexamesdodia.filter(valor => moment(valor.data_exame, 'DD/MM/YYYY - HH:mm').format('HH:mm') == item.hora_inicio).length == 0) {
+          let obj = {
+            id: null,
+            nome_exame: item.exame,
+            data_exame: data + ' - ' + item.hora_inicio,
+            id_profissional_executante: item.id_usuario,
+            nome_profissional_executante: item.id_nome_usuario,
+            conselho: null,
+            nome_paciente: null,
+            dn_paciente: null,
+          }
+          localarrayexames.push(obj);
+        }
+        return null;
+      })
+      setarrayexames(localarrayexames);
+    });
+  }
+
   function ListaDeExamesAgendados() {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
@@ -1133,21 +1441,6 @@ function MapaDeAgendamentos() {
         >
           {'EXAMES E PROCEDIMENTOS AGENDADOS'}
         </div>
-        <div className='button'
-          style={{
-            display: window.innerWidth < mobilewidth ? 'none' : 'flex',
-            width: 200,
-            alignSelf: 'center',
-            marginBottom: 10,
-          }}
-          onClick={() => {
-            localStorage.setItem('selectdate', selectdate);
-            setpagina(2);
-            history.push("/cadastro");
-          }}
-        >
-          AGENDAR EXAME OU PROCEDIMENTO
-        </div>
         <div
           id="scroll de exames e procedimentos"
           className='scroll'
@@ -1156,10 +1449,10 @@ function MapaDeAgendamentos() {
             flexDirection: 'column',
             justifyContent: "flex-start",
             height: '55vh',
-            width: window.innerWidth < mobilewidth ? '80vw' : '50vw',
+            width: window.innerWidth < mobilewidth ? '80vw' : '55vw',
           }}
         >
-          {arrayexames.filter(item => moment(item.data_exame, 'DD/MM/YYYY - HH:mm').format('DD/MM/YYYY') == selectdate).sort((a, b) => (moment(a.data_exame, 'DD/MM/HHHH - HH:mm') > moment(b.data_exame, 'DD/MM/HHHH - HH:mm') ? 1 : -1)).map(item => (
+          {arrayexames.filter(item => item.nome_exame == localStorage.getItem("procedimento")).sort((a, b) => (moment(a.data_exame, 'DD/MM/HHHH - HH:mm') > moment(b.data_exame, 'DD/MM/HHHH - HH:mm') ? 1 : -1)).map(item => (
             <div
               key={'item - ' + Math.random()}
             >
@@ -1167,11 +1460,21 @@ function MapaDeAgendamentos() {
                 style={{
                   display: item.nome_paciente != null ? 'flex' : 'none',
                   flexDirection: 'row', justifyContent: 'flex-start', width: '100%', height: '100%',
+                  position: 'relative',
                 }}
                 onClick={() => {
-                  console.log('abrir tela para mudar horários? ...')
+                  localStorage.setItem('exame', JSON.stringify(item));
                 }}
               >
+                <div className='button'
+                  style={{
+                    position: 'absolute', top: -5, left: -5,
+                    maxHeight: 30, minHeight: 30,
+                    backgroundColor: item.particular == 1 ? '#85C1E9' : '#52be80',
+                    zIndex: 2,
+                  }}>
+                  {item.particular == 1 ? 'PARTICULAR' : 'CONVÊNIO'}
+                </div>
                 <div
                   className='button'
                   style={{
@@ -1206,19 +1509,71 @@ function MapaDeAgendamentos() {
                     <div>{'MÉDICO(A): ' + item.nome_profissional_executante}</div>
                   </div>
                   <div style={{
-                    display: window.innerWidth < mobilewidth ? 'none' : 'flex',
-                    flexDirection: 'row', justifyContent: 'space-between', width: '100%'
+                    display: 'flex',
+                    flexDirection: window.innerWidth < mobilewidth ? 'column' : 'row',
+                    justifyContent: 'space-between', width: '100%'
                   }}>
-                    <div className='button'
-                      style={{
-                        display: 'flex',
-                        backgroundColor: item.status == 0 ? '#f4d03f' : item.situacao == 1 ? '#52be80' : '#EC7063', width: 150, minWidth: 150, height: 30, minHeight: 30, maxHeight: 30,
-                        alignSelf: 'flex-end'
-                      }}
-                    >
-                      {item.status == 0 ? 'AGENDADO' : item.situacao == 1 ? 'EXECUTADO' : item.situacao == 2 ? 'CANCELADO' : 'DESISTÊNCIA'}
+                    <div style={{
+                      display: 'flex',
+                      flexDirection: window.innerWidth < mobilewidth ? 'column' : 'row'
+                    }}>
+                      <div id='btn status'
+                        className='button'
+                        style={{
+                          display: 'flex',
+                          backgroundColor: item.status == 0 ? '#f4d03f' : item.situacao == 1 ? '#52be80' : '#EC7063',
+                          width: window.innerWidth < mobilewidth ? 100 : 150,
+                          minWidth: window.innerWidth < mobilewidth ? 100 : 150,
+                          height: 30, minHeight: 30, maxHeight: 30,
+                          alignSelf: 'flex-end'
+                        }}
+                      >
+                        {item.status == 0 ? 'AGENDADO' : item.situacao == 1 ? 'EXECUTADO' : item.situacao == 2 ? 'CANCELADO' : 'DESISTÊNCIA'}
+                      </div>
+                      <div id='botão para cobrar faturamento'
+                        className='button red'
+                        style={{
+                          display: window.innerWidth < mobilewidth || faturamento.filter(fat => fat.procedimento_id == item.id).length > 0 ? 'none' : 'flex',
+                          minHeight: 30, maxHeight: 30,
+                          width: 150, alignSelf: 'flex-end'
+                        }}
+                        onClick={(e) => {
+                          let procedimento = [];
+                          procedimento = allprocedimentos.filter(proc => proc.tuss_codigo == item.codigo_tuss).pop();
+                          console.log('## PROCEDIMENTO ##');
+                          console.log(procedimento);
+                          localStorage.setItem('tipo_faturamento', 'PROCEDIMENTO');
+                          localStorage.setItem('obj_procedimento', JSON.stringify(procedimento));
+                          localStorage.setItem('obj_agendado', JSON.stringify(item));
+                          setpagamento(1);
+                          localStorage.setItem('forma_pagamento', 'indefinida');
+                          setTimeout(() => {
+                            document.getElementById('inputValorParticular').value = procedimento.valor_part;
+                            document.getElementById('inputValorConvenio').value = procedimento.valor;
+                          }, 1000);
+                          e.stopPropagation();
+                        }}
+                      >
+                        FATURAR
+                      </div>
+                      <div id='botão para informar faturamento realizado'
+                        className='button green'
+                        style={{
+                          display: window.innerWidth > mobilewidth && faturamento.filter(fat => fat.procedimento_id == item.id).length > 0 ? 'flex' : 'none',
+                          minHeight: 30, maxHeight: 30, width: 150, alignSelf: 'flex-end'
+                        }}
+                        onClick={(e) => {
+                          console.log('CRIAR COMPONENTE COM O RESUMO DO FATURAMENTO');
+                          // PENDENTE!
+                        }}
+                      >
+                        FATURADO
+                      </div>
                     </div>
-                    <div style={{ display: 'flex', flexDirection: 'row' }}>
+                    <div style={{
+                      display: window.innerWidth < mobilewidth ? 'none' : 'flex',
+                      flexDirection: window.innerWidth < mobilewidth ? 'column' : 'row'
+                    }}>
                       <div id="btnDeleteAgendamento"
                         title="EXCLUIR AGENDAMENTO"
                         className="button-yellow"
@@ -1230,7 +1585,10 @@ function MapaDeAgendamentos() {
                           );
                           e.stopPropagation();
                         }}
-                        style={{ display: item.status > 0 ? 'none' : 'flex', width: 50, height: 50, alignSelf: "center" }}
+                        style={{
+                          display: item.status > 0 || faturamento.filter(fat => fat.procedimento_id == item.id).length > 0 ? 'none' : 'flex',
+                          width: 50, height: 50, alignSelf: "center"
+                        }}
                       >
                         <img
                           alt=""
@@ -1246,10 +1604,13 @@ function MapaDeAgendamentos() {
                         title="LEMBRAR CONSULTA PARA O CLIENTE"
                         className="button-green"
                         onClick={(e) => {
-                          geraWhatsappExame(item.id_paciente, item);
+                          geraWhatsappExame(item);
                           e.stopPropagation();
                         }}
-                        style={{ display: item.status > 1 ? 'none' : 'flex', width: 50, height: 50, alignSelf: 'flex-end' }}
+                        style={{
+                          display: item.status > 1 || window.innerWidth < mobilewidth ? 'none' : 'flex',
+                          width: 50, height: 50, alignSelf: 'flex-end'
+                        }}
                       >
                         <img
                           alt=""
@@ -1265,10 +1626,105 @@ function MapaDeAgendamentos() {
                   </div>
                 </div>
               </div>
+              <div id="horário livre."
+                className='button cor3'
+                style={{
+                  display: item.nome_paciente == null ? 'flex' : 'none',
+                  flexDirection: 'row', justifyContent: 'flex-start',
+                }}>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  <div className='button green' style={{ display: 'flex', flexDirection: 'column', width: 120, maxWidth: 120, minWidth: 120 }}>
+                    <div>{item.data_exame.slice(0, 10)}</div>
+                    <div>{item.data_exame.slice(13, 18)}</div>
+                  </div>
+                </div>
+                <div style={{
+                  display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
+                  alignContent: 'flex-start', width: '100%', textAlign: 'left', marginLeft: 5,
+                  alignSelf: 'center',
+                }}>
+                  <div>HORÁRIO DISPONÍVEL!</div>
+                  <div>{item.nome_exame}</div>
+                  <div>{'MÉDICO(A): ' + item.nome_profissional_executante}</div>
+                </div>
+                <div className='button-green'
+                  style={{ maxHeight: 50, alignSelf: 'flex-end', paddingLeft: 15, paddingRight: 15 }}
+                  onClick={(e) => {
+                    localStorage.setItem('horario_procedimento', JSON.stringify(item));
+                    setviewlistapacientes(2);
+                    e.stopPropagation();
+                  }}
+                >
+                  AGENDAR PROCEDIMENTO
+                </div>
+              </div>
             </div>
           ))
           }
         </div >
+      </div>
+    )
+  }
+
+  const [viewconvenioparticular, setviewconvenioparticular] = useState((0));
+  function SelecionaParticularConvenio() {
+    return (
+      <div
+        className="fundo"
+        style={{ display: viewconvenioparticular == 1 ? "flex" : "none" }}
+        onClick={() => { setviewconvenioparticular(0) }}
+      >
+        <div className="janela cor2" style={{ display: 'flex', flexDirection: 'row' }}>
+          <div
+            className='button' style={{ width: 200 }}
+            onClick={() => insertProcedimento(0, 1, JSON.parse(localStorage.getItem('obj_paciente')))}
+          >
+            CONVÊNIO
+          </div>
+          <div className='button' style={{ width: 200 }}
+            onClick={() => {
+              insertProcedimento(1, 0, JSON.parse(localStorage.getItem('obj_paciente')));
+            }}
+          >
+            PARTICULAR
+          </div>
+        </div>
+      </div >
+    )
+  }
+
+  const [selectedprocedimento, setselectedprocedimento] = useState('');
+  function SelecionaProcedimentos() {
+    return (
+      <div className="cor2"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className='scroll'
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            width: window.innerWidth < mobilewidth ? '80vw' : '50vw',
+            alignContent: 'flex-start',
+            alignSelf: 'center',
+            overflowX: 'scroll',
+            overflowY: 'hidden',
+          }}
+        >
+          {allprocedimentos.map(item => (
+            <div
+              key={'exame: ' + item.id}
+              className={selectedprocedimento == item.tuss_rol_ans_descricao ? 'button-selected' : 'button'}
+              style={{ display: 'flex', width: 150, minWidth: 150, paddingLeft: 30, paddingRight: 30 }}
+              title={item.tuss_rol_ans_descricao}
+              onClick={() => {
+                localStorage.setItem('procedimento', item.tuss_rol_ans_descricao);
+                setselectedprocedimento(item.tuss_rol_ans_descricao);
+              }}
+            >
+              {item.tuss_rol_ans_descricao.length > 30 ? item.tuss_rol_ans_descricao.slice(0, 30) + '...' : item.tuss_rol_ans_descricao}
+            </div>
+          ))}
+        </div>
       </div>
     )
   }
@@ -1306,8 +1762,20 @@ function MapaDeAgendamentos() {
             style={{ width: 30, height: 30 }}
           ></img>
         </div>
-        <div className={agendamento == 'CONSULTAS' ? 'button-selected' : 'button'} style={{ width: 200 }} onClick={() => setagendamento('CONSULTAS')}>CONSULTAS</div>
-        <div className={agendamento == 'EXAMES' ? 'button-selected' : 'button'} style={{ width: 200 }} onClick={() => setagendamento('EXAMES')}>EXAMES</div>
+        <div className={agendamento == 'CONSULTAS' ? 'button-selected' : 'button'} style={{ width: 200 }}
+          onClick={() => {
+            setagendamento('CONSULTAS');
+            localStorage.setItem('tela_agendamento', 'CONSULTAS');
+          }}>
+          CONSULTAS
+        </div>
+        <div className={agendamento == 'EXAMES' ? 'button-selected' : 'button'} style={{ width: 200 }}
+          onClick={() => {
+            setagendamento('EXAMES');
+            localStorage.setItem('tela_agendamento', 'EXAMES');
+          }}>
+          PROCEDIMENTOS E EXAMES
+        </div>
       </div>
 
       <div style={{
@@ -1321,7 +1789,7 @@ function MapaDeAgendamentos() {
             display: 'flex',
             flexDirection: window.innerWidth < mobilewidth ? 'column' : 'row',
             justifyContent: window.innerWidth < mobilewidth ? 'flex-start' : 'center',
-            marginTop: 20,
+            marginTop: 5,
             alignContent: 'center',
             alignItems: 'center',
           }}
@@ -1339,7 +1807,6 @@ function MapaDeAgendamentos() {
             }}>
             <ListaTodosAtendimentos></ListaTodosAtendimentos>
             <div style={{ display: window.innerWidth < mobilewidth ? 'none' : 'flex' }}>
-              <ViewOpcoesHorarios></ViewOpcoesHorarios>
               <GuiaConsulta></GuiaConsulta>
             </div>
           </div>
@@ -1353,9 +1820,15 @@ function MapaDeAgendamentos() {
               borderRadius: 5,
               marginLeft: 10,
             }}>
-            <ListaDeExamesAgendados></ListaDeExamesAgendados>
+            <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+              <SelecionaProcedimentos></SelecionaProcedimentos>
+              <ListaDeExamesAgendados></ListaDeExamesAgendados>
+            </div>
+            <SelecionaParticularConvenio></SelecionaParticularConvenio>
           </div>
         </div>
+        <Pagamento></Pagamento>
+        <ListaDePacientes></ListaDePacientes>
       </div>
     </div>
   )

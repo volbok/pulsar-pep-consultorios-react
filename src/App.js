@@ -95,6 +95,7 @@ function App() {
   const [paciente, setpaciente] = useState([]);
   const [objpaciente, setobjpaciente] = useState(null);
   const [atendimentos, setatendimentos] = useState([]);
+  const [selectedespecialista, setselectedespecialista] = useState([]);
 
   const [atendimento, setatendimento] = useState(null); // usado para identificar o id_atendimento.
   const [objatendimento, setobjatendimento] = useState([]); // usado para identificar o objeto de atendimento.
@@ -166,13 +167,15 @@ function App() {
   const [chat, setchat] = useState(0);
   const [socket, setsocket] = useState(null);
 
-  const [agenda, setagenda] = useState([]);
+  const [agenda, setagenda] = useState([0, 1]);
   const [agendaexame, setagendaexame] = useState([]);
 
   // componente para pagamentos (faturamento).
   const [pagamento, setpagamento] = useState(0);
   const [faturamento, setfaturamento] = useState([]);
   const [arrayatendimentos, setarrayatendimentos] = useState([]);
+  const [arrayexames, setarrayexames] = useState([]);
+  const [selectdate, setselectdate] = useState();
 
   // tema de cores.
   const [temacor, settemacor] = useState(0);
@@ -279,6 +282,8 @@ function App() {
         setobjpaciente,
         atendimentos,
         setatendimentos,
+        selectedespecialista,
+        setselectedespecialista,
         atendimento,
         setatendimento,
         objatendimento,
@@ -354,6 +359,8 @@ function App() {
         pagamento, setpagamento,
         faturamento, setfaturamento,
         arrayatendimentos, setarrayatendimentos,
+        arrayexames, setarrayexames,
+        selectdate, setselectdate,
 
         temacor, settemacor,
         logocor, setlogocor,

@@ -2,10 +2,10 @@
 import React, { useContext, useEffect, useState, useCallback } from 'react';
 import Context from './Context';
 import axios from 'axios';
+import moment from "moment";
 // imagens.
 import deletar from '../images/deletar.png';
 import back from '../images/back.png';
-import moment from "moment";
 import lupa from '../images/lupa.png';
 import imprimir from '../images/imprimir.png';
 import whatsapp from '../images/whatsapp.png';
@@ -39,12 +39,13 @@ function AgendamentoConsultas() {
     faturamento, setfaturamento,
     setpagamento,
     arrayatendimentos, setarrayatendimentos,
+    selectdate, setselectdate,
   } = useContext(Context);
 
   useEffect(() => {
     // eslint-disable-next-line
     if (pagina == 'AGENDAMENTO DE CONSULTAS') {
-      setselectdate(localStorage.getItem('selectdate'))
+      setselectdate(localStorage.getItem('selectdate'));
       loadUsuarios();
       loadPacientes();
       loadProcedimentos();
@@ -140,6 +141,26 @@ function AgendamentoConsultas() {
       .then((response) => {
         setpacientes(response.data.rows);
       });
+  }
+
+  const carregaHorarioslivres = (array_origin, data) => {
+    let array = array_origin;
+    agenda.filter(item => item.id_usuario == selectedespecialista.id_usuario &&
+      item.dia_semana == moment(data, 'DD/MM/YYYY').format('dddd').toUpperCase()).map(item => {
+        //console.log('pega horário da agenda...')
+        //console.log(moment(data + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm').diff(moment(data + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'), 'minutes'));
+        array.push(
+          {
+            situacao: 'AGENDAMENTO',
+            id_profissional: selectedespecialista.id_usuario,
+            data_inicio: moment(data + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'),
+            data_termino: moment(data + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm'),
+            faturamento_codigo_procedimento: moment(data + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm').diff(moment(data + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'), 'minutes') == cliente.tempo_consulta_convenio ? 'CONVÊNIO' : 'PARTICULAR',
+          }
+        );
+        return null;
+      });
+    setarrayatendimentos(array);
   }
 
   const loadModdedAtendimentos = (item) => {
@@ -348,6 +369,33 @@ function AgendamentoConsultas() {
       });
   };
 
+  const insertBloqueioAtendimento = (inicio) => {
+    // console.log(moment(inicio, 'DD/MM/YYYY - HH:mm'));
+    var obj = {
+      data_inicio: moment(inicio, 'DD/MM/YYYY - HH:mm'),
+      data_termino: localStorage.getItem('PARTICULAR') == 'PARTICULAR' ? moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_particular, 'minutes') : moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_convenio, 'minutes'),
+      problemas: null,
+      id_paciente: null,
+      id_unidade: 5, // ATENÇÃO: 5 é o ID da unidade ambulatorial.
+      nome_paciente: null,
+      leito: null,
+      situacao: 10, // 10 = horário bloqueado para consulta.
+      id_cliente: hospital,
+      classificacao: null,
+      id_profissional: selectedespecialista.id_usuario,
+      convenio_id: null,
+      convenio_carteira: null,
+      faturamento_codigo_procedimento: null,
+    };
+    // console.log(obj);
+    axios
+      .post(html + "insert_consulta", obj)
+      .then(() => {
+        console.log('BLOQUEIO DE HORÁRIO DE CONSULTA INSERIDO COM SUCESSO');
+        loadModdedAtendimentos(selectdate);
+      });
+  };
+
   const updateAtendimento = ([item, inicio]) => {
     console.log(item);
     console.log(inicio);
@@ -432,52 +480,50 @@ function AgendamentoConsultas() {
         }}
         onClick={(e) => e.stopPropagation(e)}
       >
-        {acessos_cliente.map(acesso => (
-          <div>
-            {arrayespecialistas.filter(item => item.tipo_usuario != 'ADMINISTRATIVO' && item.id_usuario == acesso.id_usuario)
-              .sort((a, b) => (a.nome_usuario > b.nome_usuario ? 1 : -1))
-              .map((item) => (
-                <div
-                  key={"usuarios " + Math.random()}
-                  style={{
-                    display: arrayespecialistas.length > 0 ? "flex" : "none",
-                    flexDirection: 'column',
-                    justifyContent: 'flex-start',
-                    alignItems: 'flex-start',
-                    height: 200,
-                  }}
-                  className="button"
-                  id={"usuario " + item.id_usuario}
-                  onClick={() => {
-                    setselectedespecialista(item);
-                    localStorage.setItem('id_especialista', item.id_usuario);
-                    console.log(localStorage.getItem('id_especialista'));
-                    setviewconsultas(1);
-                  }}
-                >
-                  <div
-                    className='button-green'
-                    style={{ width: 'calc(100% - 20px)', backgroundColor: '#004c4c80' }}
-                  >
-                    {item.tipo_usuario}
-                  </div>
-                  <div style={{ margin: 5, marginTop: 10, marginBottom: 0, textAlign: 'left', opacity: 0.6 }}>
-                    {'PROFISSIONAL:'}
-                  </div>
-                  <div style={{ margin: 5, marginTop: 0, textAlign: 'left' }}>
-                    {item.nome_usuario.length > 25 ? item.nome_usuario.slice(0, 25) + '...' : item.nome_usuario}
-                  </div>
-                  <div style={{ margin: 5, marginTop: 5, marginBottom: 0, textAlign: 'left', opacity: 0.6 }}>
-                    {'CONSELHO:'}
-                  </div>
-                  <div style={{ margin: 5, marginTop: 0, textAlign: 'left' }}>
-                    {item.conselho + ' - ' + item.n_conselho}
-                  </div>
-                </div>
-              ))
-            }
-          </div>
-        ))}
+        {arrayespecialistas.filter(item => item.tipo_usuario != 'ADMINISTRATIVO' && acessos_cliente.filter(acesso => acesso.id_usuario == item.id_usuario).length > 0)
+          .sort((a, b) => (a.nome_usuario > b.nome_usuario ? 1 : -1))
+          .map((item) => (
+            <div
+              key={"usuarios " + Math.random()}
+              style={{
+                display: arrayespecialistas.length > 0 && item.tipo_usuario != 'ADMINISTRATIVO' ? "flex" : "none",
+                flexDirection: 'column',
+                justifyContent: 'flex-start',
+                alignItems: 'center',
+                height: 200,
+                width: 'calc(100% - 20px)',
+              }}
+              className="button"
+              id={"usuario " + item.id_usuario}
+              onClick={() => {
+                setselectedespecialista(item);
+                localStorage.setItem('id_especialista', item.id_usuario);
+                console.log(localStorage.getItem('id_especialista'));
+                setviewconsultas(1);
+              }}
+            >
+              <div
+                className='button-green'
+                style={{ width: 'calc(100% - 20px)', backgroundColor: '#004c4c80' }}
+              >
+                {item.tipo_usuario}
+              </div>
+              <div style={{ margin: 5, marginTop: 10, marginBottom: 0, textAlign: 'left', opacity: 0.6 }}>
+                {'PROFISSIONAL:'}
+              </div>
+              <div style={{ margin: 5, marginTop: 0, textAlign: 'left' }}>
+                {item.nome_usuario.length > 25 ? item.nome_usuario.slice(0, 25) + '...' : item.nome_usuario}
+              </div>
+              <div style={{ margin: 5, marginTop: 5, marginBottom: 0, textAlign: 'left', opacity: 0.6 }}>
+                {'CONSELHO:'}
+              </div>
+              <div style={{ margin: 5, marginTop: 0, textAlign: 'left' }}>
+                {item.conselho + ' - ' + item.n_conselho}
+              </div>
+            </div>
+          ))
+        }
+
         <div
           className="text1"
           style={{
@@ -548,7 +594,6 @@ function AgendamentoConsultas() {
     setarraylist(arraydate);
   }
 
-  const [selectdate, setselectdate] = useState(localStorage.getItem('selectdate'));
   function DatePicker() {
     return (
       <div
@@ -647,6 +692,7 @@ function AgendamentoConsultas() {
                 className={selectdate == item ? "button-selected" : "button"}
                 onClick={(e) => {
                   setselectdate(item);
+                  console.log(item);
                   localStorage.setItem('selectdate', item);
                   carregaHorarioslivres(agenda, item);
                   loadModdedAtendimentos(item);
@@ -693,26 +739,6 @@ function AgendamentoConsultas() {
     )
   }
 
-  const carregaHorarioslivres = (array_origin, data) => {
-    let array = array_origin;
-    agenda.filter(item => item.id_usuario == selectedespecialista.id_usuario &&
-      item.dia_semana == moment(data, 'DD/MM/YYYY').format('dddd').toUpperCase()).map(item => {
-        //console.log('pega horário da agenda...')
-        //console.log(moment(data + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm').diff(moment(data + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'), 'minutes'));
-        array.push(
-          {
-            situacao: 'AGENDAMENTO',
-            id_profissional: selectedespecialista.id_usuario,
-            data_inicio: moment(data + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'),
-            data_termino: moment(data + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm'),
-            faturamento_codigo_procedimento: moment(data + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm').diff(moment(data + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'), 'minutes') == cliente.tempo_consulta_convenio ? 'CONVÊNIO' : 'PARTICULAR',
-          }
-        );
-        return null;
-      });
-    setarrayatendimentos(array);
-  }
-
   const ListaDeAtendimentos = useCallback(() => {
     return (
       <div
@@ -731,7 +757,7 @@ function AgendamentoConsultas() {
             flexDirection: 'column',
             justifyContent: "flex-start",
             height: '80vh',
-            width: '50vw',
+            width: '55vw',
             marginLeft: 20
           }}
         >
@@ -747,7 +773,7 @@ function AgendamentoConsultas() {
                 }}>
                 <div id='atendimentos agendados'
                   style={{
-                    display: item.situacao > 2 ? 'flex' : 'none',
+                    display: item.situacao > 2 && item.situacao != 10 ? 'flex' : 'none',
                     flexDirection: 'row',
                     position: "relative",
                     margin: 0, padding: 0,
@@ -919,6 +945,7 @@ function AgendamentoConsultas() {
                             localStorage.setItem('obj_procedimento', JSON.stringify(procedimento)); // registro de procedimento TUSS relacionado ao procedimento/consulta agendado.
                             localStorage.setItem('obj_agendado', JSON.stringify(item));
                             setpagamento(1);
+                            localStorage.setItem('forma_pagamento', 'indefinida');
                             setTimeout(() => {
                               document.getElementById('inputValorParticular').value = procedimento.valor_part;
                               document.getElementById('inputValorConvenio').value = procedimento.valor;
@@ -977,7 +1004,10 @@ function AgendamentoConsultas() {
                               item.id_atendimento
                             );
                           }}
-                          style={{ width: 50, height: 50, alignSelf: 'flex-end' }}
+                          style={{
+                            display: faturamento.filter(fat => fat.atendimento_id == item.id_atendimento && fat.codigo_tuss == '10101012').length > 0 ? 'none' : 'flex',
+                            width: 50, height: 50, alignSelf: 'flex-end'
+                          }}
                         >
                           <img
                             alt=""
@@ -1019,7 +1049,7 @@ function AgendamentoConsultas() {
                         item.situacao != 'AGENDAMENTO'
                         ||
                         arrayatendimentos.filter(valor =>
-                          valor.situacao == 3
+                          (valor.situacao == 3 || valor.situacao == 10)
                           &&
                           valor.id_profissional == selectedespecialista.id_usuario
                           &&
@@ -1062,7 +1092,7 @@ function AgendamentoConsultas() {
                       justifyContent: 'space-between',
                     }}>
                     <div style={{ display: 'flex', flexDirection: 'row', alignContent: 'center' }}>
-                      <div style={{ alignSelf: 'center', marginLeft: 5 }}>
+                      <div style={{ alignSelf: 'center', textAlign: 'left' }}>
                         {'HORÁRIO VAGO: ' + moment(item.data_inicio).format('HH:mm')}
                       </div>
                       <div
@@ -1081,16 +1111,50 @@ function AgendamentoConsultas() {
                         {item.faturamento_codigo_procedimento}
                       </div>
                     </div>
-
-                    <div
-                      className='button'
-                      onClick={() => checkConsultas(moment(item.data_inicio).format('DD/MM/YYYY - HH:mm'))}
-                      style={{
-                        padding: 2.5, paddingLeft: 15, paddingRight: 15,
-                        maxHeight: 30, minHeight: 30,
-                      }}>
-                      AGENDAR
+                    <div style={{ display: 'flex', flexDirection: 'row' }}>
+                      <div
+                        className='button-red'
+                        onClick={() => insertBloqueioAtendimento(moment(item.data_inicio).format('DD/MM/YYYY - HH:mm'))}
+                        style={{
+                          padding: 2.5, paddingLeft: 15, paddingRight: 15,
+                          maxHeight: 30, minHeight: 30,
+                        }}>
+                        BLOQUEAR
+                      </div>
+                      <div
+                        className='button'
+                        onClick={() => checkConsultas(moment(item.data_inicio).format('DD/MM/YYYY - HH:mm'))}
+                        style={{
+                          padding: 2.5, paddingLeft: 15, paddingRight: 15,
+                          maxHeight: 30, minHeight: 30,
+                        }}>
+                        AGENDAR CONSULTA
+                      </div>
                     </div>
+                  </div>
+                </div>
+                <div id='horários bloqueados'
+                  className='button'
+                  style={{
+                    display: item.situacao == 10 ? 'flex' : 'none',
+                    flexDirection: 'row',
+                    justifyContent: 'space-between',
+                    position: "relative",
+                    backgroundColor: '#f1948ab8'
+                  }}>
+                  <div style={{ marginLeft: 5 }}>
+                    {moment(item.data_inicio).format('HH:mm') + ': HORÁRIO BLOQUEADO PARA AGENDAMENTO'}
+                  </div>
+                  <div id="btn desbloquear horário de consulta"
+                    title="DESBLOQUEAR HORÁRIO"
+                    className="button-yellow"
+                    onClick={() => deleteAtendimento(item.id_atendimento)}
+                    style={{
+                      display: faturamento.filter(fat => fat.atendimento_id == item.id_atendimento && fat.codigo_tuss == '10101012').length > 0 ? 'none' : 'flex',
+                      minHeight: 30, height: 30, maxHeight: 30, paddingLeft: 10, paddingRight: 10, alignSelf: 'flex-end'
+                    }}
+                  >
+                    DESBLOQUEAR
                   </div>
                 </div>
               </div>
@@ -1104,7 +1168,7 @@ function AgendamentoConsultas() {
             flexDirection: 'column',
             justifyContent: "center",
             height: '80vh',
-            width: '50vw',
+            width: '55vw',
             marginLeft: 20
           }}
         >
@@ -1524,7 +1588,7 @@ function AgendamentoConsultas() {
               <div
                 style={{
                   display: 'flex', flexDirection: 'row', position: 'relative',
-                  marginTop: 15,
+                  marginTop: 5,
                 }}>
                 <DatePicker></DatePicker>
                 <ListaDeAtendimentos></ListaDeAtendimentos>

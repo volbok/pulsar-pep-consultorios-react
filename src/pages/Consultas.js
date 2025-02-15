@@ -10,6 +10,7 @@ import flag from "../images/white_flag.png";
 import lupa from '../images/lupa.png';
 import call from "../images/call.png";
 import clock from "../images/clock.png";
+import xis from "../images/xis.png";
 // funções.
 import toast from "../functions/toast";
 import modal from "../functions/modal";
@@ -22,7 +23,7 @@ import Alergias from "../cards/Alergias";
 import Documentos from "../cards/Documentos";
 import Exames from "../cards/Exames";
 import selector from "../functions/selector";
-import NotionField from "../cards/NotionField";
+import clearselector from "../functions/clearselector";
 import mountage from "../functions/mountage";
 
 function Consultas() {
@@ -763,12 +764,10 @@ function Consultas() {
   const getAllData = (paciente, atendimento) => {
     // Dados relacionados ao paciente.
     // alergias.
-    setbusyalergias(1);
     axios
       .get(html + "paciente_alergias/" + paciente)
       .then((response) => {
         setalergias(response.data.rows);
-        setbusyalergias(0);
       })
       .catch(function (error) {
         if (error.response == undefined) {
@@ -815,26 +814,27 @@ function Consultas() {
   // estado para alternância entre lista de pacientes e conteúdo do passômetro para versão mobile.
   const [viewlista, setviewlista] = useState(1);
 
-  // função busy.
-  const [busyalergias, setbusyalergias] = useState(0);
-
   // função para renderização dos cards fechados.
   const cartao = (sinal, titulo, opcao) => {
     return (
       <div style={{ display: 'flex' }}>
         <div
-          className={card == opcao ? "button-selected" : "button"}
+          id={'seletor ' + titulo}
+          className="button"
           style={{
             display: "flex",
             pointerEvents: opcao == null || atendimento == null ? 'none' : 'auto',
             borderColor: "transparent",
             margin: 5,
-            width: 150,
+            paddingLeft: 20, paddingRight: 20,
+            minWidth: 200,
+            maxHeight: 30,
             alignSelf: 'center',
             position: 'relative',
           }}
           onClick={() => {
             setcard(opcao);
+            selector('opcoes-tarefas', 'seletor ' + titulo, 200);
           }}
         >
           <div id="sinalizador de alerta."
@@ -855,6 +855,127 @@ function Consultas() {
       </div>
     );
   };
+
+  const [tarefas] = useState(
+    [
+      {
+        sinal: alergias,
+        nome: 'ALERGIAS',
+        card: 'card-alergias'
+      },
+      {
+        sinal: null,
+        nome: 'EVOLUÇÃO',
+        card: 'card-documento-evolucao'
+      },
+      {
+        sinal: null,
+        nome: 'RECEITA MÉDICA',
+        card: 'card-documento-receita'
+      },
+      {
+        sinal: null,
+        nome: 'ATESTADO',
+        card: 'card-documento-atestado'
+      },
+      {
+        sinal: null,
+        nome: 'SOLICITAR EXAMES (GUIAS SADT)',
+        card: 'exames'
+      },
+      {
+        sinal: null,
+        nome: 'SOLICITAR EXAMES (LIVRE)',
+        card: 'card-documento-exames'
+      },
+      {
+        sinal: null,
+        nome: 'LAUDOS',
+        card: 'card-documento-laudo'
+      },
+      {
+        sinal: null,
+        nome: 'RELATÓRIOS',
+        card: 'card-documento-relatorio'
+      },
+      {
+        sinal: null,
+        nome: 'RECIBOS',
+        card: 'card-documento-recibo'
+      },
+    ]
+  )
+  const [arraytarefas, setarraytarefas] = useState(tarefas)
+
+  const SeletorDeTarefas = useCallback(() => {
+    return (
+      <div id="cards (cartões) fixos"
+        className="scroll cor2"
+        style={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'flex-start',
+          alignSelf: 'center',
+          overflowX: 'scroll',
+          overflowY: 'hidden',
+          margin: 0,
+          marginBottom: 10,
+          minHeight: 80,
+          width: 'calc(100% - 15px)',
+          opacity: atendimento == null ? 0.5 : 1,
+        }}>
+        <div
+          onClick={() => {
+            setcard('');
+            clearselector("opcoes-tarefas", 200);
+          }}
+          style={{
+            width: 200, minWidth: 200, maxWidth: 200,
+            display: 'flex', flexDirection: 'row'
+          }}>
+          {Filter('inputSeletorTarefas', setarraytarefas, tarefas, 'item.nome')}
+          <div id='botão para limpar o filtro.'
+            className="button red"
+            onClick={() => {
+              setarraytarefas(tarefas);
+              setTimeout(() => {
+                setcard('');
+                clearselector("opcoes-tarefas", 200);
+                document.getElementById('inputSeletorTarefas').value = '';
+                document.getElementById('inputSeletorTarefas').focus();
+              }, 200);
+            }}
+            style={{
+              borderRadius: 50,
+              minWidth: 20,
+              width: 20,
+              maxWidth: 20,
+              minHeight: 20,
+              height: 20,
+              maxHeight: 20,
+              alignSelf: 'center',
+              marginLeft: -20,
+            }}>
+            <img
+              alt=""
+              src={xis}
+              style={{
+                margin: 0,
+                height: 20,
+                width: 20,
+                opacity: 1,
+                alignSelf: 'center'
+              }}
+            ></img>
+          </div>
+        </div>
+        <div id="opcoes-tarefas" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
+          {arraytarefas.map(tarefas => cartao(tarefas.sinal, tarefas.nome, tarefas.card))}
+        </div>
+      </div >
+    )
+    //eslint-disable-next-line
+  }, [arraytarefas, atendimento]);
 
   return (
     <div
@@ -884,38 +1005,14 @@ function Consultas() {
           <Usuario></Usuario>
           <ListaDeAtendimentos></ListaDeAtendimentos>
         </div>
-        <div style={{
-          display: 'flex', flexDirection: 'column',
-          justifyContent: 'flex-end',
-          marginLeft: 5,
-          width: window.innerWidth < 800 ? '65vw' : 'calc(75vw - 20px)',
-        }}>
-          <div id="cards (cartões) fixos"
-            className="scroll"
-            style={{
-              display: 'flex',
-              flexDirection: 'row',
-              justifyContent: 'flex-start',
-              alignSelf: 'center',
-              overflowX: 'scroll',
-              overflowY: 'hidden',
-              margin: 0,
-              marginBottom: 10,
-              minHeight: 80,
-              width: 'calc(100% - 15px)',
-              opacity: atendimento == null ? 0.5 : 1,
-            }}>
-            {cartao(alergias, "ALERGIAS", "card-alergias", busyalergias, 0)}
-            {cartao(null, "EVOLUÇÃO", "card-documento-evolucao", null, 1)}
-            {cartao(null, "RECEITA MÉDICA", "card-documento-receita", null, 1)}
-            {cartao(null, "ATESTADO", "card-documento-atestado", null, 1)}
-            {cartao(null, 'EXAMES', 'exames')}
-            {cartao(null, 'IMAGEM', 'card-documento-procedimentos')}
-            {cartao(null, 'LAUDOS', 'card-documento-laudo')}
-            {cartao(null, 'RELATÓRIOS', 'card-documento-relatorio')}
-            {cartao(null, 'RECIBOS', 'card-documento-recibo')}
-            {cartao(null, 'EDITOR', 'card-notion')}
-          </div>
+        <div
+          style={{
+            display: 'flex', flexDirection: 'column',
+            justifyContent: 'flex-end',
+            marginLeft: 5,
+            width: window.innerWidth < 800 ? '65vw' : 'calc(75vw - 20px)',
+          }}>
+          <SeletorDeTarefas></SeletorDeTarefas>
           <div id="conteúdo cheio (componentes)"
             style={{
               // display: 'flex',
@@ -929,7 +1026,6 @@ function Consultas() {
           >
             <Alergias></Alergias>
             <Documentos></Documentos>
-            <NotionField></NotionField>
             <Exames></Exames>
           </div>
           <div id="conteúdo vazio"

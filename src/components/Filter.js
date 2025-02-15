@@ -43,7 +43,7 @@ function Filter(input_id, setarraylist, list, parameter) {
         id={input_id}
         // defaultValue={setfilter}
         maxLength={100}
-        style={{ width: '100%' }}
+        style={{ width: '100%', minWidth: 150 }}
       ></input>
     </div>
   );

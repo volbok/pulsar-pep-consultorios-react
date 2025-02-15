@@ -36,6 +36,8 @@ function AgendamentoExames() {
     agendaexame, setagendaexame,
     setpagamento,
     faturamento, setfaturamento,
+    selectdate, setselectdate,
+    arrayexames, setarrayexames,
   } = useContext(Context);
 
   // history (router).
@@ -79,8 +81,6 @@ function AgendamentoExames() {
       });
   };
 
-
-
   const [selecionaexame, setselecionaexame] = useState(1);
   function SelecionaExame() {
     return (
@@ -117,6 +117,33 @@ function AgendamentoExames() {
           </div>
         </div>
       </div>
+    )
+  }
+
+  const [viewconvenioparticular, setviewconvenioparticular] = useState((0));
+  function SelecionaParticularConvenio() {
+    return (
+      <div
+        className="fundo"
+        style={{ display: viewconvenioparticular == 1 ? "flex" : "none" }}
+        onClick={() => { setviewconvenioparticular(0) }}
+      >
+        <div className="janela cor2" style={{ display: 'flex', flexDirection: 'row' }}>
+          <div
+            className='button' style={{ width: 200 }}
+            onClick={() => insertProcedimento(0, 1, JSON.parse(localStorage.getItem('obj_agendado')).data_exame)}
+          >
+            CONVÊNIO
+          </div>
+          <div className='button' style={{ width: 200 }}
+            onClick={() => {
+              insertProcedimento(1, 0, JSON.parse(localStorage.getItem('obj_agendado')).data_exame);
+            }}
+          >
+            PARTICULAR
+          </div>
+        </div>
+      </div >
     )
   }
 
@@ -175,7 +202,6 @@ function AgendamentoExames() {
     setarraylist(arraydate);
   }
 
-  const [selectdate, setselectdate] = useState(localStorage.getItem('selectdate'));
   function DatePicker() {
     return (
       <div
@@ -319,7 +345,6 @@ function AgendamentoExames() {
     )
   }
 
-  const [arrayexames, setarrayexames] = useState([]);
   const montaArrayAgenda = (data) => {
     // atualizando lista de exames agendados.
     axios.get(html + 'list_exames_clinicas/' + cliente.id_cliente).then((response) => {
@@ -343,6 +368,7 @@ function AgendamentoExames() {
           status: item.status,
           codigo_operadora: item.codigo_operadora,
           codigo_tuss: item.codigo_tuss,
+          particular: item.particular,
         }
         localarrayexames.push(obj);
         return null;
@@ -369,11 +395,11 @@ function AgendamentoExames() {
     });
   }
 
-  const checkProcedimentos = (lista, forma_pagamento, data_inicio) => {
+  const checkProcedimentos = (lista, data_inicio) => {
     if (lista.filter(item => item.nome_exame == localStorage.getItem("procedimento") && item.data_exame == data_inicio).length > 0) {
       toast(settoast, 'JÁ EXISTE UM AGENDAMENTO PARA ESTE EXAME NESTE HORÁRIO', 3000);
     } else {
-      insertExameAgendado(0, 1, data_inicio);
+      insertProcedimento(0, 1, data_inicio);
     }
   }
 
@@ -493,36 +519,7 @@ function AgendamentoExames() {
     )
   }
 
-  // inserir registro de procedimento/exame quando inserimos um agendamento do procedimento.
-  // inserir item de exame laboratorial.
-  const insertProcedimento = () => {
-    let random = Math.random()
-    var obj = {
-      id_paciente: paciente,
-      id_atendimento: null,
-      data_pedido: moment(),
-      data_resultado: null,
-      codigo_exame: localStorage.getItem('codigo_tuss'),
-      nome_exame: localStorage.getItem('procedimento'),
-      material: null,
-      resultado: null,
-      status: null,
-      profissional: localStorage.getItem('id_profissional'),
-      unidade_medida: null,
-      vref_min: null,
-      vref_max: null,
-      obs: null,
-      random: random,
-      array_campos: null,
-      metodo: null,
-    }
-    console.log(obj);
-    axios.post(html + 'insert_laboratorio', obj).then(() => {
-      console.log('ITEM DE PROCEDIMENTO CADASTRADO COM SUCESSO');
-    });
-  }
-
-  const insertExameAgendado = (particular, convenio, data) => {
+  const insertProcedimento = (particular, convenio, data) => {
     let obj = {
       id_exame: null,
       nome_exame: localStorage.getItem('procedimento'),
@@ -547,7 +544,6 @@ function AgendamentoExames() {
       console.log('EXAME OU PROCEDIMENTO AGENDADO COM SUCESSO.');
       setviewopcoeshorarios(0);
       montaArrayAgenda(selectdate);
-      insertProcedimento();
     })
   }
 
@@ -605,7 +601,7 @@ function AgendamentoExames() {
           flexDirection: 'column',
           justifyContent: "flex-start",
           height: '80vh',
-          width: '50vw',
+          width: '55vw',
           marginLeft: 20
         }}
       >
@@ -617,11 +613,21 @@ function AgendamentoExames() {
               style={{
                 display: item.nome_paciente != null ? 'flex' : 'none',
                 flexDirection: 'row', justifyContent: 'flex-start', width: '100%', height: '100%',
+                position: 'relative',
               }}
               onClick={() => {
                 localStorage.setItem('exame', JSON.stringify(item));
               }}
             >
+              <div className='button'
+                style={{
+                  position: 'absolute', top: -5, left: -5,
+                  maxHeight: 30, minHeight: 30,
+                  backgroundColor: item.particular == 1 ? '#52be80' : '#85C1E9',
+                  zIndex: 2,
+                }}>
+                {item.particular == 1 ? 'PARTICULAR' : 'CONVÊNIO'}
+              </div>
               <div
                 className='button'
                 style={{
@@ -656,16 +662,16 @@ function AgendamentoExames() {
                   <div>{'MÉDICO(A): ' + item.nome_profissional_executante}</div>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
-                  <div className='button'
-                    style={{
-                      display: 'flex',
-                      backgroundColor: item.status == 0 ? '#f4d03f' : item.situacao == 1 ? '#52be80' : '#EC7063', width: 150, minWidth: 150, height: 30, minHeight: 30, maxHeight: 30,
-                      alignSelf: 'flex-end'
-                    }}
-                  >
-                    {item.status == 0 ? 'AGENDADO' : item.situacao == 1 ? 'EXECUTADO' : item.situacao == 2 ? 'CANCELADO' : 'DESISTÊNCIA'}
-                  </div>
-                  <div style={{ display: 'flex', flexDirection: 'row' }}>
+                  <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
+                    <div className='button'
+                      style={{
+                        display: 'flex',
+                        backgroundColor: item.status == 0 ? '#f4d03f' : item.situacao == 1 ? '#52be80' : '#EC7063', width: 150, minWidth: 150, height: 30, minHeight: 30, maxHeight: 30,
+                        alignSelf: 'flex-end'
+                      }}
+                    >
+                      {item.status == 0 ? 'AGENDADO' : item.situacao == 1 ? 'EXECUTADO' : item.situacao == 2 ? 'CANCELADO' : 'DESISTÊNCIA'}
+                    </div>
                     <div id='botão para cobrar faturamento'
                       className='button red'
                       style={{
@@ -682,6 +688,7 @@ function AgendamentoExames() {
                         localStorage.setItem('obj_procedimento', JSON.stringify(procedimento));
                         localStorage.setItem('obj_agendado', JSON.stringify(item));
                         setpagamento(1);
+                        localStorage.setItem('forma_pagamento', 'indefinida');
                         setTimeout(() => {
                           document.getElementById('inputValorParticular').value = procedimento.valor_part;
                           document.getElementById('inputValorConvenio').value = procedimento.valor;
@@ -691,7 +698,7 @@ function AgendamentoExames() {
                     >
                       FATURAR
                     </div>
-                    <div id='botão para cobrar faturamento'
+                    <div id='botão para exibir faturamento já realizado'
                       className='button green'
                       style={{
                         display: faturamento.filter(fat => fat.procedimento_id == item.id).length > 0 ? 'flex' : 'none',
@@ -704,6 +711,8 @@ function AgendamentoExames() {
                     >
                       FATURADO
                     </div>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
                     <div id="btnDeleteAgendamento"
                       title="EXCLUIR AGENDAMENTO"
                       className="button-yellow"
@@ -716,7 +725,10 @@ function AgendamentoExames() {
                         montaArrayAgenda(selectdate);
                         e.stopPropagation();
                       }}
-                      style={{ display: item.status > 0 ? 'none' : 'flex', width: 50, height: 50, alignSelf: "center" }}
+                      style={{
+                        display: item.status > 0 || faturamento.filter(fat => fat.procedimento_id == item.id).length > 0 ? 'none' : 'flex',
+                        width: 50, height: 50, alignSelf: "center"
+                      }}
                     >
                       <img
                         alt=""
@@ -735,7 +747,10 @@ function AgendamentoExames() {
                         geraWhatsappExame(item);
                         e.stopPropagation();
                       }}
-                      style={{ display: item.status > 1 ? 'none' : 'flex', width: 50, height: 50, alignSelf: 'flex-end' }}
+                      style={{
+                        display: item.status > 1 ? 'none' : 'flex',
+                        width: 50, height: 50, alignSelf: 'flex-end'
+                      }}
                     >
                       <img
                         alt=""
@@ -776,7 +791,7 @@ function AgendamentoExames() {
                 style={{ maxHeight: 50, width: 150, alignSelf: 'flex-end' }}
                 onClick={(e) => {
                   localStorage.setItem('obj_agendado', JSON.stringify(item));
-                  insertExameAgendado(1, 0, item.data_exame);
+                  setviewconvenioparticular(1);
                   e.stopPropagation();
                 }}
               >
@@ -839,7 +854,7 @@ function AgendamentoExames() {
             display: 'flex',
             flexDirection: 'column', justifyContent: 'center',
             alignItems: 'flex-start', textAlign: 'center', alignSelf: 'center',
-            marginTop: 10, marginBottom: 10,
+            marginTop: 5, marginBottom: 10,
           }}>
           <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', alignSelf: 'center' }}>
             <DatePicker></DatePicker>
@@ -849,6 +864,7 @@ function AgendamentoExames() {
         <Pagamento></Pagamento>
         <ViewOpcoesHorarios></ViewOpcoesHorarios>
         <GuiaConsulta></GuiaConsulta>
+        <SelecionaParticularConvenio></SelecionaParticularConvenio>
       </div>
     </div>
   )

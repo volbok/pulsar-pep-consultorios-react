@@ -83,8 +83,8 @@ function Documentos() {
     } else if (card == 'card-documento-alta') {
       settipodocumento('ALTA HOSPITALAR');
       preparaDocumentos();
-    } else if (card == 'card-documento-exame') {
-      settipodocumento('EXAME');
+    } else if (card == 'card-documento-exames') {
+      settipodocumento('SOLICITAÇÃO DE EXAMES COMPLEMENTARES');
       preparaDocumentos();
     } else if (card == 'card-documento-laudo') {
       settipodocumento('LAUDO');

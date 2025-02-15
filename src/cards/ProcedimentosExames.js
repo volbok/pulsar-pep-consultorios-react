@@ -70,7 +70,7 @@ function ProcedimentosExames() {
   const loadNotionDocs = (item) => {
     axios.get(html + "list_documentos_idpct/" + item.id_paciente).then((response) => {
       var x = response.data.rows;
-      setdocumentos(x.filter(documento => documento.tipo_documento == 'PROCEDIMENTO ' + item.id + '-' + item.id_paciente + '-' + item.nome_exame).sort((a, b) => moment(a.data) < moment(b.data) ? 1 : -1));
+      setdocumentos(x.filter(documento => documento.tipo_documento == 'PROCEDIMENTO ' + item.nome_exame + '-' + item.id_paciente).sort((a, b) => moment(a.data) < moment(b.data) ? 1 : -1));
       setselecteddocumento([]);
     })
   }
@@ -84,7 +84,7 @@ function ProcedimentosExames() {
       data: moment(),
       texto: null,
       status: 0,
-      tipo_documento: 'PROCEDIMENTO ' + exame.id + '-' + exame.id_paciente + '-' + exame.nome_exame,
+      tipo_documento: 'PROCEDIMENTO ' + exame.nome_exame + '-' + exame.id_paciente,
       profissional: exame.nome_profissional_executante,
       conselho: exame.conselho_profissional_executante,
       id_profissional: exame.id_profissional_executante,
@@ -169,7 +169,7 @@ function ProcedimentosExames() {
       data: moment(),
       texto: item.texto,
       status: 0,
-      tipo_documento: 'PROCEDIMENTO ' + exame.id + '-' + exame.id_paciente + '-' + exame.nome_exame,
+      tipo_documento: 'PROCEDIMENTO ' + exame.nome_exame + '-' + exame.id_paciente,
       profissional: exame.nome_profissional_executante,
       conselho: exame.conselho_profissional_executante,
       id_profissional: exame.id_profissional_executante,
@@ -1307,16 +1307,21 @@ function ProcedimentosExames() {
               id={'botão exame agendado ' + item.id}
               key={'botão exame agendado ' + item.id}
               style={{
+                display: 'flex',
+                flexDirection: 'row',
+                justifyContent: 'flex-start',
                 position: 'relative',
                 marginBottom: item.status == 0 ? 35 : 5,
-                justifyContent: 'flex-start'
+                alignContent: 'flex-start',
+                alignItems: 'flex-start',
+                minHeight: 120,
               }}
               onClick={() => {
                 localStorage.setItem('exame_selecionado', JSON.stringify(item));
                 axios.get(html + "list_documentos_idpct/" + item.id_paciente).then((response) => {
                   var x = response.data.rows;
                   localStorage.setItem('id_exame_selecionado', item.id);
-                  setdocumentos(x.filter(documento => documento.tipo_documento == 'PROCEDIMENTO ' + item.id + '-' + item.id_paciente + '-' + item.nome_exame).sort((a, b) => moment(a.data) < moment(b.data) ? 1 : -1));
+                  setdocumentos(x.filter(documento => documento.tipo_documento == 'PROCEDIMENTO ' + item.nome_exame + '-' + item.id_paciente).sort((a, b) => moment(a.data) < moment(b.data) ? 1 : -1));
                   selector('lista de exames agendados para laudar', 'botão exame agendado ' + item.id, 100);
                 })
               }}
@@ -1390,7 +1395,7 @@ function ProcedimentosExames() {
                   }}
                   onClick={(e) => {
                     selector('lista de exames agendados para laudar', 'botão exame agendado ' + item.id, 100);
-                    settipodocumento('PROCEDIMENTO ' + item.id + '-' + item.id_paciente + '-' + item.nome_exame);
+                    settipodocumento('PROCEDIMENTO ' + item.nome_exame + '-' + item.id_paciente);
                     insertDocumento(item);
                     e.stopPropagation();
                   }}
@@ -1425,7 +1430,10 @@ function ProcedimentosExames() {
                   ></img>
                 </div>
               </div>
-              <div className={item.status == 1 ? 'button green' : item.status == 2 ? 'button-grey' : 'button orange'} style={{ width: 150, display: 'flex', flexDirection: 'column' }}>
+              <div
+                className={item.status == 1 ? 'button green' : item.status == 2 ? 'button-grey' : 'button orange'}
+                style={{ width: 150, display: 'flex', flexDirection: 'column' }}
+              >
                 <div>
                   {item.data_exame.slice(0, 10)}
                 </div>
@@ -1436,6 +1444,8 @@ function ProcedimentosExames() {
               <div style={{ display: 'flex', flexDirection: 'column' }}>
                 <div style={{ textAlign: 'left' }}>{item.nome_exame}</div>
                 <div style={{ textAlign: 'left' }}>{'PROFISSIONAL: ' + item.nome_profissional_executante}</div>
+                <div style={{ textAlign: 'left' }}>{'PACIENTE: ' + item.nome_paciente}</div>
+                <div style={{ textAlign: 'left' }}>{'DN: ' + item.dn_paciente}</div>
               </div>
             </div>
           ))}

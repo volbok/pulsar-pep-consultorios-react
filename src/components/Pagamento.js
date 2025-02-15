@@ -7,6 +7,7 @@ import selector from '../functions/selector';
 // criação dos documentos PDF.
 import pdfMake from "pdfmake/build/pdfmake";
 import moment from 'moment';
+import toast from '../functions/toast';
 
 function Pagamento() {
 
@@ -16,7 +17,13 @@ function Pagamento() {
     setpagamento, pagamento,
     html,
     setfaturamento,
-    setarrayatendimentos,
+    setarrayatendimentos, arrayatendimentos,
+    agenda,
+    selectedespecialista,
+    setarrayexames,
+    agendaexame,
+    pagina,
+    settoast,
   } = useContext(Context);
 
   let arrayformaspagamento = [
@@ -60,17 +67,16 @@ function Pagamento() {
       setfaturamento(x);
       console.log(x);
       console.log('LISTA DE FATURAMENTOS CARREGADA');
-    })
-  }
-
-  const loadConsultas = () => {
-    axios
-      .get(html + "list_consultas/" + 5) // 5 corresponde ao id da unidade "AMBULATÓRIO".
-      .then((response) => {
-        var x = response.data.rows;
-        var y = x.filter(item => item.id_unidade == 5);
-        setarrayatendimentos(y.filter(atendimento => atendimento.id_cliente == cliente.id_cliente));
-      });
+      if (localStorage.getItem('tela_agendamento') == 'CONSULTAS') {
+        console.log('ATUALIZANDO LISTA DE CONSULTAS E HORÁRIOS LIVRES');
+        loadModdedAtendimentos();
+      } else {
+        console.log('ATUALIZANDO LISTA DE PROCEDIMENTOS E HORÁRIOS LIVRES');
+        setTimeout(() => {
+          montaArrayAgenda(localStorage.getItem('selectdate'));
+        }, 2000);
+      }
+    });
   }
 
   const [arrayfaturas, setarrayfaturas] = useState([]);
@@ -92,6 +98,7 @@ function Pagamento() {
               key={'forma_pgto ' + item.forma}
               onClick={() => {
                 selector('lista de formas de pagamento', 'forma_pgto ' + item.forma, 300);
+                localStorage.setItem('forma_pagamento', item.forma);
                 let procedimento = JSON.parse(localStorage.getItem('obj_procedimento')); // obj_procedimento pode receber registro de consulta ou de atendimento/procedimento médico.
                 let obj_agendado = JSON.parse(localStorage.getItem('obj_agendado'));
                 let localarray = [];
@@ -127,9 +134,16 @@ function Pagamento() {
     )
   }
 
+  let timeout = null;
   const gerarfaturamento = (obj) => {
     axios.post(html + 'insert_faturamento_clinicas', obj).then(() => {
+      clearTimeout(timeout);
+      console.log('CANCELA!')
       console.log('REGISTRO DE FATURAMENTO RECEBIDO COM SUCESSO');
+      timeout = setTimeout(() => {
+        loadFaturamentos();
+        console.log('CARREGANDO TUDO AGORA.')
+      }, 500);
     });
   }
 
@@ -238,7 +252,7 @@ function Pagamento() {
             type="text"
             onFocus={(e) => (e.target.placeholder = "")}
             onBlur={(e) => (e.target.placeholder = "NOME DO PAGADOR...")}
-            defaultValue={objpaciente.nome_paciente}
+            defaultValue={objpaciente != null ? objpaciente.nome_paciente : ''}
             style={{
               flexDirection: "center",
               justifyContent: "center",
@@ -259,7 +273,7 @@ function Pagamento() {
             type="text"
             onFocus={(e) => (e.target.placeholder = "")}
             onBlur={(e) => (e.target.placeholder = "DOCUMENTO DO PAGADOR...")}
-            defaultValue={objpaciente.tipo_documento + ': ' + objpaciente.numero_documento}
+            defaultValue={objpaciente != null ? objpaciente.tipo_documento + ': ' + objpaciente.numero_documento : ''}
             style={{
               flexDirection: "center",
               justifyContent: "center",
@@ -293,11 +307,124 @@ function Pagamento() {
     )
   }
 
+  const loadModdedAtendimentos = () => {
+    axios
+      .get(html + "list_consultas/" + 5) // 5 corresponde ao id da unidade "AMBULATÓRIO".
+      .then((response) => {
+        var x = response.data.rows;
+        var y = x.filter(item => item.id_unidade == 5);
+          carregaHorarioslivres(y);
+      });
+  };
+
+  const montaArrayAgenda = (data) => {
+    // atualizando lista de exames agendados.
+    axios.get(html + 'list_exames_clinicas/' + cliente.id_cliente).then((response) => {
+      var x = [];
+      x = response.data.rows;
+      console.log('MONTANDO AGENDA...');
+      console.log(data);
+      let localarrayexames = []
+      // preenchendo a array com os exames já agendados.
+      let arrayexamesdodia = x.filter(item => item.id_cliente == cliente.id_cliente && moment(item.data_exame, 'DD/MM/YYYY - HH:mm').format('DD/MM/YYYY') == data);
+      arrayexamesdodia.map(item => {
+        let obj = {
+          id: item.id,
+          nome_exame: item.nome_exame,
+          data_exame: item.data_exame,
+          id_profisisonal_executante: item.id_profissional_executante,
+          nome_profissional_executante: item.nome_profissional_executante,
+          conselho: item.n_conselho_profissional_executante,
+          id_paciente: item.id_paciente,
+          nome_paciente: item.nome_paciente,
+          dn_paciente: item.dn_paciente,
+          status: item.status,
+          codigo_operadora: item.codigo_operadora,
+          codigo_tuss: item.codigo_tuss,
+        }
+        localarrayexames.push(obj);
+        return null;
+      });
+      console.log('ARRAY EXAMES AGENDADOS DO DIA:');
+      console.log(localarrayexames);
+      // preenchendo a array com os horários disponíveis para agendamento, excluindo os já agendados.
+      let arrayagendadodia = agendaexame.filter(item => item.id_cliente == cliente.id_cliente && item.dia_semana == moment(data, 'DD/MM/YYYY').format('dddd').toUpperCase());
+      arrayagendadodia.map(item => {
+        if (arrayexamesdodia.filter(valor => moment(valor.data_exame, 'DD/MM/YYYY - HH:mm').format('HH:mm') == item.hora_inicio).length == 0) {
+          let obj = {
+            id: null,
+            nome_exame: item.exame,
+            data_exame: data + ' - ' + item.hora_inicio,
+            id_profissional_executante: item.id_usuario,
+            nome_profissional_executante: item.id_nome_usuario,
+            conselho: null,
+            nome_paciente: null,
+            dn_paciente: null,
+          }
+          localarrayexames.push(obj);
+        }
+        console.log('ARRAY COM HORÁRIOS MARCADOS E DISPONÍVEIS DO DIA:');
+        console.log(localarrayexames);
+        return null;
+      })
+      setarrayexames(localarrayexames);
+    });
+  }
+
+  // PENDÊNCIA!
+  // se disparado da tela mapa, mudar o filtro de agenda retirando o filtro id.usuario.
+  const carregaHorarioslivres = (array) => {
+    setarrayatendimentos([]);
+    console.log(pagina);
+    let selectdate = localStorage.getItem('selectdate');
+    if (pagina == 'MAPA DE AGENDAMENTOS') { // carrega horários de todos os médicos registrados para o cliente.
+      console.log('AGENDAMENTO VIA MAPA');
+      let array_origin = array;
+      agenda.filter(item => item.dia_semana == moment(selectdate, 'DD/MM/YYYY').format('dddd').toUpperCase()).map(item => {
+        array_origin.push(
+          {
+            situacao: 'AGENDAMENTO',
+            id_profissional: item.id_usuario,
+            data_inicio: moment(selectdate + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'),
+            data_termino: moment(selectdate + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm'),
+            faturamento_codigo_procedimento: moment(selectdate + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm').diff(moment(selectdate + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'), 'minutes') == cliente.tempo_consulta_convenio ? 'CONVÊNIO' : 'PARTICULAR',
+          }
+        );
+        return null;
+      });
+      setarrayatendimentos(array_origin);
+    } else {
+      console.log('AGENDAMENTO VIA CADASTRO');
+      let array_origin = arrayatendimentos;
+      agenda.filter(item => item.id_usuario == selectedespecialista.id_usuario && item.dia_semana == moment(selectdate, 'DD/MM/YYYY').format('dddd').toUpperCase()).map(item => {
+        array_origin.push(
+          {
+            situacao: 'AGENDAMENTO',
+            id_profissional: selectedespecialista.id_usuario,
+            data_inicio: moment(selectdate + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'),
+            data_termino: moment(selectdate + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm'),
+            faturamento_codigo_procedimento: moment(selectdate + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm').diff(moment(selectdate + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'), 'minutes') == cliente.tempo_consulta_convenio ? 'CONVÊNIO' : 'PARTICULAR',
+          }
+        );
+        return null;
+      });
+      setarrayatendimentos(array_origin);
+    }
+  }
+
   return (
     <div
       className="fundo"
       style={{ display: pagamento == 1 ? "flex" : "none" }}
-      onClick={() => { setpagamento(0) }}
+      onClick={() => {
+        setpagamento(0);
+        var botoes = document
+          .getElementById('lista de formas de pagamento')
+          .getElementsByClassName("button-selected");
+        for (var i = 0; i < botoes.length; i++) {
+          botoes.item(i).className = "button";
+        }
+      }}
     >
       <div className="janela scroll cor2" style={{ height: '80vh' }}
         onClick={(e) => e.stopPropagation()}
@@ -342,14 +469,29 @@ function Pagamento() {
               </div>
               <div className='button' style={{ width: 200 }}>NFE</div>
               <div
-                className='button' style={{ width: 200 }}
+                className='button'
+                style={{
+                  display: 'flex',
+                  width: 200,
+                }}
                 onClick={() => {
-                  setpagamento(0);
-                  arrayfaturas.map(item => gerarfaturamento(item));
-                  // PENDENTE! separar a ativação destas funções para economizar recursos!
-                  // trocar o loadConsultas por função loadModdedAtendimentos em AgendamentoConsultas.js.
-                  loadFaturamentos();
-                  loadConsultas();
+                  if (localStorage.getItem('forma_pagamento') != 'indefinida') {
+                    setpagamento(0);
+                    var botoes = document
+                      .getElementById('lista de formas de pagamento')
+                      .getElementsByClassName("button-selected");
+                    for (var i = 0; i < botoes.length; i++) {
+                      botoes.item(i).className = "button";
+                    }
+                    arrayfaturas.map(item => gerarfaturamento(item));
+                  } else {
+                    toast(
+                      settoast,
+                      "INDIQUE A FORMA DE PAGAMENTO",
+                      "#EC7063",
+                      1000
+                    );
+                  }
                 }}
               >
                 CONCLUIR FATURAMENTO
@@ -359,7 +501,7 @@ function Pagamento() {
           <div className='button cor1'
             style={{ flexDirection: 'column', justifyContent: 'flex-start' }}>
             <div style={{ padding: 20, paddingBottom: 5, fontSize: 20 }}>CONVÊNIO</div>
-            <div style={{ marginTop: 0, color: '#52be80' }}>{objpaciente.convenio_nome}</div>
+            <div style={{ marginTop: 0, color: '#52be80' }}>{objpaciente != null ? objpaciente.convenio_nome : ''}</div>
             <div style={{ marginTop: 20, opacity: 0.6 }}>{'VALOR (R$)'}</div>
             <input id="inputValorConvenio"
               autoComplete="off"

@@ -23,6 +23,9 @@ import salvar from "../images/salvar.png";
 import editar from "../images/editar.png";
 import lupa from '../images/lupa.png';
 
+var bcrypt = require('bcryptjs');
+var salt = bcrypt.genSaltSync(5);
+
 function Usuarios() {
   // context.
   const {
@@ -164,12 +167,17 @@ function Usuarios() {
 
   // inserindo um usuário.
   const insertUsuario = () => {
+
+    // gerando senha criptografada com o bcrypt.
+    var password = document.getElementById("inputCpf").value;
+    var hash = bcrypt.hashSync(password, salt);
+
     var obj = {
       nome_usuario: document.getElementById("inputNome").value.toUpperCase(),
       dn_usuario: moment(document.getElementById("inputDn").value, "DD/MM/YYYY"),
       cpf_usuario: document.getElementById("inputCpf").value,
       contato_usuario: document.getElementById("inputContato").value,
-      senha: document.getElementById("inputContato").value,
+      senha: hash,
       login: document.getElementById("inputCpf").value,
       conselho: document.getElementById("inputConselho").value.toUpperCase(),
       n_conselho: document.getElementById("inputNumeroConselho").value,
@@ -418,7 +426,7 @@ function Usuarios() {
                   onKeyUp={() => {
                     maskdate(timeout, "inputDn");
                   }}
-                  defaultValue={moment(localStorage.getItem('dn')).format('DD/MM/YYYY')}
+                  defaultValue={localStorage.getItem('dn') == '' ? moment().format('DD/MM/YYYY') : moment(localStorage.getItem('dn')).format('DD/MM/YYYY')}
                   style={{
                     flexDirection: "center",
                     justifyContent: "center",
@@ -1306,8 +1314,8 @@ function Usuarios() {
           }, 200);
         }}
       >
-        <div className="janela" onClick={(e) => e.stopPropagation()}
-          style={{ display: 'flex', flexDirection: 'column', width: '50vw', height: '80vh' }}>
+        <div className="janela scroll" onClick={(e) => e.stopPropagation()}
+          style={{ display: 'flex', flexDirection: 'column', width: '50vw', maxHeight: '80vh' }}>
           <div id="weeklist" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', flexWrap: 'wrap' }}>
             {arrayweek.map(item => (
               <div id={'weekday ' + item}
@@ -1406,6 +1414,7 @@ function Usuarios() {
                   dia_semana: localStorage.getItem('dia'),
                   hora_inicio: horainicio,
                   hora_termino: horatermino,
+                  id_cliente: cliente.id_cliente,
                 }
                 insertAgenda(obj);
                 setinsertagendaview(0);
@@ -1775,6 +1784,9 @@ function Usuarios() {
               onClick={() => {
                 limpaCampos();
                 setselectedusuario(0);
+                localStorage.setItem('uf_conselho', '');
+                localStorage.setItem('codigo_cbo', '');
+                localStorage.setItem('dn', '');
                 setviewnewusuario(1);
               }}
             >
