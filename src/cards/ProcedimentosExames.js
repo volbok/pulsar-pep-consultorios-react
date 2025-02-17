@@ -20,6 +20,11 @@ import deletar from '../images/deletar.png';
 import VanillaCaret from 'vanilla-caret-js';
 import toast from '../functions/toast';
 import flag from "../images/white_flag.png";
+import text_center from "../images/text_center.png";
+import text_left from "../images/text_left.png";
+import text_right from "../images/text_right.png";
+import ampliar from "../images/ampliar.png";
+import reduzir from "../images/reduzir.png";
 
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
@@ -47,7 +52,7 @@ function ProcedimentosExames() {
 
   useEffect(() => {
     if (pagina == 'PROCEDIMENTOS') {
-      loadExamesAgendados();
+      // loadExamesAgendados();
       loadModelos();
       loadFaturamentoClinicaProcedimentos();
     }
@@ -402,10 +407,12 @@ function ProcedimentosExames() {
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'space-between',
-          margin: 0, marginLeft: 10,
+          margin: 0, marginLeft: 7.5,
           width: '20vw',
           minWidth: '20vw',
           maxWidth: '20vw',
+          height: 'calc(100% - 20px)',
+          alignSelf: 'center',
         }}
       >
         <div
@@ -768,14 +775,25 @@ function ProcedimentosExames() {
     element_delete.appendChild(image_delete);
 
     element_zoom_in = document.createElement("div");
-    element_zoom_in.className = 'notion_img_button';
-    element_zoom_in.innerText = '+';
     element_zoom_in.id = 'notionblock_zoom_in ' + random;
+    element_zoom_in.className = 'notion_img_button';
+    
+    let element_ampliar_image = document.createElement("img");
+    element_ampliar_image.src = ampliar;
+    element_ampliar_image.height = 25;
+    element_ampliar_image.width = 25;
+    element_zoom_in.appendChild(element_ampliar_image);
+
 
     element_zoom_out = document.createElement("div");
-    element_zoom_out.className = 'notion_img_button';
-    element_zoom_out.innerText = '-';
     element_zoom_out.id = 'notionblock_zoom_out ' + random;
+    element_zoom_out.className = 'notion_img_button';
+    
+    let element_reduzir_image = document.createElement("img");
+    element_reduzir_image.src = reduzir;
+    element_reduzir_image.height = 25;
+    element_reduzir_image.width = 25;
+    element_zoom_out.appendChild(element_reduzir_image);
 
     if (document.getElementById('notionfieldexames').nextElementSibling != null) {
       document.getElementById("notionfieldexames").insertBefore(element_canvas, document.activeElement.nextSibling);
@@ -967,37 +985,37 @@ function ProcedimentosExames() {
 
   // função que insere ou altera elementos ao clicar-se em uma tecla do teclado.
   const keyHandler = (e) => {
-    // console.log(e.keyCode);
-    // console.log(document.activeElement.id);
     localStorage.setItem('element', document.activeElement.id);
-    // console.log(localStorage.getItem('element'));
     if (e.keyCode == 13) { // tecla enter
       e.preventDefault();
       insereP();
     } else if (e.keyCode == 8) { // tecla backspace
-      // console.log('ID: ' + document.activeElement.id);
       // verificando se o conteúdo do elemento é vazio, para realizar sua exclusão.
       if (document.activeElement.textContent.length == 0) {
         if (document.activeElement.previousSibling != null) {
+          e.preventDefault();
           console.log('DELETANDO ELEMENTO');
           let id = document.getElementById(document.activeElement.id).previousSibling.id;
+          console.log(id);
+          localStorage.setItem('element', id);
           document.getElementById("notionfieldexames").removeChild(document.activeElement);
           document.getElementById(id).focus();
-          localStorage.setItem('element', id);
+          let caret = new VanillaCaret(document.getElementById(id));
+          let conteudo = document.getElementById(id).innerText;
+          console.log(conteudo);
+          caret.setPos(conteudo.length);
         } else {
           document.getElementById("notionfieldexames").removeChild(document.activeElement);
         }
       }
     } else if (e.keyCode == 38) { // tecla seta para cima
       if (document.activeElement.previousSibling != null) {
-        // console.log('DESLOCANDO PARA O ELEMENTO ANTERIOR');
         let id = document.getElementById(document.activeElement.id).previousSibling.id;
         document.getElementById(id).focus();
         localStorage.setItem('element', id);
       }
     } else if (e.keyCode == 40) { // tecla seta para baixo
       if (document.activeElement.nextSibling != null) {
-        // console.log('DESLOCANDO PARA O PRÓXIMO ELEMENTO');
         let id = document.getElementById(document.activeElement.id).nextSibling.id;
         document.getElementById(id).focus();
         localStorage.setItem('element', id);
@@ -1081,7 +1099,11 @@ function ProcedimentosExames() {
             }}
             style={{ width: 30, minWidth: 30, maxWidth: 30, height: 25, minHeight: 25, maxHeight: 25 }}
           >
-            L
+            <img
+              alt=""
+              src={text_left}
+              style={{ width: 25, height: 25 }}
+            ></img>
           </div>
           <div className='button'
             onClick={() => {
@@ -1092,7 +1114,11 @@ function ProcedimentosExames() {
             }}
             style={{ width: 30, minWidth: 30, maxWidth: 30, height: 25, minHeight: 25, maxHeight: 25 }}
           >
-            C
+            <img
+              alt=""
+              src={text_center}
+              style={{ width: 25, height: 25 }}
+            ></img>
           </div>
           <div className='button'
             onClick={() => {
@@ -1103,7 +1129,11 @@ function ProcedimentosExames() {
             }}
             style={{ width: 30, minWidth: 30, maxWidth: 30, height: 25, minHeight: 25, maxHeight: 25, marginRight: 30 }}
           >
-            R
+            <img
+              alt=""
+              src={text_right}
+              style={{ width: 25, height: 25 }}
+            ></img>
           </div>
           <div className='button'
             onClick={() => {
@@ -1185,7 +1215,7 @@ function ProcedimentosExames() {
   }
 
   const [viewseletorexame, setviewseletorexame] = useState(0);
-  const [selectedexame, setselectedexame] = useState('');
+  const [selectedexame, setselectedexame] = useState('SELECIONE UM PROCEDIMENTO');
   function SeletorExame() {
     return (
       <div
@@ -1203,6 +1233,7 @@ function ProcedimentosExames() {
                 }}
                 onClick={() => {
                   setselectedexame(item.nome_procedimento);
+                  loadExamesAgendados();
                   setviewseletorexame(0);
                 }}
               >
@@ -1256,12 +1287,16 @@ function ProcedimentosExames() {
       <div style={{
         display: 'flex',
         flexDirection: 'column',
-        height: 'calc(100vh - 10px)',
         justifyContent: 'space-between',
-        // backgroundColor: 'red',
+        height: 'calc(100% - 20px)',
+        width: '50vw',
+        alignSelf: 'center',
+        marginRight: 5,
       }}>
         <div style={{
           display: 'flex', flexDirection: 'column', justifyContent: 'center',
+          width: 'calc(100% - 20px)',
+          alignSelf: 'center',
         }}>
           <div style={{
             display: 'flex',
@@ -1286,7 +1321,7 @@ function ProcedimentosExames() {
               ></img>
             </div>
             <div className='button'
-              style={{ width: 200 }}
+              style={{ width: 'calc(100% - 20px)' }}
               onClick={() => setviewseletorexame(1)}>
               {selectedexame}
             </div>
@@ -1295,10 +1330,8 @@ function ProcedimentosExames() {
         <div id="lista de exames agendados para laudar"
           className='scroll'
           style={{
-            width: '25vw',
-            minWidth: '30vw',
-            maxWidth: '30vw',
-            marginRight: 10,
+            width: 'calc(100% - 20px)',
+            minWidth: 'calc(100% - 20px)',
             height: '100vh'
           }}
         >
@@ -1528,6 +1561,7 @@ function ProcedimentosExames() {
         style={{
           display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
           width: 'calc(100vw - 20px)',
+          height: 'calc(100vw - 20px)',
         }}
       >
         <MenuColinhas></MenuColinhas>
@@ -1535,10 +1569,9 @@ function ProcedimentosExames() {
         <div style={{
           display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
           width: '100%',
-          height: '100%',
           position: 'relative',
-          alignSelf: 'flex-end',
-          // backgroundColor: 'red',
+          height: 'calc(100% - 20px)',
+          alignSelf: 'center',
         }}>
           <Menu></Menu>
           <NotionField></NotionField>

@@ -184,7 +184,7 @@ function Exames() {
         className='scroll'
         style={{
           width: 'calc(25vw - 10px)',
-          height: 'calc(100vh - 120px)',
+          height: 'calc(100% - 10px)',
           margin: 0, marginLeft: 10,
           backgroundColor: 'white',
           borderColor: 'white',
@@ -428,7 +428,7 @@ function Exames() {
         className='scroll'
         style={{
           display: 'flex',
-          height: 'calc(100vh - 120px)',
+          height: 'calc(100% - 10px)',
           width: 'calc(100% - 30px)',
           backgroundColor: 'white',
           borderColor: 'white',

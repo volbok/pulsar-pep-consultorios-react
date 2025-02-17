@@ -196,7 +196,7 @@ function Consultas() {
           alignSelf: 'center',
           flexWrap: 'wrap',
           marginBottom: 5,
-          width: '100%',
+          width: '25vw',
         }}>
         <div className="text3"
           style={{ alignSelf: 'center', margin: 0, marginTop: -2.5, color: 'white', fontSize: 16 }}>{'USUÁRIO: ' + usuario.nome_usuario.split(' ', 1)}</div>
@@ -207,7 +207,7 @@ function Consultas() {
             justifyContent: 'center',
             alignContent: 'center',
             alignSelf: 'center',
-            width: '100%',
+            flexWrap: 'wrap',
           }}
         >
           <div
@@ -252,7 +252,7 @@ function Consultas() {
               }}
             ></img>
           </div>
-          <div style={{ width: '100%' }}>
+          <div>
             {Filter('inputFilterConsulta', setarrayatendimentos, atendimentos, 'item.nome_paciente')}
           </div>
         </div>
@@ -413,21 +413,20 @@ function Consultas() {
   const ListaDeAtendimentos = useCallback(() => {
     return (
       <div
+        className="scroll"
         style={{
           display: "flex",
           flexDirection: "column",
           justifyContent: "flex-start",
-          marginTop: 1,
-          height: 'calc(100vh - 130px)'
+          flexGrow: 1,
+          width: 'calc(100% - 15px)',
         }}
       >
         <div id="scroll atendimentos com pacientes"
-          className="scroll"
           style={{
             display: arrayatendimentos.length > 0 ? "flex" : "none",
+            flexDirection: 'column',
             justifyContent: "flex-start",
-            width: 'calc(100% - 15px)',
-            height: '100%',
           }}
         >
           <div className="text3">
@@ -743,7 +742,6 @@ function Consultas() {
           }
         </div>
         <div id="scroll atendimento vazio"
-          className="scroll"
           style={{
             display: arrayatendimentos.length < 1 ? "flex" : "none",
             justifyContent: "flex-start",
@@ -931,7 +929,7 @@ function Consultas() {
           }}
           style={{
             width: 200, minWidth: 200, maxWidth: 200,
-            display: 'flex', flexDirection: 'row'
+            display: 'flex', flexDirection: 'row',
           }}>
           {Filter('inputSeletorTarefas', setarraytarefas, tarefas, 'item.nome')}
           <div id='botão para limpar o filtro.'
@@ -972,7 +970,7 @@ function Consultas() {
         <div id="opcoes-tarefas" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
           {arraytarefas.map(tarefas => cartao(tarefas.sinal, tarefas.nome, tarefas.card))}
         </div>
-      </div >
+      </div>
     )
     //eslint-disable-next-line
   }, [arraytarefas, atendimento]);
@@ -998,8 +996,10 @@ function Consultas() {
             position: 'sticky', top: 0,
             margin: 0,
             marginRight: 5,
-            // backgroundColor: 'red',
-            width: window.innerWidth < 800 ? '30vw' : '25vw'
+            width: window.innerWidth < 800 ? '30vw' : '25vw',
+            height: 'calc(100vh - 20px)',
+            alignSelf: 'center'
+
           }}
         >
           <Usuario></Usuario>
@@ -1010,7 +1010,9 @@ function Consultas() {
             display: 'flex', flexDirection: 'column',
             justifyContent: 'flex-end',
             marginLeft: 5,
-            width: window.innerWidth < 800 ? '65vw' : 'calc(75vw - 20px)',
+            width: window.innerWidth < 800 ? '65vw' : 'calc(75vw - 30px)',
+            height: 'calc(100vh - 20px)',
+            alignSelf: 'center',
           }}>
           <SeletorDeTarefas></SeletorDeTarefas>
           <div id="conteúdo cheio (componentes)"

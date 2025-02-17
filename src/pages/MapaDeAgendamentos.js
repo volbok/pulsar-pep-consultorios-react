@@ -48,16 +48,14 @@ function MapaDeAgendamentos() {
     // eslint-disable-next-line
     if (pagina == 'MAPA DE AGENDAMENTOS') {
       localStorage.setItem('tela_agendamento', 'CONSULTAS');
+      currentMonth();
       setselectdate(moment().format('DD/MM/YYYY'))
       loadUsuarios();
       loadPacientes();
-      loadAgenda();
       loadProcedimentos();
       loadFaturamentos();
-      //loadAgendaConsultas();
-      loadModdedAtendimentos(moment().format('DD/MM/YYYY'));
       loadAgendaExames();
-      currentMonth();
+      loadAgenda();
     }
     // eslint-disable-next-line
   }, [pagina]);
@@ -72,8 +70,30 @@ function MapaDeAgendamentos() {
   const loadAgenda = () => {
     axios.get(html + "list_agenda").then((response) => {
       let x = response.data.rows;
-      setagenda(x.filter(item => item.id_cliente == cliente.id_cliente));
+      let local_agenda = x.filter(item => item.id_cliente == cliente.id_cliente);
+      setagenda(local_agenda);
+      localStorage.setItem('selectdate', selectdate);
       setarrayatendimentos([]);
+      axios
+        .get(html + "list_consultas/" + 5) // 5 corresponde ao id da unidade "AMBULATÓRIO".
+        .then((response) => {
+          var x = response.data.rows;
+          var y = x.filter(item => item.id_unidade == 5 && item.id_cliente == cliente.id_cliente);
+          let array = y;
+          local_agenda.filter(item => item.dia_semana == moment(selectdate, 'DD/MM/YYYY').format('dddd').toUpperCase()).map(item => {
+            array.push(
+              {
+                situacao: 'AGENDAMENTO',
+                id_profissional: item.id_usuario,
+                data_inicio: moment(selectdate + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'),
+                data_termino: moment(selectdate + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm'),
+                faturamento_codigo_procedimento: moment(selectdate + ' - ' + item.hora_termino, 'DD/MM/YYYY - HH:mm').diff(moment(selectdate + ' - ' + item.hora_inicio, 'DD/MM/YYYY - HH:mm'), 'minutes') == cliente.tempo_consulta_convenio ? 'CONVÊNIO' : 'PARTICULAR',
+              }
+            );
+            return null;
+          });
+          setarrayatendimentos(array);
+        });
     })
   }
 

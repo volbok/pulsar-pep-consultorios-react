@@ -30,7 +30,10 @@ function Filter(input_id, setarraylist, list, parameter) {
     }, 1000);
   }
   return (
-    <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', width: '100%' }}>
+    <div style={{
+      display: 'flex', flexDirection: 'row', justifyContent: 'center',
+      width: '100%'
+    }}>
       <input
         title={input_id}
         className="input"
