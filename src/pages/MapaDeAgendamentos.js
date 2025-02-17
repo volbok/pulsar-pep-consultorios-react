@@ -802,6 +802,7 @@ function MapaDeAgendamentos() {
                             localStorage.setItem('tipo_faturamento', 'ATENDIMENTO');
                             localStorage.setItem('obj_procedimento', JSON.stringify(procedimento)); // registro de procedimento TUSS relacionado ao procedimento/consulta agendado.
                             localStorage.setItem('obj_agendado', JSON.stringify(item));
+                            localStorage.setItem('procedimento', 'CONSULTA MÉDICA');
                             localStorage.setItem('forma_pagamento', '');
                             setpagamento(1);
                             localStorage.setItem('forma_pagamento', 'indefinida');
@@ -1032,8 +1033,13 @@ function MapaDeAgendamentos() {
                     position: "relative",
                     backgroundColor: '#f1948ab8'
                   }}>
-                  <div style={{ alignSelf: 'center', textAlign: 'left' }}>
-                    {moment(item.data_inicio).format('DD/MM/YYYY - HH:mm') + ': HORÁRIO BLOQUEADO PARA AGENDAMENTO'}
+                  <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', marginLeft: 5 }}>
+                    <div style={{ alignSelf: 'flex-start', textAlign: 'left' }}>
+                      {moment(item.data_inicio).format('DD/MM/YYYY - HH:mm') + ': HORÁRIO BLOQUEADO PARA AGENDAMENTO'}
+                    </div>
+                    <div style={{ alignSelf: 'flex-start', textAlign: 'left' }}>
+                      {'PROFISSIONAL: ' + usuarios.filter(usuario => usuario.id_usuario == item.id_profissional).map(valor => valor.nome_usuario)}
+                    </div>
                   </div>
                   <div id="btn desbloquear horário de consulta"
                     title="DESBLOQUEAR HORÁRIO"
