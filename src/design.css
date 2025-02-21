@@ -264,6 +264,11 @@ td {
   outline: none !important;
   border: 0px;
   box-shadow: none;
+  overflow-wrap: break-word;
+  word-Break: break-word;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: grey;
 }
 
 .notion_block:focus {
@@ -326,6 +331,9 @@ td {
   line-break: normal !important;
   word-wrap: break-word;
   align-self: center;
+  width: 20% !important;
+  min-width: 20% !important;
+  max-width: 20% !important;
   background-color: transparent;
   vertical-align: top;
   outline: none !important;

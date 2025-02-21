@@ -576,8 +576,6 @@ function ProcedimentosExames() {
       insereTitulo();
     } else if (tipo == 'texto') {
       insereFirstP();
-    } else if (tipo == 'bloco') {
-      insereBloco();
     } else if (tipo == 'imagem') {
       insereImagem();
     }
@@ -630,19 +628,17 @@ function ProcedimentosExames() {
     element.className = 'notion_p';
     element.style.width = 300;
     element.setAttribute('contenteditable', "true");
-
     if (document.getElementById('notionfieldexames').nextElementSibling != null) {
       document.getElementById("notionfieldexames").insertBefore(element, document.activeElement.nextSibling);
     } else {
       document.getElementById("notionfieldexames").appendChild(element);
     }
-
     document.getElementById(element.id).focus();
     localStorage.setItem('element', element.id);
   };
   const insereP = () => {
     let random = Math.random();
-    if (document.activeElement.nextSibling != null) {
+    if (document.activeElement.nextSibling != null && !document.activeElement.id.includes('notionblock')) {
       let element = document.createElement("div");
       element.id = 'notionblock ' + random;
       element.className = 'notion_p';
@@ -677,55 +673,10 @@ function ProcedimentosExames() {
     document.getElementById(element.id).focus();
     localStorage.setItem('element', element.id);
   }
-  const insereBloco = () => {
-    console.log('insere bloco');
-    let random = Math.random();
-    let element_bloco = document.createElement("table"); // porra.
-    element_bloco.className = 'notion_block';
-    element_bloco.id = 'notionblock ' + random;
-    let element_lateral_e = document.createElement("td");
-    let element_lateral_d = document.createElement("td");
-    let element_table_text = document.createElement("th");
-
-    element_table_text.style.className = 'notion_block_editable';
-    element_table_text.style.width = '60%';
-    element_table_text.setAttribute('contenteditable', "true");
-
-    element_lateral_d.className = 'notion_block_lateral';
-    element_lateral_e.className = 'notion_block_lateral';
-    element_lateral_d.style.color = '#FFFFFF';
-    element_lateral_e.style.color = '#FFFFFF';
-    element_lateral_d.style.backgroundColor = '#FFFFFF';
-    element_lateral_e.style.backgroundColor = '#FFFFFF';
-    element_lateral_e.textContent = '............................'
-    element_lateral_d.textContent = '............................'
-
-    if (document.getElementById('notionfieldexames').nextElementSibling != null) {
-      document.getElementById("notionfieldexames").insertBefore(element_bloco, document.activeElement.nextSibling);
-      element_bloco.appendChild(element_lateral_e);
-      element_bloco.appendChild(element_table_text);
-      element_bloco.appendChild(element_lateral_d);
-      element_table_text.focus();
-
-    } else {
-      document.getElementById("notionfieldexames").appendChild(element_bloco);
-      element_bloco.appendChild(element_lateral_e);
-      element_bloco.appendChild(element_table_text);
-      element_bloco.appendChild(element_lateral_d);
-      element_table_text.focus();
-    }
-
-    document.getElementById(element_bloco.id).focus();
-    localStorage.setItem('element', element_bloco.id);
-
-  }
   const insereImagem = () => {
-
     console.log('insere canvas');
-
     // criando o random para tratamento dos id's dos elementos.
     let random = Math.random();
-
     // criando os elementos HTML.
     let element_canvas = null;
     let element_parent = null; // div que vai ter como elementos filhos o botão selecionar imagem, deletar imagem e botões de zoom.
@@ -736,65 +687,52 @@ function ProcedimentosExames() {
     let element_zoom_out = null;
     let img = null;
     let element_image = null;
-
     element_canvas = document.createElement("canvas");
     element_canvas.id = 'notionblock_canvas ' + random;
     element_canvas.className = 'notion_canvas'
-
     element_parent = document.createElement("div");
     element_parent.id = 'notionblock_parent ' + random;
     element_parent.style.display = 'flex';
     element_parent.style.flexDirection = 'row';
     element_parent.style.justifyContent = 'center';
-
     element_input = document.createElement("input");
     element_input.type = 'file';
     element_input.id = 'notionblock_picker ' + random;
     element_input.style.display = 'none';
-
     element_pseudo_input = document.createElement("div");
     element_pseudo_input.className = "notion_img_button";
     element_pseudo_input.id = 'notionblock_pseudo_picker ' + random;
-
     let image_novo = document.createElement('img');
     image_novo.src = novo;
     image_novo.width = 25;
     image_novo.height = 25;
     image_novo.alt = "";
     element_pseudo_input.appendChild(image_novo);
-
     element_delete = document.createElement("div");
     element_delete.className = 'notion_img_button_red';
     element_delete.id = 'notionblock_delete ' + random;
-
     let image_delete = document.createElement('img');
     image_delete.src = deletar;
     image_delete.width = 25;
     image_delete.height = 25;
     image_delete.alt = "";
     element_delete.appendChild(image_delete);
-
     element_zoom_in = document.createElement("div");
     element_zoom_in.id = 'notionblock_zoom_in ' + random;
     element_zoom_in.className = 'notion_img_button';
-    
     let element_ampliar_image = document.createElement("img");
     element_ampliar_image.src = ampliar;
     element_ampliar_image.height = 25;
     element_ampliar_image.width = 25;
     element_zoom_in.appendChild(element_ampliar_image);
-
-
     element_zoom_out = document.createElement("div");
     element_zoom_out.id = 'notionblock_zoom_out ' + random;
     element_zoom_out.className = 'notion_img_button';
-    
     let element_reduzir_image = document.createElement("img");
     element_reduzir_image.src = reduzir;
     element_reduzir_image.height = 25;
     element_reduzir_image.width = 25;
     element_zoom_out.appendChild(element_reduzir_image);
-
     if (document.getElementById('notionfieldexames').nextElementSibling != null) {
       document.getElementById("notionfieldexames").insertBefore(element_canvas, document.activeElement.nextSibling);
       document.getElementById("notionfieldexames").insertBefore(element_parent, document.activeElement.nextSibling);
@@ -803,8 +741,6 @@ function ProcedimentosExames() {
       element_parent.appendChild(element_delete);
       element_parent.appendChild(element_zoom_in);
       element_parent.appendChild(element_zoom_out);
-      //document.getElementById("notionfield").insertBefore(element_input, document.activeElement.nextSibling);
-      //document.getElementById("notionfield").insertBefore(element_pseudo_input, document.activeElement.nextSibling);
     } else {
       document.getElementById("notionfieldexames").appendChild(element_canvas);
       document.getElementById("notionfieldexames").insertBefore(element_parent, document.activeElement.nextSibling);
@@ -813,8 +749,6 @@ function ProcedimentosExames() {
       element_parent.appendChild(element_delete);
       element_parent.appendChild(element_zoom_in);
       element_parent.appendChild(element_zoom_out);
-      // document.getElementById("notionfield").appendChild(element_input);
-      // document.getElementById("notionfield").appendChild(element_pseudo_input);
     }
 
     // adicionando as funções para abrir a janela do explorer e capturar uma imagem.
@@ -860,7 +794,6 @@ function ProcedimentosExames() {
         document.getElementById('notionblock_img ' + random).remove();
       }
       document.getElementById("notionfieldexames").appendChild(element_canvas);
-
       // carregando a imagem selecionada no explorador de arquivos no canvas.
       let canvas = document.getElementById(element_canvas.id);
       canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
@@ -868,28 +801,17 @@ function ProcedimentosExames() {
       img = new Image();
       img.src = URL.createObjectURL(myFile);
       img.onload = () => {
-        console.log('image uploaded');
-
-        console.log('IMG WIDTH: ' + img.width);
-        console.log('IMG HEIGHT: ' + img.height);
-
         let notionfieldwidth = document.getElementById("notionfieldexames").offsetWidth;
         let ratio = notionfieldwidth / img.width;
-
         if (notionfieldwidth < img.width) {
-          // console.log('imagem grande!');
           canvas.width = 0.6 * ratio * img.width;
           canvas.height = 0.6 * ratio * img.height;
-          // console.log('VEJA: ' + canvas.width + ' - ' + canvas.height);
         } else {
-          // console.log('imagem menor...');
           canvas.width = 0.7 * img.width;
           canvas.height = 0.7 * img.height;
-          // console.log('VEJA: ' + canvas.width + ' - ' + canvas.height);
         }
-
         document.getElementById('notionblock_canvas ' + random).getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-
+        
         // criando o elemento imagem e transferindo a figura para o elemento imagem.
         element_image = document.createElement("img");
         element_image.id = 'notionblock_img ' + random;
@@ -985,6 +907,8 @@ function ProcedimentosExames() {
 
   // função que insere ou altera elementos ao clicar-se em uma tecla do teclado.
   const keyHandler = (e) => {
+    console.log(document.activeElement.id);
+    console.log(document.activeElement.parentElement.id);
     localStorage.setItem('element', document.activeElement.id);
     if (e.keyCode == 13) { // tecla enter
       e.preventDefault();
@@ -1005,7 +929,7 @@ function ProcedimentosExames() {
           console.log(conteudo);
           caret.setPos(conteudo.length);
         } else {
-          document.getElementById("notionfieldexames").removeChild(document.activeElement);
+          document.activeElement.remove();
         }
       }
     } else if (e.keyCode == 38) { // tecla seta para cima
@@ -1075,12 +999,6 @@ function ProcedimentosExames() {
             style={{ width: 100, height: 25, minHeight: 25, maxHeight: 25 }}
           >
             TEXTO
-          </div>
-          <div className='button'
-            onClick={() => appendElement('bloco')}
-            style={{ width: 100, height: 25, minHeight: 25, maxHeight: 25 }}
-          >
-            BLOCO
           </div>
           <div className='button' for="uploader"
             onClick={() => appendElement('imagem')}

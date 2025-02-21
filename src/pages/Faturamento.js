@@ -2,17 +2,21 @@
 import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import Context from "./Context";
+import moment from "moment";
 // imagens.
 import salvar from '../images/salvar.png';
 import novo from '../images/novo.png';
 import deletar from '../images/deletar.png';
 import editar from '../images/editar.png';
 import back from '../images/back.png';
+import lupa from '../images/lupa.png'
 // import salvar from "../images/salvar.svg";
 import "moment/locale/pt-br";
 import modal from "../functions/modal";
 import { useHistory } from "react-router-dom";
 import Filter from "../components/Filter";
+import selector from "../functions/selector";
+import clearselector from "../functions/clearselector";
 
 function Faturamento() {
 
@@ -20,36 +24,24 @@ function Faturamento() {
   const {
     pagina, setpagina,
     html,
-    setatendimentos,
-    setpacientes,
-    setaih,
     operadoras, setoperadoras,
     setselectedoperadora, selectedoperadora,
     procedimentos, setprocedimentos,
     selectedprocedimento, setselectedprocedimento,
     setdialogo,
     cliente,
+    usuarios,
   } = useContext(Context);
 
   // history (router).
   let history = useHistory();
 
-  const loadAtendimentos = () => {
-    axios
-      .get(html + "all_atendimentos")
-      .then((response) => {
-        setatendimentos(response.data.rows);
-      });
-  };
-  const loadPacientes = () => {
-    axios.get(html + "list_pacientes").then((response) => {
-      setpacientes(response.data.rows);
-      loadAtendimentos();
-    });
-  }
-  const loadAih = () => {
-    axios.get(html + 'load_aih').then((response) => {
-      setaih(response.data.rows);
+  const [localfaturamento, setlocalfaturamento] = useState([]);
+  const loadfaturamentosmes = (data) => {
+    axios.get(html + 'list_faturamento_geral_mes/' + cliente.id_cliente + '/' + data).then((response) => {
+      let x = response.data.rows;
+      setlocalfaturamento(x);
+      console.log(x);
     });
   }
 
@@ -57,12 +49,13 @@ function Faturamento() {
     // eslint-disable-next-line
     if (pagina == 'FATURAMENTO') {
       console.log('PÁGINA DE FATURAMENTO');
-      loadAtendimentos();
-      loadPacientes();
-      loadAih();
+      // loadAtendimentos();
+      // loadPacientes();
+      // loadAih();
       loadOperadoras();
       loadProcedimentos();
       loadTuss();
+      // loadFaturamentos();
     }
     // eslint-disable-next-line
   }, [pagina]);
@@ -235,19 +228,6 @@ function Faturamento() {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <div style={{ display: 'flex', flexDirection: 'row', alignSelf: 'center' }}>
-          <div id="botão para sair da tela de faturamento"
-            className="button-yellow"
-            style={{ maxHeight: 50, maxWidth: 50, alignSelf: 'center' }}
-            onClick={() => {
-              setpagina(0);
-              history.push("/");
-            }}>
-            <img
-              alt=""
-              src={back}
-              style={{ width: 30, height: 30 }}
-            ></img>
-          </div>
           <div className="text2" style={{ fontSize: 22 }}>LISTA DE OPERADORAS CADASTRADAS</div>
         </div>
         <ListOperadoras></ListOperadoras>
@@ -413,7 +393,7 @@ function Faturamento() {
   // cadastro de operadoras de saúde.
   const loadProcedimentos = () => {
     axios.get(html + 'all_procedimentos').then((response) => {
-      setprocedimentos(response.data.rows); 
+      setprocedimentos(response.data.rows);
       console.log(response.data.rows);
     })
   };
@@ -791,6 +771,228 @@ function Faturamento() {
     )
   }
 
+  const [menufaturamento, setmenufaturamento] = useState('REGISTROS DE FATURAMENTO');
+  let opcoesmenufaturamento = [
+    'REGISTROS DE FATURAMENTO',
+    'CADASTRO DE OPERADORAS',
+  ]
+  function MenuFaturamento() {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center', marginBottom: 5 }}>
+        <div id="botão para sair da tela de faturamento"
+          className="button-yellow"
+          style={{ maxHeight: 50, maxWidth: 50, alignSelf: 'center' }}
+          onClick={() => {
+            setpagina(0);
+            history.push("/");
+          }}>
+          <img
+            alt=""
+            src={back}
+            style={{ width: 30, height: 30 }}
+          ></img>
+        </div>
+        {opcoesmenufaturamento.map((item) => (
+          <div className={menufaturamento == item ? "button-selected" : "button"}
+            onClick={() => setmenufaturamento(item)}
+            style={{ width: 250 }}
+          >
+            {item}
+          </div>
+        ))}
+      </div>
+    )
+  }
+
+  let calendariomensal = [
+    moment().subtract(3, 'months').format('MM-YYYY'),
+    moment().subtract(2, 'months').format('MM-YYYY'),
+    moment().subtract(1, 'month').format('MM-YYYY'),
+    moment().format('MM-YYYY'),
+    moment().add(1, 'month').format('MM-YYYY'),
+    moment().add(2, 'months').format('MM-YYYY'),
+    moment().add(3, 'months').format('MM-YYYY'),
+  ]
+
+  const [atendimentos_mes, setatendimentos_mes] = useState([]);
+  const filtraregistrosconsultas = (data) => {
+    axios.get(html + "list_faturamento_clinicas_mes/" + cliente.id_cliente + "/" + data).then((response) => {
+      let x = response.data.rows;
+      setatendimentos_mes(x);
+      console.log(x.length);
+    });
+  }
+
+  const [objfaturamento, setobjfaturamento] = useState(null);
+  function ListaDeFaturamentosConsultas() {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+        <div id="seletores de meses">
+          <div id="scroll de meses"
+            className="scroll cor2"
+            style={{
+              display: 'flex', flexDirection: 'row', justifyContent: 'flex-start',
+              overflowY: 'hidden', overflowX: 'scroll',
+              width: '80vw', alignSelf: 'center',
+            }}>
+            <textarea
+              autoComplete="off"
+              placeholder="DN"
+              className="textarea"
+              type="text"
+              inputMode="numeric"
+              maxLength={10}
+              id="inputMesFaturamento"
+              title="FORMATO: MM-YYYY"
+              onClick={() => document.getElementById("inputMesFaturamento").value = ""}
+              onFocus={(e) => (e.target.placeholder = "")}
+              onBlur={(e) => (e.target.placeholder = "MÊS-ANO")}
+              // defaultValue={moment().format('MM-YYYY')}
+              style={{
+                flexDirection: "center",
+                justifyContent: "center",
+                alignSelf: "center",
+                width: 150,
+                textAlign: "center",
+                padding: 5,
+                height: 20,
+                minHeight: 20,
+                maxHeight: 20,
+              }}
+            ></textarea>
+            <div id='botão para limpar o filtro.'
+              className="button red"
+              onClick={() => {
+                filtraregistrosconsultas(document.getElementById("inputMesFaturamento").value);
+                loadfaturamentosmes(document.getElementById("inputMesFaturamento").value);
+                clearselector("scroll de meses", 300);
+              }}
+              style={{
+                borderRadius: 50,
+                minWidth: 20,
+                width: 20,
+                maxWidth: 20,
+                minHeight: 20,
+                height: 20,
+                maxHeight: 20,
+                alignSelf: 'center',
+                marginLeft: -20,
+              }}>
+              <img
+                alt=""
+                src={lupa}
+                style={{
+                  margin: 0,
+                  height: 20,
+                  width: 20,
+                  opacity: 1,
+                  alignSelf: 'center'
+                }}
+              ></img>
+            </div>
+            {calendariomensal.map(item => (
+              <div
+                id={'btn_datas_faturamento ' + item}
+                className="button"
+                style={{ width: 200, minHeight: 30, height: 30, maxHeight: 30 }}
+                onClick={() => {
+                  filtraregistrosconsultas(item);
+                  loadfaturamentosmes(item);
+                  selector("scroll de meses", 'btn_datas_faturamento ' + item, 200);
+                }}>
+                {item}
+              </div>
+            ))}
+          </div>
+          <div id='inputdata'></div>
+        </div>
+        {
+          atendimentos_mes.map(item => (
+            <div className="button" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignSelf: 'flex-start' }}>
+                <div className="button red" style={{
+                  display: 'flex', flexDirection: 'column', justifyContent: 'center', width: 200, minWidth: 200,
+                  marginRight: 10, alignSelf: 'center',
+                }}>
+                  <div>{moment(item.data_inicio).format('DD/MM/YYYY - HH:mm')}</div>
+                  <div>{'CONSULTA'}</div>
+                </div>
+                <div style={{
+                  display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', textAlign: 'left',
+                  alignSelf: 'center',
+                }}>
+                  <div>
+                    {'CLIENTE: ' + item.nome_paciente}
+                  </div>
+                  <div>
+                    {'PROFISSIONAL: ' + usuarios.filter(usuario => usuario.id_usuario == item.id_profissional).map(usuario => usuario.nome_usuario)}
+                  </div>
+                </div>
+              </div>
+              <div style={{
+                display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between',
+                width: 360
+              }}>
+                {localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).map(valor => (
+                  <div className={valor.status_pagamento == 'ABERTO' ? 'button red' : 'button green'}
+                    onClick={() => {
+                      setobjfaturamento(valor);
+                      console.log(valor);
+                      setvieweditfaturamento(1);
+                    }}
+                    style={{
+                      display: 'flex', flexDirection: 'column',
+                      width: 100, minWidth: 100, maxWidth: 100,
+                    }}>
+                    <div>{valor.forma_pagamento}</div>
+                    <div>{valor.status_pagamento}</div>
+                    <div>{'R$ ' + parseFloat(valor.valor_pagamento).toFixed(2)}</div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))
+        }
+      </div >
+    )
+  }
+
+  const [vieweditfaturamento, setvieweditfaturamento] = useState(0);
+  function EditFaturamento() {
+    const [statusfatura, setstatusfatura] = useState(null);
+    return (
+      <div className="fundo"
+        style={{ display: vieweditfaturamento == 1 ? 'flex' : 'none', flexDirection: 'column', justifyContent: 'center' }}
+        onClick={() => setvieweditfaturamento(0)}
+      >
+        <div
+          className="janela scroll cor2"
+          onClick={(e) => e.stopPropagation()}>
+          <div className="text1" style={{ fontSize: 20 }}>RESUMO DA FATURA</div>
+          <div className="text1">{objfaturamento != null ? 'VALOR DO PAGAMENTO: R$ ' + parseFloat(objfaturamento.valor_pagamento).toFixed(2) : ''}</div>
+          <div
+            style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+            <div className={statusfatura == 'PAGO' ? "button-selected" : "button-green"}
+              style={{ display: 'flex', minWidth: 150, width: 150, maxWidth: 150 }}
+              onClick={() => setstatusfatura('PAGO')}
+            >
+              {'PAGO'}
+            </div>
+            <div className={statusfatura == 'ABERTO' ? "button-selected" : "button-yellow"}
+              style={{ display: 'flex', minWidth: 150, width: 150, maxWidth: 150 }}>
+              {'ABERTO'}
+            </div>
+            <div className={statusfatura == 'VENCIDO' ? "button-selected" : "button-red"}
+              style={{ display: 'flex', minWidth: 150, width: 150, maxWidth: 150 }}>
+              {'VENCIDO'}
+            </div>
+          </div>
+          <div></div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div id="tela de faturamento"
       className='main'
@@ -803,8 +1005,24 @@ function Faturamento() {
           display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
           width: 'calc(100vw - 20px)',
         }}>
-        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-          <ViewOperadoras></ViewOperadoras>
+        <div style={{
+          display: 'flex', flexDirection: 'column', justifyContent: 'center',
+          alignItems: 'center',
+        }}>
+          <MenuFaturamento></MenuFaturamento>
+          <div style={{
+            display: menufaturamento == 'CADASTRO DE OPERADORAS' ? 'flex' : 'none',
+            flexDirection: 'column', justifyContent: 'center'
+          }}>
+            <ViewOperadoras></ViewOperadoras>
+          </div>
+          <div style={{
+            display: menufaturamento == 'REGISTROS DE FATURAMENTO' ? 'flex' : 'none',
+            flexDirection: 'column', justifyContent: 'center'
+          }}>
+            <ListaDeFaturamentosConsultas></ListaDeFaturamentosConsultas>
+            <EditFaturamento></EditFaturamento>
+          </div>
         </div>
       </div>
     </div>
