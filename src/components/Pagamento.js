@@ -103,21 +103,23 @@ function Pagamento() {
                 let obj_agendado = JSON.parse(localStorage.getItem('obj_agendado'));
                 let localarray = [];
                 for (let step = 0; step < item.lancamentos; step++) {
+                  let data = moment().add(step, 'month');
                   let obj = {
                     cliente_id: cliente.id_cliente,
                     cliente_nome: cliente.razao_social,
                     atendimento_id: localStorage.getItem('tipo_faturamento') == 'ATENDIMENTO' ? obj_agendado.id_atendimento : null,
                     procedimento_id: localStorage.getItem('tipo_faturamento') == 'PROCEDIMENTO' ? obj_agendado.id : null,
-                    data_pagamento: moment().format('DD/MM/YYYY'),
-                    data_vencimento: null,
+                    data_pagamento: step + 1 == 1 ? data.format('DD/MM/YYYY') : null, // primeira parcela paga à vista.
+                    data_vencimento: data.format('DD/MM/YYYY'),
                     parcela: step + 1,
                     forma_pagamento: item.forma,
-                    status_pagamento: 'ABERTO', // passar como parâmetro.
+                    status_pagamento: step + 1 == 1 ? 'PAGO' : 'ABERTO', // passar como parâmetro.
                     valor_pagamento: parseInt(procedimento.valor_part) / item.lancamentos,
                     id_operadora: obj_agendado.id_operadora,
                     codigo_operadora: null,
                     codigo_tuss: procedimento.tuss_codigo,
                     nome_tuss: procedimento.tuss_rol_ans_descricao,
+                    data_registro: moment().format('DD/MM/YYYY'),
                   }
                   // PENDENTE: adaptar para o agendamento de consultas!
                   localarray.push(obj);

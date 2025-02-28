@@ -15,8 +15,8 @@ import "moment/locale/pt-br";
 import modal from "../functions/modal";
 import { useHistory } from "react-router-dom";
 import Filter from "../components/Filter";
-import selector from "../functions/selector";
-import clearselector from "../functions/clearselector";
+import { PieChart, Pie, Tooltip } from 'recharts';
+import pdfMake from "pdfmake/build/pdfmake";
 
 function Faturamento() {
 
@@ -31,17 +31,55 @@ function Faturamento() {
     setdialogo,
     cliente,
     usuarios,
+    setobjatendimento,
   } = useContext(Context);
 
   // history (router).
   let history = useHistory();
 
   const [localfaturamento, setlocalfaturamento] = useState([]);
+  const builddonutfaturamentodata = (arrayfaturamento, status) => {
+    let total = 0;
+    arrayfaturamento.filter(item => item.status_pagamento == status).map(item => {
+      total = parseFloat(total) + parseFloat(item.valor_pagamento);
+      return null;
+    });
+    console.log(status + ': ' + total.toFixed(2));
+    return total.toFixed(2);
+  }
+
+  const buildtotalvalorfaturamento = (arrayfaturamento) => {
+    let total = 0;
+    arrayfaturamento.map(item => {
+      total = parseFloat(total) + parseFloat(item.valor_pagamento);
+      return null;
+    });
+    return total.toFixed(2);
+  }
+
+  const donutfaturamentodata = () => {
+    console.log(dadosdonutaberto);
+    return (
+      [
+        { name: 'PAGAMENTOS EM ABERTO', value: parseFloat(dadosdonutaberto), fill: '#f5d142' },
+        { name: 'PAGAMENTOS VENCIDOS', value: parseFloat(dadosdonutvencido), fill: '#EC7063' },
+        { name: 'PAGAMENTOS RECEBIDOS', value: parseFloat(dadosdonutpago), fill: '#52be80' },
+      ]
+    )
+  }
+
+  const [dadosdonutaberto, setdadosdonutaberto] = useState();
+  const [dadosdonutvencido, setdadosdonutvencido] = useState();
+  const [dadosdonutpago, setdadosdonutpago] = useState();
   const loadfaturamentosmes = (data) => {
     axios.get(html + 'list_faturamento_geral_mes/' + cliente.id_cliente + '/' + data).then((response) => {
       let x = response.data.rows;
       setlocalfaturamento(x);
       console.log(x);
+      buildtotalvalorfaturamento(x);
+      setdadosdonutaberto(builddonutfaturamentodata(x, 'ABERTO'));
+      setdadosdonutvencido(builddonutfaturamentodata(x, 'VENCIDO'));
+      setdadosdonutpago(builddonutfaturamentodata(x, 'PAGO'));
     });
   }
 
@@ -49,13 +87,12 @@ function Faturamento() {
     // eslint-disable-next-line
     if (pagina == 'FATURAMENTO') {
       console.log('PÁGINA DE FATURAMENTO');
-      // loadAtendimentos();
-      // loadPacientes();
-      // loadAih();
       loadOperadoras();
       loadProcedimentos();
       loadTuss();
-      // loadFaturamentos();
+      filtraregistrosconsultas(moment().format('MM-YYYY'));
+      filtraregistrosprocedimentos(moment().format('MM-YYYY'));
+      loadfaturamentosmes(moment().format('MM-YYYY'));
     }
     // eslint-disable-next-line
   }, [pagina]);
@@ -823,8 +860,21 @@ function Faturamento() {
     });
   }
 
+  const [procedimentos_mes, setprocedimentos_mes] = useState([]);
+  const filtraregistrosprocedimentos = (data) => {
+    console.log(data);
+    axios.get(html + "list_faturamento_procedimentos_mes/" + cliente.id_cliente + "/" + data).then((response) => {
+      let x = response.data.rows;
+      setprocedimentos_mes(x);
+      console.log('PORRA');
+      console.log(x.length);
+    });
+  }
+
   const [objfaturamento, setobjfaturamento] = useState(null);
-  function ListaDeFaturamentosConsultas() {
+  const [selecteddate, setselecteddate] = useState(moment().format('MM-YYYY'));
+  const [tipoatendimento, settipoatendimento] = useState('CONSULTAS');
+  function ListaDeFaturamentos() {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
         <div id="seletores de meses">
@@ -837,7 +887,7 @@ function Faturamento() {
             }}>
             <textarea
               autoComplete="off"
-              placeholder="DN"
+              placeholder="MÊS/ANO"
               className="textarea"
               type="text"
               inputMode="numeric"
@@ -847,7 +897,6 @@ function Faturamento() {
               onClick={() => document.getElementById("inputMesFaturamento").value = ""}
               onFocus={(e) => (e.target.placeholder = "")}
               onBlur={(e) => (e.target.placeholder = "MÊS-ANO")}
-              // defaultValue={moment().format('MM-YYYY')}
               style={{
                 flexDirection: "center",
                 justifyContent: "center",
@@ -864,8 +913,8 @@ function Faturamento() {
               className="button red"
               onClick={() => {
                 filtraregistrosconsultas(document.getElementById("inputMesFaturamento").value);
+                filtraregistrosprocedimentos(document.getElementById("inputMesFaturamento").value);
                 loadfaturamentosmes(document.getElementById("inputMesFaturamento").value);
-                clearselector("scroll de meses", 300);
               }}
               style={{
                 borderRadius: 50,
@@ -893,67 +942,246 @@ function Faturamento() {
             {calendariomensal.map(item => (
               <div
                 id={'btn_datas_faturamento ' + item}
-                className="button"
+                className={selecteddate == item ? "button-selected" : "button"}
                 style={{ width: 200, minHeight: 30, height: 30, maxHeight: 30 }}
                 onClick={() => {
+                  setselecteddate(item);
                   filtraregistrosconsultas(item);
+                  filtraregistrosprocedimentos(item);
                   loadfaturamentosmes(item);
-                  selector("scroll de meses", 'btn_datas_faturamento ' + item, 200);
+                  document.getElementById("inputMesFaturamento").value = selecteddate;
                 }}>
                 {item}
               </div>
             ))}
           </div>
-          <div id='inputdata'></div>
         </div>
-        {
-          atendimentos_mes.map(item => (
-            <div className="button" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
-              <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignSelf: 'flex-start' }}>
-                <div className="button red" style={{
-                  display: 'flex', flexDirection: 'column', justifyContent: 'center', width: 200, minWidth: 200,
-                  marginRight: 10, alignSelf: 'center',
-                }}>
-                  <div>{moment(item.data_inicio).format('DD/MM/YYYY - HH:mm')}</div>
-                  <div>{'CONSULTA'}</div>
+        <TotaisFaturamento></TotaisFaturamento>
+        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+          <div
+            className={tipoatendimento == 'CONSULTAS' ? "button-selected" : "button"}
+            style={{ width: 150 }}
+            onClick={() => settipoatendimento('CONSULTAS')}
+          >
+            CONSULTAS
+          </div>
+          <div
+            className={tipoatendimento == 'PROCEDIMENTOS' ? "button-selected" : "button"}
+            style={{ width: 150 }}
+            onClick={() => settipoatendimento('PROCEDIMENTOS')}
+          >
+            PROCEDIMENTOS
+          </div>
+        </div>
+        <div style={{ display: tipoatendimento == 'CONSULTAS' ? 'flex' : 'none', flexDirection: 'column' }}>
+          {
+            atendimentos_mes.filter(item => item.nome_paciente != 'HORÁRIO BLOQUEADO!').map(item => (
+              <div className="button" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignSelf: 'flex-start' }}>
+                  <div className="button red" style={{
+                    display: 'flex', flexDirection: 'column', justifyContent: 'center', width: 200, minWidth: 200,
+                    marginRight: 10, alignSelf: 'center',
+                  }}>
+                    <div>{moment(item.data_inicio).format('DD/MM/YYYY - HH:mm')}</div>
+                    <div>{'CONSULTA'}</div>
+                  </div>
+                  <div style={{
+                    display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', textAlign: 'left',
+                    alignSelf: 'center',
+                  }}>
+                    <div style={{ fontSize: 10, opacity: 0.5 }}>
+                      {'ID ATENDIMENTO: ' + item.id_atendimento}
+                    </div>
+                    <div>
+                      {'CLIENTE: ' + item.nome_paciente}
+                    </div>
+                    <div>
+                      {'PROFISSIONAL: ' + usuarios.filter(usuario => usuario.id_usuario == item.id_profissional).map(usuario => usuario.nome_usuario)}
+                    </div>
+                  </div>
                 </div>
                 <div style={{
-                  display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', textAlign: 'left',
-                  alignSelf: 'center',
+                  display: 'flex', flexDirection: 'column', flexWrap: 'wrap', justifyContent: 'flex-start',
+                  width: '40vw'
                 }}>
-                  <div>
-                    {'CLIENTE: ' + item.nome_paciente}
-                  </div>
-                  <div>
-                    {'PROFISSIONAL: ' + usuarios.filter(usuario => usuario.id_usuario == item.id_profissional).map(usuario => usuario.nome_usuario)}
-                  </div>
+                  {localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).sort((a, b) => a.parcela < b.parcela ? -1 : 1).map(valor => (
+                    <div className={valor.status_pagamento == 'ABERTO' ? 'button yellow' : valor.status_pagamento == 'VENCIDO' ? 'button red' : 'button green'}
+                      onClick={() => {
+                        setobjatendimento(item);
+                        setobjfaturamento(valor);
+                        console.log(valor);
+                        setvieweditfaturamento(1);
+                      }}
+                      style={{
+                        display: 'flex', flexDirection: 'column',
+                        justifyContent: 'flex-start',
+                        alignContent: 'flex-start',
+                        alignItems: 'flex-start',
+                        paddingLeft: 10,
+                      }}>
+                      <div>{valor.forma_pagamento}</div>
+                      <div>{'PARCELA: ' + valor.parcela}</div>
+                      <div>{'STATUS: ' + valor.status_pagamento}</div>
+                      <div>{valor.data_pagamento == null ? 'DATA DO PAGAMENTO: PENDENTE' : 'DATA DO PAGAMENTO: ' + valor.data_pagamento}</div>
+                      <div>{'DATA DO VENCIMENTO: ' + valor.data_vencimento}</div>
+                      <div>{'R$ ' + parseFloat(valor.valor_pagamento).toFixed(2)}</div>
+                    </div>
+                  ))}
                 </div>
               </div>
-              <div style={{
-                display: 'flex', flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between',
-                width: 360
-              }}>
-                {localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).map(valor => (
-                  <div className={valor.status_pagamento == 'ABERTO' ? 'button red' : 'button green'}
-                    onClick={() => {
-                      setobjfaturamento(valor);
-                      console.log(valor);
-                      setvieweditfaturamento(1);
-                    }}
-                    style={{
-                      display: 'flex', flexDirection: 'column',
-                      width: 100, minWidth: 100, maxWidth: 100,
-                    }}>
-                    <div>{valor.forma_pagamento}</div>
-                    <div>{valor.status_pagamento}</div>
-                    <div>{'R$ ' + parseFloat(valor.valor_pagamento).toFixed(2)}</div>
+            ))
+          }
+        </div>
+        <div style={{ display: tipoatendimento == 'PROCEDIMENTOS' ? 'flex' : 'none', flexDirection: 'column' }}>
+          {
+            procedimentos_mes.map(item => (
+              <div className="button" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignSelf: 'flex-start' }}>
+                  <div className="button red" style={{
+                    display: 'flex', flexDirection: 'column', justifyContent: 'center', width: 200, minWidth: 200,
+                    marginRight: 10, alignSelf: 'center',
+                  }}>
+                    <div>{item.data_exame}</div>
+                    <div>{item.nome_exame}</div>
                   </div>
-                ))}
+                  <div style={{
+                    display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', textAlign: 'left',
+                    alignSelf: 'center',
+                  }}>
+                    <div style={{ fontSize: 10, opacity: 0.5 }}>
+                      {'ID PROCEDIMENTO: ' + item.id}
+                    </div>
+                    <div>
+                      {'CLIENTE: ' + item.nome_paciente}
+                    </div>
+                    <div>
+                      {'PROFISSIONAL: ' + usuarios.filter(usuario => usuario.id_usuario == item.id_profissional_executante).map(usuario => usuario.nome_usuario)}
+                    </div>
+                  </div>
+                </div>
+                <div style={{
+                  display: 'flex', flexDirection: 'column', flexWrap: 'wrap', justifyContent: 'flex-start',
+                  width: '40vw'
+                }}>
+                  {localfaturamento.filter(valor => valor.procedimento_id == item.id).sort((a, b) => a.parcela < b.parcela ? -1 : 1).map(valor => (
+                    <div className={valor.status_pagamento == 'ABERTO' ? 'button yellow' : valor.status_pagamento == 'VENCIDO' ? 'button red' : 'button green'}
+                      onClick={() => {
+                        setobjfaturamento(valor);
+                        console.log(valor);
+                        setvieweditfaturamento(1);
+                      }}
+                      style={{
+                        display: 'flex', flexDirection: 'column',
+                        justifyContent: 'flex-start',
+                        alignContent: 'flex-start',
+                        alignItems: 'flex-start',
+                        paddingLeft: 10,
+                      }}>
+                      <div>{valor.forma_pagamento}</div>
+                      <div>{'PARCELA: ' + valor.parcela}</div>
+                      <div>{'STATUS: ' + valor.status_pagamento}</div>
+                      <div>{valor.data_pagamento == null ? 'DATA DO PAGAMENTO: PENDENTE' : 'DATA DO PAGAMENTO: ' + valor.data_pagamento}</div>
+                      <div>{'DATA DO VENCIMENTO: ' + valor.data_vencimento}</div>
+                      <div>{'R$ ' + parseFloat(valor.valor_pagamento).toFixed(2)}</div>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))
-        }
+            ))
+          }
+        </div>
       </div >
+    )
+  }
+
+  const totaisfaturamento = (arrayfaturamento, status) => {
+    let total = 0;
+    arrayfaturamento.filter(item => item.status_pagamento == status).map(item => {
+      total = parseFloat(total) + parseFloat(item.valor_pagamento);
+      return null;
+    });
+    return (
+      <div
+        className={status == 'ABERTO' ? "button yellow" : status == 'VENCIDO' ? "button red" : "button green"}
+        style={{ width: 150, display: 'flex', flexDirection: 'column' }}
+      >
+        <div>{status}</div>
+        <div>
+          {'R$ ' + total.toFixed(2)}
+        </div>
+      </div>
+    );
+  }
+
+  const donutchart = (data, tamanho, fontsize, total) => {
+    // tooltip
+    const CustomTooltip = ({ payload, label }) => {
+      return (
+        <div style={{
+          display: 'flex', flexDirection: 'column', justifyContent: 'flex-start',
+          backgroundColor: 'black', borderRadius: 5, padding: 10, color: 'white',
+          fontSize: fontsize, fontWeight: 'bold',
+        }}>
+          <div>{label}</div>
+          {payload.map(item => (
+            <div>
+              <div>{item.name + ':'}</div>
+              <div>{'R$: ' + item.value}</div>
+              <div>{Math.ceil(item.value * 100 / total) + '%'}</div>
+            </div>
+          ))}
+        </div>
+      )
+    }
+
+    // labels.
+    const RADIAN = Math.PI / 180;
+    let renderLabel = ({ cx, cy, midAngle, innerRadius, outerRadius, value }) => {
+
+      const radius = innerRadius + (outerRadius - innerRadius) * 0.3;
+      const x = cx + radius * Math.cos(-midAngle * RADIAN);
+      const y = cy + radius * Math.sin(-midAngle * RADIAN);
+
+      if (Math.ceil(100 * value / localfaturamento.length) > 0) {
+        return (
+          <div style={{ backgroundColor: 'black' }} x={x} y={y} fill={'white'} fontWeight={'bold'} fontSize={fontsize} textAnchor={x > cx ? 'start' : 'end'} dominantBaseline="central">
+            {Math.ceil(100 * value / localfaturamento.length) + '%'}
+          </div>
+        );
+      } else {
+        return null;
+      }
+    }
+
+    return (
+      <div style={{ display: 'flex', borderRadius: 5, margin: 5 }}>
+        <PieChart width={tamanho + 10} height={tamanho + 10} style={{ alignSelf: 'center' }}>
+          {localfaturamento.length}
+          BOBO
+          <Tooltip content={<CustomTooltip payload={[]} />} />
+          <Pie
+            data={data} dataKey="value" nameKey={"name"} labelLine={false} label={renderLabel} cx={0.5 * tamanho} cy={0.5 * tamanho} outerRadius={0.5 * tamanho} innerRadius={0.2 * tamanho}
+            stroke={''} strokeWidth={5}
+          >
+          </Pie>
+        </PieChart>
+      </div>
+    )
+  }
+
+
+  function TotaisFaturamento() {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+          {donutchart(donutfaturamentodata(), 200, 16, buildtotalvalorfaturamento(localfaturamento))}
+        </div>
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', marginTop: 5 }}>
+          {totaisfaturamento(localfaturamento, 'ABERTO')}
+          {totaisfaturamento(localfaturamento, 'VENCIDO')}
+          {totaisfaturamento(localfaturamento, 'PAGO')}
+        </div>
+      </div>
     )
   }
 
@@ -969,7 +1197,20 @@ function Faturamento() {
           className="janela scroll cor2"
           onClick={(e) => e.stopPropagation()}>
           <div className="text1" style={{ fontSize: 20 }}>RESUMO DA FATURA</div>
-          <div className="text1">{objfaturamento != null ? 'VALOR DO PAGAMENTO: R$ ' + parseFloat(objfaturamento.valor_pagamento).toFixed(2) : ''}</div>
+          <div className="text1">VALOR DO PAGAMENTO</div>
+          <input
+            className="input"
+            autoComplete="off"
+            placeholder="VALOR DO PAGAMENTO"
+            onFocus={(e) => (e.target.placeholder = "")}
+            onBlur={(e) => (e.target.placeholder = "VALOR DO PAGAMENTO (R$)")}
+            type="text"
+            id="inputValorDoPagamento"
+            defaultValue={objfaturamento != null ? parseFloat(objfaturamento.valor_pagamento).toFixed(2) : ''}
+            maxLength={200}
+            style={{ margin: 5, width: window.innerWidth < 426 ? 200 : 200 }}
+          >
+          </input>
           <div
             style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
             <div className={statusfatura == 'PAGO' ? "button-selected" : "button-green"}
@@ -979,15 +1220,220 @@ function Faturamento() {
               {'PAGO'}
             </div>
             <div className={statusfatura == 'ABERTO' ? "button-selected" : "button-yellow"}
-              style={{ display: 'flex', minWidth: 150, width: 150, maxWidth: 150 }}>
+              style={{ display: 'flex', minWidth: 150, width: 150, maxWidth: 150 }}
+              onClick={() => setstatusfatura('ABERTO')}
+            >
               {'ABERTO'}
             </div>
             <div className={statusfatura == 'VENCIDO' ? "button-selected" : "button-red"}
-              style={{ display: 'flex', minWidth: 150, width: 150, maxWidth: 150 }}>
+              style={{ display: 'flex', minWidth: 150, width: 150, maxWidth: 150 }}
+              onClick={() => setstatusfatura('VENCIDO')}
+            >
               {'VENCIDO'}
             </div>
           </div>
-          <div></div>
+          <div
+            className="button" style={{ paddingLeft: 15, paddingRight: 15 }}
+            onClick={() => updateRegistroProcedimento(objfaturamento, statusfatura, document.getElementById('inputValorDoPagamento').value)}
+          >
+            ATUALIZAR INFORMAÇÕES
+          </div>
+          <div className="button green"
+            onClick={
+              () => {
+                setreciboform(1);
+                localStorage.setItem('pagador', atendimentos_mes.filter(atend => atend.id_atendimento == objfaturamento.atendimento_id).map(atend => atend.nome_paciente));
+                localStorage.setItem('procedimento', 'CONSULTA MÉDICA');
+              }
+            }
+            style={{ paddingLeft: 15, paddingRight: 15 }}>
+            GERAR RECIBO
+          </div>
+        </div>
+      </div >
+    )
+  }
+
+  const updateRegistroProcedimento = (item, status, valor) => {
+    let obj = {
+      cliente_id: cliente.id_cliente,
+      cliente_nome: cliente.razao_social,
+      atendimento_id: item.atendimento_id,
+      procedimento_id: item.procedimento_id,
+      data_pagamento: item.data_pagamento,
+      data_vencimento: item.data_vencimento,
+      parcela: item.parcela,
+      forma_pagamento: item.forma_pagamento,
+      status_pagamento: status,
+      valor_pagamento: valor,
+      id_operadora: item.id_operadora,
+      codigo_operadora: item.codigo_operadora,
+      codigo_tuss: item.codigo_tuss,
+      nome_tuss: item.nome_tuss,
+      data_registro: item.data_registro,
+    }
+    axios.post(html + 'update_faturamento_clinicas/' + item.id, obj).then(() => {
+      console.log('REGISTRO DE FATURAMENTO REALIZADO COM SUCESSO');
+      loadfaturamentosmes(document.getElementById("inputMesFaturamento").value);
+      setvieweditfaturamento(0);
+    })
+  }
+
+  // ## CRIAÇÃO DE RECIBOS EM PDFMAKE ## //
+  // impressão de recibo de pagamento (consulta ou procedimento particular).
+  const printFile = () => {
+    const docDefinition = {
+      pageSize: 'A4',
+      pageOrientation: 'portrait',
+      pageMargins: [40, 200, 40, 120],
+      header: {
+        stack: [
+          {
+            columns: [
+              {
+                image: cliente.logo,
+                width: 75,
+                alignment: 'center',
+              },
+              {
+                stack: [
+                  { text: cliente.razao_social, alignment: 'left', fontSize: 10, width: 300 },
+                  { text: 'ENDEREÇO: ' + cliente.endereco, alignment: 'left', fontSize: 6, width: 300 },
+                  { text: 'TELEFONE: ' + cliente.telefone, alignment: 'left', fontSize: 6, width: 300 },
+                  { text: 'EMAIL: ' + cliente.email, alignment: 'left', fontSize: 6, width: 300 },
+                ],
+                width: '*'
+              },
+              { qr: cliente.qrcode, width: '40%', fit: 75, alignment: 'right', margin: [0, 0, 10, 0] },
+            ],
+            columnGap: 10,
+          },
+          {
+            "canvas": [{
+              "lineColor": "gray",
+              "type": "line",
+              "x1": 0,
+              "y1": 0,
+              "x2": 524,
+              "y2": 0,
+              "lineWidth": 1
+            }], margin: [0, 10, 0, 0], alignment: 'center',
+          },
+
+        ],
+        margin: [40, 40, 40, 40],
+      },
+      footer: function (currentPage, pageCount) {
+        return {
+          stack: [
+            {
+              "canvas": [{
+                "lineColor": "gray",
+                "type": "line",
+                "x1": 0,
+                "y1": 0,
+                "x2": 524,
+                "y2": 0,
+                "lineWidth": 1
+              }], margin: [0, 10, 0, 0], alignment: 'center',
+            },
+            {
+              columns: [
+                {
+                  stack: [
+                    { text: '________________________________', alignment: 'center', width: 400 },
+                    { text: 'DEPARTAMENTO FINANCEIRO', width: '*', alignment: 'center', fontSize: 8 },
+                  ], with: '30%',
+                },
+                { text: 'PÁGINA ' + currentPage.toString() + ' DE ' + pageCount, fontSize: 8 },
+                { text: '', width: '*' },
+              ],
+              margin: [40, 40, 40, 40], alignment: 'center',
+            },
+          ],
+        }
+      },
+      content: [
+        { text: 'RECIBO DE PAGAMENTO', alignment: 'center', fontSize: 14, bold: true, margin: 10 },
+        { text: localStorage.getItem('texto_recibo'), fontSize: 10, bold: false },
+        { text: '---x---', fontSize: 10, bold: true, color: '#ffffff' },
+        { text: 'INFORMAÇÕES DO RECEBEDOR:', fontSize: 10, bold: true },
+        { text: 'CNPJ: ' + cliente.cnpj, fontSize: 10, bold: false },
+        { text: 'RAZÃO SOCIAL: ' + cliente.razao_social, fontSize: 10, bold: false },
+        { text: 'ENDEREÇO: ' + cliente.endereco, fontSize: 10, bold: false },
+      ],
+    }
+    // utilizando a lib pdfmake para gerar o pdf e converter em base64.
+    const pdfDocGenerator = pdfMake.createPdf(docDefinition);
+    pdfDocGenerator.open();
+  }
+  const [reciboform, setreciboform] = useState(0);
+  function ReciboNomePagador() {
+    return (
+      <div
+        className="fundo"
+        style={{ display: reciboform == 1 ? "flex" : "none" }}
+        onClick={() => { setreciboform(0) }}
+      >
+        <div className="janela scroll cor2" onClick={(e) => e.stopPropagation()}>
+          <div className='text1'>NOME DO PAGADOR</div>
+          <input id="inputNomePagador"
+            autoComplete="off"
+            placeholder="NOME DO PAGADOR..."
+            className="input"
+            type="text"
+            onFocus={(e) => (e.target.placeholder = "")}
+            onBlur={(e) => (e.target.placeholder = "NOME DO PAGADOR...")}
+            defaultValue={localStorage.getItem('pagador')}
+            style={{
+              flexDirection: "center",
+              justifyContent: "center",
+              alignSelf: "center",
+              textAlign: "center",
+              width: 400,
+              padding: 15,
+              height: 20,
+              minHeight: 20,
+              maxHeight: 20,
+            }}
+          ></input>
+          <div className='text1'>DOCUMENTO DO PAGADOR</div>
+          <input id="inputDocumentoPagador"
+            autoComplete="off"
+            placeholder="DOCUMENTO DO PAGADOR..."
+            className="input"
+            type="text"
+            onFocus={(e) => (e.target.placeholder = "")}
+            onBlur={(e) => (e.target.placeholder = "DOCUMENTO DO PAGADOR...")}
+            style={{
+              flexDirection: "center",
+              justifyContent: "center",
+              alignSelf: "center",
+              textAlign: "center",
+              width: 400,
+              padding: 15,
+              height: 20,
+              minHeight: 20,
+              maxHeight: 20,
+            }}
+          ></input>
+          <div className='button green'
+            style={{ width: 200 }}
+            onClick={() => {
+              let total_parcelas = localfaturamento.filter(fat => fat.atendimento_id == objfaturamento.atendimento_id).length;
+              if (total_parcelas < 2) {
+                let texto = 'RECEBEMOS DE ' + document.getElementById('inputNomePagador').value.toUpperCase() + ', ' + document.getElementById('inputDocumentoPagador').value + ', A IMPORTÂNCIA DE R$ ' + objfaturamento.valor_pagamento + ', REFERENTE À REALIZAÇÃO DO EXAME/PROCEDIMENTO ' + localStorage.getItem('procedimento');
+                localStorage.setItem('texto_recibo', texto);
+              } else {
+                let texto = 'RECEBEMOS DE ' + document.getElementById('inputNomePagador').value.toUpperCase() + ', ' + document.getElementById('inputDocumentoPagador').value + ', A IMPORTÂNCIA DE R$ ' + objfaturamento.valor_pagamento + ', PARCELA ' + objfaturamento.parcela + ' DE ' + total_parcelas + ', REFERENTE À REALIZAÇÃO DO EXAME/PROCEDIMENTO:' + localStorage.getItem('procedimento');
+                localStorage.setItem('texto_recibo', texto);
+              }
+              printFile();
+              setreciboform(0);
+            }}
+          >
+            IMPRIMIR RECIBO
+          </div>
         </div>
       </div>
     )
@@ -1020,8 +1466,9 @@ function Faturamento() {
             display: menufaturamento == 'REGISTROS DE FATURAMENTO' ? 'flex' : 'none',
             flexDirection: 'column', justifyContent: 'center'
           }}>
-            <ListaDeFaturamentosConsultas></ListaDeFaturamentosConsultas>
+            <ListaDeFaturamentos></ListaDeFaturamentos>
             <EditFaturamento></EditFaturamento>
+            <ReciboNomePagador></ReciboNomePagador>
           </div>
         </div>
       </div>
