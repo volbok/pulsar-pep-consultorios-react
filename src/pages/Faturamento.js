@@ -984,6 +984,7 @@ function Faturamento() {
                   }}>
                     <div>{moment(item.data_inicio).format('DD/MM/YYYY - HH:mm')}</div>
                     <div>{'CONSULTA'}</div>
+                    <div>{item.faturamento_codigo_procedimento}</div>
                   </div>
                   <div style={{
                     display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', textAlign: 'left',

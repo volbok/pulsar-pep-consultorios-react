@@ -531,7 +531,28 @@ function Pagamento() {
               <div
                 className='button' style={{ width: 200 }}
                 onClick={() => {
-                  console.log('LANÇAR REGISTRO DE FATURAMENTO - CONVÊNIO');
+                  let objprocedimento = JSON.parse(localStorage.getItem('obj_procedimento'));
+                  let objagendado = JSON.parse(localStorage.getItem('obj_agendado'));
+                  let obj = {
+                    cliente_id: cliente.id_cliente,
+                    cliente_nome: cliente.razao_social,
+                    atendimento_id: localStorage.getItem('tipo_faturamento') == 'ATENDIMENTO' ? objagendado.id_atendimento : null,
+                    procedimento_id: localStorage.getItem('tipo_faturamento') == 'PROCEDIMENTO' ? objagendado.id : null,
+                    data_pagamento: moment().format('DD/MM/YYYY'),
+                    data_vencimento: moment().format('DD/MM/YYYY'),
+                    parcela: 1,
+                    forma_pagamento: 'CONVÊNIO',
+                    status_pagamento: 'ABERTO',
+                    valor_pagamento: parseInt(objprocedimento.valor_part),
+                    id_operadora: objprocedimento.id_operadora,
+                    codigo_operadora: null,
+                    codigo_tuss: objprocedimento.tuss_codigo,
+                    nome_tuss: objprocedimento.tuss_rol_ans_descricao,
+                    data_registro: moment().format('DD/MM/YYYY'),
+                  }
+                  gerarfaturamento(obj);
+                  setpagamento(0);
+                  loadFaturamentos();
                 }}
               >
                 CONCLUIR FATURAMENTO
