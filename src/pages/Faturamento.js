@@ -1462,9 +1462,10 @@ function Faturamento() {
   // ## IMPRESSÃO DE RELATÓRIOS DE FATURAMENTO ## //
   const printRelatorioFaturamento = () => {
     let tabledata = [];
+    // eslint-disable-next-line
     atendimentos_mes.filter(item => item.nome_paciente != 'HORÁRIO BLOQUEADO!').map(item => {
-
       let tablefaturamentos = [];
+      // eslint-disable-next-line
       localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).sort((a, b) => a.parcela < b.parcela ? -1 : 1).map(faturamento => {
         tablefaturamentos.push(
           [
