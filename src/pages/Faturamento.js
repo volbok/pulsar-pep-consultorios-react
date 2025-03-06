@@ -10,6 +10,7 @@ import deletar from '../images/deletar.png';
 import editar from '../images/editar.png';
 import back from '../images/back.png';
 import lupa from '../images/lupa.png'
+import impressora from '../images/imprimir.png'
 // import salvar from "../images/salvar.svg";
 import "moment/locale/pt-br";
 import modal from "../functions/modal";
@@ -17,6 +18,9 @@ import { useHistory } from "react-router-dom";
 import Filter from "../components/Filter";
 import { PieChart, Pie, Tooltip } from 'recharts';
 import pdfMake from "pdfmake/build/pdfmake";
+
+// JSON to XML.
+const parser = require('json-xml-parse');
 
 function Faturamento() {
 
@@ -972,6 +976,13 @@ function Faturamento() {
           >
             PROCEDIMENTOS
           </div>
+          <div className="button" style={{ width: 50, maxWidth: 50, alignSelf: 'center' }} onClick={() => printRelatorioFaturamento()}>
+            <img
+              alt=""
+              src={impressora}
+              style={{ width: 25, height: 25 }}
+            ></img>
+          </div>
         </div>
         <div style={{ display: tipoatendimento == 'CONSULTAS' ? 'flex' : 'none', flexDirection: 'column' }}>
           {
@@ -1028,6 +1039,16 @@ function Faturamento() {
                       <div>{'R$ ' + parseFloat(valor.valor_pagamento).toFixed(2)}</div>
                     </div>
                   ))}
+                  <div id='gerarXml - procedimento de convênio'
+                    className="button green"
+                    style={{
+                      width: 150, minWidth: 120, maxWidth: 120,
+                      alignSelf: 'flex-end',
+                    }}
+                    onClick={() => createxml(dataxmltest)}
+                  >
+                    GERAR XML
+                  </div>
                 </div>
               </div>
             ))
@@ -1158,7 +1179,6 @@ function Faturamento() {
       <div style={{ display: 'flex', borderRadius: 5, margin: 5 }}>
         <PieChart width={tamanho + 10} height={tamanho + 10} style={{ alignSelf: 'center' }}>
           {localfaturamento.length}
-          BOBO
           <Tooltip content={<CustomTooltip payload={[]} />} />
           <Pie
             data={data} dataKey="value" nameKey={"name"} labelLine={false} label={renderLabel} cx={0.5 * tamanho} cy={0.5 * tamanho} outerRadius={0.5 * tamanho} innerRadius={0.2 * tamanho}
@@ -1169,7 +1189,6 @@ function Faturamento() {
       </div>
     )
   }
-
 
   function TotaisFaturamento() {
     return (
@@ -1282,7 +1301,7 @@ function Faturamento() {
 
   // ## CRIAÇÃO DE RECIBOS EM PDFMAKE ## //
   // impressão de recibo de pagamento (consulta ou procedimento particular).
-  const printFile = () => {
+  const printRecibo = () => {
     const docDefinition = {
       pageSize: 'A4',
       pageOrientation: 'portrait',
@@ -1429,7 +1448,7 @@ function Faturamento() {
                 let texto = 'RECEBEMOS DE ' + document.getElementById('inputNomePagador').value.toUpperCase() + ', ' + document.getElementById('inputDocumentoPagador').value + ', A IMPORTÂNCIA DE R$ ' + objfaturamento.valor_pagamento + ', PARCELA ' + objfaturamento.parcela + ' DE ' + total_parcelas + ', REFERENTE À REALIZAÇÃO DO EXAME/PROCEDIMENTO:' + localStorage.getItem('procedimento');
                 localStorage.setItem('texto_recibo', texto);
               }
-              printFile();
+              printRecibo();
               setreciboform(0);
             }}
           >
@@ -1438,6 +1457,144 @@ function Faturamento() {
         </div>
       </div>
     )
+  }
+
+  // ## IMPRESSÃO DE RELATÓRIOS DE FATURAMENTO ## //
+  const printRelatorioFaturamento = () => {
+    let tabledata = [];
+    atendimentos_mes.filter(item => item.nome_paciente != 'HORÁRIO BLOQUEADO!').map(item => {
+
+      let tablefaturamentos = [];
+      localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).sort((a, b) => a.parcela < b.parcela ? -1 : 1).map(faturamento => {
+        tablefaturamentos.push(
+          [
+            { text: faturamento.forma_pagamento }
+          ]
+        );
+        console.log(tablefaturamentos);
+      })
+
+      tabledata.push(
+        [
+          { text: moment(item.data_inicio).format('DD/MM/YYYY') }, { text: 'CONSULTA' }, { text: item.nome_paciente },
+          { text: usuarios.filter(usuario => usuario.id_usuario == item.id_profissional).map(usuario => usuario.nome_usuario) },
+          // ...tablefaturamentos
+        ]
+      );
+
+    });
+    console.log(tabledata);
+    const docDefinition = {
+      pageSize: 'A4',
+      pageOrientation: 'landscape',
+      pageMargins: [40, 200, 40, 120],
+      header: {
+        stack: [
+          {
+            columns: [
+              {
+                image: cliente.logo,
+                width: 75,
+                alignment: 'center',
+              },
+              {
+                stack: [
+                  { text: cliente.razao_social, alignment: 'left', fontSize: 10, width: 300 },
+                  { text: 'ENDEREÇO: ' + cliente.endereco, alignment: 'left', fontSize: 6, width: 300 },
+                  { text: 'TELEFONE: ' + cliente.telefone, alignment: 'left', fontSize: 6, width: 300 },
+                  { text: 'EMAIL: ' + cliente.email, alignment: 'left', fontSize: 6, width: 300 },
+                ],
+                width: '*'
+              },
+              { qr: cliente.qrcode, width: '40%', fit: 75, alignment: 'right', margin: [0, 0, 10, 0] },
+            ],
+            columnGap: 10,
+          },
+          {
+            "canvas": [{
+              "lineColor": "gray",
+              "type": "line",
+              "x1": 0,
+              "y1": 0,
+              "x2": 524,
+              "y2": 0,
+              "lineWidth": 1
+            }], margin: [0, 10, 0, 0], alignment: 'center',
+          },
+
+        ],
+        margin: [40, 40, 40, 40],
+      },
+      footer: function (currentPage, pageCount) {
+        return {
+          stack: [
+            {
+              "canvas": [{
+                "lineColor": "gray",
+                "type": "line",
+                "x1": 0,
+                "y1": 0,
+                "x2": 524,
+                "y2": 0,
+                "lineWidth": 1
+              }], margin: [0, 10, 0, 0], alignment: 'center',
+            },
+            {
+              columns: [
+                {
+                  stack: [
+                    { text: '________________________________', alignment: 'center', width: 400 },
+                    { text: 'DEPARTAMENTO FINANCEIRO', width: '*', alignment: 'center', fontSize: 8 },
+                  ], with: '30%',
+                },
+                { text: 'PÁGINA ' + currentPage.toString() + ' DE ' + pageCount, fontSize: 8 },
+                { text: '', width: '*' },
+              ],
+              margin: [40, 40, 40, 40], alignment: 'center',
+            },
+          ],
+        }
+      },
+
+      content: [
+        {
+          table: {
+            body: [
+              ['DATA', 'PROCEDIMENTO', 'CLIENTE', 'PROFISSIONAL EXECUTANTE', 'PAGAMENTO'],
+              ...tabledata
+            ]
+          }
+        },
+      ],
+    }
+    // utilizando a lib pdfmake para gerar o pdf e converter em base64.
+    const pdfDocGenerator = pdfMake.createPdf(docDefinition);
+    pdfDocGenerator.open();
+  }
+
+  // ## CRIAÇÃO DOS ARQUIVOS XML ## //
+  const dataxmltest = {
+    Planet: [
+      {
+        "position": "1",
+        "name": "<Mercury>",
+        "distance": "58",
+      },
+    ]
+  }
+
+  const createxml = (data) => {
+    const xml = parser.jsXml.toXmlString(data);
+    console.log(xml);
+    var filename = "file.xml";
+    var pom = document.createElement('a');
+    var bb = new Blob([xml], { type: 'text/plain' });
+    pom.setAttribute('href', window.URL.createObjectURL(bb));
+    pom.setAttribute('download', filename);
+    pom.dataset.downloadurl = ['text/plain', pom.download, pom.href].join(':');
+    pom.draggable = true;
+    pom.classList.add('dragout');
+    pom.click();
   }
 
   return (

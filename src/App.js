@@ -137,6 +137,7 @@ function App() {
     'CARDIOLOGIA',
     'CLÍNICA MÉDICA',
     'CIRURGIA GERAL',
+    'GENETICISTA',
     'PEDIATRA',
     'UROLOGIA',
     'RADIOLOGIA',
