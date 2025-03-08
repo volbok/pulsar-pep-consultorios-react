@@ -12,6 +12,7 @@ import toast from '../functions/toast';
 function Pagamento() {
 
   const {
+    hospital,
     cliente,
     objpaciente,
     setpagamento, pagamento,
@@ -24,6 +25,7 @@ function Pagamento() {
     agendaexame,
     pagina,
     settoast,
+    objatendimento,
   } = useContext(Context);
 
   let arrayformaspagamento = [
@@ -141,6 +143,30 @@ function Pagamento() {
       console.log('REGISTRO DE FATURAMENTO RECEBIDO COM SUCESSO');
     });
   }
+
+  const updateAtendimento = (tipo) => {
+    var obj = {
+      data_inicio: objatendimento.data_inicio,
+      data_termino: tipo == 'PARTICULAR' ? moment(objatendimento.data_inicio).add(cliente.tempo_consulta_particular, 'minutes') : moment(objatendimento.data_inicio).add(cliente.tempo_consulta_convenio, 'minutes'),
+      problemas: objatendimento.problemas,
+      id_paciente: objatendimento.id_paciente,
+      id_unidade: 5, // ATENÇÃO: 5 é o ID da unidade ambulatorial.
+      nome_paciente: objatendimento.nome_paciente,
+      leito: null,
+      situacao: 3, // 3 = atendimento ambulatorial (consulta).
+      id_cliente: hospital,
+      classificacao: null,
+      id_profissional: objatendimento.id_profissional,
+      convenio_id: objatendimento.convenio_codigo,
+      convenio_carteira: objatendimento.convenio_carteira,
+      faturamento_codigo_procedimento: tipo,
+    };
+    axios
+      .post(html + "update_atendimento/" + objatendimento.id_atendimento, obj)
+      .then(() => {
+        console.log('AGENDAMENTO DE CONSULTA ATUALIZADO COM SUCESSO')
+      });
+  };
 
   // ## CRIAÇÃO DE RECIBOS EM PDFMAKE ## //
   // impressão de recibo de pagamento (consulta ou procedimento particular).
@@ -307,7 +333,7 @@ function Pagamento() {
       .get(html + "list_consultas/" + 5) // 5 corresponde ao id da unidade "AMBULATÓRIO".
       .then((response) => {
         var x = response.data.rows;
-        var y = x.filter(item => item.id_unidade == 5);
+        var y = x.filter(item => item.id_unidade == 5 && item.id_cliente == cliente.id_cliente);
         carregaHorarioslivres(y);
       });
   };
@@ -375,7 +401,7 @@ function Pagamento() {
     if (pagina == 'MAPA DE AGENDAMENTOS') { // carrega horários de todos os médicos registrados para o cliente.
       console.log('AGENDAMENTO VIA MAPA');
       let array_origin = array;
-      agenda.filter(item => item.dia_semana == moment(selectdate, 'DD/MM/YYYY').format('dddd').toUpperCase()).map(item => {
+      agenda.filter(item => item.id_cliente == cliente.id_cliente && item.dia_semana == moment(selectdate, 'DD/MM/YYYY').format('dddd').toUpperCase()).map(item => {
         array_origin.push(
           {
             situacao: 'AGENDAMENTO',
@@ -478,8 +504,11 @@ function Pagamento() {
                     for (var i = 0; i < botoes.length; i++) {
                       botoes.item(i).className = "button";
                     }
+                    updateAtendimento('PARTICULAR');
                     arrayfaturas.map(item => gerarfaturamento(item));
-                    loadFaturamentos();
+                    setTimeout(() => {
+                      loadFaturamentos();
+                    }, 1000);
                   } else {
                     toast(
                       settoast,
@@ -531,6 +560,7 @@ function Pagamento() {
               <div
                 className='button' style={{ width: 200 }}
                 onClick={() => {
+                  setpagamento(0);
                   let objprocedimento = JSON.parse(localStorage.getItem('obj_procedimento'));
                   let objagendado = JSON.parse(localStorage.getItem('obj_agendado'));
                   let obj = {
@@ -551,8 +581,10 @@ function Pagamento() {
                     data_registro: moment().format('DD/MM/YYYY'),
                   }
                   gerarfaturamento(obj);
-                  setpagamento(0);
-                  loadFaturamentos();
+                  updateAtendimento('CONVÊNIO');
+                  setTimeout(() => {
+                    loadFaturamentos();
+                  }, 1000);
                 }}
               >
                 CONCLUIR FATURAMENTO

@@ -986,7 +986,7 @@ function Faturamento() {
         </div>
         <div style={{ display: tipoatendimento == 'CONSULTAS' ? 'flex' : 'none', flexDirection: 'column' }}>
           {
-            atendimentos_mes.filter(item => item.nome_paciente != 'HORÁRIO BLOQUEADO!').map(item => (
+            atendimentos_mes.sort((a, b) => moment(a.data_inicio) > moment(b.data_inicio) ? 1 : -1).filter(item => item.nome_paciente != 'HORÁRIO BLOQUEADO!').map(item => (
               <div className="button" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignSelf: 'flex-start' }}>
                   <div className="button red" style={{
@@ -1012,10 +1012,13 @@ function Faturamento() {
                     </div>
                   </div>
                 </div>
-                <div style={{
-                  display: 'flex', flexDirection: 'column', flexWrap: 'wrap', justifyContent: 'flex-start',
-                  width: '40vw'
-                }}>
+
+                <div id="elementos do faturamento particular"
+                  style={{
+                    display: item.faturamento_codigo_procedimento == 'PARTICULAR' && localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).length > 0 ? 'flex' : 'none',
+                    flexDirection: 'column', flexWrap: 'wrap', justifyContent: 'flex-start',
+                    width: '40vw'
+                  }}>
                   {localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).sort((a, b) => a.parcela < b.parcela ? -1 : 1).map(valor => (
                     <div className={valor.status_pagamento == 'ABERTO' ? 'button yellow' : valor.status_pagamento == 'VENCIDO' ? 'button red' : 'button green'}
                       onClick={() => {
@@ -1042,6 +1045,7 @@ function Faturamento() {
                   <div id='gerarXml - procedimento de convênio'
                     className="button green"
                     style={{
+                      display: item.faturamento_codigo_procedimento != 'PARTICULAR' ? 'flex' : 'none',
                       width: 150, minWidth: 120, maxWidth: 120,
                       alignSelf: 'flex-end',
                     }}
@@ -1049,6 +1053,22 @@ function Faturamento() {
                   >
                     GERAR XML
                   </div>
+                </div>
+                <div id="elementos do faturamento particular"
+                  style={{
+                    display: item.faturamento_codigo_procedimento == 'CONVÊNIO' && localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).length > 0 ? 'flex' : 'none',
+                    flexDirection: 'column', flexWrap: 'wrap', justifyContent: 'flex-start',
+                    width: '40vw'
+                  }}>
+                  EXPOR ELEMENTOS DO FATURAMENTO DE CONVÊNIO
+                </div>
+                <div id="faturamento pendente"
+                  style={{
+                    display: localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).length < 1 ? 'flex' : 'none',
+                    flexDirection: 'column', flexWrap: 'wrap', justifyContent: 'flex-start',
+                    width: '40vw'
+                  }}>
+                  <div className="button red" style={{ width: 200, alignSelf: 'flex-end' }}>FATURAMENTO PENDENTE!</div>
                 </div>
               </div>
             ))
@@ -1463,24 +1483,38 @@ function Faturamento() {
   const printRelatorioFaturamento = () => {
     let tabledata = [];
     // eslint-disable-next-line
-    atendimentos_mes.filter(item => item.nome_paciente != 'HORÁRIO BLOQUEADO!').map(item => {
+    atendimentos_mes.sort((a, b) => moment(a.data_inicio) > moment(b.data_inicio) ? 1 : -1).filter(item => item.nome_paciente != 'HORÁRIO BLOQUEADO!').map(item => {
       let tablefaturamentos = [];
+      let formapagamento = null;
       // eslint-disable-next-line
       localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).sort((a, b) => a.parcela < b.parcela ? -1 : 1).map(faturamento => {
+        formapagamento = faturamento.forma_pagamento;
         tablefaturamentos.push(
           [
-            { text: faturamento.forma_pagamento }
+            { text: faturamento.parcela }, { text: faturamento.status_pagamento }, { text: faturamento.data_pagamento }, { text: faturamento.valor_pagamento }
           ]
         );
         console.log(tablefaturamentos);
+        console.log(formapagamento);
       })
 
       tabledata.push(
         [
           { text: moment(item.data_inicio).format('DD/MM/YYYY') }, { text: 'CONSULTA' }, { text: item.nome_paciente },
           { text: usuarios.filter(usuario => usuario.id_usuario == item.id_profissional).map(usuario => usuario.nome_usuario) },
-          // ...tablefaturamentos
-        ]
+          { text: formapagamento },
+          {
+            style: 'soffttable',
+            table: {
+
+              widths: [75, 75, 75, 75],
+              body: [
+                ['PARCELA', 'STATUS', 'DATA PGTO', 'VALOR'],
+                ...tablefaturamentos,
+              ]
+            }
+          },
+        ],
       );
 
     });
@@ -1557,13 +1591,28 @@ function Faturamento() {
         }
       },
 
+      styles: {
+        softtable: {
+          fontSize: 10,
+          bold: false,
+          margin: [2.5, 2.5, 2.5, 2.5]
+        },
+        boldtable: {
+          fontSize: 10,
+          bold: true,
+          margin: [2.5, 2.5, 2.5, 2.5]
+        },
+      },
+
       content: [
         {
+          style: 'softtable',
           table: {
+            // widths: ['*', '*', '*', '*', '*', '*'],
             body: [
-              ['DATA', 'PROCEDIMENTO', 'CLIENTE', 'PROFISSIONAL EXECUTANTE', 'PAGAMENTO'],
+              ['DATA', 'PROCEDIMENTO', 'CLIENTE', 'PROFISSIONAL EXECUTANTE', 'FORMA DE PAGAMENTO', 'PAGAMENTOS'],
               ...tabledata
-            ]
+            ],
           }
         },
       ],

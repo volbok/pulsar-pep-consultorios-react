@@ -19,6 +19,8 @@ import { useHistory } from "react-router-dom";
 import modal from '../functions/modal';
 import GuiaConsulta from '../cards/GuiaConsulta';
 import mountage from '../functions/mountage';
+import selector from '../functions/selector';
+import toast from '../functions/toast';
 
 function MapaDeAgendamentos() {
 
@@ -42,6 +44,8 @@ function MapaDeAgendamentos() {
     arrayatendimentos, setarrayatendimentos,
     usuarios,
     agendaexame, setagendaexame,
+    settoast,
+    setobjatendimento,
   } = useContext(Context);
 
   useEffect(() => {
@@ -247,6 +251,56 @@ function MapaDeAgendamentos() {
       modal(setdialogo, 'JÁ EXISTE UMA CONSULTA AGENDADA PARA ESTE HORÁRIO, CONFIRMAR ESTE NOVO AGENDAMENTO?', updateAtendimento, [item, inicio]);
     } else {
       updateAtendimento([item, inicio]);
+    }
+  }
+
+  const checkUpdateTipoConsulta = (item, tipo, data_inicio) => {
+    let inicio = moment(data_inicio, 'DD/MM/YYYY - HH:mm');
+    let termino = null;
+    if (localStorage.getItem('PARTICULAR') == 'PARTICULAR') {
+      termino = moment(inicio).add(cliente.tempo_consulta_particular, 'minutes');
+    } else {
+      termino = moment(inicio).add(cliente.tempo_consulta_convenio, 'minutes');
+    }
+    let count = arrayatendimentos.filter(valor =>
+      valor.situacao == 3
+      &&
+      valor.id_profissional == selectedespecialista.id_usuario
+      &&
+      (
+        (
+          // situação 0
+          moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') == moment(inicio).format('DD/MM/YYYY - HH:mm')
+          ||
+          moment(valor.data_termino).format('DD/MM/YYYY - HH:mm') == moment(termino).format('DD/MM/YYYY - HH:mm')
+          ||
+          // situação 1
+          (
+            moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') < moment(inicio).format('DD/MM/YYYY - HH:mm')
+            &&
+            moment(valor.data_termino).format('DD/MM/YYYY - HH:mm') > moment(inicio).format('DD/MM/YYYY - HH:mm')
+          )
+          ||
+          // situação 2
+          (
+            moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') > moment(inicio).format('DD/MM/YYYY - HH:mm')
+            &&
+            moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') < moment(termino).format('DD/MM/YYYY - HH:mm')
+          )
+          ||
+          // situação 3
+          (
+            moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') > moment(inicio).format('DD/MM/YYYY - HH:mm')
+            &&
+            moment(valor.data_inicio).format('DD/MM/YYYY - HH:mm') < moment(termino).format('DD/MM/YYYY - HH:mm')
+          )
+        )
+      )
+    ).length;
+    if (count > 0) {
+      modal(setdialogo, 'JÁ EXISTE UMA CONSULTA AGENDADA PARA ESTE HORÁRIO, CONFIRMAR ESTE NOVO AGENDAMENTO?', updateAtendimento, [item, inicio]);
+    } else {
+        updateTipoAtendimento(item, tipo);
     }
   }
 
@@ -655,6 +709,14 @@ function MapaDeAgendamentos() {
                   }}
                 >
                   <div
+                    onClick={() => {
+                      console.log(item.faturamento_codigo_procedimento);
+                      if (item.faturamento_codigo_procedimento == 'PARTICULAR') {
+                        checkUpdateTipoConsulta(item, 'CONVÊNIO', item.data_inicio);
+                      } else {
+                        checkUpdateTipoConsulta(item, 'PARTICULAR', item.data_inicio);
+                      }
+                    }}
                     style={{
                       display: item.faturamento_codigo_procedimento == null ? 'none' : 'flex',
                       position: 'absolute',
@@ -817,6 +879,9 @@ function MapaDeAgendamentos() {
                           }}
                           onClick={(e) => {
                             let procedimento = [];
+                            let paciente = pacientes.filter(pac => pac.id_paciente == item.id_paciente);
+                            setobjatendimento(item);
+                            setobjpaciente(paciente.pop());
                             procedimento = allprocedimentos.filter(proc => proc.tuss_codigo == '10101012').pop();
                             console.log('## ATENDIMENTO ##');
                             localStorage.setItem('tipo_faturamento', 'ATENDIMENTO');
@@ -1082,6 +1147,33 @@ function MapaDeAgendamentos() {
     // eslint-disable-next-line
   }, [arrayatendimentos, selectdate, pacientes]);
 
+  // função para trocar o atendimento entre particular e convênio, direto no botão tipo de atendimento.
+  const updateTipoAtendimento = (objatendimento, tipo) => {
+    var obj = {
+      data_inicio: objatendimento.data_inicio,
+      data_termino: tipo == 'PARTICULAR' ? moment(objatendimento.data_inicio).add(cliente.tempo_consulta_particular, 'minutes') : moment(objatendimento.data_inicio).add(cliente.tempo_consulta_convenio, 'minutes'),
+      problemas: objatendimento.problemas,
+      id_paciente: objatendimento.id_paciente,
+      id_unidade: 5, // ATENÇÃO: 5 é o ID da unidade ambulatorial.
+      nome_paciente: objatendimento.nome_paciente,
+      leito: null,
+      situacao: 3, // 3 = atendimento ambulatorial (consulta).
+      id_cliente: hospital,
+      classificacao: null,
+      id_profissional: objatendimento.id_profissional,
+      convenio_id: objatendimento.convenio_codigo,
+      convenio_carteira: objatendimento.convenio_carteira,
+      faturamento_codigo_procedimento: tipo,
+    };
+    console.log(obj);
+    axios
+      .post(html + "update_atendimento/" + objatendimento.id_atendimento, obj)
+      .then(() => {
+        console.log('AGENDAMENTO DE CONSULTA ATUALIZADO COM SUCESSO');
+        loadModdedAtendimentos(selectdate);
+      });
+  };
+
   const ViewUpdateAtendimento = (item) => {
     function TimeUpdateComponent() {
       var timeout = null;
@@ -1293,6 +1385,7 @@ function MapaDeAgendamentos() {
                     padding: 10,
                   }}
                   onClick={() => {
+                    setobjpaciente(item);
                     if (viewlistapacientes == 1) {
                       insertAtendimento(item, JSON.parse(localStorage.getItem('horario_consulta')));
                     } else {
@@ -1424,7 +1517,7 @@ function MapaDeAgendamentos() {
             alignSelf: 'center',
           }}
         >
-          {'EXAMES E PROCEDIMENTOS AGENDADOS'}
+          {selectedprocedimento == '' ? 'EXAMES E PROCEDIMENTOS AGENDADOS ' : selectedprocedimento}
         </div>
         <div
           id="scroll de exames e procedimentos"
@@ -1523,20 +1616,31 @@ function MapaDeAgendamentos() {
                           width: 150, alignSelf: 'flex-end'
                         }}
                         onClick={(e) => {
+                          let paciente = pacientes.filter(pac => pac.id_paciente == item.id_paciente);
+                          setobjpaciente(paciente.pop());
+                          setobjatendimento(item);
+                          console.log(paciente);
+                          let convenio_paciente = pacientes.filter(pac => pac.id_paciente == item.id_paciente).map(pac => pac.convenio_nome);
+                          let codigo_convenio_paciente = pacientes.filter(pac => pac.id_paciente == item.id_paciente).map(pac => pac.convenio_codigo);
                           let procedimento = [];
                           procedimento = allprocedimentos.filter(proc => proc.tuss_codigo == item.codigo_tuss).pop();
-                          console.log('## PROCEDIMENTO ##');
-                          console.log(procedimento);
-                          localStorage.setItem('tipo_faturamento', 'PROCEDIMENTO');
-                          localStorage.setItem('obj_procedimento', JSON.stringify(procedimento));
-                          localStorage.setItem('obj_agendado', JSON.stringify(item));
-                          setpagamento(1);
-                          localStorage.setItem('forma_pagamento', 'indefinida');
-                          setTimeout(() => {
-                            document.getElementById('inputValorParticular').value = procedimento.valor_part;
-                            document.getElementById('inputValorConvenio').value = procedimento.valor;
-                          }, 1000);
-                          e.stopPropagation();
+
+                          if (allprocedimentos.filter(proc => proc.tuss_codigo == item.codigo_tuss && codigo_convenio_paciente == proc.id_operadora).length > 0) {
+                            console.log('## PROCEDIMENTO ##');
+                            console.log(procedimento);
+                            localStorage.setItem('tipo_faturamento', 'PROCEDIMENTO');
+                            localStorage.setItem('obj_procedimento', JSON.stringify(procedimento));
+                            localStorage.setItem('obj_agendado', JSON.stringify(item));
+                            setpagamento(1);
+                            localStorage.setItem('forma_pagamento', 'indefinida');
+                            setTimeout(() => {
+                              document.getElementById('inputValorParticular').value = procedimento.valor_part;
+                              document.getElementById('inputValorConvenio').value = procedimento.valor;
+                            }, 1000);
+                            e.stopPropagation();
+                          } else {
+                            toast(settoast, 'PROCEDIMENTO NÃO CADASTRADO PARA O CONVÊNIO ' + convenio_paciente, '#ec7063', 3000);
+                          }
                         }}
                       >
                         FATURAR
@@ -1662,7 +1766,14 @@ function MapaDeAgendamentos() {
         <div className="janela cor2" style={{ display: 'flex', flexDirection: 'row' }}>
           <div
             className='button' style={{ width: 200 }}
-            onClick={() => insertProcedimento(0, 1, JSON.parse(localStorage.getItem('obj_paciente')))}
+            onClick={() => {
+              let obj_paciente = JSON.parse(localStorage.getItem('obj_paciente'));
+              if (allprocedimentos.filter(proc => proc.tuss_codigo == selectedcodigotussprocedimento && proc.nome_operadora == obj_paciente.convenio_nome).length > 0) {
+                insertProcedimento(0, 1, JSON.parse(localStorage.getItem('obj_paciente')));
+              } else {
+                toast(settoast, 'PROCEDIMENTO NÃO CADASTRADO PARA O CONVÊNIO ' + obj_paciente.convenio_nome, '#ec7063', 3000);
+              }
+            }}
           >
             CONVÊNIO
           </div>
@@ -1679,12 +1790,15 @@ function MapaDeAgendamentos() {
   }
 
   const [selectedprocedimento, setselectedprocedimento] = useState('');
-  function SelecionaProcedimentos() {
+  const [selectedcodigotussprocedimento, setselectedcodigotussprocedimento] = useState('');
+  const SelecionaProcedimentos = useCallback(() => {
     return (
       <div className="cor2"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className='scroll'
+        <div
+          id="scroll procedimentos"
+          className='scroll'
           style={{
             display: 'flex',
             flexDirection: 'row',
@@ -1698,12 +1812,16 @@ function MapaDeAgendamentos() {
           {allprocedimentos.map(item => (
             <div
               key={'exame: ' + item.id}
+              id={'btn procedimento ' + item.id}
               className={selectedprocedimento == item.tuss_rol_ans_descricao ? 'button-selected' : 'button'}
               style={{ display: 'flex', width: 150, minWidth: 150, paddingLeft: 30, paddingRight: 30 }}
               title={item.tuss_rol_ans_descricao}
               onClick={() => {
                 localStorage.setItem('procedimento', item.tuss_rol_ans_descricao);
+                localStorage.setItem('codigo_tuss', item.tuss_codigo);
                 setselectedprocedimento(item.tuss_rol_ans_descricao);
+                setselectedcodigotussprocedimento(item.tuss_codigo);
+                selector("scroll procedimentos", 'btn procedimento ' + item.id, 100);
               }}
             >
               {item.tuss_rol_ans_descricao.length > 30 ? item.tuss_rol_ans_descricao.slice(0, 30) + '...' : item.tuss_rol_ans_descricao}
@@ -1712,7 +1830,8 @@ function MapaDeAgendamentos() {
         </div>
       </div>
     )
-  }
+    // eslint-disable-next-line
+  }, [allprocedimentos]);
 
   const [agendamento, setagendamento] = useState('CONSULTAS');
   return (
