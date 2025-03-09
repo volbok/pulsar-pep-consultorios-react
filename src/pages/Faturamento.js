@@ -913,11 +913,12 @@ function Faturamento() {
                 maxHeight: 20,
               }}
             ></textarea>
-            <div id='botão para limpar o filtro.'
+            <div id='botão para buscar por data.'
               className="button red"
               onClick={() => {
                 filtraregistrosconsultas(document.getElementById("inputMesFaturamento").value);
                 filtraregistrosprocedimentos(document.getElementById("inputMesFaturamento").value);
+                setselecteddate(document.getElementById("inputMesFaturamento").value);
                 loadfaturamentosmes(document.getElementById("inputMesFaturamento").value);
               }}
               style={{
@@ -1034,7 +1035,7 @@ function Faturamento() {
                         alignItems: 'flex-start',
                         paddingLeft: 10,
                       }}>
-                      <div>{valor.forma_pagamento}</div>
+                      <div style={{ fontSize: 20, textDecoration: 'underline' }}>{valor.forma_pagamento}</div>
                       <div>{'PARCELA: ' + valor.parcela}</div>
                       <div>{'STATUS: ' + valor.status_pagamento}</div>
                       <div>{valor.data_pagamento == null ? 'DATA DO PAGAMENTO: PENDENTE' : 'DATA DO PAGAMENTO: ' + valor.data_pagamento}</div>
@@ -1042,25 +1043,60 @@ function Faturamento() {
                       <div>{'R$ ' + parseFloat(valor.valor_pagamento).toFixed(2)}</div>
                     </div>
                   ))}
-                  <div id='gerarXml - procedimento de convênio'
-                    className="button green"
-                    style={{
-                      display: item.faturamento_codigo_procedimento != 'PARTICULAR' ? 'flex' : 'none',
-                      width: 150, minWidth: 120, maxWidth: 120,
-                      alignSelf: 'flex-end',
-                    }}
-                    onClick={() => createxml(dataxmltest)}
-                  >
-                    GERAR XML
-                  </div>
                 </div>
-                <div id="elementos do faturamento particular"
+                <div id="elementos do faturamento convênio"
                   style={{
                     display: item.faturamento_codigo_procedimento == 'CONVÊNIO' && localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).length > 0 ? 'flex' : 'none',
                     flexDirection: 'column', flexWrap: 'wrap', justifyContent: 'flex-start',
                     width: '40vw'
                   }}>
-                  EXPOR ELEMENTOS DO FATURAMENTO DE CONVÊNIO
+                  {localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).map(valor => (
+                    <div className={valor.status_pagamento == 'ABERTO' ? 'button yellow' : valor.status_pagamento == 'VENCIDO' ? 'button red' : 'button green'}
+                      onClick={() => {
+                        setobjatendimento(item);
+                        setobjfaturamento(valor);
+                        console.log(valor);
+                        // setvieweditfaturamentoconvenio(1); PENDÊNCIA! CRIAR COMPONENTE QUE MUDA O STATUS DO PROCEDIMENTO FATURADO APRA CONVÊNIO (GLOSA, ERRO, ETC.).
+                      }}
+                      style={{
+                        display: 'flex', flexDirection: 'column',
+                        justifyContent: 'flex-start',
+                        alignContent: 'flex-start',
+                        alignItems: 'flex-start',
+                        paddingLeft: 10,
+                      }}>
+                      <div style={{ fontSize: 20, textDecoration: 'underline' }}>{valor.forma_pagamento}</div>
+                      <div>{'OPERADORA: ' + operadoras.filter(op => op.id == valor.id_operadora).map(op => op.nome_operadora)}</div>
+                      <div>{'STATUS: ' + valor.status_pagamento}</div>
+                      <div>{valor.data_pagamento == null ? 'DATA DO PAGAMENTO: PENDENTE' : 'DATA DO PAGAMENTO: ' + valor.data_pagamento}</div>
+                      <div>{'DATA DO VENCIMENTO: ' + valor.data_vencimento}</div>
+                      <div>{'R$ ' + parseFloat(valor.valor_pagamento).toFixed(2)}</div>
+                      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+                        <div id='gerarXml - procedimento de convênio'
+                          className="button-green"
+                          style={{
+                            display: valor.status_pagamento != 'PAGO' ? 'flex' : 'none',
+                            alignSelf: 'flex-end',
+                            width: 150, minWidth: 120, maxWidth: 120,
+                          }}
+                          onClick={() => updateRegistroProcedimento(valor, 'PAGO', parseFloat(valor.valor_pagamento).toFixed(2))}
+                        >
+                          CONFIRMAR PAGAMENTO PELA OPERADORA
+                        </div>
+                        <div id='gerarXml - procedimento de convênio'
+                          className="button-green"
+                          style={{
+                            display: 'flex',
+                            alignSelf: 'flex-end',
+                            width: 150, minWidth: 120, maxWidth: 120,
+                          }}
+                          onClick={() => createxml(dataxmltest)} // SUPER PENDENTE!!!
+                        >
+                          GERAR XML
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
                 <div id="faturamento pendente"
                   style={{
@@ -1105,28 +1141,99 @@ function Faturamento() {
                   display: 'flex', flexDirection: 'column', flexWrap: 'wrap', justifyContent: 'flex-start',
                   width: '40vw'
                 }}>
-                  {localfaturamento.filter(valor => valor.procedimento_id == item.id).sort((a, b) => a.parcela < b.parcela ? -1 : 1).map(valor => (
-                    <div className={valor.status_pagamento == 'ABERTO' ? 'button yellow' : valor.status_pagamento == 'VENCIDO' ? 'button red' : 'button green'}
-                      onClick={() => {
-                        setobjfaturamento(valor);
-                        console.log(valor);
-                        setvieweditfaturamento(1);
-                      }}
-                      style={{
-                        display: 'flex', flexDirection: 'column',
-                        justifyContent: 'flex-start',
-                        alignContent: 'flex-start',
-                        alignItems: 'flex-start',
-                        paddingLeft: 10,
-                      }}>
-                      <div>{valor.forma_pagamento}</div>
-                      <div>{'PARCELA: ' + valor.parcela}</div>
-                      <div>{'STATUS: ' + valor.status_pagamento}</div>
-                      <div>{valor.data_pagamento == null ? 'DATA DO PAGAMENTO: PENDENTE' : 'DATA DO PAGAMENTO: ' + valor.data_pagamento}</div>
-                      <div>{'DATA DO VENCIMENTO: ' + valor.data_vencimento}</div>
-                      <div>{'R$ ' + parseFloat(valor.valor_pagamento).toFixed(2)}</div>
-                    </div>
-                  ))}
+                  <div id="elementos do faturamento particular"
+                    style={{
+                      display: item.faturamento_codigo_procedimento != 'CONVÊNIO' && localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).length > 0 ? 'flex' : 'none',
+                      flexDirection: 'column', flexWrap: 'wrap', justifyContent: 'flex-start',
+                      width: '40vw'
+                    }}>
+                    {localfaturamento.filter(valor => valor.procedimento_id == item.id).map(valor => (
+                      <div className={valor.status_pagamento == 'ABERTO' ? 'button yellow' : valor.status_pagamento == 'VENCIDO' ? 'button red' : 'button green'}
+                        onClick={() => {
+                          setobjatendimento(item);
+                          setobjfaturamento(valor);
+                          console.log(valor);
+                          setvieweditfaturamento(1);
+                        }}
+                        style={{
+                          display: 'flex', flexDirection: 'column',
+                          justifyContent: 'flex-start',
+                          alignContent: 'flex-start',
+                          alignItems: 'flex-start',
+                          paddingLeft: 10,
+                        }}>
+                        <div style={{ fontSize: 20, textDecoration: 'underline' }}>{valor.forma_pagamento}</div>
+                        <div>{'PARCELA: ' + valor.parcela}</div>
+                        <div>{'STATUS: ' + valor.status_pagamento}</div>
+                        <div>{valor.data_pagamento == null ? 'DATA DO PAGAMENTO: PENDENTE' : 'DATA DO PAGAMENTO: ' + valor.data_pagamento}</div>
+                        <div>{'DATA DO VENCIMENTO: ' + valor.data_vencimento}</div>
+                        <div>{'R$ ' + parseFloat(valor.valor_pagamento).toFixed(2)}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div id="elementos do faturamento convênio"
+                    style={{
+                      display: item.faturamento_codigo_procedimento == 'CONVÊNIO' && localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).length > 0 ? 'flex' : 'none',
+                      flexDirection: 'column', flexWrap: 'wrap', justifyContent: 'flex-start',
+                      width: '40vw'
+                    }}>
+                    {
+                      localfaturamento.filter(valor => valor.procedimento_id == item.id).map(valor => (
+                        <div className={valor.status_pagamento == 'ABERTO' ? 'button yellow' : valor.status_pagamento == 'VENCIDO' ? 'button red' : 'button green'}
+                          onClick={() => {
+                            setobjatendimento(item);
+                            setobjfaturamento(valor);
+                            console.log(valor);
+                            // setvieweditfaturamentoconvenio(1); PENDÊNCIA! CRIAR COMPONENTE QUE MUDA O STATUS DO PROCEDIMENTO FATURADO APRA CONVÊNIO (GLOSA, ERRO, ETC.).
+                          }}
+                          style={{
+                            display: 'flex', flexDirection: 'column',
+                            justifyContent: 'flex-start',
+                            alignContent: 'flex-start',
+                            alignItems: 'flex-start',
+                            paddingLeft: 10,
+                          }}>
+                          <div style={{ fontSize: 20, textDecoration: 'underline' }}>{valor.forma_pagamento}</div>
+                          <div>{'OPERADORA: ' + operadoras.filter(op => op.id == valor.id_operadora).map(op => op.nome_operadora)}</div>
+                          <div>{'STATUS: ' + valor.status_pagamento}</div>
+                          <div>{valor.data_pagamento == null ? 'DATA DO PAGAMENTO: PENDENTE' : 'DATA DO PAGAMENTO: ' + valor.data_pagamento}</div>
+                          <div>{'DATA DO VENCIMENTO: ' + valor.data_vencimento}</div>
+                          <div>{'R$ ' + parseFloat(valor.valor_pagamento).toFixed(2)}</div>
+                          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+                            <div id='gerarXml - procedimento de convênio'
+                              className="button-green"
+                              style={{
+                                display: valor.status_pagamento != 'PAGO' ? 'flex' : 'none',
+                                alignSelf: 'flex-end',
+                                width: 150, minWidth: 120, maxWidth: 120,
+                              }}
+                              onClick={() => updateRegistroProcedimento(valor, 'PAGO', parseFloat(valor.valor_pagamento).toFixed(2))}
+                            >
+                              CONFIRMAR PAGAMENTO PELA OPERADORA
+                            </div>
+                            <div id='gerarXml - procedimento de convênio'
+                              className="button-green"
+                              style={{
+                                display: 'flex',
+                                alignSelf: 'flex-end',
+                                width: 150, minWidth: 120, maxWidth: 120,
+                              }}
+                              onClick={() => createxml(dataxmltest)} // SUPER PENDENTE!!!
+                            >
+                              GERAR XML
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                  <div id="faturamento pendente"
+                    style={{
+                      display: localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).length < 1 ? 'flex' : 'none',
+                      flexDirection: 'column', flexWrap: 'wrap', justifyContent: 'flex-start',
+                      width: '40vw'
+                    }}>
+                    <div className="button red" style={{ width: 200, alignSelf: 'flex-end' }}>FATURAMENTO PENDENTE!</div>
+                  </div>
                 </div>
               </div>
             ))
@@ -1314,7 +1421,8 @@ function Faturamento() {
     }
     axios.post(html + 'update_faturamento_clinicas/' + item.id, obj).then(() => {
       console.log('REGISTRO DE FATURAMENTO REALIZADO COM SUCESSO');
-      loadfaturamentosmes(document.getElementById("inputMesFaturamento").value);
+      // loadfaturamentosmes(document.getElementById("inputMesFaturamento").value);
+      loadfaturamentosmes(selecteddate);
       setvieweditfaturamento(0);
     })
   }
@@ -1489,35 +1597,133 @@ function Faturamento() {
       // eslint-disable-next-line
       localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).sort((a, b) => a.parcela < b.parcela ? -1 : 1).map(faturamento => {
         formapagamento = faturamento.forma_pagamento;
-        tablefaturamentos.push(
-          [
-            { text: faturamento.parcela }, { text: faturamento.status_pagamento }, { text: faturamento.data_pagamento }, { text: faturamento.valor_pagamento }
-          ]
-        );
+        if (formapagamento != 'CONVÊNIO') {
+          tablefaturamentos.push(
+            [
+              { text: faturamento.parcela }, { text: faturamento.status_pagamento }, { text: faturamento.data_pagamento }, { text: faturamento.valor_pagamento }
+            ]
+          );
+        } else {
+          tablefaturamentos.push(
+            // 'OPERADORA', 'CÓDIGO_TUSS', 'DATA PGTO', 'VALOR'
+            [
+              { text: operadoras.filter(op => op.id == faturamento.id_operadora).map(op => op.nome_operadora) }, { text: faturamento.codigo_tuss }, { text: faturamento.data_pagamento }, { text: faturamento.data_pagamento }, { text: faturamento.valor_pagamento }
+            ]
+          );
+        }
         console.log(tablefaturamentos);
         console.log(formapagamento);
       })
-
-      tabledata.push(
-        [
-          { text: moment(item.data_inicio).format('DD/MM/YYYY') }, { text: 'CONSULTA' }, { text: item.nome_paciente },
-          { text: usuarios.filter(usuario => usuario.id_usuario == item.id_profissional).map(usuario => usuario.nome_usuario) },
-          { text: formapagamento },
-          {
-            style: 'soffttable',
-            table: {
-
-              widths: [75, 75, 75, 75],
-              body: [
-                ['PARCELA', 'STATUS', 'DATA PGTO', 'VALOR'],
-                ...tablefaturamentos,
-              ]
-            }
-          },
-        ],
-      );
+      if (localfaturamento.filter(fat => fat.atendimento_id == item.id_atendimento).length > 0) {
+        if (formapagamento != 'CONVÊNIO') {
+          tabledata.push(
+            [
+              { text: moment(item.data_inicio).format('DD/MM/YYYY') }, { text: 'CONSULTA' }, { text: item.nome_paciente },
+              { text: usuarios.filter(usuario => usuario.id_usuario == item.id_profissional).map(usuario => usuario.nome_usuario) },
+              { text: formapagamento },
+              {
+                style: 'soffttable',
+                table: {
+                  // headerRows: 1,
+                  widths: [75, 75, 75, 75],
+                  body: [
+                    ['PARCELA', 'STATUS', 'DATA PGTO', 'VALOR'],
+                    ...tablefaturamentos,
+                  ]
+                }
+              },
+            ],
+          );
+        } else {
+          tabledata.push(
+            [
+              { text: moment(item.data_inicio).format('DD/MM/YYYY') }, { text: 'CONSULTA' }, { text: item.nome_paciente },
+              { text: usuarios.filter(usuario => usuario.id_usuario == item.id_profissional).map(usuario => usuario.nome_usuario) },
+              { text: formapagamento },
+              {
+                style: 'soffttable',
+                table: {
+                  // headerRows: 1,
+                  widths: [75, 75, 75, 75, 75],
+                  body: [
+                    ['OPERADORA', 'CÓDIGO_TUSS', 'STATUS', 'DATA PGTO', 'VALOR'],
+                    ...tablefaturamentos,
+                  ]
+                }
+              },
+            ],
+          );
+        }
+      }
 
     });
+    // eslint-disable-next-line
+    procedimentos_mes.sort((a, b) => moment(a.data_exame, 'DD/MM/YYYY - HH:mm') > moment(b.data_exame, 'DD/MM/YYYY - HH:mm') ? 1 : -1).map(item => {
+      let tablefaturamentos = [];
+      let formapagamento = null;
+      // eslint-disable-next-line
+      localfaturamento.filter(valor => valor.procedimento_id == item.id).sort((a, b) => a.parcela < b.parcela ? -1 : 1).map(faturamento => {
+        formapagamento = faturamento.forma_pagamento;
+        if (formapagamento != 'CONVÊNIO') {
+          tablefaturamentos.push(
+            [
+              { text: faturamento.parcela }, { text: faturamento.status_pagamento }, { text: faturamento.data_pagamento }, { text: faturamento.valor_pagamento }
+            ]
+          );
+        } else {
+          tablefaturamentos.push(
+            // 'OPERADORA', 'CÓDIGO_TUSS', 'DATA PGTO', 'VALOR'
+            [
+              { text: operadoras.filter(op => op.id == faturamento.id_operadora).map(op => op.nome_operadora) }, { text: faturamento.codigo_tuss }, { text: faturamento.data_pagamento }, { text: faturamento.data_pagamento }, { text: faturamento.valor_pagamento }
+            ]
+          );
+        }
+        console.log(tablefaturamentos);
+        console.log(formapagamento);
+      })
+      if (localfaturamento.filter(fat => fat.procedimento_id == item.id).length > 0) {
+        if (formapagamento != 'CONVÊNIO') {
+          tabledata.push(
+            [
+              { text: moment(item.data_inicio).format('DD/MM/YYYY') }, { text: 'CONSULTA' }, { text: item.nome_paciente },
+              { text: usuarios.filter(usuario => usuario.id_usuario == item.id_profissional).map(usuario => usuario.nome_usuario) },
+              { text: formapagamento },
+              {
+                style: 'soffttable',
+                table: {
+                  // headerRows: 1,
+                  widths: [75, 75, 75, 75],
+                  body: [
+                    ['PARCELA', 'STATUS', 'DATA PGTO', 'VALOR'],
+                    ...tablefaturamentos,
+                  ]
+                }
+              },
+            ],
+          );
+        } else {
+          tabledata.push(
+            [
+              { text: moment(item.data_inicio).format('DD/MM/YYYY') }, { text: 'CONSULTA' }, { text: item.nome_paciente },
+              { text: usuarios.filter(usuario => usuario.id_usuario == item.id_profissional).map(usuario => usuario.nome_usuario) },
+              { text: formapagamento },
+              {
+                style: 'soffttable',
+                table: {
+                  // headerRows: 1,
+                  widths: [75, 75, 75, 75, 75],
+                  body: [
+                    ['OPERADORA', 'CÓDIGO_TUSS', 'STATUS', 'DATA PGTO', 'VALOR'],
+                    ...tablefaturamentos,
+                  ]
+                }
+              },
+            ],
+          );
+        }
+      }
+    });
+
     console.log(tabledata);
     const docDefinition = {
       pageSize: 'A4',
@@ -1608,6 +1814,7 @@ function Faturamento() {
         {
           style: 'softtable',
           table: {
+            headerRows: 1,
             // widths: ['*', '*', '*', '*', '*', '*'],
             body: [
               ['DATA', 'PROCEDIMENTO', 'CLIENTE', 'PROFISSIONAL EXECUTANTE', 'FORMA DE PAGAMENTO', 'PAGAMENTOS'],

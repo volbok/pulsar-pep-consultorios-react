@@ -101,6 +101,7 @@ function Pagamento() {
               onClick={() => {
                 selector('lista de formas de pagamento', 'forma_pgto ' + item.forma, 300);
                 localStorage.setItem('forma_pagamento', item.forma);
+                let valor = document.getElementById("inputValorParticular").value;
                 let procedimento = JSON.parse(localStorage.getItem('obj_procedimento')); // obj_procedimento pode receber registro de consulta ou de atendimento/procedimento médico.
                 let obj_agendado = JSON.parse(localStorage.getItem('obj_agendado'));
                 let localarray = [];
@@ -116,7 +117,7 @@ function Pagamento() {
                     parcela: step + 1,
                     forma_pagamento: item.forma,
                     status_pagamento: step + 1 == 1 ? 'PAGO' : 'ABERTO', // passar como parâmetro.
-                    valor_pagamento: parseInt(procedimento.valor_part) / item.lancamentos,
+                    valor_pagamento: (parseFloat(valor) / item.lancamentos).toFixed(2),
                     id_operadora: obj_agendado.id_operadora,
                     codigo_operadora: null,
                     codigo_tuss: procedimento.tuss_codigo,
@@ -497,6 +498,8 @@ function Pagamento() {
                 }}
                 onClick={() => {
                   if (localStorage.getItem('forma_pagamento') != 'indefinida') {
+                    localStorage.setItem('valor_total', document.getElementById('inputValorParticular').value);
+                    console.log(localStorage.getItem('valor_total'));
                     setpagamento(0);
                     var botoes = document
                       .getElementById('lista de formas de pagamento')
@@ -560,6 +563,7 @@ function Pagamento() {
               <div
                 className='button' style={{ width: 200 }}
                 onClick={() => {
+                  localStorage.setItem('valor_total', document.getElementById('inputValorConvenio').value);
                   setpagamento(0);
                   let objprocedimento = JSON.parse(localStorage.getItem('obj_procedimento'));
                   let objagendado = JSON.parse(localStorage.getItem('obj_agendado'));
@@ -573,7 +577,7 @@ function Pagamento() {
                     parcela: 1,
                     forma_pagamento: 'CONVÊNIO',
                     status_pagamento: 'ABERTO',
-                    valor_pagamento: parseInt(objprocedimento.valor_part),
+                    valor_pagamento: parseFloat(localStorage.getItem('valor_total')).toFixed(2),
                     id_operadora: objprocedimento.id_operadora,
                     codigo_operadora: null,
                     codigo_tuss: objprocedimento.tuss_codigo,
