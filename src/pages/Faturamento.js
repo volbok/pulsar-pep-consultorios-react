@@ -1,5 +1,5 @@
 /* eslint eqeqeq: "off" */
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useCallback } from "react";
 import axios from "axios";
 import Context from "./Context";
 import moment from "moment";
@@ -18,6 +18,7 @@ import { useHistory } from "react-router-dom";
 import Filter from "../components/Filter";
 import { PieChart, Pie, Tooltip } from 'recharts';
 import pdfMake from "pdfmake/build/pdfmake";
+import selector from '../functions/selector';
 
 // JSON to XML.
 const parser = require('json-xml-parse');
@@ -42,13 +43,13 @@ function Faturamento() {
   let history = useHistory();
 
   const [localfaturamento, setlocalfaturamento] = useState([]);
+  const [statelocalfaturamento, setstatelocalfaturamento] = useState([]);
   const builddonutfaturamentodata = (arrayfaturamento, status) => {
     let total = 0;
     arrayfaturamento.filter(item => item.status_pagamento == status).map(item => {
       total = parseFloat(total) + parseFloat(item.valor_pagamento);
       return null;
     });
-    console.log(status + ': ' + total.toFixed(2));
     return total.toFixed(2);
   }
 
@@ -62,7 +63,6 @@ function Faturamento() {
   }
 
   const donutfaturamentodata = () => {
-    console.log(dadosdonutaberto);
     return (
       [
         { name: 'PAGAMENTOS EM ABERTO', value: parseFloat(dadosdonutaberto), fill: '#f5d142' },
@@ -78,15 +78,71 @@ function Faturamento() {
   const loadfaturamentosmes = (data) => {
     axios.get(html + 'list_faturamento_geral_mes/' + cliente.id_cliente + '/' + data).then((response) => {
       let x = response.data.rows;
+      setstatelocalfaturamento(x);
       setlocalfaturamento(x);
-      console.log(x);
-      buildtotalvalorfaturamento(x);
-      setdadosdonutaberto(builddonutfaturamentodata(x, 'ABERTO'));
-      setdadosdonutvencido(builddonutfaturamentodata(x, 'VENCIDO'));
-      setdadosdonutpago(builddonutfaturamentodata(x, 'PAGO'));
+      refreshChart(x);
     });
   }
 
+
+  const refreshChart = (y) => {
+    buildtotalvalorfaturamento(y);
+    setdadosdonutaberto(builddonutfaturamentodata(y, 'ABERTO'));
+    setdadosdonutvencido(builddonutfaturamentodata(y, 'VENCIDO'));
+    setdadosdonutpago(builddonutfaturamentodata(y, 'PAGO'));
+  }
+
+  const refreshfaturamentomes = () => {
+    let x = [];
+    x = statelocalfaturamento;
+    let tipoatendimento = localStorage.getItem('tipoatendimento');
+    let modopagamento = localStorage.getItem('formapagamento');
+
+    // filtro para todas as consultas (particulares e convênio).
+    if (tipoatendimento == 'CONSULTAS' && modopagamento == 'TODAS') {
+      setatendimentos_mes(stateatendimentos_mes);
+      setprocedimentos_mes([]);
+      setlocalfaturamento(x.filter(fat => fat.atendimento_id != null));
+      // filtro para consultas de convênio.
+    } else if (tipoatendimento == 'CONSULTAS' && modopagamento == 'CONVÊNIO') {
+      setatendimentos_mes(stateatendimentos_mes.filter(cons => cons.faturamento_codigo_procedimento == 'CONVÊNIO'));
+      setprocedimentos_mes([]);
+      setlocalfaturamento(x.filter(fat => fat.atendimento_id != null && fat.forma_pagamento == 'CONVÊNIO'));
+      // filtro para consultas particulares.
+    } else if (tipoatendimento == 'CONSULTAS' && modopagamento == 'PARTICULAR') {
+      setatendimentos_mes(stateatendimentos_mes.filter(cons => cons.faturamento_codigo_procedimento == 'PARTICULAR'));
+      setprocedimentos_mes([]);
+      setlocalfaturamento(x.filter(fat => fat.atendimento_id != null && fat.forma_pagamento != 'CONVÊNIO'));
+    } else if (tipoatendimento == 'PROCEDIMENTOS' && modopagamento == 'TODAS') {
+      setatendimentos_mes([]);
+      setprocedimentos_mes(stateprocedimentos_mes);
+      setlocalfaturamento(x.filter(fat => fat.procedimento_id != null));
+    } else if (tipoatendimento == 'PROCEDIMENTOS' && modopagamento == 'CONVÊNIO') {
+      setatendimentos_mes([]);
+      setprocedimentos_mes(stateprocedimentos_mes.filter(proc => proc.convenio == 1));
+      setlocalfaturamento(x.filter(fat => fat.procedimento_id != null && fat.forma_pagamento == 'CONVÊNIO'));
+      // filtro para consultas particulares.
+    } else if (tipoatendimento == 'PROCEDIMENTOS' && modopagamento == 'PARTICULAR') {
+      setatendimentos_mes([]);
+      setprocedimentos_mes(stateprocedimentos_mes.filter(proc => proc.particular == 1));
+      setlocalfaturamento(x.filter(fat => fat.procedimento_id != null && fat.forma_pagamento != 'CONVÊNIO'));
+    } else if (tipoatendimento == 'TODOS' && modopagamento == 'PARTICULAR') {
+      setatendimentos_mes(stateatendimentos_mes);
+      setprocedimentos_mes(stateprocedimentos_mes);
+      setlocalfaturamento(x.filter(fat => fat.forma_pagamento != 'CONVÊNIO'));
+    } else if (tipoatendimento == 'TODOS' && modopagamento == 'CONVÊNIO') {
+      setatendimentos_mes(stateatendimentos_mes);
+      setprocedimentos_mes(stateprocedimentos_mes);
+      setlocalfaturamento(x.filter(fat => fat.forma_pagamento == 'CONVÊNIO'));
+    } else {
+      setatendimentos_mes(stateatendimentos_mes);
+      setprocedimentos_mes(stateprocedimentos_mes);
+      setlocalfaturamento(x);
+    }
+    refreshChart(localfaturamento);
+  }
+
+  const [selecteddate, setselecteddate] = useState(moment().format('MM-YYYY'));
   useEffect(() => {
     // eslint-disable-next-line
     if (pagina == 'FATURAMENTO') {
@@ -97,6 +153,9 @@ function Faturamento() {
       filtraregistrosconsultas(moment().format('MM-YYYY'));
       filtraregistrosprocedimentos(moment().format('MM-YYYY'));
       loadfaturamentosmes(moment().format('MM-YYYY'));
+      setTimeout(() => {
+        document.getElementById("inputMesFaturamento").value = moment().format('MM-YYYY');
+      }, 1000);
     }
     // eslint-disable-next-line
   }, [pagina]);
@@ -107,10 +166,8 @@ function Faturamento() {
   const [arraylistatuss, setarraylistatuss] = useState([]);
   const loadTuss = () => {
     axios.get(html + 'all_tabela_tuss').then((response) => {
-      var x = response.data.rows;
       setarraylistatuss(response.data.rows);
       setlistatuss(response.data.rows);
-      console.log(x.length);
     })
   };
 
@@ -194,7 +251,6 @@ function Faturamento() {
             }}
             onClick={() => {
               setselectedoperadora(item);
-              console.log(selectedoperadora);
             }}
           >
             <div className="button"
@@ -217,8 +273,6 @@ function Faturamento() {
                     const img = new Image();
                     img.src = item.logo_operadora;
                     img.onload = function () {
-                      console.log('image uploaded');
-                      console.log(img.height);
                       let canvas = document.getElementById('canvas');
                       canvas.style.backgroundColor = 'white';
                       canvas.height = img.height;
@@ -390,8 +444,6 @@ function Faturamento() {
               const img = new Image();
               img.src = URL.createObjectURL(myFile);
               img.onload = () => {
-                console.log('image uploaded');
-                console.log(img.height + ' - ' + img.width);
                 document.getElementById('canvas').style.backgroundColor = 'white';
                 document.getElementById('canvas').width = img.width;
                 document.getElementById('canvas').height = img.height;
@@ -435,7 +487,6 @@ function Faturamento() {
   const loadProcedimentos = () => {
     axios.get(html + 'all_procedimentos').then((response) => {
       setprocedimentos(response.data.rows);
-      console.log(response.data.rows);
     })
   };
 
@@ -569,6 +620,62 @@ function Faturamento() {
       </div>
     )
   }
+
+  const [tipoatendimento, settipoatendimento] = useState('CONSULTAS');
+  const [formapagamento, setformapagamento] = useState('');
+  const SelecionaProcedimentos = useCallback(() => {
+    return (
+      <div
+        id="scroll procedimentos faturamento"
+        className='scroll'
+        style={{
+          display: tipoatendimento == 'PROCEDIMENTOS' ? 'flex' : 'none',
+          flexDirection: 'row',
+          width: '100%',
+          margin: 10,
+          alignContent: 'flex-start',
+          alignSelf: 'center',
+          overflowX: 'scroll',
+          overflowY: 'hidden',
+        }}
+      >
+        {procedimentos.map(item => (
+          <div
+            key={'exame: ' + item.id}
+            id={'btn procedimento faturamento ' + item.id}
+            className='button'
+            style={{ display: 'flex', width: 150, minWidth: 150, paddingLeft: 30, paddingRight: 30 }}
+            title={item.tuss_rol_ans_descricao}
+            onClick={() => {
+              setprocedimentos_mes(stateprocedimentos_mes.filter(proc => proc.nome_exame == item.tuss_rol_ans_descricao));
+              loadfaturamentosmes(selecteddate);
+              localStorage.setItem('procedimento', item.tuss_rol_ans_descricao);
+              localStorage.setItem('codigo_tuss', item.tuss_codigo);
+              selector("scroll procedimentos faturamento", 'btn procedimento faturamento ' + item.id, 100);
+            }}
+          >
+            {item.tuss_rol_ans_descricao.length > 30 ? item.tuss_rol_ans_descricao.slice(0, 30) + '...' : item.tuss_rol_ans_descricao}
+          </div>
+        ))}
+        <div
+          key={'exame: todos'}
+          id={'btn procedimento faturamento todos'}
+          className='button'
+          style={{ display: 'flex', width: 150, minWidth: 150, paddingLeft: 30, paddingRight: 30 }}
+          onClick={() => {
+            setprocedimentos_mes(stateprocedimentos_mes);
+            loadfaturamentosmes(selecteddate);
+            localStorage.setItem('procedimento', '');
+            localStorage.setItem('codigo_tuss', '');
+            selector("scroll procedimentos faturamento", 'btn procedimento faturamento todos', 100);
+          }}
+        >
+          {'TODOS'}
+        </div>
+      </div>
+    )
+    // eslint-disable-next-line
+  }, [procedimentos, tipoatendimento, selecteddate]);
 
   const [viewprocedimentos, setviewprocedimentos] = useState(0);
   function ViewProcedimentos() {
@@ -855,127 +962,203 @@ function Faturamento() {
     moment().add(3, 'months').format('MM-YYYY'),
   ]
 
+  // eslint-disable-next-line
+  const [stateatendimentos_mes, setstateatendimentos_mes] = useState([]);
   const [atendimentos_mes, setatendimentos_mes] = useState([]);
   const filtraregistrosconsultas = (data) => {
     axios.get(html + "list_faturamento_clinicas_mes/" + cliente.id_cliente + "/" + data).then((response) => {
       let x = response.data.rows;
+      setstateatendimentos_mes(x);
       setatendimentos_mes(x);
-      console.log(x.length);
     });
   }
 
+  const [stateprocedimentos_mes, setstateprocedimentos_mes] = useState([]);
   const [procedimentos_mes, setprocedimentos_mes] = useState([]);
   const filtraregistrosprocedimentos = (data) => {
-    console.log(data);
     axios.get(html + "list_faturamento_procedimentos_mes/" + cliente.id_cliente + "/" + data).then((response) => {
       let x = response.data.rows;
+      setstateprocedimentos_mes(x);
       setprocedimentos_mes(x);
-      console.log('PORRA');
-      console.log(x.length);
     });
   }
 
   const [objfaturamento, setobjfaturamento] = useState(null);
-  const [selecteddate, setselecteddate] = useState(moment().format('MM-YYYY'));
-  const [tipoatendimento, settipoatendimento] = useState('CONSULTAS');
   function ListaDeFaturamentos() {
     return (
       <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <div id="seletores de meses">
-          <div id="scroll de meses"
-            className="scroll cor2"
+        <div id="scroll de meses"
+          className="scroll cor2"
+          style={{
+            display: 'flex', flexDirection: 'row', justifyContent: 'flex-start',
+            overflowY: 'hidden', overflowX: 'scroll',
+            width: '80vw', alignSelf: 'center',
+          }}>
+          <textarea
+            autoComplete="off"
+            placeholder="MÊS/ANO"
+            className="textarea"
+            type="text"
+            inputMode="numeric"
+            maxLength={10}
+            id="inputMesFaturamento"
+            title="FORMATO: MM-YYYY"
+            onClick={() => document.getElementById("inputMesFaturamento").value = ""}
+            onFocus={(e) => (e.target.placeholder = "")}
+            onBlur={(e) => (e.target.placeholder = "MÊS-ANO")}
             style={{
-              display: 'flex', flexDirection: 'row', justifyContent: 'flex-start',
-              overflowY: 'hidden', overflowX: 'scroll',
-              width: '80vw', alignSelf: 'center',
+              flexDirection: "center",
+              justifyContent: "center",
+              alignSelf: "center",
+              width: 150,
+              textAlign: "center",
+              padding: 5,
+              height: 20,
+              minHeight: 20,
+              maxHeight: 20,
+            }}
+          ></textarea>
+          <div id='botão para buscar por data.'
+            className="button red"
+            onClick={() => {
+              let data = document.getElementById("inputMesFaturamento").value;
+              filtraregistrosconsultas(document.getElementById("inputMesFaturamento").value);
+              filtraregistrosprocedimentos(document.getElementById("inputMesFaturamento").value);
+              loadfaturamentosmes(document.getElementById("inputMesFaturamento").value);
+              setselecteddate(document.getElementById("inputMesFaturamento").value);
+              setTimeout(() => {
+                document.getElementById("inputMesFaturamento").value = data;
+              }, 1000);
+            }}
+            style={{
+              borderRadius: 50,
+              minWidth: 20,
+              width: 20,
+              maxWidth: 20,
+              minHeight: 20,
+              height: 20,
+              maxHeight: 20,
+              alignSelf: 'center',
+              marginLeft: -20,
             }}>
-            <textarea
-              autoComplete="off"
-              placeholder="MÊS/ANO"
-              className="textarea"
-              type="text"
-              inputMode="numeric"
-              maxLength={10}
-              id="inputMesFaturamento"
-              title="FORMATO: MM-YYYY"
-              onClick={() => document.getElementById("inputMesFaturamento").value = ""}
-              onFocus={(e) => (e.target.placeholder = "")}
-              onBlur={(e) => (e.target.placeholder = "MÊS-ANO")}
+            <img
+              alt=""
+              src={lupa}
               style={{
-                flexDirection: "center",
-                justifyContent: "center",
-                alignSelf: "center",
-                width: 150,
-                textAlign: "center",
-                padding: 5,
+                margin: 0,
                 height: 20,
-                minHeight: 20,
-                maxHeight: 20,
-              }}
-            ></textarea>
-            <div id='botão para buscar por data.'
-              className="button red"
-              onClick={() => {
-                filtraregistrosconsultas(document.getElementById("inputMesFaturamento").value);
-                filtraregistrosprocedimentos(document.getElementById("inputMesFaturamento").value);
-                setselecteddate(document.getElementById("inputMesFaturamento").value);
-                loadfaturamentosmes(document.getElementById("inputMesFaturamento").value);
-              }}
-              style={{
-                borderRadius: 50,
-                minWidth: 20,
                 width: 20,
-                maxWidth: 20,
-                minHeight: 20,
-                height: 20,
-                maxHeight: 20,
-                alignSelf: 'center',
-                marginLeft: -20,
-              }}>
-              <img
-                alt=""
-                src={lupa}
-                style={{
-                  margin: 0,
-                  height: 20,
-                  width: 20,
-                  opacity: 1,
-                  alignSelf: 'center'
-                }}
-              ></img>
-            </div>
-            {calendariomensal.map(item => (
-              <div
-                id={'btn_datas_faturamento ' + item}
-                className={selecteddate == item ? "button-selected" : "button"}
-                style={{ width: 200, minHeight: 30, height: 30, maxHeight: 30 }}
-                onClick={() => {
-                  setselecteddate(item);
-                  filtraregistrosconsultas(item);
-                  filtraregistrosprocedimentos(item);
-                  loadfaturamentosmes(item);
-                  document.getElementById("inputMesFaturamento").value = selecteddate;
-                }}>
-                {item}
-              </div>
-            ))}
+                opacity: 1,
+                alignSelf: 'center'
+              }}
+            ></img>
           </div>
+          {calendariomensal.map(item => (
+            <div
+              id={'btn_datas_faturamento ' + item}
+              className={selecteddate == item ? "button-selected" : "button"}
+              style={{ width: 200, minHeight: 30, height: 30, maxHeight: 30 }}
+              onClick={() => {
+                setselecteddate(item);
+                filtraregistrosconsultas(item);
+                filtraregistrosprocedimentos(item);
+                loadfaturamentosmes(item);
+                setTimeout(() => {
+                  document.getElementById("inputMesFaturamento").value = item;
+                }, 1000);
+              }}>
+              {item}
+            </div>
+          ))}
         </div>
         <TotaisFaturamento></TotaisFaturamento>
-        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+        <div id='filtros'
+          style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
           <div
             className={tipoatendimento == 'CONSULTAS' ? "button-selected" : "button"}
             style={{ width: 150 }}
-            onClick={() => settipoatendimento('CONSULTAS')}
+            onClick={() => {
+              console.log('DATA: ' + selecteddate);
+              settipoatendimento('CONSULTAS');
+              localStorage.setItem('tipoatendimento', 'CONSULTAS');
+              refreshfaturamentomes();
+              setTimeout(() => {
+                document.getElementById("inputMesFaturamento").value = selecteddate;
+              }, 1000);
+            }}
           >
             CONSULTAS
           </div>
           <div
             className={tipoatendimento == 'PROCEDIMENTOS' ? "button-selected" : "button"}
             style={{ width: 150 }}
-            onClick={() => settipoatendimento('PROCEDIMENTOS')}
+            onClick={() => {
+              console.log('DATA: ' + selecteddate);
+              settipoatendimento('PROCEDIMENTOS');
+              localStorage.setItem('tipoatendimento', 'PROCEDIMENTOS');
+              refreshfaturamentomes();
+              setTimeout(() => {
+                document.getElementById("inputMesFaturamento").value = selecteddate;
+              }, 1000);
+            }}
           >
             PROCEDIMENTOS
+          </div>
+          <div
+            className={tipoatendimento == 'TODOS' ? "button-selected" : "button"}
+            style={{ width: 150 }}
+            onClick={() => {
+              settipoatendimento('TODOS')
+              localStorage.setItem('tipoatendimento', 'TODOS');
+              refreshfaturamentomes();
+              setTimeout(() => {
+                document.getElementById("inputMesFaturamento").value = selecteddate;
+              }, 1000);
+            }}
+          >
+            TODOS
+          </div>
+          <div
+            className={formapagamento == 'PARTICULAR' ? "button-selected" : "button"}
+            style={{ width: 150 }}
+            onClick={() => {
+              setformapagamento('PARTICULAR')
+              localStorage.setItem('formapagamento', 'PARTICULAR');
+              refreshfaturamentomes();
+              setTimeout(() => {
+                document.getElementById("inputMesFaturamento").value = selecteddate;
+              }, 1000);
+            }}
+          >
+            PARTICULAR
+          </div>
+          <div
+            className={formapagamento == 'CONVÊNIO' ? "button-selected" : "button"}
+            style={{ width: 150 }}
+            onClick={() => {
+              setformapagamento('CONVÊNIO')
+              localStorage.setItem('formapagamento', 'CONVÊNIO');
+              refreshfaturamentomes();
+              setTimeout(() => {
+                document.getElementById("inputMesFaturamento").value = selecteddate;
+              }, 1000);
+            }}
+          >
+            CONVÊNIO
+          </div>
+          <div
+            className={formapagamento == 'TODAS' ? "button-selected" : "button"}
+            style={{ width: 150 }}
+            onClick={() => {
+              setformapagamento('TODAS')
+              localStorage.setItem('formapagamento', 'TODAS');
+              refreshfaturamentomes();
+              setTimeout(() => {
+                document.getElementById("inputMesFaturamento").value = selecteddate;
+              }, 1000);
+            }}
+          >
+            TODAS
           </div>
           <div className="button" style={{ width: 50, maxWidth: 50, alignSelf: 'center' }} onClick={() => printRelatorioFaturamento()}>
             <img
@@ -985,10 +1168,10 @@ function Faturamento() {
             ></img>
           </div>
         </div>
-        <div style={{ display: tipoatendimento == 'CONSULTAS' ? 'flex' : 'none', flexDirection: 'column' }}>
+        <div>
           {
             atendimentos_mes.sort((a, b) => moment(a.data_inicio) > moment(b.data_inicio) ? 1 : -1).filter(item => item.nome_paciente != 'HORÁRIO BLOQUEADO!').map(item => (
-              <div className="button" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+              <div className="button" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignSelf: 'flex-start' }}>
                   <div className="button red" style={{
                     display: 'flex', flexDirection: 'column', justifyContent: 'center', width: 200, minWidth: 200,
@@ -1013,19 +1196,14 @@ function Faturamento() {
                     </div>
                   </div>
                 </div>
-
-                <div id="elementos do faturamento particular"
-                  style={{
-                    display: item.faturamento_codigo_procedimento == 'PARTICULAR' && localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).length > 0 ? 'flex' : 'none',
-                    flexDirection: 'column', flexWrap: 'wrap', justifyContent: 'flex-start',
-                    width: '40vw'
-                  }}>
+                <div id="elementos do faturamento particular - atendimentos (consultas)"
+                  className="grid"
+                  style={{ display: item.faturamento_codigo_procedimento == 'PARTICULAR' ? 'grid' : 'none', width: '100%' }}>
                   {localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).sort((a, b) => a.parcela < b.parcela ? -1 : 1).map(valor => (
                     <div className={valor.status_pagamento == 'ABERTO' ? 'button yellow' : valor.status_pagamento == 'VENCIDO' ? 'button red' : 'button green'}
                       onClick={() => {
                         setobjatendimento(item);
                         setobjfaturamento(valor);
-                        console.log(valor);
                         setvieweditfaturamento(1);
                       }}
                       style={{
@@ -1033,45 +1211,41 @@ function Faturamento() {
                         justifyContent: 'flex-start',
                         alignContent: 'flex-start',
                         alignItems: 'flex-start',
-                        paddingLeft: 10,
+                        textAlign: 'left',
                       }}>
-                      <div style={{ fontSize: 20, textDecoration: 'underline' }}>{valor.forma_pagamento}</div>
+                      <div style={{ fontSize: 14, textDecoration: 'underline' }}>{valor.forma_pagamento}</div>
                       <div>{'PARCELA: ' + valor.parcela}</div>
                       <div>{'STATUS: ' + valor.status_pagamento}</div>
                       <div>{valor.data_pagamento == null ? 'DATA DO PAGAMENTO: PENDENTE' : 'DATA DO PAGAMENTO: ' + valor.data_pagamento}</div>
                       <div>{'DATA DO VENCIMENTO: ' + valor.data_vencimento}</div>
-                      <div>{'R$ ' + parseFloat(valor.valor_pagamento).toFixed(2)}</div>
+                      <div style={{ fontSize: 14 }}>{'VALOR: R$ ' + parseFloat(valor.valor_pagamento).toFixed(2)}</div>
                     </div>
                   ))}
                 </div>
-                <div id="elementos do faturamento convênio"
-                  style={{
-                    display: item.faturamento_codigo_procedimento == 'CONVÊNIO' && localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).length > 0 ? 'flex' : 'none',
-                    flexDirection: 'column', flexWrap: 'wrap', justifyContent: 'flex-start',
-                    width: '40vw'
-                  }}>
+                <div id="elementos do faturamento convênio - atendimentos (consultas)"
+                  className="grid"
+                  style={{ width: '100%', display: item.faturamento_codigo_procedimento == 'CONVÊNIO' ? 'grid' : 'none' }}>
                   {localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).map(valor => (
-                    <div className={valor.status_pagamento == 'ABERTO' ? 'button yellow' : valor.status_pagamento == 'VENCIDO' ? 'button red' : 'button green'}
+                    <div
+                      className={valor.status_pagamento == 'ABERTO' ? 'button yellow' : valor.status_pagamento == 'VENCIDO' ? 'button red' : 'button green'}
                       onClick={() => {
                         setobjatendimento(item);
                         setobjfaturamento(valor);
-                        console.log(valor);
-                        // setvieweditfaturamentoconvenio(1); PENDÊNCIA! CRIAR COMPONENTE QUE MUDA O STATUS DO PROCEDIMENTO FATURADO APRA CONVÊNIO (GLOSA, ERRO, ETC.).
                       }}
                       style={{
                         display: 'flex', flexDirection: 'column',
                         justifyContent: 'flex-start',
                         alignContent: 'flex-start',
                         alignItems: 'flex-start',
-                        paddingLeft: 10,
+                        textAlign: 'left',
                       }}>
-                      <div style={{ fontSize: 20, textDecoration: 'underline' }}>{valor.forma_pagamento}</div>
+                      <div style={{ fontSize: 14, textDecoration: 'underline' }}>{valor.forma_pagamento}</div>
                       <div>{'OPERADORA: ' + operadoras.filter(op => op.id == valor.id_operadora).map(op => op.nome_operadora)}</div>
                       <div>{'STATUS: ' + valor.status_pagamento}</div>
                       <div>{valor.data_pagamento == null ? 'DATA DO PAGAMENTO: PENDENTE' : 'DATA DO PAGAMENTO: ' + valor.data_pagamento}</div>
                       <div>{'DATA DO VENCIMENTO: ' + valor.data_vencimento}</div>
-                      <div>{'R$ ' + parseFloat(valor.valor_pagamento).toFixed(2)}</div>
-                      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
+                      <div style={{ fontSize: 14 }}>{'VALOR R$ ' + parseFloat(valor.valor_pagamento).toFixed(2)}</div>
+                      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', marginTop: 20 }}>
                         <div id='gerarXml - procedimento de convênio'
                           className="button-green"
                           style={{
@@ -1098,11 +1272,11 @@ function Faturamento() {
                     </div>
                   ))}
                 </div>
-                <div id="faturamento pendente"
+                <div id="faturamento pendente - atendimentos (consultas)"
                   style={{
                     display: localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).length < 1 ? 'flex' : 'none',
                     flexDirection: 'column', flexWrap: 'wrap', justifyContent: 'flex-start',
-                    width: '40vw'
+                    alignSelf: 'flex-end',
                   }}>
                   <div className="button red" style={{ width: 200, alignSelf: 'flex-end' }}>FATURAMENTO PENDENTE!</div>
                 </div>
@@ -1110,10 +1284,11 @@ function Faturamento() {
             ))
           }
         </div>
-        <div style={{ display: tipoatendimento == 'PROCEDIMENTOS' ? 'flex' : 'none', flexDirection: 'column' }}>
+        <div>
+          <SelecionaProcedimentos></SelecionaProcedimentos>
           {
-            procedimentos_mes.map(item => (
-              <div className="button" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+            procedimentos_mes.sort((a, b) => moment(a.data_exame, 'DD/MM/YYYY - HH:mm') > moment(b.data_exame, 'DD/MM/YYYY - HH:mm') ? 1 : -1).map(item => (
+              <div className="button" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignSelf: 'flex-start' }}>
                   <div className="button red" style={{
                     display: 'flex', flexDirection: 'column', justifyContent: 'center', width: 200, minWidth: 200,
@@ -1139,20 +1314,16 @@ function Faturamento() {
                 </div>
                 <div style={{
                   display: 'flex', flexDirection: 'column', flexWrap: 'wrap', justifyContent: 'flex-start',
-                  width: '40vw'
+                  width: '100%'
                 }}>
-                  <div id="elementos do faturamento particular"
-                    style={{
-                      display: item.faturamento_codigo_procedimento != 'CONVÊNIO' && localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).length > 0 ? 'flex' : 'none',
-                      flexDirection: 'column', flexWrap: 'wrap', justifyContent: 'flex-start',
-                      width: '40vw'
-                    }}>
+                  <div id="elementos do faturamento particular - atendimentos (procedimentos)"
+                    className="grid"
+                    style={{ width: '100%', display: item.particular == 1 ? 'grid' : 'none' }}>
                     {localfaturamento.filter(valor => valor.procedimento_id == item.id).map(valor => (
                       <div className={valor.status_pagamento == 'ABERTO' ? 'button yellow' : valor.status_pagamento == 'VENCIDO' ? 'button red' : 'button green'}
                         onClick={() => {
                           setobjatendimento(item);
                           setobjfaturamento(valor);
-                          console.log(valor);
                           setvieweditfaturamento(1);
                         }}
                         style={{
@@ -1160,77 +1331,71 @@ function Faturamento() {
                           justifyContent: 'flex-start',
                           alignContent: 'flex-start',
                           alignItems: 'flex-start',
-                          paddingLeft: 10,
+                          textAlign: 'left',
                         }}>
-                        <div style={{ fontSize: 20, textDecoration: 'underline' }}>{valor.forma_pagamento}</div>
+                        <div style={{ fontSize: 14, textDecoration: 'underline' }}>{valor.forma_pagamento}</div>
                         <div>{'PARCELA: ' + valor.parcela}</div>
                         <div>{'STATUS: ' + valor.status_pagamento}</div>
                         <div>{valor.data_pagamento == null ? 'DATA DO PAGAMENTO: PENDENTE' : 'DATA DO PAGAMENTO: ' + valor.data_pagamento}</div>
                         <div>{'DATA DO VENCIMENTO: ' + valor.data_vencimento}</div>
-                        <div>{'R$ ' + parseFloat(valor.valor_pagamento).toFixed(2)}</div>
+                        <div style={{ fontSize: 14 }}>{'R$ ' + parseFloat(valor.valor_pagamento).toFixed(2)}</div>
                       </div>
                     ))}
                   </div>
-                  <div id="elementos do faturamento convênio"
-                    style={{
-                      display: item.faturamento_codigo_procedimento == 'CONVÊNIO' && localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).length > 0 ? 'flex' : 'none',
-                      flexDirection: 'column', flexWrap: 'wrap', justifyContent: 'flex-start',
-                      width: '40vw'
-                    }}>
-                    {
-                      localfaturamento.filter(valor => valor.procedimento_id == item.id).map(valor => (
-                        <div className={valor.status_pagamento == 'ABERTO' ? 'button yellow' : valor.status_pagamento == 'VENCIDO' ? 'button red' : 'button green'}
-                          onClick={() => {
-                            setobjatendimento(item);
-                            setobjfaturamento(valor);
-                            console.log(valor);
-                            // setvieweditfaturamentoconvenio(1); PENDÊNCIA! CRIAR COMPONENTE QUE MUDA O STATUS DO PROCEDIMENTO FATURADO APRA CONVÊNIO (GLOSA, ERRO, ETC.).
-                          }}
-                          style={{
-                            display: 'flex', flexDirection: 'column',
-                            justifyContent: 'flex-start',
-                            alignContent: 'flex-start',
-                            alignItems: 'flex-start',
-                            paddingLeft: 10,
-                          }}>
-                          <div style={{ fontSize: 20, textDecoration: 'underline' }}>{valor.forma_pagamento}</div>
-                          <div>{'OPERADORA: ' + operadoras.filter(op => op.id == valor.id_operadora).map(op => op.nome_operadora)}</div>
-                          <div>{'STATUS: ' + valor.status_pagamento}</div>
-                          <div>{valor.data_pagamento == null ? 'DATA DO PAGAMENTO: PENDENTE' : 'DATA DO PAGAMENTO: ' + valor.data_pagamento}</div>
-                          <div>{'DATA DO VENCIMENTO: ' + valor.data_vencimento}</div>
-                          <div>{'R$ ' + parseFloat(valor.valor_pagamento).toFixed(2)}</div>
-                          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end' }}>
-                            <div id='gerarXml - procedimento de convênio'
-                              className="button-green"
-                              style={{
-                                display: valor.status_pagamento != 'PAGO' ? 'flex' : 'none',
-                                alignSelf: 'flex-end',
-                                width: 150, minWidth: 120, maxWidth: 120,
-                              }}
-                              onClick={() => updateRegistroProcedimento(valor, 'PAGO', parseFloat(valor.valor_pagamento).toFixed(2))}
-                            >
-                              CONFIRMAR PAGAMENTO PELA OPERADORA
-                            </div>
-                            <div id='gerarXml - procedimento de convênio'
-                              className="button-green"
-                              style={{
-                                display: 'flex',
-                                alignSelf: 'flex-end',
-                                width: 150, minWidth: 120, maxWidth: 120,
-                              }}
-                              onClick={() => createxml(dataxmltest)} // SUPER PENDENTE!!!
-                            >
-                              GERAR XML
-                            </div>
+                  <div id="elementos do faturamento convênio - atendimentos (procedimentos)"
+                    className="grid"
+                    style={{ width: '100%', display: item.convenio == 1 ? 'grid' : 'none' }}>
+                    {localfaturamento.filter(valor => valor.procedimento_id == item.id).map(valor => (
+                      <div className={valor.status_pagamento == 'ABERTO' ? 'button yellow' : valor.status_pagamento == 'VENCIDO' ? 'button red' : 'button green'}
+                        onClick={() => {
+                          setobjatendimento(item);
+                          setobjfaturamento(valor);
+                        }}
+                        style={{
+                          display: 'flex', flexDirection: 'column',
+                          justifyContent: 'flex-start',
+                          alignContent: 'flex-start',
+                          alignItems: 'flex-start',
+                          textAlign: 'left',
+                        }}>
+                        <div style={{ fontSize: 14, textDecoration: 'underline' }}>{valor.forma_pagamento}</div>
+                        <div>{'OPERADORA: ' + operadoras.filter(op => op.id == valor.id_operadora).map(op => op.nome_operadora)}</div>
+                        <div>{'STATUS: ' + valor.status_pagamento}</div>
+                        <div>{valor.data_pagamento == null ? 'DATA DO PAGAMENTO: PENDENTE' : 'DATA DO PAGAMENTO: ' + valor.data_pagamento}</div>
+                        <div>{'DATA DO VENCIMENTO: ' + valor.data_vencimento}</div>
+                        <div style={{ fontSize: 14 }}>{'R$ ' + parseFloat(valor.valor_pagamento).toFixed(2)}</div>
+                        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', marginTop: 20 }}>
+                          <div id='gerarXml - procedimento de convênio'
+                            className="button-green"
+                            style={{
+                              display: valor.status_pagamento != 'PAGO' ? 'flex' : 'none',
+                              alignSelf: 'flex-end',
+                              width: 150, minWidth: 120, maxWidth: 120,
+                            }}
+                            onClick={() => updateRegistroProcedimento(valor, 'PAGO', parseFloat(valor.valor_pagamento).toFixed(2))}
+                          >
+                            CONFIRMAR PAGAMENTO PELA OPERADORA
+                          </div>
+                          <div id='gerarXml - procedimento de convênio'
+                            className="button-green"
+                            style={{
+                              display: 'flex',
+                              alignSelf: 'flex-end',
+                              width: 150, minWidth: 120, maxWidth: 120,
+                            }}
+                            onClick={() => createxml(dataxmltest)} // SUPER PENDENTE!!!
+                          >
+                            GERAR XML
                           </div>
                         </div>
-                      ))}
+                      </div>
+                    ))}
                   </div>
                   <div id="faturamento pendente"
                     style={{
                       display: localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).length < 1 ? 'flex' : 'none',
                       flexDirection: 'column', flexWrap: 'wrap', justifyContent: 'flex-start',
-                      width: '40vw'
+                      width: '100%'
                     }}>
                     <div className="button red" style={{ width: 200, alignSelf: 'flex-end' }}>FATURAMENTO PENDENTE!</div>
                   </div>
@@ -1263,7 +1428,8 @@ function Faturamento() {
   }
 
   const donutchart = (data, tamanho, fontsize, total) => {
-    // tooltip
+    // tooltip.
+    // eslint-disable-next-line
     const CustomTooltip = ({ payload, label }) => {
       return (
         <div style={{
@@ -1421,7 +1587,6 @@ function Faturamento() {
     }
     axios.post(html + 'update_faturamento_clinicas/' + item.id, obj).then(() => {
       console.log('REGISTRO DE FATURAMENTO REALIZADO COM SUCESSO');
-      // loadfaturamentosmes(document.getElementById("inputMesFaturamento").value);
       loadfaturamentosmes(selecteddate);
       setvieweditfaturamento(0);
     })
@@ -1589,7 +1754,8 @@ function Faturamento() {
 
   // ## IMPRESSÃO DE RELATÓRIOS DE FATURAMENTO ## //
   const printRelatorioFaturamento = () => {
-    let tabledata = [];
+    let tabledataconsultas = [];
+    let tabledataprocedimentos = [];
     // eslint-disable-next-line
     atendimentos_mes.sort((a, b) => moment(a.data_inicio) > moment(b.data_inicio) ? 1 : -1).filter(item => item.nome_paciente != 'HORÁRIO BLOQUEADO!').map(item => {
       let tablefaturamentos = [];
@@ -1611,18 +1777,16 @@ function Faturamento() {
             ]
           );
         }
-        console.log(tablefaturamentos);
-        console.log(formapagamento);
       })
       if (localfaturamento.filter(fat => fat.atendimento_id == item.id_atendimento).length > 0) {
         if (formapagamento != 'CONVÊNIO') {
-          tabledata.push(
+          tabledataconsultas.push(
             [
               { text: moment(item.data_inicio).format('DD/MM/YYYY') }, { text: 'CONSULTA' }, { text: item.nome_paciente },
               { text: usuarios.filter(usuario => usuario.id_usuario == item.id_profissional).map(usuario => usuario.nome_usuario) },
               { text: formapagamento },
               {
-                style: 'soffttable',
+                style: 'table',
                 table: {
                   // headerRows: 1,
                   widths: [75, 75, 75, 75],
@@ -1635,13 +1799,13 @@ function Faturamento() {
             ],
           );
         } else {
-          tabledata.push(
+          tabledataconsultas.push(
             [
               { text: moment(item.data_inicio).format('DD/MM/YYYY') }, { text: 'CONSULTA' }, { text: item.nome_paciente },
               { text: usuarios.filter(usuario => usuario.id_usuario == item.id_profissional).map(usuario => usuario.nome_usuario) },
               { text: formapagamento },
               {
-                style: 'soffttable',
+                style: 'table',
                 table: {
                   // headerRows: 1,
                   widths: [75, 75, 75, 75, 75],
@@ -1672,29 +1836,26 @@ function Faturamento() {
           );
         } else {
           tablefaturamentos.push(
-            // 'OPERADORA', 'CÓDIGO_TUSS', 'DATA PGTO', 'VALOR'
             [
               { text: operadoras.filter(op => op.id == faturamento.id_operadora).map(op => op.nome_operadora) }, { text: faturamento.codigo_tuss }, { text: faturamento.data_pagamento }, { text: faturamento.data_pagamento }, { text: faturamento.valor_pagamento }
             ]
           );
         }
-        console.log(tablefaturamentos);
-        console.log(formapagamento);
       })
       if (localfaturamento.filter(fat => fat.procedimento_id == item.id).length > 0) {
         if (formapagamento != 'CONVÊNIO') {
-          tabledata.push(
+          tabledataprocedimentos.push(
             [
-              { text: moment(item.data_inicio).format('DD/MM/YYYY') }, { text: 'CONSULTA' }, { text: item.nome_paciente },
-              { text: usuarios.filter(usuario => usuario.id_usuario == item.id_profissional).map(usuario => usuario.nome_usuario) },
+              { text: item.data_exame }, { text: item.nome_exame }, { text: item.nome_paciente },
+              { text: usuarios.filter(usuario => usuario.id_usuario == item.id_profissional_executante).map(usuario => usuario.nome_usuario) },
               { text: formapagamento },
               {
-                style: 'soffttable',
+                style: 'table',
                 table: {
                   // headerRows: 1,
                   widths: [75, 75, 75, 75],
                   body: [
-                    ['PARCELA', 'STATUS', 'DATA PGTO', 'VALOR'],
+                    ['PARCELA', 'STATUS', 'DATA PGTO', 'VALOR (R$)'],
                     ...tablefaturamentos,
                   ]
                 }
@@ -1702,18 +1863,18 @@ function Faturamento() {
             ],
           );
         } else {
-          tabledata.push(
+          tabledataprocedimentos.push(
             [
               { text: moment(item.data_inicio).format('DD/MM/YYYY') }, { text: 'CONSULTA' }, { text: item.nome_paciente },
               { text: usuarios.filter(usuario => usuario.id_usuario == item.id_profissional).map(usuario => usuario.nome_usuario) },
               { text: formapagamento },
               {
-                style: 'soffttable',
+                style: 'table',
                 table: {
                   // headerRows: 1,
                   widths: [75, 75, 75, 75, 75],
                   body: [
-                    ['OPERADORA', 'CÓDIGO_TUSS', 'STATUS', 'DATA PGTO', 'VALOR'],
+                    ['OPERADORA', 'CÓDIGO_TUSS', 'STATUS', 'DATA PGTO', 'VALOR (R$)'],
                     ...tablefaturamentos,
                   ]
                 }
@@ -1724,7 +1885,6 @@ function Faturamento() {
       }
     });
 
-    console.log(tabledata);
     const docDefinition = {
       pageSize: 'A4',
       pageOrientation: 'landscape',
@@ -1798,29 +1958,48 @@ function Faturamento() {
       },
 
       styles: {
-        softtable: {
-          fontSize: 10,
-          bold: false,
-          margin: [2.5, 2.5, 2.5, 2.5]
+        title: {
+          fontsize: 20,
+          bold: true,
+          alignment: 'center',
+          margin: [2.5, 10, 2.5, 5]
         },
-        boldtable: {
+        tableheaders: {
           fontSize: 10,
           bold: true,
-          margin: [2.5, 2.5, 2.5, 2.5]
+          fill: 'blue'
+        },
+        tablecells: {
+          fontSize: 10,
+          bold: false,
         },
       },
 
       content: [
+        { text: 'FATURAMENTO DE CONSULTAS', style: 'title' },
         {
-          style: 'softtable',
+          style: 'tablecells',
           table: {
             headerRows: 1,
-            // widths: ['*', '*', '*', '*', '*', '*'],
+            dontBreakRows: true,
             body: [
-              ['DATA', 'PROCEDIMENTO', 'CLIENTE', 'PROFISSIONAL EXECUTANTE', 'FORMA DE PAGAMENTO', 'PAGAMENTOS'],
-              ...tabledata
+              [{ text: 'DATA', style: 'tableheaders' }, { text: 'PROCEDIMENTO', style: 'tableheaders' }, { text: 'CLIENTE', style: 'tableheaders' }, { text: 'PROFISSIONAL EXECUTANTE', style: 'tableheaders' }, { text: 'FORMA DE PAGAMENTO', style: 'tableheaders' }, { text: 'PAGAMENTOS', style: 'tableheaders' }],
+              ...tabledataconsultas
             ],
-          }
+          },
+
+        },
+        { text: 'FATURAMENTO DE PROCEDIMENTOS E EXAMES', style: 'title' },
+        {
+          style: 'tablecells',
+          table: {
+            headerRows: 1,
+            dontBreakRows: true,
+            body: [
+              [{ text: 'DATA', style: 'tableheaders' }, { text: 'PROCEDIMENTO', style: 'tableheaders' }, { text: 'CLIENTE', style: 'tableheaders' }, { text: 'PROFISSIONAL EXECUTANTE', style: 'tableheaders' }, { text: 'FORMA DE PAGAMENTO', style: 'tableheaders' }, { text: 'PAGAMENTOS', style: 'tableheaders' }],
+              ...tabledataprocedimentos
+            ],
+          },
         },
       ],
     }

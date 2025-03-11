@@ -297,10 +297,15 @@ function MapaDeAgendamentos() {
         )
       )
     ).length;
-    if (count > 0) {
-      modal(setdialogo, 'JÁ EXISTE UMA CONSULTA AGENDADA PARA ESTE HORÁRIO, CONFIRMAR ESTE NOVO AGENDAMENTO?', updateAtendimento, [item, inicio]);
-    } else {
+
+    if (faturamento.filter(fat => fat.atendimento_id == item.id_atendimento && fat.codigo_tuss == '10101012').length == 0) {
+      if (count > 0) {
+        modal(setdialogo, 'JÁ EXISTE UMA CONSULTA AGENDADA PARA ESTE HORÁRIO, CONFIRMAR ESTE NOVO AGENDAMENTO?', updateAtendimento, [item, inicio]);
+      } else {
         updateTipoAtendimento(item, tipo);
+      }
+    } else {
+      toast(settoast, 'CONSULTA JÁ FATURADA, TIPO DE ATENDIMENTO NÃO PODE SER ALTERADO.', '#ec7063', 3000);
     }
   }
 

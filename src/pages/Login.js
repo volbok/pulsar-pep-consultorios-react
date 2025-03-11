@@ -53,6 +53,7 @@ function Login() {
     if (pagina == 0) {
       // console.log('CLIENTE ' + JSON.stringify(cliente));
       // console.log(cliente.id_cliente);
+      // localStorage.clear();
       setviewalterarsenha(0);
       setviewlistaunidades(0);
       loadOperadoras();

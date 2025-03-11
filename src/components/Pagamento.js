@@ -169,6 +169,33 @@ function Pagamento() {
       });
   };
 
+  const updateProcedimento = (tipo) => {
+    let obj = {
+      id_exame: null,
+      nome_exame: objatendimento.nome_exame,
+      codigo_tuss: objatendimento.codigo_tuss,
+      particular: tipo == 'PARTICULAR' ? 1 : 0,
+      convenio: tipo == 'PARTICULAR' ? 0 : 1,
+      codigo_operadora: objatendimento.codigo_operadora,
+      id_paciente: objatendimento.id_paciente,
+      nome_paciente: objatendimento.nome_paciente,
+      dn_paciente: moment(objatendimento.dn_paciente).format('DD/MM/YYYY'),
+      id_profissional_executante: objatendimento.id_profissional_executante,
+      nome_profissional_executante: objatendimento.nome_profissional_executante,
+      conselho_profissional_executante: objatendimento.conselho_profissional_executante,
+      n_conselho_profissional_executante: objatendimento.n_conselho_profissional_executante,
+      status: objatendimento.status, // 0 = solicitado, 1 = executado, 2 = cancelado, 3 = desistência.
+      laudohtml: objatendimento.laudohtml,
+      id_cliente: cliente.id_cliente,
+      data_exame: objatendimento.data_exame,
+    }
+    axios
+      .post(html + "update_exames_clinicas/" + objatendimento.id, obj)
+      .then(() => {
+        console.log('AGENDAMENTO DE PROCEDIMENTO ATUALIZADO COM SUCESSO')
+      });
+  };
+
   // ## CRIAÇÃO DE RECIBOS EM PDFMAKE ## //
   // impressão de recibo de pagamento (consulta ou procedimento particular).
   const printFile = () => {
@@ -363,6 +390,7 @@ function Pagamento() {
           status: item.status,
           codigo_operadora: item.codigo_operadora,
           codigo_tuss: item.codigo_tuss,
+          particular: item.particular,
         }
         localarrayexames.push(obj);
         return null;
@@ -507,11 +535,18 @@ function Pagamento() {
                     for (var i = 0; i < botoes.length; i++) {
                       botoes.item(i).className = "button";
                     }
-                    updateAtendimento('PARTICULAR');
+
+                    if (localStorage.getItem('tela_agendamento') == 'CONSULTAS') {
+                      updateAtendimento('PARTICULAR');
+                    } else {
+                      updateProcedimento('PARTICULAR');
+                    }
+
                     arrayfaturas.map(item => gerarfaturamento(item));
                     setTimeout(() => {
                       loadFaturamentos();
                     }, 1000);
+
                   } else {
                     toast(
                       settoast,
@@ -585,10 +620,17 @@ function Pagamento() {
                     data_registro: moment().format('DD/MM/YYYY'),
                   }
                   gerarfaturamento(obj);
-                  updateAtendimento('CONVÊNIO');
+
+                  if (localStorage.getItem('tela_agendamento') == 'CONSULTAS') {
+                    updateAtendimento('CONVÊNIO');
+                  } else {
+                    updateProcedimento('CONVÊNIO');
+                  }
+
                   setTimeout(() => {
                     loadFaturamentos();
                   }, 1000);
+                  
                 }}
               >
                 CONCLUIR FATURAMENTO
