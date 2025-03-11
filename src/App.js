@@ -146,6 +146,7 @@ function App() {
     'FONOAUDIOLOGIA',
     'TERAPIA OCUPACIONAL',
     'PSICOLOGIA',
+    'PNEUMOLOGIA',
   ]);
 
   // largura do dispositivo (global).
