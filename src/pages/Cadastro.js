@@ -37,6 +37,7 @@ function Cadastro() {
     setatendimentos,
     setoperadoras, operadoras,
     setprocedimentos,
+    usuarios,
   } = useContext(Context);
 
   // history (router).
@@ -392,7 +393,7 @@ function Cadastro() {
                         valor.data_termino == null &&
                         valor.id_paciente == item.id_paciente
                     ));
-                  setvieweditpaciente(1)
+                  setvieweditpaciente(1);
                 }}
               >
                 <div style={{ display: 'flex', flexDirection: 'column', width: '100%', height: '100%' }}>
@@ -451,27 +452,13 @@ function Cadastro() {
                     ></textarea>
                   </div>
                 </div>
-                <div
-                  className="button"
-                  style={{
-                    width: 'calc(100% - 20px)',
-                    backgroundColor:
-                      atendimentos.filter(
-                        (valor) =>
-                          valor.id_paciente == item.id_paciente &&
-                          valor.situacao == 3
-                      ).length > 0
-                        ? "rgb(82, 190, 128, 1)"
-                        : "#66b2b2"
+                <div className='button green' style={{ width: 'calc(100% - 20px)' }}
+                  onClick={() => {
+                    setviewagendamentos(1);
+                    setpaciente(item);
                   }}
                 >
-                  {atendimentos.filter(
-                    (valor) =>
-                      valor.id_paciente == item.id_paciente &&
-                      valor.situacao == 3
-                  ).length > 0
-                    ? "CONSULTA AGENDADA"
-                    : "AGENDAR CONSULTA"}
+                  {'AGENDAMENTOS'}
                 </div>
               </div>
             ))}
@@ -489,6 +476,48 @@ function Cadastro() {
       </div>
     );
   }
+
+  // LISTA DE AGENDAMENTOS DE CONSULTAS PARA O PACIENTE SELECIONADO.
+  const [viewagendamentos, setviewagendamentos] = useState(0);
+  function ViewAgendamentos() {
+    return (
+      <div className="fundo"
+        style={{
+          display: viewagendamentos == 1 ? 'flex' : 'none',
+          flexDirection: 'column', justifyContent: 'center'
+        }}
+        onClick={() => setviewagendamentos(0)}
+      >
+        <div className="janela scroll cor2" style={{ width: '80vw', height: '80vh' }}>
+          <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+            <div id="botão para fechar histórico de atnedimentos"
+              className="button-yellow"
+              onClick={() => setviewagendamentos(0)}
+            >
+              <img
+                alt=""
+                src={back}
+                style={{
+                  margin: 10,
+                  height: 30,
+                  width: 30,
+                }}
+              ></img>
+            </div>
+            <div className="text1">HISTÓRICO DE ATENDIMENTOS</div>
+          </div>
+          {atendimentos.filter(atend => atend.id_paciente == paciente.id_paciente).sort((a, b) => moment(a.data_inicio) > moment(b.data_inicio) ? -1 : 1).map(atend => (
+            <div className="button" style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', width: 'calc(100% - 20px)', padding: 10, paddingLeft: 0 }}>
+              <div className="button green" style={{ margin: 5, width: 300 }}>{'DATA: ' + moment(atend.data_inicio).format('DD/MM/YYYY - HH:mm')}</div>
+              <div style={{ margin: 5, width: 300 }}>{atend.situacao == 3 ? 'STATUS: AGENDADA' : atend.situacao == 4 ? 'STATUS: FINALIZADA' : 'STATUS: CANCELADA'}</div>
+              <div style={{ margin: 5, width: '100%', alignSelf: 'center', textAlign: 'left' }}>{'PROFISSIONAL: ' + usuarios.filter(usuario => usuario.id_usuario == atend.id_profissional).map(usuario => usuario.nome_usuario)}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
 
   // api para busca do endereço pelo CEP:
   const pegaEndereco = (cep) => {
@@ -1878,6 +1907,7 @@ function Cadastro() {
       >
         <ListaDePacientes></ListaDePacientes>
         <DadosPacienteAtendimento></DadosPacienteAtendimento>
+        <ViewAgendamentos></ViewAgendamentos>
       </div>
     </div>
   );
