@@ -588,6 +588,16 @@ td {
   }
 }
 
+.destak {
+  opacity: 0.5;
+  transition: 500ms, 500ms ease-in-out;
+}
+
+.destak:hover {
+  opacity: 1;
+  transition: 500ms, 500ms ease-in-out;
+}
+
 html,
 body {
   -webkit-overflow-scrolling: touch;

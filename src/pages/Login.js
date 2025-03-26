@@ -9,7 +9,9 @@ import toast from "../functions/toast";
 import power from "../images/power.png";
 import salvar from "../images/salvar.png";
 import back from "../images/back.png";
-
+import notion from "../images/notion.png"
+import pdf from "../images/pdf.png"
+import web from "../images/globo.png"
 // componentes.
 import Logo from "../components/Logo";
 // router.
@@ -97,7 +99,7 @@ function Login() {
   function TemaCorSelector() {
     return (
       <div style={{
-        display: cliente.id_cliente != undefined ? 'flex' : 'none',
+        display: cliente.id_cliente != undefined && pagina == 0 ? 'flex' : 'none',
         flexDirection: 'row', justifyContent: 'center',
         position: 'absolute',
         top: 5, right: 10,
@@ -632,7 +634,7 @@ function Login() {
             5
           )}
           {montaModuloDeApoio(
-            "OPERADORAS E PROCEDIMENTOS",
+            "FATURAMENTO",
             usuario.faturamento,
             "/faturamento",
             "FATURAMENTO"
@@ -916,6 +918,72 @@ function Login() {
     );
   }
 
+  function LandPage() {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+        <div className='destak' style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: 100 }}>
+          <img
+            alt=""
+            src={web}
+            style={{
+              display: "flex",
+              height: 40,
+              alignSelf: 'center',
+              marginBottom: -10
+            }}
+          ></img>
+          <a id="landpage"
+            className="text2"
+            href="site/index.html"
+            style={{
+              display: 'flex',
+              backgroundColor: 'transparent',
+              borderRadius: 5,
+            }}
+            target="_blank" rel="noreferrer">
+            SITE
+          </a>
+        </div>
+        <div className='destak' style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: 100 }}>
+          <img
+            alt=""
+            src={notion}
+            style={{
+              display: "flex",
+              height: 40,
+              alignSelf: 'center',
+              marginBottom: -10
+            }}
+          ></img>
+          <a id="landpage"
+            className="text2"
+            href="https://obsidian-tarp-c1d.notion.site/pulsarpep"
+            style={{
+              display: 'flex',
+              backgroundColor: 'transparent',
+              borderRadius: 5,
+            }}
+            target="_blank" rel="noreferrer">
+            NOTION
+          </a>
+        </div>
+        <div className='destak' style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: 100 }}>
+          <img
+            alt=""
+            src={pdf}
+            style={{
+              display: "flex",
+              height: 40,
+              alignSelf: 'center',
+              marginBottom: -10
+            }}
+          ></img>
+          <a className="text2" href="site/pulsarpep.pdf" download="portfolio">PORTFOLIO</a>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div
       id="login"
@@ -1047,7 +1115,8 @@ function Login() {
             }}
           ></img>
         </div>
-        <div className="text2" style={{ fontSize: 10, marginTop: 0 }}>{'CONTATO DO DESENVOLVEDOR'}</div>
+        <LandPage></LandPage>
+        <div className="text2" style={{ marginTop: 10, fontSize: 10 }}>{'CONTATO DO DESENVOLVEDOR'}</div>
         <div className="text2" style={{ fontSize: 10, marginTop: -5 }}>{'(31) 99226-6268'}</div>
         <TemaCorSelector></TemaCorSelector>
       </div>

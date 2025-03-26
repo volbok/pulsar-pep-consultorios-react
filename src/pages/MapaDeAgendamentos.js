@@ -1630,7 +1630,7 @@ function MapaDeAgendamentos() {
                           let procedimento = [];
                           procedimento = allprocedimentos.filter(proc => proc.tuss_codigo == item.codigo_tuss).pop();
 
-                          if (allprocedimentos.filter(proc => proc.tuss_codigo == item.codigo_tuss && codigo_convenio_paciente == proc.id_operadora).length > 0) {
+                          if (item.particular == 1 || (item.particular == 0 && allprocedimentos.filter(proc => proc.tuss_codigo == item.codigo_tuss && codigo_convenio_paciente == proc.id_operadora).length > 0)) {
                             console.log('## PROCEDIMENTO ##');
                             console.log(procedimento);
                             localStorage.setItem('tipo_faturamento', 'PROCEDIMENTO');

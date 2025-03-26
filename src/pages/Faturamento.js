@@ -84,7 +84,6 @@ function Faturamento() {
     });
   }
 
-
   const refreshChart = (y) => {
     buildtotalvalorfaturamento(y);
     setdadosdonutaberto(builddonutfaturamentodata(y, 'ABERTO'));
@@ -94,52 +93,87 @@ function Faturamento() {
 
   const refreshfaturamentomes = () => {
     let x = [];
+    let localarray = [];
     x = statelocalfaturamento;
     let tipoatendimento = localStorage.getItem('tipoatendimento');
     let modopagamento = localStorage.getItem('formapagamento');
+    let selectedprocedimento = localStorage.getItem('procedimento_selecionado');
+
+    console.log(tipoatendimento);
+    console.log(modopagamento);
+    console.log(selectedprocedimento);
 
     // filtro para todas as consultas (particulares e convênio).
     if (tipoatendimento == 'CONSULTAS' && modopagamento == 'TODAS') {
       setatendimentos_mes(stateatendimentos_mes);
       setprocedimentos_mes([]);
       setlocalfaturamento(x.filter(fat => fat.atendimento_id != null));
+      localarray = x.filter(fat => fat.atendimento_id != null);
       // filtro para consultas de convênio.
     } else if (tipoatendimento == 'CONSULTAS' && modopagamento == 'CONVÊNIO') {
       setatendimentos_mes(stateatendimentos_mes.filter(cons => cons.faturamento_codigo_procedimento == 'CONVÊNIO'));
       setprocedimentos_mes([]);
       setlocalfaturamento(x.filter(fat => fat.atendimento_id != null && fat.forma_pagamento == 'CONVÊNIO'));
+      localarray = x.filter(fat => fat.atendimento_id != null && fat.forma_pagamento == 'CONVÊNIO');
       // filtro para consultas particulares.
     } else if (tipoatendimento == 'CONSULTAS' && modopagamento == 'PARTICULAR') {
       setatendimentos_mes(stateatendimentos_mes.filter(cons => cons.faturamento_codigo_procedimento == 'PARTICULAR'));
       setprocedimentos_mes([]);
       setlocalfaturamento(x.filter(fat => fat.atendimento_id != null && fat.forma_pagamento != 'CONVÊNIO'));
-    } else if (tipoatendimento == 'PROCEDIMENTOS' && modopagamento == 'TODAS') {
+      localarray = x.filter(fat => fat.atendimento_id != null && fat.forma_pagamento != 'CONVÊNIO');
+      // filtro para todos os procedimentos (particulares e convênios).
+    } else if (tipoatendimento == 'PROCEDIMENTOS' && selectedprocedimento == 0 && modopagamento == 'TODAS') {
       setatendimentos_mes([]);
       setprocedimentos_mes(stateprocedimentos_mes);
       setlocalfaturamento(x.filter(fat => fat.procedimento_id != null));
-    } else if (tipoatendimento == 'PROCEDIMENTOS' && modopagamento == 'CONVÊNIO') {
+      localarray = x.filter(fat => fat.procedimento_id != null);
+      // filtro para todos procedimentos de convênio.
+    } else if (tipoatendimento == 'PROCEDIMENTOS' && selectedprocedimento == 0 && modopagamento == 'CONVÊNIO') {
       setatendimentos_mes([]);
       setprocedimentos_mes(stateprocedimentos_mes.filter(proc => proc.convenio == 1));
       setlocalfaturamento(x.filter(fat => fat.procedimento_id != null && fat.forma_pagamento == 'CONVÊNIO'));
-      // filtro para consultas particulares.
-    } else if (tipoatendimento == 'PROCEDIMENTOS' && modopagamento == 'PARTICULAR') {
+      localarray = x.filter(fat => fat.procedimento_id != null && fat.forma_pagamento == 'CONVÊNIO');
+      // filtro para todos os procedimentos particulares.
+    } else if (tipoatendimento == 'PROCEDIMENTOS' && selectedprocedimento == 0 && modopagamento == 'PARTICULAR') {
       setatendimentos_mes([]);
       setprocedimentos_mes(stateprocedimentos_mes.filter(proc => proc.particular == 1));
       setlocalfaturamento(x.filter(fat => fat.procedimento_id != null && fat.forma_pagamento != 'CONVÊNIO'));
+      localarray = x.filter(fat => fat.procedimento_id != null && fat.forma_pagamento != 'CONVÊNIO');
+      // filtro para um determinado procedimento, convênio ou particular.
+    } else if (tipoatendimento == 'PROCEDIMENTOS' && selectedprocedimento != 0 && modopagamento == 'TODAS') {
+      setatendimentos_mes([]);
+      setprocedimentos_mes(stateprocedimentos_mes.filter(proc => proc.nome_exame == selectedprocedimento));
+      setlocalfaturamento(x.filter(fat => fat.procedimento_id != null && fat.nome_tuss == selectedprocedimento));
+      localarray = x.filter(fat => fat.procedimento_id != null && fat.nome_tuss == selectedprocedimento);
+      // filtro para um determinado procedimento, convênio.
+    } else if (tipoatendimento == 'PROCEDIMENTOS' && selectedprocedimento != 0 && modopagamento == 'CONVÊNIO') {
+      setatendimentos_mes([]);
+      setprocedimentos_mes(stateprocedimentos_mes.filter(proc => proc.nome_exame == selectedprocedimento && proc.convenio == 1));
+      setlocalfaturamento(x.filter(fat => fat.procedimento_id != null && fat.nome_tuss == selectedprocedimento && fat.forma_pagamento == 'CONVÊNIO'));
+      localarray = x.filter(fat => fat.procedimento_id != null && fat.nome_tuss == selectedprocedimento && fat.forma_pagamento == 'CONVÊNIO');
+      // filtro para um determinado procedimento, particular.
+    } else if (tipoatendimento == 'PROCEDIMENTOS' && selectedprocedimento != 0 && modopagamento != 'CONVÊNIO') {
+      setatendimentos_mes([]);
+      setprocedimentos_mes(stateprocedimentos_mes.filter(proc => proc.nome_exame == selectedprocedimento && proc.particular == 1));
+      setlocalfaturamento(x.filter(fat => fat.procedimento_id != null && fat.nome_tuss == selectedprocedimento && fat.forma_pagamento != 'CONVÊNIO'));
+      localarray = x.filter(fat => fat.procedimento_id != null && fat.nome_tuss == selectedprocedimento && fat.forma_pagamento != 'CONVÊNIO');
     } else if (tipoatendimento == 'TODOS' && modopagamento == 'PARTICULAR') {
       setatendimentos_mes(stateatendimentos_mes);
       setprocedimentos_mes(stateprocedimentos_mes);
       setlocalfaturamento(x.filter(fat => fat.forma_pagamento != 'CONVÊNIO'));
+      localarray = x.filter(fat => fat.forma_pagamento != 'CONVÊNIO');
     } else if (tipoatendimento == 'TODOS' && modopagamento == 'CONVÊNIO') {
       setatendimentos_mes(stateatendimentos_mes);
       setprocedimentos_mes(stateprocedimentos_mes);
       setlocalfaturamento(x.filter(fat => fat.forma_pagamento == 'CONVÊNIO'));
+      localarray = x.filter(fat => fat.forma_pagamento == 'CONVÊNIO');
     } else {
       setatendimentos_mes(stateatendimentos_mes);
       setprocedimentos_mes(stateprocedimentos_mes);
       setlocalfaturamento(x);
+      localarray = x;
     }
-    refreshChart(localfaturamento);
+    refreshChart(localarray);
   }
 
   const [selecteddate, setselecteddate] = useState(moment().format('MM-YYYY'));
@@ -155,7 +189,7 @@ function Faturamento() {
       loadfaturamentosmes(moment().format('MM-YYYY'));
       setTimeout(() => {
         document.getElementById("inputMesFaturamento").value = moment().format('MM-YYYY');
-      }, 1000);
+      }, 3000);
     }
     // eslint-disable-next-line
   }, [pagina]);
@@ -622,7 +656,7 @@ function Faturamento() {
   }
 
   const [tipoatendimento, settipoatendimento] = useState('CONSULTAS');
-  const [formapagamento, setformapagamento] = useState('');
+  const [formapagamento, setformapagamento] = useState('TODAS');
   const SelecionaProcedimentos = useCallback(() => {
     return (
       <div
@@ -631,7 +665,7 @@ function Faturamento() {
         style={{
           display: tipoatendimento == 'PROCEDIMENTOS' ? 'flex' : 'none',
           flexDirection: 'row',
-          width: '100%',
+          width: '80vw',
           margin: 10,
           alignContent: 'flex-start',
           alignSelf: 'center',
@@ -643,12 +677,14 @@ function Faturamento() {
           <div
             key={'exame: ' + item.id}
             id={'btn procedimento faturamento ' + item.id}
-            className='button'
+            className={selectedprocedimento == item.tuss_rol_ans_descricao ? 'button-selected' : 'button'}
             style={{ display: 'flex', width: 150, minWidth: 150, paddingLeft: 30, paddingRight: 30 }}
             title={item.tuss_rol_ans_descricao}
             onClick={() => {
               setprocedimentos_mes(stateprocedimentos_mes.filter(proc => proc.nome_exame == item.tuss_rol_ans_descricao));
-              loadfaturamentosmes(selecteddate);
+              setselectedprocedimento(item.tuss_rol_ans_descricao);
+              localStorage.setItem('procedimento_selecionado', item.tuss_rol_ans_descricao);
+              refreshfaturamentomes();
               localStorage.setItem('procedimento', item.tuss_rol_ans_descricao);
               localStorage.setItem('codigo_tuss', item.tuss_codigo);
               selector("scroll procedimentos faturamento", 'btn procedimento faturamento ' + item.id, 100);
@@ -675,7 +711,7 @@ function Faturamento() {
       </div>
     )
     // eslint-disable-next-line
-  }, [procedimentos, tipoatendimento, selecteddate]);
+  }, [procedimentos, tipoatendimento, selecteddate, selectedprocedimento]);
 
   const [viewprocedimentos, setviewprocedimentos] = useState(0);
   function ViewProcedimentos() {
@@ -922,7 +958,7 @@ function Faturamento() {
   const [menufaturamento, setmenufaturamento] = useState('REGISTROS DE FATURAMENTO');
   let opcoesmenufaturamento = [
     'REGISTROS DE FATURAMENTO',
-    'CADASTRO DE OPERADORAS',
+    'CADASTRO DE OPERADORAS E PROCEDIMENTOS',
   ]
   function MenuFaturamento() {
     return (
@@ -983,95 +1019,9 @@ function Faturamento() {
     });
   }
 
-  const [objfaturamento, setobjfaturamento] = useState(null);
-  function ListaDeFaturamentos() {
+  function Filtros() {
     return (
-      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-        <div id="scroll de meses"
-          className="scroll cor2"
-          style={{
-            display: 'flex', flexDirection: 'row', justifyContent: 'flex-start',
-            overflowY: 'hidden', overflowX: 'scroll',
-            width: '80vw', alignSelf: 'center',
-          }}>
-          <textarea
-            autoComplete="off"
-            placeholder="MÊS/ANO"
-            className="textarea"
-            type="text"
-            inputMode="numeric"
-            maxLength={10}
-            id="inputMesFaturamento"
-            title="FORMATO: MM-YYYY"
-            onClick={() => document.getElementById("inputMesFaturamento").value = ""}
-            onFocus={(e) => (e.target.placeholder = "")}
-            onBlur={(e) => (e.target.placeholder = "MÊS-ANO")}
-            style={{
-              flexDirection: "center",
-              justifyContent: "center",
-              alignSelf: "center",
-              width: 150,
-              textAlign: "center",
-              padding: 5,
-              height: 20,
-              minHeight: 20,
-              maxHeight: 20,
-            }}
-          ></textarea>
-          <div id='botão para buscar por data.'
-            className="button red"
-            onClick={() => {
-              let data = document.getElementById("inputMesFaturamento").value;
-              filtraregistrosconsultas(document.getElementById("inputMesFaturamento").value);
-              filtraregistrosprocedimentos(document.getElementById("inputMesFaturamento").value);
-              loadfaturamentosmes(document.getElementById("inputMesFaturamento").value);
-              setselecteddate(document.getElementById("inputMesFaturamento").value);
-              setTimeout(() => {
-                document.getElementById("inputMesFaturamento").value = data;
-              }, 1000);
-            }}
-            style={{
-              borderRadius: 50,
-              minWidth: 20,
-              width: 20,
-              maxWidth: 20,
-              minHeight: 20,
-              height: 20,
-              maxHeight: 20,
-              alignSelf: 'center',
-              marginLeft: -20,
-            }}>
-            <img
-              alt=""
-              src={lupa}
-              style={{
-                margin: 0,
-                height: 20,
-                width: 20,
-                opacity: 1,
-                alignSelf: 'center'
-              }}
-            ></img>
-          </div>
-          {calendariomensal.map(item => (
-            <div
-              id={'btn_datas_faturamento ' + item}
-              className={selecteddate == item ? "button-selected" : "button"}
-              style={{ width: 200, minHeight: 30, height: 30, maxHeight: 30 }}
-              onClick={() => {
-                setselecteddate(item);
-                filtraregistrosconsultas(item);
-                filtraregistrosprocedimentos(item);
-                loadfaturamentosmes(item);
-                setTimeout(() => {
-                  document.getElementById("inputMesFaturamento").value = item;
-                }, 1000);
-              }}>
-              {item}
-            </div>
-          ))}
-        </div>
-        <TotaisFaturamento></TotaisFaturamento>
+      <div>
         <div id='filtros'
           style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
           <div
@@ -1168,10 +1118,104 @@ function Faturamento() {
             ></img>
           </div>
         </div>
+      </div>
+    )
+  }
+
+  const [objfaturamento, setobjfaturamento] = useState(null);
+  function ListaDeFaturamentos() {
+    return (
+      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', width: '100%' }}>
+        <div id="scroll de meses"
+          className="scroll cor2"
+          style={{
+            display: 'flex', flexDirection: 'row', justifyContent: 'flex-start',
+            overflowY: 'hidden', overflowX: 'scroll',
+            width: '80vw', alignSelf: 'center',
+          }}>
+          <textarea
+            autoComplete="off"
+            placeholder="MÊS/ANO"
+            className="textarea"
+            type="text"
+            inputMode="numeric"
+            maxLength={10}
+            id="inputMesFaturamento"
+            title="FORMATO: MM-YYYY"
+            onClick={() => document.getElementById("inputMesFaturamento").value = ""}
+            onFocus={(e) => (e.target.placeholder = "")}
+            onBlur={(e) => (e.target.placeholder = "MÊS-ANO")}
+            style={{
+              flexDirection: "center",
+              justifyContent: "center",
+              alignSelf: "center",
+              width: 150,
+              textAlign: "center",
+              padding: 5,
+              height: 20,
+              minHeight: 20,
+              maxHeight: 20,
+            }}
+          ></textarea>
+          <div id='botão para buscar por data.'
+            className="button red"
+            onClick={() => {
+              let data = document.getElementById("inputMesFaturamento").value;
+              filtraregistrosconsultas(document.getElementById("inputMesFaturamento").value);
+              filtraregistrosprocedimentos(document.getElementById("inputMesFaturamento").value);
+              loadfaturamentosmes(document.getElementById("inputMesFaturamento").value);
+              setselecteddate(document.getElementById("inputMesFaturamento").value);
+              setTimeout(() => {
+                document.getElementById("inputMesFaturamento").value = data;
+              }, 1000);
+            }}
+            style={{
+              borderRadius: 50,
+              minWidth: 20,
+              width: 20,
+              maxWidth: 20,
+              minHeight: 20,
+              height: 20,
+              maxHeight: 20,
+              alignSelf: 'center',
+              marginLeft: -20,
+            }}>
+            <img
+              alt=""
+              src={lupa}
+              style={{
+                margin: 0,
+                height: 20,
+                width: 20,
+                opacity: 1,
+                alignSelf: 'center'
+              }}
+            ></img>
+          </div>
+          {calendariomensal.map(item => (
+            <div
+              id={'btn_datas_faturamento ' + item}
+              className={selecteddate == item ? "button-selected" : "button"}
+              style={{ width: 200, minHeight: 30, height: 30, maxHeight: 30 }}
+              onClick={() => {
+                setselecteddate(item);
+                filtraregistrosconsultas(item);
+                filtraregistrosprocedimentos(item);
+                loadfaturamentosmes(item);
+                setTimeout(() => {
+                  document.getElementById("inputMesFaturamento").value = item;
+                }, 1000);
+              }}>
+              {item}
+            </div>
+          ))}
+        </div>
+        <TotaisFaturamento></TotaisFaturamento>
+        <Filtros></Filtros>
         <div>
           {
             atendimentos_mes.sort((a, b) => moment(a.data_inicio) > moment(b.data_inicio) ? 1 : -1).filter(item => item.nome_paciente != 'HORÁRIO BLOQUEADO!').map(item => (
-              <div className="button" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div className="button" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', width: '90vw' }}>
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignSelf: 'flex-start' }}>
                   <div className="button red" style={{
                     display: 'flex', flexDirection: 'column', justifyContent: 'center', width: 200, minWidth: 200,
@@ -1224,7 +1268,7 @@ function Faturamento() {
                 </div>
                 <div id="elementos do faturamento convênio - atendimentos (consultas)"
                   className="grid"
-                  style={{ width: '100%', display: item.faturamento_codigo_procedimento == 'CONVÊNIO' ? 'grid' : 'none' }}>
+                  style={{ display: item.faturamento_codigo_procedimento == 'CONVÊNIO' ? 'grid' : 'none' }}>
                   {localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).map(valor => (
                     <div
                       className={valor.status_pagamento == 'ABERTO' ? 'button yellow' : valor.status_pagamento == 'VENCIDO' ? 'button red' : 'button green'}
@@ -1245,13 +1289,13 @@ function Faturamento() {
                       <div>{valor.data_pagamento == null ? 'DATA DO PAGAMENTO: PENDENTE' : 'DATA DO PAGAMENTO: ' + valor.data_pagamento}</div>
                       <div>{'DATA DO VENCIMENTO: ' + valor.data_vencimento}</div>
                       <div style={{ fontSize: 14 }}>{'VALOR R$ ' + parseFloat(valor.valor_pagamento).toFixed(2)}</div>
-                      <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', marginTop: 20 }}>
+                      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', marginTop: 20 }}>
                         <div id='gerarXml - procedimento de convênio'
                           className="button-green"
                           style={{
                             display: valor.status_pagamento != 'PAGO' ? 'flex' : 'none',
                             alignSelf: 'flex-end',
-                            width: 150, minWidth: 120, maxWidth: 120,
+                            width: 'calc(100% - 20px)',
                           }}
                           onClick={() => updateRegistroProcedimento(valor, 'PAGO', parseFloat(valor.valor_pagamento).toFixed(2))}
                         >
@@ -1262,7 +1306,7 @@ function Faturamento() {
                           style={{
                             display: 'flex',
                             alignSelf: 'flex-end',
-                            width: 150, minWidth: 120, maxWidth: 120,
+                            width: 'calc(100% - 20px)',
                           }}
                           onClick={() => createxml(dataxmltest)} // SUPER PENDENTE!!!
                         >
@@ -1284,16 +1328,19 @@ function Faturamento() {
             ))
           }
         </div>
-        <div>
+        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
           <SelecionaProcedimentos></SelecionaProcedimentos>
           {
             procedimentos_mes.sort((a, b) => moment(a.data_exame, 'DD/MM/YYYY - HH:mm') > moment(b.data_exame, 'DD/MM/YYYY - HH:mm') ? 1 : -1).map(item => (
-              <div className="button" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+              <div className="button" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', width: '90vw' }}>
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignSelf: 'flex-start' }}>
                   <div className="button red" style={{
                     display: 'flex', flexDirection: 'column', justifyContent: 'center', width: 200, minWidth: 200,
                     marginRight: 10, alignSelf: 'center',
                   }}>
+                    <div style={{ fontSize: 20 }}>
+                      {item.particular == 1 ? 'PARTICULAR' : 'CONVÊNIO'}
+                    </div>
                     <div>{item.data_exame}</div>
                     <div>{item.nome_exame}</div>
                   </div>
@@ -1364,13 +1411,13 @@ function Faturamento() {
                         <div>{valor.data_pagamento == null ? 'DATA DO PAGAMENTO: PENDENTE' : 'DATA DO PAGAMENTO: ' + valor.data_pagamento}</div>
                         <div>{'DATA DO VENCIMENTO: ' + valor.data_vencimento}</div>
                         <div style={{ fontSize: 14 }}>{'R$ ' + parseFloat(valor.valor_pagamento).toFixed(2)}</div>
-                        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-end', marginTop: 20 }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', marginTop: 20 }}>
                           <div id='gerarXml - procedimento de convênio'
                             className="button-green"
                             style={{
                               display: valor.status_pagamento != 'PAGO' ? 'flex' : 'none',
                               alignSelf: 'flex-end',
-                              width: 150, minWidth: 120, maxWidth: 120,
+                              width: 'calc(100% - 20px)',
                             }}
                             onClick={() => updateRegistroProcedimento(valor, 'PAGO', parseFloat(valor.valor_pagamento).toFixed(2))}
                           >
@@ -1381,7 +1428,7 @@ function Faturamento() {
                             style={{
                               display: 'flex',
                               alignSelf: 'flex-end',
-                              width: 150, minWidth: 120, maxWidth: 120,
+                              width: 'calc(100% - 20px)'
                             }}
                             onClick={() => createxml(dataxmltest)} // SUPER PENDENTE!!!
                           >
@@ -1771,9 +1818,9 @@ function Faturamento() {
           );
         } else {
           tablefaturamentos.push(
-            // 'OPERADORA', 'CÓDIGO_TUSS', 'DATA PGTO', 'VALOR'
+            // 'OPERADORA', 'CÓDIGO_TUSS', STATUS, 'DATA PGTO', 'VALOR'
             [
-              { text: operadoras.filter(op => op.id == faturamento.id_operadora).map(op => op.nome_operadora) }, { text: faturamento.codigo_tuss }, { text: faturamento.data_pagamento }, { text: faturamento.data_pagamento }, { text: faturamento.valor_pagamento }
+              { text: operadoras.filter(op => op.id == faturamento.id_operadora).map(op => op.nome_operadora) }, { text: faturamento.codigo_tuss }, { text: faturamento.status_pagamento }, { text: faturamento.data_pagamento }, { text: faturamento.valor_pagamento }
             ]
           );
         }
@@ -1837,7 +1884,7 @@ function Faturamento() {
         } else {
           tablefaturamentos.push(
             [
-              { text: operadoras.filter(op => op.id == faturamento.id_operadora).map(op => op.nome_operadora) }, { text: faturamento.codigo_tuss }, { text: faturamento.data_pagamento }, { text: faturamento.data_pagamento }, { text: faturamento.valor_pagamento }
+              { text: operadoras.filter(op => op.id == faturamento.id_operadora).map(op => op.nome_operadora) }, { text: faturamento.codigo_tuss }, { text: faturamento.status_pagamento }, { text: faturamento.data_pagamento }, { text: faturamento.valor_pagamento }
             ]
           );
         }
@@ -1865,7 +1912,7 @@ function Faturamento() {
         } else {
           tabledataprocedimentos.push(
             [
-              { text: moment(item.data_inicio).format('DD/MM/YYYY') }, { text: 'CONSULTA' }, { text: item.nome_paciente },
+              { text: moment(item.data_inicio).format('DD/MM/YYYY') }, { text: item.nome_exame }, { text: item.nome_paciente },
               { text: usuarios.filter(usuario => usuario.id_usuario == item.id_profissional).map(usuario => usuario.nome_usuario) },
               { text: formapagamento },
               {
@@ -2051,7 +2098,7 @@ function Faturamento() {
         }}>
           <MenuFaturamento></MenuFaturamento>
           <div style={{
-            display: menufaturamento == 'CADASTRO DE OPERADORAS' ? 'flex' : 'none',
+            display: menufaturamento == 'CADASTRO DE OPERADORAS E PROCEDIMENTOS' ? 'flex' : 'none',
             flexDirection: 'column', justifyContent: 'center'
           }}>
             <ViewOperadoras></ViewOperadoras>
