@@ -99,6 +99,8 @@ function Faturamento() {
     let modopagamento = localStorage.getItem('formapagamento');
     let selectedprocedimento = localStorage.getItem('procedimento_selecionado');
 
+    setstatusatendimento('');
+
     console.log(tipoatendimento);
     console.log(modopagamento);
     console.log(selectedprocedimento);
@@ -1215,29 +1217,42 @@ function Faturamento() {
         <div>
           {
             atendimentos_mes.sort((a, b) => moment(a.data_inicio) > moment(b.data_inicio) ? 1 : -1).filter(item => item.nome_paciente != 'HORÁRIO BLOQUEADO!').map(item => (
-              <div className="button" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', width: '90vw' }}>
-                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignSelf: 'flex-start' }}>
-                  <div className="button red" style={{
-                    display: 'flex', flexDirection: 'column', justifyContent: 'center', width: 200, minWidth: 200,
-                    marginRight: 10, alignSelf: 'center',
-                  }}>
-                    <div>{moment(item.data_inicio).format('DD/MM/YYYY - HH:mm')}</div>
-                    <div>{'CONSULTA'}</div>
-                    <div>{item.faturamento_codigo_procedimento}</div>
+              <div className="button cor3"
+                style={{
+                  display: 'flex', flexDirection: 'column', justifyContent: 'space-between', width: '90vw',
+                }}>
+                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
+                  <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
+                    <div className="button-opaque" style={{
+                      display: 'flex', flexDirection: 'column', justifyContent: 'center', width: 200, minWidth: 200,
+                      marginRight: 10, alignSelf: 'center',
+                    }}>
+                      <div style={{ fontSize: 16 }}>{'CONSULTA'}</div>
+                      <div>{moment(item.data_inicio).format('DD/MM/YYYY - HH:mm')}</div>
+                      <div>{item.faturamento_codigo_procedimento}</div>
+                    </div>
+                    <div style={{
+                      display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', textAlign: 'left',
+                      alignSelf: 'center',
+                    }}>
+                      <div style={{ fontSize: 10, opacity: 0.5 }}>
+                        {'ID ATENDIMENTO: ' + item.id_atendimento}
+                      </div>
+                      <div>
+                        {'CLIENTE: ' + item.nome_paciente}
+                      </div>
+                      <div>
+                        {'PROFISSIONAL: ' + usuarios.filter(usuario => usuario.id_usuario == item.id_profissional).map(usuario => usuario.nome_usuario)}
+                      </div>
+                    </div>
                   </div>
-                  <div style={{
-                    display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', textAlign: 'left',
-                    alignSelf: 'center',
-                  }}>
-                    <div style={{ fontSize: 10, opacity: 0.5 }}>
-                      {'ID ATENDIMENTO: ' + item.id_atendimento}
-                    </div>
-                    <div>
-                      {'CLIENTE: ' + item.nome_paciente}
-                    </div>
-                    <div>
-                      {'PROFISSIONAL: ' + usuarios.filter(usuario => usuario.id_usuario == item.id_profissional).map(usuario => usuario.nome_usuario)}
-                    </div>
+                  <div id="faturamento pendente - atendimentos (consultas)"
+                    style={{
+                      display: localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).length < 1 ? 'flex' : 'none',
+                      flexDirection: 'column', flexWrap: 'wrap',
+                      alignSelf: 'flex-end',
+                    }}>
+                    <div className="button red" style={{ width: 200, alignSelf: 'flex-end' }}>FATURAMENTO PENDENTE!</div>
                   </div>
                 </div>
                 <div id="elementos do faturamento particular - atendimentos (consultas)"
@@ -1289,13 +1304,12 @@ function Faturamento() {
                       <div>{valor.data_pagamento == null ? 'DATA DO PAGAMENTO: PENDENTE' : 'DATA DO PAGAMENTO: ' + valor.data_pagamento}</div>
                       <div>{'DATA DO VENCIMENTO: ' + valor.data_vencimento}</div>
                       <div style={{ fontSize: 14 }}>{'VALOR R$ ' + parseFloat(valor.valor_pagamento).toFixed(2)}</div>
-                      <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', marginTop: 20 }}>
-                        <div id='gerarXml - procedimento de convênio'
+                      <div className="grid2" style={{ marginTop: 10 }}>
+                        <div id='confirmar pagamento pela operadora'
                           className="button-green"
                           style={{
                             display: valor.status_pagamento != 'PAGO' ? 'flex' : 'none',
-                            alignSelf: 'flex-end',
-                            width: 'calc(100% - 20px)',
+                            height: 100, minHeight: 100,
                           }}
                           onClick={() => updateRegistroProcedimento(valor, 'PAGO', parseFloat(valor.valor_pagamento).toFixed(2))}
                         >
@@ -1305,8 +1319,7 @@ function Faturamento() {
                           className="button-green"
                           style={{
                             display: 'flex',
-                            alignSelf: 'flex-end',
-                            width: 'calc(100% - 20px)',
+                            height: 100, minHeight: 100,
                           }}
                           onClick={() => createxml(dataxmltest)} // SUPER PENDENTE!!!
                         >
@@ -1316,14 +1329,6 @@ function Faturamento() {
                     </div>
                   ))}
                 </div>
-                <div id="faturamento pendente - atendimentos (consultas)"
-                  style={{
-                    display: localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).length < 1 ? 'flex' : 'none',
-                    flexDirection: 'column', flexWrap: 'wrap', justifyContent: 'flex-start',
-                    alignSelf: 'flex-end',
-                  }}>
-                  <div className="button red" style={{ width: 200, alignSelf: 'flex-end' }}>FATURAMENTO PENDENTE!</div>
-                </div>
               </div>
             ))
           }
@@ -1332,31 +1337,39 @@ function Faturamento() {
           <SelecionaProcedimentos></SelecionaProcedimentos>
           {
             procedimentos_mes.sort((a, b) => moment(a.data_exame, 'DD/MM/YYYY - HH:mm') > moment(b.data_exame, 'DD/MM/YYYY - HH:mm') ? 1 : -1).map(item => (
-              <div className="button" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', width: '90vw' }}>
+              <div className="button cor3" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', width: '90vw' }}>
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignSelf: 'flex-start' }}>
-                  <div className="button red" style={{
-                    display: 'flex', flexDirection: 'column', justifyContent: 'center', width: 200, minWidth: 200,
-                    marginRight: 10, alignSelf: 'center',
-                  }}>
-                    <div style={{ fontSize: 20 }}>
-                      {item.particular == 1 ? 'PARTICULAR' : 'CONVÊNIO'}
+                  <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
+                    <div className="button-opaque" style={{
+                      display: 'flex', flexDirection: 'column', justifyContent: 'center', width: 200, minWidth: 200,
+                      marginRight: 10, alignSelf: 'center',
+                    }}>
+                      <div style={{ fontSize: 16 }}>{item.nome_exame}</div>
+                      <div>{item.data_exame}</div>
+                      <div>{item.particular == 1 ? 'PARTICULAR' : 'CONVÊNIO'}</div>
                     </div>
-                    <div>{item.data_exame}</div>
-                    <div>{item.nome_exame}</div>
+                    <div style={{
+                      display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', textAlign: 'left',
+                      alignSelf: 'center',
+                    }}>
+                      <div style={{ fontSize: 10, opacity: 0.5 }}>
+                        {'ID PROCEDIMENTO: ' + item.id}
+                      </div>
+                      <div>
+                        {'CLIENTE: ' + item.nome_paciente}
+                      </div>
+                      <div>
+                        {'PROFISSIONAL: ' + usuarios.filter(usuario => usuario.id_usuario == item.id_profissional_executante).map(usuario => usuario.nome_usuario)}
+                      </div>
+                    </div>
                   </div>
-                  <div style={{
-                    display: 'flex', flexDirection: 'column', justifyContent: 'flex-start', textAlign: 'left',
-                    alignSelf: 'center',
-                  }}>
-                    <div style={{ fontSize: 10, opacity: 0.5 }}>
-                      {'ID PROCEDIMENTO: ' + item.id}
-                    </div>
-                    <div>
-                      {'CLIENTE: ' + item.nome_paciente}
-                    </div>
-                    <div>
-                      {'PROFISSIONAL: ' + usuarios.filter(usuario => usuario.id_usuario == item.id_profissional_executante).map(usuario => usuario.nome_usuario)}
-                    </div>
+                  <div id="faturamento pendente"
+                    style={{
+                      display: localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).length < 1 ? 'flex' : 'none',
+                      flexDirection: 'column', flexWrap: 'wrap', justifyContent: 'flex-start',
+                      width: '100%'
+                    }}>
+                    <div className="button red" style={{ width: 200, alignSelf: 'flex-end' }}>FATURAMENTO PENDENTE!</div>
                   </div>
                 </div>
                 <div style={{
@@ -1411,13 +1424,12 @@ function Faturamento() {
                         <div>{valor.data_pagamento == null ? 'DATA DO PAGAMENTO: PENDENTE' : 'DATA DO PAGAMENTO: ' + valor.data_pagamento}</div>
                         <div>{'DATA DO VENCIMENTO: ' + valor.data_vencimento}</div>
                         <div style={{ fontSize: 14 }}>{'R$ ' + parseFloat(valor.valor_pagamento).toFixed(2)}</div>
-                        <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', marginTop: 20 }}>
-                          <div id='gerarXml - procedimento de convênio'
+                        <div className="grid2" style={{ marginTop: 10 }}>
+                          <div id='confirmar pagamento pela operadora'
                             className="button-green"
                             style={{
                               display: valor.status_pagamento != 'PAGO' ? 'flex' : 'none',
-                              alignSelf: 'flex-end',
-                              width: 'calc(100% - 20px)',
+                              height: 100, minHeight: 100,
                             }}
                             onClick={() => updateRegistroProcedimento(valor, 'PAGO', parseFloat(valor.valor_pagamento).toFixed(2))}
                           >
@@ -1427,8 +1439,7 @@ function Faturamento() {
                             className="button-green"
                             style={{
                               display: 'flex',
-                              alignSelf: 'flex-end',
-                              width: 'calc(100% - 20px)'
+                              height: 100, minHeight: 100,
                             }}
                             onClick={() => createxml(dataxmltest)} // SUPER PENDENTE!!!
                           >
@@ -1437,14 +1448,6 @@ function Faturamento() {
                         </div>
                       </div>
                     ))}
-                  </div>
-                  <div id="faturamento pendente"
-                    style={{
-                      display: localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).length < 1 ? 'flex' : 'none',
-                      flexDirection: 'column', flexWrap: 'wrap', justifyContent: 'flex-start',
-                      width: '100%'
-                    }}>
-                    <div className="button red" style={{ width: 200, alignSelf: 'flex-end' }}>FATURAMENTO PENDENTE!</div>
                   </div>
                 </div>
               </div>
@@ -1455,6 +1458,7 @@ function Faturamento() {
     )
   }
 
+  const [statusatendimento, setstatusatendimento] = useState('');
   const totaisfaturamento = (arrayfaturamento, status) => {
     let total = 0;
     arrayfaturamento.filter(item => item.status_pagamento == status).map(item => {
@@ -1463,8 +1467,36 @@ function Faturamento() {
     });
     return (
       <div
-        className={status == 'ABERTO' ? "button yellow" : status == 'VENCIDO' ? "button red" : "button green"}
-        style={{ width: 150, display: 'flex', flexDirection: 'column' }}
+        className={status == statusatendimento ? "button border-selected" : "button border"}
+        style={{
+          width: 150, display: 'flex', flexDirection: 'column',
+          backgroundColor: status == 'ABERTO' ? "#f5d142" : status == 'VENCIDO' ? "#E59866" : "#52be80"
+        }}
+        onClick={() => {
+          setstatusatendimento(status);
+          // capturando atendimentos que têm registros de faturamento com o status do parâmetro.
+          let arrayatendimentos = []
+          // eslint-disable-next-line
+          arrayfaturamento.filter(fat => fat.status_pagamento == status && fat.atendimento_id != null).map(fat => {
+            let atendimento = stateatendimentos_mes.filter(atend => atend.id_atendimento == fat.atendimento_id);
+            if (atendimento.length > 0) {
+              arrayatendimentos.push(atendimento.pop());
+            }
+          });
+          setatendimentos_mes(arrayatendimentos);
+          console.log(arrayatendimentos);
+          // capturando atendimentos que têm registros de faturamento com o status do parâmetro.
+          let arrayprocedimentos = []
+          // eslint-disable-next-line
+          arrayfaturamento.filter(fat => fat.status_pagamento == status && fat.procedimento_id != null).map(fat => {
+            let procedimento = stateprocedimentos_mes.filter(proc => proc.id == fat.procedimento_id);
+            if (procedimento.length > 0) {
+              arrayprocedimentos.push(procedimento.pop());
+            }
+          });
+          setprocedimentos_mes(arrayprocedimentos);
+          console.log(arrayprocedimentos);
+        }}
       >
         <div>{status}</div>
         <div>
