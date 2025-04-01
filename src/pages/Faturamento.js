@@ -1311,7 +1311,7 @@ function Faturamento() {
                             display: valor.status_pagamento != 'PAGO' ? 'flex' : 'none',
                             height: 100, minHeight: 100,
                           }}
-                          onClick={() => updateRegistroProcedimento(valor, 'PAGO', parseFloat(valor.valor_pagamento).toFixed(2))}
+                          onClick={() => updateRegistroProcedimento(valor, 'PAGO', moment().format('DD/MM/YYYY'), parseFloat(valor.valor_pagamento).toFixed(2))}
                         >
                           CONFIRMAR PAGAMENTO PELA OPERADORA
                         </div>
@@ -1431,7 +1431,7 @@ function Faturamento() {
                               display: valor.status_pagamento != 'PAGO' ? 'flex' : 'none',
                               height: 100, minHeight: 100,
                             }}
-                            onClick={() => updateRegistroProcedimento(valor, 'PAGO', parseFloat(valor.valor_pagamento).toFixed(2))}
+                            onClick={() => updateRegistroProcedimento(valor, 'PAGO', moment().format('DD/MM/YYYY'), parseFloat(valor.valor_pagamento).toFixed(2))}
                           >
                             CONFIRMAR PAGAMENTO PELA OPERADORA
                           </div>
@@ -1478,9 +1478,14 @@ function Faturamento() {
           let arrayatendimentos = []
           // eslint-disable-next-line
           arrayfaturamento.filter(fat => fat.status_pagamento == status && fat.atendimento_id != null).map(fat => {
-            let atendimento = stateatendimentos_mes.filter(atend => atend.id_atendimento == fat.atendimento_id);
-            if (atendimento.length > 0) {
-              arrayatendimentos.push(atendimento.pop());
+            let checkrepeat = arrayatendimentos.filter(atend => atend.id_atendimento == fat.atendimento_id).length;
+            if (checkrepeat > 0) {
+              console.log('REGISTRO JÁ LANÇADO.')
+            } else {
+              let atendimento = stateatendimentos_mes.filter(atend => atend.id_atendimento == fat.atendimento_id);
+              if (atendimento.length > 0) {
+                arrayatendimentos.push(atendimento.pop());
+              }
             }
           });
           setatendimentos_mes(arrayatendimentos);
@@ -1626,7 +1631,13 @@ function Faturamento() {
           </div>
           <div
             className="button" style={{ paddingLeft: 15, paddingRight: 15 }}
-            onClick={() => updateRegistroProcedimento(objfaturamento, statusfatura, document.getElementById('inputValorDoPagamento').value)}
+            onClick={() => {
+              if (statusfatura == 'PAGO') {
+                updateRegistroProcedimento(objfaturamento, statusfatura, moment().format('DD/MM/YYYY'), document.getElementById('inputValorDoPagamento').value);
+              } else {
+                updateRegistroProcedimento(objfaturamento, statusfatura, null, document.getElementById('inputValorDoPagamento').value);
+              }
+            }}
           >
             ATUALIZAR INFORMAÇÕES
           </div>
@@ -1646,13 +1657,13 @@ function Faturamento() {
     )
   }
 
-  const updateRegistroProcedimento = (item, status, valor) => {
+  const updateRegistroProcedimento = (item, status, data_pgto, valor) => {
     let obj = {
       cliente_id: cliente.id_cliente,
       cliente_nome: cliente.razao_social,
       atendimento_id: item.atendimento_id,
       procedimento_id: item.procedimento_id,
-      data_pagamento: item.data_pagamento,
+      data_pagamento: data_pgto,
       data_vencimento: item.data_vencimento,
       parcela: item.parcela,
       forma_pagamento: item.forma_pagamento,
@@ -1964,50 +1975,34 @@ function Faturamento() {
       }
     });
 
-    const docDefinition = {
-      pageSize: 'A4',
-      pageOrientation: 'landscape',
-      pageMargins: [40, 200, 40, 120],
-      header: {
-        stack: [
-          {
-            columns: [
-              {
-                image: cliente.logo,
-                width: 75,
-                alignment: 'center',
-              },
-              {
-                stack: [
-                  { text: cliente.razao_social, alignment: 'left', fontSize: 10, width: 300 },
-                  { text: 'ENDEREÇO: ' + cliente.endereco, alignment: 'left', fontSize: 6, width: 300 },
-                  { text: 'TELEFONE: ' + cliente.telefone, alignment: 'left', fontSize: 6, width: 300 },
-                  { text: 'EMAIL: ' + cliente.email, alignment: 'left', fontSize: 6, width: 300 },
-                ],
-                width: '*'
-              },
-              { qr: cliente.qrcode, width: '40%', fit: 75, alignment: 'right', margin: [0, 0, 10, 0] },
-            ],
-            columnGap: 10,
-          },
-          {
-            "canvas": [{
-              "lineColor": "gray",
-              "type": "line",
-              "x1": 0,
-              "y1": 0,
-              "x2": 524,
-              "y2": 0,
-              "lineWidth": 1
-            }], margin: [0, 10, 0, 0], alignment: 'center',
-          },
-
-        ],
-        margin: [40, 40, 40, 40],
-      },
-      footer: function (currentPage, pageCount) {
-        return {
+    let docDefinition = {};
+    if (tabledataconsultas.length > 0 && tabledataprocedimentos.length > 0) {
+      docDefinition = {
+        pageSize: 'A4',
+        pageOrientation: 'landscape',
+        pageMargins: [40, 200, 40, 120],
+        header: {
           stack: [
+            {
+              columns: [
+                {
+                  image: cliente.logo,
+                  width: 75,
+                  alignment: 'center',
+                },
+                {
+                  stack: [
+                    { text: cliente.razao_social, alignment: 'left', fontSize: 10, width: 300 },
+                    { text: 'ENDEREÇO: ' + cliente.endereco, alignment: 'left', fontSize: 6, width: 300 },
+                    { text: 'TELEFONE: ' + cliente.telefone, alignment: 'left', fontSize: 6, width: 300 },
+                    { text: 'EMAIL: ' + cliente.email, alignment: 'left', fontSize: 6, width: 300 },
+                  ],
+                  width: '*'
+                },
+                { qr: cliente.qrcode, width: '40%', fit: 75, alignment: 'right', margin: [0, 0, 10, 0] },
+              ],
+              columnGap: 10,
+            },
             {
               "canvas": [{
                 "lineColor": "gray",
@@ -2019,68 +2014,387 @@ function Faturamento() {
                 "lineWidth": 1
               }], margin: [0, 10, 0, 0], alignment: 'center',
             },
+
+          ],
+          margin: [40, 40, 40, 40],
+        },
+        footer: function (currentPage, pageCount) {
+          return {
+            stack: [
+              {
+                "canvas": [{
+                  "lineColor": "gray",
+                  "type": "line",
+                  "x1": 0,
+                  "y1": 0,
+                  "x2": 524,
+                  "y2": 0,
+                  "lineWidth": 1
+                }], margin: [0, 10, 0, 0], alignment: 'center',
+              },
+              {
+                columns: [
+                  {
+                    stack: [
+                      { text: '________________________________', alignment: 'center', width: 400 },
+                      { text: 'DEPARTAMENTO FINANCEIRO', width: '*', alignment: 'center', fontSize: 8 },
+                    ], with: '30%',
+                  },
+                  { text: 'PÁGINA ' + currentPage.toString() + ' DE ' + pageCount, fontSize: 8 },
+                  { text: '', width: '*' },
+                ],
+                margin: [40, 40, 40, 40], alignment: 'center',
+              },
+            ],
+          }
+        },
+        styles: {
+          title: {
+            fontsize: 20,
+            bold: true,
+            alignment: 'center',
+            margin: [2.5, 10, 2.5, 5]
+          },
+          tableheaders: {
+            fontSize: 10,
+            bold: true,
+            fill: 'blue'
+          },
+          tablecells: {
+            fontSize: 10,
+            bold: false,
+          },
+        },
+        content: [
+          { text: 'FATURAMENTO DE CONSULTAS', style: 'title' },
+          {
+            style: 'tablecells',
+            table: {
+              headerRows: 1,
+              dontBreakRows: true,
+              body: [
+                [{ text: 'DATA', style: 'tableheaders' }, { text: 'PROCEDIMENTO', style: 'tableheaders' }, { text: 'CLIENTE', style: 'tableheaders' }, { text: 'PROFISSIONAL EXECUTANTE', style: 'tableheaders' }, { text: 'FORMA DE PAGAMENTO', style: 'tableheaders' }, { text: 'PAGAMENTOS', style: 'tableheaders' }],
+                ...tabledataconsultas
+              ],
+            },
+
+          },
+          { text: 'FATURAMENTO DE PROCEDIMENTOS E EXAMES', style: 'title' },
+          {
+            style: 'tablecells',
+            table: {
+              headerRows: 1,
+              dontBreakRows: true,
+              body: [
+                [{ text: 'DATA', style: 'tableheaders' }, { text: 'PROCEDIMENTO', style: 'tableheaders' }, { text: 'CLIENTE', style: 'tableheaders' }, { text: 'PROFISSIONAL EXECUTANTE', style: 'tableheaders' }, { text: 'FORMA DE PAGAMENTO', style: 'tableheaders' }, { text: 'PAGAMENTOS', style: 'tableheaders' }],
+                ...tabledataprocedimentos
+              ],
+            },
+          },
+        ],
+      }
+    } else if (tabledataconsultas.length > 0 && tabledataprocedimentos.length == 0) {
+      docDefinition = {
+        pageSize: 'A4',
+        pageOrientation: 'landscape',
+        pageMargins: [40, 200, 40, 120],
+        header: {
+          stack: [
             {
               columns: [
                 {
-                  stack: [
-                    { text: '________________________________', alignment: 'center', width: 400 },
-                    { text: 'DEPARTAMENTO FINANCEIRO', width: '*', alignment: 'center', fontSize: 8 },
-                  ], with: '30%',
+                  image: cliente.logo,
+                  width: 75,
+                  alignment: 'center',
                 },
-                { text: 'PÁGINA ' + currentPage.toString() + ' DE ' + pageCount, fontSize: 8 },
-                { text: '', width: '*' },
+                {
+                  stack: [
+                    { text: cliente.razao_social, alignment: 'left', fontSize: 10, width: 300 },
+                    { text: 'ENDEREÇO: ' + cliente.endereco, alignment: 'left', fontSize: 6, width: 300 },
+                    { text: 'TELEFONE: ' + cliente.telefone, alignment: 'left', fontSize: 6, width: 300 },
+                    { text: 'EMAIL: ' + cliente.email, alignment: 'left', fontSize: 6, width: 300 },
+                  ],
+                  width: '*'
+                },
+                { qr: cliente.qrcode, width: '40%', fit: 75, alignment: 'right', margin: [0, 0, 10, 0] },
               ],
-              margin: [40, 40, 40, 40], alignment: 'center',
+              columnGap: 10,
             },
+            {
+              "canvas": [{
+                "lineColor": "gray",
+                "type": "line",
+                "x1": 0,
+                "y1": 0,
+                "x2": 524,
+                "y2": 0,
+                "lineWidth": 1
+              }], margin: [0, 10, 0, 0], alignment: 'center',
+            },
+
           ],
-        }
-      },
-
-      styles: {
-        title: {
-          fontsize: 20,
-          bold: true,
-          alignment: 'center',
-          margin: [2.5, 10, 2.5, 5]
+          margin: [40, 40, 40, 40],
         },
-        tableheaders: {
-          fontSize: 10,
-          bold: true,
-          fill: 'blue'
-        },
-        tablecells: {
-          fontSize: 10,
-          bold: false,
-        },
-      },
-
-      content: [
-        { text: 'FATURAMENTO DE CONSULTAS', style: 'title' },
-        {
-          style: 'tablecells',
-          table: {
-            headerRows: 1,
-            dontBreakRows: true,
-            body: [
-              [{ text: 'DATA', style: 'tableheaders' }, { text: 'PROCEDIMENTO', style: 'tableheaders' }, { text: 'CLIENTE', style: 'tableheaders' }, { text: 'PROFISSIONAL EXECUTANTE', style: 'tableheaders' }, { text: 'FORMA DE PAGAMENTO', style: 'tableheaders' }, { text: 'PAGAMENTOS', style: 'tableheaders' }],
-              ...tabledataconsultas
+        footer: function (currentPage, pageCount) {
+          return {
+            stack: [
+              {
+                "canvas": [{
+                  "lineColor": "gray",
+                  "type": "line",
+                  "x1": 0,
+                  "y1": 0,
+                  "x2": 524,
+                  "y2": 0,
+                  "lineWidth": 1
+                }], margin: [0, 10, 0, 0], alignment: 'center',
+              },
+              {
+                columns: [
+                  {
+                    stack: [
+                      { text: '________________________________', alignment: 'center', width: 400 },
+                      { text: 'DEPARTAMENTO FINANCEIRO', width: '*', alignment: 'center', fontSize: 8 },
+                    ], with: '30%',
+                  },
+                  { text: 'PÁGINA ' + currentPage.toString() + ' DE ' + pageCount, fontSize: 8 },
+                  { text: '', width: '*' },
+                ],
+                margin: [40, 40, 40, 40], alignment: 'center',
+              },
             ],
+          }
+        },
+        styles: {
+          title: {
+            fontsize: 20,
+            bold: true,
+            alignment: 'center',
+            margin: [2.5, 10, 2.5, 5]
           },
+          tableheaders: {
+            fontSize: 10,
+            bold: true,
+            fill: 'blue'
+          },
+          tablecells: {
+            fontSize: 10,
+            bold: false,
+          },
+        },
+        content: [
+          { text: 'FATURAMENTO DE CONSULTAS', style: 'title' },
+          {
+            style: 'tablecells',
+            table: {
+              headerRows: 1,
+              dontBreakRows: true,
+              body: [
+                [{ text: 'DATA', style: 'tableheaders' }, { text: 'PROCEDIMENTO', style: 'tableheaders' }, { text: 'CLIENTE', style: 'tableheaders' }, { text: 'PROFISSIONAL EXECUTANTE', style: 'tableheaders' }, { text: 'FORMA DE PAGAMENTO', style: 'tableheaders' }, { text: 'PAGAMENTOS', style: 'tableheaders' }],
+                ...tabledataconsultas
+              ],
+            },
 
+          },
+        ],
+      }
+    } else if (tabledataconsultas.length == 0 && tabledataprocedimentos.length > 0) {
+      docDefinition = {
+        pageSize: 'A4',
+        pageOrientation: 'landscape',
+        pageMargins: [40, 200, 40, 120],
+        header: {
+          stack: [
+            {
+              columns: [
+                {
+                  image: cliente.logo,
+                  width: 75,
+                  alignment: 'center',
+                },
+                {
+                  stack: [
+                    { text: cliente.razao_social, alignment: 'left', fontSize: 10, width: 300 },
+                    { text: 'ENDEREÇO: ' + cliente.endereco, alignment: 'left', fontSize: 6, width: 300 },
+                    { text: 'TELEFONE: ' + cliente.telefone, alignment: 'left', fontSize: 6, width: 300 },
+                    { text: 'EMAIL: ' + cliente.email, alignment: 'left', fontSize: 6, width: 300 },
+                  ],
+                  width: '*'
+                },
+                { qr: cliente.qrcode, width: '40%', fit: 75, alignment: 'right', margin: [0, 0, 10, 0] },
+              ],
+              columnGap: 10,
+            },
+            {
+              "canvas": [{
+                "lineColor": "gray",
+                "type": "line",
+                "x1": 0,
+                "y1": 0,
+                "x2": 524,
+                "y2": 0,
+                "lineWidth": 1
+              }], margin: [0, 10, 0, 0], alignment: 'center',
+            },
+
+          ],
+          margin: [40, 40, 40, 40],
         },
-        { text: 'FATURAMENTO DE PROCEDIMENTOS E EXAMES', style: 'title' },
-        {
-          style: 'tablecells',
-          table: {
-            headerRows: 1,
-            dontBreakRows: true,
-            body: [
-              [{ text: 'DATA', style: 'tableheaders' }, { text: 'PROCEDIMENTO', style: 'tableheaders' }, { text: 'CLIENTE', style: 'tableheaders' }, { text: 'PROFISSIONAL EXECUTANTE', style: 'tableheaders' }, { text: 'FORMA DE PAGAMENTO', style: 'tableheaders' }, { text: 'PAGAMENTOS', style: 'tableheaders' }],
-              ...tabledataprocedimentos
+        footer: function (currentPage, pageCount) {
+          return {
+            stack: [
+              {
+                "canvas": [{
+                  "lineColor": "gray",
+                  "type": "line",
+                  "x1": 0,
+                  "y1": 0,
+                  "x2": 524,
+                  "y2": 0,
+                  "lineWidth": 1
+                }], margin: [0, 10, 0, 0], alignment: 'center',
+              },
+              {
+                columns: [
+                  {
+                    stack: [
+                      { text: '________________________________', alignment: 'center', width: 400 },
+                      { text: 'DEPARTAMENTO FINANCEIRO', width: '*', alignment: 'center', fontSize: 8 },
+                    ], with: '30%',
+                  },
+                  { text: 'PÁGINA ' + currentPage.toString() + ' DE ' + pageCount, fontSize: 8 },
+                  { text: '', width: '*' },
+                ],
+                margin: [40, 40, 40, 40], alignment: 'center',
+              },
             ],
+          }
+        },
+        styles: {
+          title: {
+            fontsize: 20,
+            bold: true,
+            alignment: 'center',
+            margin: [2.5, 10, 2.5, 5]
+          },
+          tableheaders: {
+            fontSize: 10,
+            bold: true,
+            fill: 'blue'
+          },
+          tablecells: {
+            fontSize: 10,
+            bold: false,
           },
         },
-      ],
+        content: [
+          { text: 'FATURAMENTO DE PROCEDIMENTOS E EXAMES', style: 'title' },
+          {
+            style: 'tablecells',
+            table: {
+              headerRows: 1,
+              dontBreakRows: true,
+              body: [
+                [{ text: 'DATA', style: 'tableheaders' }, { text: 'PROCEDIMENTO', style: 'tableheaders' }, { text: 'CLIENTE', style: 'tableheaders' }, { text: 'PROFISSIONAL EXECUTANTE', style: 'tableheaders' }, { text: 'FORMA DE PAGAMENTO', style: 'tableheaders' }, { text: 'PAGAMENTOS', style: 'tableheaders' }],
+                ...tabledataprocedimentos
+              ],
+            },
+          },
+        ],
+      }
+    } else {
+      docDefinition = {
+        pageSize: 'A4',
+        pageOrientation: 'landscape',
+        pageMargins: [40, 200, 40, 120],
+        header: {
+          stack: [
+            {
+              columns: [
+                {
+                  image: cliente.logo,
+                  width: 75,
+                  alignment: 'center',
+                },
+                {
+                  stack: [
+                    { text: cliente.razao_social, alignment: 'left', fontSize: 10, width: 300 },
+                    { text: 'ENDEREÇO: ' + cliente.endereco, alignment: 'left', fontSize: 6, width: 300 },
+                    { text: 'TELEFONE: ' + cliente.telefone, alignment: 'left', fontSize: 6, width: 300 },
+                    { text: 'EMAIL: ' + cliente.email, alignment: 'left', fontSize: 6, width: 300 },
+                  ],
+                  width: '*'
+                },
+                { qr: cliente.qrcode, width: '40%', fit: 75, alignment: 'right', margin: [0, 0, 10, 0] },
+              ],
+              columnGap: 10,
+            },
+            {
+              "canvas": [{
+                "lineColor": "gray",
+                "type": "line",
+                "x1": 0,
+                "y1": 0,
+                "x2": 524,
+                "y2": 0,
+                "lineWidth": 1
+              }], margin: [0, 10, 0, 0], alignment: 'center',
+            },
+
+          ],
+          margin: [40, 40, 40, 40],
+        },
+        footer: function (currentPage, pageCount) {
+          return {
+            stack: [
+              {
+                "canvas": [{
+                  "lineColor": "gray",
+                  "type": "line",
+                  "x1": 0,
+                  "y1": 0,
+                  "x2": 524,
+                  "y2": 0,
+                  "lineWidth": 1
+                }], margin: [0, 10, 0, 0], alignment: 'center',
+              },
+              {
+                columns: [
+                  {
+                    stack: [
+                      { text: '________________________________', alignment: 'center', width: 400 },
+                      { text: 'DEPARTAMENTO FINANCEIRO', width: '*', alignment: 'center', fontSize: 8 },
+                    ], with: '30%',
+                  },
+                  { text: 'PÁGINA ' + currentPage.toString() + ' DE ' + pageCount, fontSize: 8 },
+                  { text: '', width: '*' },
+                ],
+                margin: [40, 40, 40, 40], alignment: 'center',
+              },
+            ],
+          }
+        },
+        styles: {
+          title: {
+            fontsize: 20,
+            bold: true,
+            alignment: 'center',
+            margin: [2.5, 10, 2.5, 5]
+          },
+          tableheaders: {
+            fontSize: 10,
+            bold: true,
+            fill: 'blue'
+          },
+          tablecells: {
+            fontSize: 10,
+            bold: false,
+          },
+        },
+        content: [
+          { text: 'SEM DADOS PARA APRESENTAÇÃO COM OS FILTROS APLICADOS.', style: 'title' },
+        ],
+      }
     }
     // utilizando a lib pdfmake para gerar o pdf e converter em base64.
     const pdfDocGenerator = pdfMake.createPdf(docDefinition);
