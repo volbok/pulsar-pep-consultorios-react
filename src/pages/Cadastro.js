@@ -32,12 +32,13 @@ function Cadastro() {
     pacientes,
     setpacientes,
     paciente, setpaciente,
-    setobjpaciente,
+    setobjpaciente, objpaciente,
     atendimentos,
     setatendimentos,
     setoperadoras, operadoras,
     setprocedimentos,
     usuarios,
+    mobilewidth,
   } = useContext(Context);
 
   // history (router).
@@ -60,7 +61,6 @@ function Cadastro() {
   const [viewtipoconsulta, setviewtipoconsulta] = useState(0);
   useEffect(() => {
     if (pagina == 2) {
-      console.log('PACIENTE: ' + paciente);
       setatendimento([]);
       loadPacientes();
       loadOperadoras();
@@ -314,7 +314,11 @@ function Cadastro() {
   function ListaDePacientes() {
     return (
       <div style={{ position: 'relative', width: 'calc(100vw - 20px)' }}>
-        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: window.innerWidth < mobilewidth ? 'column' : 'row',
+          justifyContent: 'center', alignItems: 'center',
+        }}>
           <div id="botão de voltar (sair do cadastro)"
             className="button-yellow"
             style={{ margin: 0, marginRight: 10, width: 50, height: 50, alignSelf: 'center' }}
@@ -348,7 +352,10 @@ function Cadastro() {
           </div>
           <div id="botão para cadastrar paciente"
             className="button-green"
-            style={{ margin: 0, marginLeft: 10, width: 50, height: 50, alignSelf: 'center' }}
+            style={{
+              display: window.innerWidth < mobilewidth ? 'none' : 'flex',
+              margin: 0, marginLeft: 10, width: 50, height: 50, alignSelf: 'center'
+            }}
             title={"CADASTRAR PACIENTE"}
             onClick={() => setvieweditpaciente(2)}
           >
@@ -363,7 +370,8 @@ function Cadastro() {
             ></img>
           </div>
         </div>
-        <div className="grid"
+        <div
+          className={window.innerWidth < mobilewidth ? "" : "grid"}
           style={{
             marginTop: 10,
           }}
@@ -403,6 +411,17 @@ function Cadastro() {
                     height: '100%',
                   }}>
                     <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      <img
+                        alt=""
+                        src={pacientes.filter(valor => valor.id_paciente == item.id_paciente).map(valor => valor.foto)}
+                        style={{
+                          display: pacientes.filter(valor => valor.id_paciente == item.id_paciente).map(valor => valor.foto) != '' ? 'flex' : 'none',
+                          margin: 5,
+                          height: 100,
+                          width: 100,
+                          borderRadius: 5,
+                        }}
+                      ></img>
                       <div className="texto_claro">
                         {'NOME DO PACIENTE:'}
                       </div>
@@ -477,6 +496,92 @@ function Cadastro() {
     );
   }
 
+  // CAPTURA DE IMAGEM PARA FOTO DO PACIENTE.  
+  const [viewcamera, setviewcamera] = useState(0);
+  let video = null;
+  let canvas = null;
+  let startvideo = null;
+  let globalstream = null;
+  function Capture() {
+    startvideo = () => {
+      video = document.getElementById('video');
+      canvas = document.getElementById('canvas');
+      navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then((stream) => {
+        globalstream = stream;
+        video.srcObject = stream;
+        console.log('INICIADO STREAM');
+      }).catch((error) => {
+        console.log(error);
+      });
+    }
+
+    const getimage = () => {
+      canvas.getContext('2d').drawImage(video, 150, 100, 300, 300, 0, 0, 300, 300);
+      let image = canvas.toDataURL('image/jpeg');
+      console.log(image);
+      globalstream.getTracks().forEach((track) => track.stop());
+      updatePacienteImage(image);
+      setviewcamera(0);
+    }
+
+    return (
+      <div className="fundo"
+        style={{
+          display: viewcamera == 1 ? 'flex' : 'none',
+          flexDirection: 'column', justifyContent: 'center'
+        }}
+        onClick={() => setviewcamera(0)}
+      >
+        <div className="janela scroll cor2" onClick={(e) => e.stopPropagation()}>
+          <div class="camera"
+            style={{
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+              alignSelf: 'center',
+            }}>
+            <div style={{
+              display: 'flex', flexDirection: 'row',
+              justifyContent: 'center', alignSelf: 'center',
+              position: 'relative',
+            }}>
+              <div id="painel esquerdo"
+                style={{
+                  display: 'none',
+                  position: 'absolute',
+                  top: 0, bottom: 0, left: 0,
+                  width: 150,
+                  backgroundColor: 'black', zIndex: 1,
+                }}>
+              </div>
+              <video id="video" autoplay='true' muted='true' width='300' height='300' style={{ objectFit: 'cover', borderRadius: 5 }}></video>
+              <div id="painel direito"
+                style={{
+                  display: 'none',
+                  position: 'absolute',
+                  top: 0, bottom: 0, right: 0,
+                  width: 150,
+                  backgroundColor: 'black', zIndex: 1,
+                }}>
+              </div>
+            </div>
+            <div className='button' style={{ width: 200, alignSelf: 'center', marginTop: 10 }}
+              onClick={() => startvideo()}
+            >
+              ACIONAR CÂMERA
+            </div>
+            <canvas id="canvas" height='300' width='300' style={{ display: 'none', backgroundColor: 'green', alignSelf: 'center' }}></canvas>
+            <div className='button' style={{ width: 200, alignSelf: 'center', marginTop: 10 }}
+              onClick={() => getimage()}
+            >
+              CAPTURAR
+            </div>
+          </div >
+        </div>
+      </div>
+    )
+  }
+
   // LISTA DE AGENDAMENTOS DE CONSULTAS PARA O PACIENTE SELECIONADO.
   const [viewagendamentos, setviewagendamentos] = useState(0);
   function ViewAgendamentos() {
@@ -517,7 +622,6 @@ function Cadastro() {
       </div>
     )
   }
-
 
   // api para busca do endereço pelo CEP:
   const pegaEndereco = (cep) => {
@@ -689,7 +793,7 @@ function Cadastro() {
           onClick={(e) => e.stopPropagation()}
           style={{
             position: 'relative',
-            flexDirection: "row",
+            flexDirection: window.innerWidth < mobilewidth ? "column" : "row",
             justifyContent: "center",
             alignSelf: "center",
           }}
@@ -715,6 +819,7 @@ function Cadastro() {
           <div id="dados do paciente"
             className="scroll cor2"
             style={{
+              display: window.innerWidth < mobilewidth ? 'none' : 'flex',
               flexDirection: "column",
               justifyContent: 'flex-start',
               alignItems: "center",
@@ -1573,10 +1678,8 @@ function Cadastro() {
                 className="button-green"
                 onClick={() => {
                   if (vieweditpaciente == 1) {
-                    // checkinput('textarea', settoast, ["inputEditNomePaciente", "inputEditDn", "inputEditNumeroDocumento", "inputEditNomeMae"], "btnUpdatePaciente", updatePaciente, [])
                     updatePaciente();
                   } else {
-                    // checkinput('textarea', settoast, ["inputEditNomePaciente", "inputEditDn", "inputEditNumeroDocumento", "inputEditNomeMae"], "btnUpdatePaciente", insertPaciente, [])
                     insertPaciente();
                   }
                 }}
@@ -1640,7 +1743,7 @@ function Cadastro() {
           <div id="botão para agendar consulta"
             className="button"
             style={{
-              display: vieweditpaciente == 2 ? 'none' : 'flex',
+              display: vieweditpaciente == 2 || window.innerWidth < mobilewidth ? 'none' : 'flex',
               width: 100, height: 100, alignSelf: 'center'
             }}
             onClick={() => {
@@ -1652,10 +1755,10 @@ function Cadastro() {
           >
             AGENDAR CONSULTA
           </div>
-          <div id="botão para agendar consulta"
+          <div id="botão para agendar exame"
             className="button"
             style={{
-              display: vieweditpaciente == 2 ? 'none' : 'flex',
+              display: vieweditpaciente == 2 || window.innerWidth < mobilewidth ? 'none' : 'flex',
               width: 100, height: 100, alignSelf: 'center'
             }}
             onClick={() => {
@@ -1664,6 +1767,18 @@ function Cadastro() {
             }}
           >
             AGENDAR EXAME
+          </div>
+          <div id="botão para agendar consulta"
+            className="button"
+            style={{
+              display: vieweditpaciente == 2 ? 'none' : 'flex',
+              width: 100, height: 100, alignSelf: 'center'
+            }}
+            onClick={() => {
+              setviewcamera(1);
+            }}
+          >
+            TIRAR FOTO
           </div>
         </div>
       </div>
@@ -1811,10 +1926,80 @@ function Cadastro() {
       validade_carteira: document.getElementById("inputValidadeCarteira").value.toUpperCase(),
       nome_social: document.getElementById("inputNomeSocial").value.toUpperCase(),
       obs: paciente.obs,
+      foto: paciente.foto,
 
     };
     axios
       .post(html + "update_paciente/" + paciente.id_paciente, obj)
+      .then(() => {
+        loadPacientes();
+        setvieweditpaciente(0);
+        toast(
+          settoast,
+          "PACIENTE ATUALIZADO COM SUCESSO NA BASE PULSAR",
+          "rgb(82, 190, 128, 1)",
+          3000
+        );
+      })
+      .catch(function () {
+        toast(
+          settoast,
+          "ERRO DE CONEXÃO, REINICIANDO APLICAÇÃO.",
+          "black",
+          5000
+        );
+        setTimeout(() => {
+          window.location.reload();
+        }, 5000);
+      });
+  };
+
+  const updatePacienteImage = (imagem) => {
+    var obj = {
+      nome_paciente: objpaciente.nome_paciente,
+      nome_mae_paciente: objpaciente.nome_mae_paciente,
+      nome_pai_paciente: objpaciente.nome_pai_paciente,
+      dn_paciente: objpaciente.dn_paciente,
+      antecedentes_pessoais: objpaciente.antecedentes_pessoais,
+      medicacoes_previas: objpaciente.medicacoes_previas,
+      exames_previos: objpaciente.exames_previos,
+      exames_atuais: objpaciente.exames_atuais,
+      tipo_documento: objpaciente.tipo_documento,
+      numero_documento: objpaciente.numero_documento,
+      cns: objpaciente.cns,
+      endereco: objpaciente.endereco,
+
+      logradouro: objpaciente.logradouro,
+      bairro: objpaciente.bairro,
+      localidade: objpaciente.localidade,
+      uf: objpaciente.uf,
+      cep: objpaciente.cep,
+
+      telefone: objpaciente.telefone,
+      email: objpaciente.email,
+
+      nome_responsavel: objpaciente.nome_responsavel,
+      sexo: objpaciente.sexo,
+      nacionalidade: objpaciente.nacionalidade,
+      cor: objpaciente.cor,
+      etnia: objpaciente.etnia,
+
+      orgao_emissor: objpaciente.orgao_emissor,
+      endereco_numero: objpaciente.endereco_numero,
+      endereco_complemento: objpaciente.endereco_complemento,
+
+      // CONVÊNIO.
+      convenio_nome: objpaciente.convenio_nome,
+      convenio_codigo: objpaciente.convenio_codigo,
+      convenio_carteira: objpaciente.convenio_carteira,
+      validade_carteira: objpaciente.convenio_carteira,
+      nome_social: objpaciente.nome_paciente,
+      obs: objpaciente.obs,
+      foto: imagem,
+
+    };
+    axios
+      .post(html + "update_paciente/" + objpaciente.id_paciente, obj)
       .then(() => {
         loadPacientes();
         setvieweditpaciente(0);
@@ -1908,6 +2093,7 @@ function Cadastro() {
         <ListaDePacientes></ListaDePacientes>
         <DadosPacienteAtendimento></DadosPacienteAtendimento>
         <ViewAgendamentos></ViewAgendamentos>
+        <Capture></Capture>
       </div>
     </div>
   );

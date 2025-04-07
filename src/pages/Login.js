@@ -568,7 +568,7 @@ function Login() {
       <div
         className="button"
         style={{
-          display: acesso != 0 || acesso != null ? "flex" : "none",
+          display: ((window.innerWidth > mobilewidth && (acesso != 0 || acesso != null))) || ((window.innerWidth < mobilewidth && pagina == 2) && (acesso != 0 || acesso != null)) ? "flex" : "none",
           minWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
           maxWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
           height: window.innerWidth < mobilewidth ? "30vw" : "15vw",
@@ -599,7 +599,7 @@ function Login() {
     return (
       <div
         style={{
-          display: viewlistaunidades == 1 && window.innerWidth > mobilewidth ? "flex" : "none",
+          display: viewlistaunidades == 1 ? "flex" : "none",
           flexDirection: "column",
           justifyContent: "center",
           alignSelf: "center",
@@ -698,14 +698,14 @@ function Login() {
       <div
         className="button"
         style={{
-          display: window.innerWidth < mobilewidth && pagina != 'MAPA DE AGENDAMENTOS' ? "none" : "flex",
+          display: window.innerWidth < mobilewidth && (pagina != 'MAPA DE AGENDAMENTOS') ? "none" : "flex",
           padding: 10,
           margin: 5,
-          minWidth: window.innerWidth < mobilewidth ? "40vw" : "15vw",
-          maxWidth: window.innerWidth < mobilewidth ? "40vw" : "15vw",
-          height: window.innerWidth < mobilewidth ? "40vw" : "15vw",
-          minHeight: window.innerWidth < mobilewidth ? "40vw" : "15vw",
-          maxHeight: window.innerWidth < mobilewidth ? "40vw" : "15vw",
+          minWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+          maxWidth: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+          height: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+          minHeight: window.innerWidth < mobilewidth ? "30vw" : "15vw",
+          maxHeight: window.innerWidth < mobilewidth ? "30vw" : "15vw",
           color: 'white',
         }}
         onClick={() => {

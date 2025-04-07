@@ -25,6 +25,7 @@ import Exames from "../cards/Exames";
 import selector from "../functions/selector";
 import clearselector from "../functions/clearselector";
 import mountage from "../functions/mountage";
+import NotionField from "../cards/NotionField";
 
 function Consultas() {
   // context.
@@ -898,6 +899,11 @@ function Consultas() {
       },
       {
         sinal: null,
+        nome: 'RELATÓRIOS PLUS',
+        card: 'NOTION'
+      },
+      {
+        sinal: null,
         nome: 'RECIBOS',
         card: 'card-documento-recibo'
       },
@@ -1028,6 +1034,7 @@ function Consultas() {
           >
             <Alergias></Alergias>
             <Documentos></Documentos>
+            <NotionField></NotionField>
             <Exames></Exames>
           </div>
           <div id="conteúdo vazio"

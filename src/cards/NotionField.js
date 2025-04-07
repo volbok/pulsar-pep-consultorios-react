@@ -19,6 +19,12 @@ import deletar from '../images/deletar.png';
 import VanillaCaret from 'vanilla-caret-js';
 import toast from '../functions/toast';
 
+import text_center from "../images/text_center.png";
+import text_left from "../images/text_left.png";
+import text_right from "../images/text_right.png";
+import ampliar from "../images/ampliar.png";
+import reduzir from "../images/reduzir.png";
+
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import htmlToPdfmake from 'html-to-pdfmake';
@@ -44,9 +50,10 @@ function NotionField() {
   } = useContext(Context);
 
   useEffect(() => {
-    if (card == 'card-notion') {
-      settipodocumento('NOTION');
+    if (card == 'NOTION') {
+      settipodocumento('RELATÓRIO PLUS');
       loadNotionDocs();
+      console.log(objpaciente);
     }
     // eslint-disable-next-line
   }, [card]);
@@ -54,7 +61,7 @@ function NotionField() {
   const loadNotionDocs = () => {
     axios.get(html + "list_documentos/" + atendimento).then((response) => {
       var x = response.data.rows;
-      setdocumentos(x.filter(item => item.tipo_documento == 'NOTION').sort((a, b) => moment(a.data) < moment(b.data) ? 1 : -1));
+      setdocumentos(x.filter(item => item.tipo_documento == 'RELATÓRIO PLUS').sort((a, b) => moment(a.data) < moment(b.data) ? 1 : -1));
       setselecteddocumento([]);
     })
   }
@@ -593,12 +600,9 @@ function NotionField() {
 
   }
   const insereImagem = () => {
-
     console.log('insere canvas');
-
     // criando o random para tratamento dos id's dos elementos.
     let random = Math.random();
-
     // criando os elementos HTML.
     let element_canvas = null;
     let element_parent = null; // div que vai ter como elementos filhos o botão selecionar imagem, deletar imagem e botões de zoom.
@@ -609,54 +613,52 @@ function NotionField() {
     let element_zoom_out = null;
     let img = null;
     let element_image = null;
-
     element_canvas = document.createElement("canvas");
     element_canvas.id = 'notionblock_canvas ' + random;
     element_canvas.className = 'notion_canvas'
-
     element_parent = document.createElement("div");
     element_parent.id = 'notionblock_parent ' + random;
     element_parent.style.display = 'flex';
     element_parent.style.flexDirection = 'row';
     element_parent.style.justifyContent = 'center';
-
     element_input = document.createElement("input");
     element_input.type = 'file';
     element_input.id = 'notionblock_picker ' + random;
     element_input.style.display = 'none';
-
     element_pseudo_input = document.createElement("div");
     element_pseudo_input.className = "notion_img_button";
     element_pseudo_input.id = 'notionblock_pseudo_picker ' + random;
-
     let image_novo = document.createElement('img');
     image_novo.src = novo;
     image_novo.width = 25;
     image_novo.height = 25;
     image_novo.alt = "";
     element_pseudo_input.appendChild(image_novo);
-
     element_delete = document.createElement("div");
     element_delete.className = 'notion_img_button_red';
     element_delete.id = 'notionblock_delete ' + random;
-
     let image_delete = document.createElement('img');
     image_delete.src = deletar;
     image_delete.width = 25;
     image_delete.height = 25;
     image_delete.alt = "";
     element_delete.appendChild(image_delete);
-
     element_zoom_in = document.createElement("div");
-    element_zoom_in.className = 'notion_img_button';
-    element_zoom_in.innerText = '+';
     element_zoom_in.id = 'notionblock_zoom_in ' + random;
-
+    element_zoom_in.className = 'notion_img_button';
+    let element_ampliar_image = document.createElement("img");
+    element_ampliar_image.src = ampliar;
+    element_ampliar_image.height = 25;
+    element_ampliar_image.width = 25;
+    element_zoom_in.appendChild(element_ampliar_image);
     element_zoom_out = document.createElement("div");
-    element_zoom_out.className = 'notion_img_button';
-    element_zoom_out.innerText = '-';
     element_zoom_out.id = 'notionblock_zoom_out ' + random;
-
+    element_zoom_out.className = 'notion_img_button';
+    let element_reduzir_image = document.createElement("img");
+    element_reduzir_image.src = reduzir;
+    element_reduzir_image.height = 25;
+    element_reduzir_image.width = 25;
+    element_zoom_out.appendChild(element_reduzir_image);
     if (document.getElementById('notionfield').nextElementSibling != null) {
       document.getElementById("notionfield").insertBefore(element_canvas, document.activeElement.nextSibling);
       document.getElementById("notionfield").insertBefore(element_parent, document.activeElement.nextSibling);
@@ -665,8 +667,6 @@ function NotionField() {
       element_parent.appendChild(element_delete);
       element_parent.appendChild(element_zoom_in);
       element_parent.appendChild(element_zoom_out);
-      //document.getElementById("notionfield").insertBefore(element_input, document.activeElement.nextSibling);
-      //document.getElementById("notionfield").insertBefore(element_pseudo_input, document.activeElement.nextSibling);
     } else {
       document.getElementById("notionfield").appendChild(element_canvas);
       document.getElementById("notionfield").insertBefore(element_parent, document.activeElement.nextSibling);
@@ -675,8 +675,6 @@ function NotionField() {
       element_parent.appendChild(element_delete);
       element_parent.appendChild(element_zoom_in);
       element_parent.appendChild(element_zoom_out);
-      // document.getElementById("notionfield").appendChild(element_input);
-      // document.getElementById("notionfield").appendChild(element_pseudo_input);
     }
 
     // adicionando as funções para abrir a janela do explorer e capturar uma imagem.
@@ -722,7 +720,6 @@ function NotionField() {
         document.getElementById('notionblock_img ' + random).remove();
       }
       document.getElementById("notionfield").appendChild(element_canvas);
-
       // carregando a imagem selecionada no explorador de arquivos no canvas.
       let canvas = document.getElementById(element_canvas.id);
       canvas.getContext('2d').clearRect(0, 0, canvas.width, canvas.height);
@@ -730,26 +727,15 @@ function NotionField() {
       img = new Image();
       img.src = URL.createObjectURL(myFile);
       img.onload = () => {
-        console.log('image uploaded');
-
-        console.log('IMG WIDTH: ' + img.width);
-        console.log('IMG HEIGHT: ' + img.height);
-
         let notionfieldwidth = document.getElementById("notionfield").offsetWidth;
         let ratio = notionfieldwidth / img.width;
-
         if (notionfieldwidth < img.width) {
-          // console.log('imagem grande!');
           canvas.width = 0.6 * ratio * img.width;
           canvas.height = 0.6 * ratio * img.height;
-          // console.log('VEJA: ' + canvas.width + ' - ' + canvas.height);
         } else {
-          // console.log('imagem menor...');
           canvas.width = 0.7 * img.width;
           canvas.height = 0.7 * img.height;
-          // console.log('VEJA: ' + canvas.width + ' - ' + canvas.height);
         }
-
         document.getElementById('notionblock_canvas ' + random).getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
 
         // criando o elemento imagem e transferindo a figura para o elemento imagem.
@@ -847,37 +833,42 @@ function NotionField() {
 
   // função que insere ou altera elementos ao clicar-se em uma tecla do teclado.
   const keyHandler = (e) => {
-    // console.log(e.keyCode);
-    // console.log(document.activeElement.id);
+    console.log(document.activeElement.id);
+    console.log(document.activeElement.parentElement.id);
     localStorage.setItem('element', document.activeElement.id);
-    // console.log(localStorage.getItem('element'));
     if (e.keyCode == 13) { // tecla enter
       e.preventDefault();
       insereP();
     } else if (e.keyCode == 8) { // tecla backspace
-      // console.log('ID: ' + document.activeElement.id);
       // verificando se o conteúdo do elemento é vazio, para realizar sua exclusão.
       if (document.activeElement.textContent.length == 0) {
         if (document.activeElement.previousSibling != null) {
+          e.preventDefault();
           console.log('DELETANDO ELEMENTO');
           let id = document.getElementById(document.activeElement.id).previousSibling.id;
-          document.getElementById("notionfield").removeChild(document.activeElement);
-          document.getElementById(id).focus();
+          console.log(id);
           localStorage.setItem('element', id);
-        } else {
           document.getElementById("notionfield").removeChild(document.activeElement);
+
+          document.getElementById(id).focus();
+          if (id.includes('_parent') == false) {
+            let caret = new VanillaCaret(document.getElementById(id));
+            let conteudo = document.getElementById(id).innerText;
+            console.log(conteudo);
+            caret.setPos(conteudo.length);
+          }
+        } else {
+          document.activeElement.remove();
         }
       }
     } else if (e.keyCode == 38) { // tecla seta para cima
       if (document.activeElement.previousSibling != null) {
-        // console.log('DESLOCANDO PARA O ELEMENTO ANTERIOR');
         let id = document.getElementById(document.activeElement.id).previousSibling.id;
         document.getElementById(id).focus();
         localStorage.setItem('element', id);
       }
     } else if (e.keyCode == 40) { // tecla seta para baixo
       if (document.activeElement.nextSibling != null) {
-        // console.log('DESLOCANDO PARA O PRÓXIMO ELEMENTO');
         let id = document.getElementById(document.activeElement.id).nextSibling.id;
         document.getElementById(id).focus();
         localStorage.setItem('element', id);
@@ -909,14 +900,65 @@ function NotionField() {
     updateDocumento(selecteddocumento, 0);
   }
 
+  function NotionField() {
+    return (
+      <div
+        style={{
+          display: 'flex',
+          flexDirection: 'column',
+          position: 'relative',
+          height: '100%',
+        }}>
+        <div id='notionfield'
+          className='scroll'
+          style={{
+            display: 'flex',
+            flexDirection: 'column', justifyContent: 'flex-start',
+            alignContent: 'flex-start',
+            alignSelf: 'center',
+            width: 'calc(100% - 20px)',
+            maxWidth: 'calc(100% - 20px)',
+            height: 'calc(100% - 20px)',
+            maxHeight: 'calc(100% - 20px)',
+            marginTop: 10,
+            backgroundColor: 'white',
+            borderColor: 'white',
+            borderRadius: 5,
+            position: 'absolute',
+            top: 0,
+            bottom: 0,
+          }}
+          onClick={() => setviewmenucolinha(0)}
+          onKeyDown={(e) => {
+            if (selecteddocumento.status == 0) {
+              keyHandler(e);
+            } else {
+              e.preventDefault();
+              toast(settoast, 'ESTE DOCUMENTO JÁ FOI FECHADO E NÃO PODE SER ALTERADO', '#EC7063', 2000);
+            }
+          }}
+          onMouseMove={() => {
+            localStorage.setItem('texto_notion', document.getElementById('notionfield').innerHTML);
+          }}
+        >
+        </div>
+      </div>
+    )
+  }
+
   return (
-    <div style={{
-      display: card == 'card-notion' ? 'flex' : 'none',
-      flexDirection: 'row',
-      width: '100%',
-      height: '100%',
-      position: 'relative',
-    }}>
+    <div
+      className='card-aberto'
+      style={{
+        display: card == 'NOTION' ? 'flex' : 'none',
+        flexDirection: 'row',
+        width: '100%',
+        height: '100%',
+        maxHeight: '100%',
+        padding: 0,
+        margin: 0,
+        position: 'relative',
+      }}>
       <MenuColinhas></MenuColinhas>
       <div style={{
         display: 'flex', flexDirection: 'column', justifyContent: 'space-between',
@@ -924,7 +966,6 @@ function NotionField() {
         height: '100%',
         position: 'relative',
         alignSelf: 'flex-end',
-        // backgroundColor: 'red',
       }}>
         <div id='menu'
           className='scroll'
@@ -933,11 +974,10 @@ function NotionField() {
             display: 'flex',
             flexDirection: 'column', justifyContent: 'flex-start',
             alignSelf: 'center',
-            width: 'calc(100% - 15px)',
-            height: 90,
+            width: 'calc(100% - 20px)',
+            height: 115,
             opacity: selecteddocumento.length == 0 || selecteddocumento.status == 1 ? 0.3 : 1,
             pointerEvents: selecteddocumento.length == 0 || selecteddocumento.status == 1 ? 'none' : 'auto',
-            marginBottom: 10,
           }}
         // onMouseOver={() => console.log(selecteddocumento)}
         >
@@ -953,12 +993,6 @@ function NotionField() {
               style={{ width: 100, height: 25, minHeight: 25, maxHeight: 25 }}
             >
               TEXTO
-            </div>
-            <div className='button'
-              onClick={() => appendElement('bloco')}
-              style={{ width: 100, height: 25, minHeight: 25, maxHeight: 25 }}
-            >
-              BLOCO
             </div>
             <div className='button' for="uploader"
               onClick={() => appendElement('imagem')}
@@ -977,7 +1011,11 @@ function NotionField() {
               }}
               style={{ width: 30, minWidth: 30, maxWidth: 30, height: 25, minHeight: 25, maxHeight: 25 }}
             >
-              L
+              <img
+                alt=""
+                src={text_left}
+                style={{ width: 25, height: 25 }}
+              ></img>
             </div>
             <div className='button'
               onClick={() => {
@@ -988,7 +1026,11 @@ function NotionField() {
               }}
               style={{ width: 30, minWidth: 30, maxWidth: 30, height: 25, minHeight: 25, maxHeight: 25 }}
             >
-              C
+              <img
+                alt=""
+                src={text_center}
+                style={{ width: 25, height: 25 }}
+              ></img>
             </div>
             <div className='button'
               onClick={() => {
@@ -999,7 +1041,11 @@ function NotionField() {
               }}
               style={{ width: 30, minWidth: 30, maxWidth: 30, height: 25, minHeight: 25, maxHeight: 25, marginRight: 30 }}
             >
-              R
+              <img
+                alt=""
+                src={text_right}
+                style={{ width: 25, height: 25 }}
+              ></img>
             </div>
             <div className='button'
               onClick={() => {
@@ -1031,40 +1077,7 @@ function NotionField() {
             </div>
           </div>
         </div>
-        <div id='notionfield' // porra!
-          className='scroll'
-          style={{
-            display: 'flex',
-            flexDirection: 'column', justifyContent: 'flex-start',
-            alignContent: 'flex-start',
-            alignSelf: 'flex-end',
-            maxHeight: 'calc(100vh - 230px)',
-            flexGrow: 1,
-            width: 'calc(100% - 15px)',
-            maxWidth: 'calc(55vw - 15px)',
-            backgroundColor: 'white',
-            borderColor: 'white',
-            borderRadius: 5,
-            position: 'relative',
-            marginBottom: -2.5,
-            // pointerEvents: selecteddocumento.status == 1 ? 'none' : 'auto',
-          }}
-          onClick={() => setviewmenucolinha(0)}
-          onKeyDown={(e) => {
-            if (selecteddocumento.status == 0) {
-              keyHandler(e);
-            } else {
-              e.preventDefault();
-              toast(settoast, 'ESTE DOCUMENTO JÁ FOI FECHADO E NÃO PODE SER ALTERADO', '#EC7063', 2000);
-            }
-          }}
-          onMouseMove={() => {
-            localStorage.setItem('texto_notion', document.getElementById('notionfield').innerHTML);
-            // console.log(document.getElementById('notionfield').innerHTML);
-          }}
-        >
-        </div>
-        <div style={{ backgroundColor: 'red' }}></div>
+        <NotionField></NotionField>
       </div>
       <ListaDeDocumentos></ListaDeDocumentos>
       <PrintNotion></PrintNotion>
