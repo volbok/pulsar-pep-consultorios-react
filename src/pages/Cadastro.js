@@ -514,8 +514,6 @@ function Cadastro() {
       canvas = document.getElementById('canvas');
       navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
         globalstream = stream;
-        video.setAttribute("height", 320);
-        video.setAttribute("width", 300);
         video.srcObject = stream;
         console.log('INICIADO STREAM');
       }).catch((error) => {
@@ -562,7 +560,7 @@ function Cadastro() {
                   backgroundColor: 'black', zIndex: 1,
                 }}>
               </div>
-              <video id="video" autoplay='true' muted='true' disablePictureInPicture='true' width='300' height='320' style={{ objectFit: 'cover', borderRadius: 5 }}></video>
+              <video id="video" autoplay='true' muted='true' disablePictureInPicture='true' width='300' height='300' style={{ objectFit: 'none', borderRadius: 5 }}></video>
               <div id="painel direito"
                 style={{
                   display: 'none',
