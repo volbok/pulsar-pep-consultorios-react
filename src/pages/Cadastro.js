@@ -562,7 +562,7 @@ function Cadastro() {
                   backgroundColor: 'black', zIndex: 1,
                 }}>
               </div>
-              <video id="video" autoplay='true' muted='true' width='300' height='300' style={{ objectFit: 'cover', borderRadius: 5 }}></video>
+              <video id="video" autoplay='true' muted='true' disablePictureInPicture='true' width='300' height='320' style={{ objectFit: 'cover', borderRadius: 5 }}></video>
               <div id="painel direito"
                 style={{
                   display: 'none',
