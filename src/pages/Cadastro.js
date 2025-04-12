@@ -502,11 +502,17 @@ function Cadastro() {
   let canvas = null;
   let startvideo = null;
   let globalstream = null;
+  let constraints =
+  {
+    video: {
+      facingMode: 'environment'
+    }
+  }
   function Capture() {
     startvideo = () => {
       video = document.getElementById('video');
       canvas = document.getElementById('canvas');
-      navigator.mediaDevices.getUserMedia({ video: true, audio: false }).then((stream) => {
+      navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
         globalstream = stream;
         video.srcObject = stream;
         console.log('INICIADO STREAM');
