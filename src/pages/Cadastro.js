@@ -514,6 +514,8 @@ function Cadastro() {
       canvas = document.getElementById('canvas');
       navigator.mediaDevices.getUserMedia(constraints).then((stream) => {
         globalstream = stream;
+        video.setAttribute("height", 320);
+        video.setAttribute("width", 300);
         video.srcObject = stream;
         console.log('INICIADO STREAM');
       }).catch((error) => {
