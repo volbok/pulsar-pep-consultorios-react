@@ -1374,6 +1374,7 @@ function MapaDeAgendamentos() {
           <div className="grid"
             style={{
               marginTop: 10,
+              width: '90vw',
             }}
           >
             {arraypacientes
@@ -1698,7 +1699,7 @@ function MapaDeAgendamentos() {
                         title="LEMBRAR CONSULTA PARA O CLIENTE"
                         className="button-green"
                         onClick={(e) => {
-                          geraWhatsappExame(item);
+                          geraWhatsappExame(item.id_paciente, item);
                           e.stopPropagation();
                         }}
                         style={{
@@ -1814,7 +1815,7 @@ function MapaDeAgendamentos() {
             overflowY: 'hidden',
           }}
         >
-          {allprocedimentos.map(item => (
+          {allprocedimentos.filter(item => item.id_cliente == cliente.id_cliente).map(item => (
             <div
               key={'exame: ' + item.id}
               id={'btn procedimento ' + item.id}

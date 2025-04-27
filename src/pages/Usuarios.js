@@ -1121,9 +1121,11 @@ function Usuarios() {
   const loadFaturamentoClinicaProcedimentos = () => {
     console.log(cliente.id_cliente);
     axios
-      .get(html + "list_faturamento_clinicas_procedimentos/" + cliente.id_cliente)
+      .get(html + "all_procedimentos/")
       .then((response) => {
-        setprocedimentos_cliente(response.data.rows);
+        let x = [];
+        x = response.data.rows;
+        setprocedimentos_cliente(x.filter(item => item.id_cliente == + cliente.id_cliente));
       });
   };
 
@@ -1461,15 +1463,15 @@ function Usuarios() {
                 id={"btn_exame " + item.id}
                 style={{ width: 200, height: 120, paddingLeft: 20, paddingRight: 20 }}
                 onClick={() => {
-                  localStorage.setItem('procedimento', item.nome_procedimento);
-                  localStorage.setItem('codigo_tuss', item.codigo_tuss);
-                  localStorage.setItem('valor_convenio', item.valor_convenio);
-                  localStorage.setItem('valor_particular', item.valor_particular);
+                  localStorage.setItem('procedimento', item.tuss_rol_ans_descricao);
+                  localStorage.setItem('codigo_tuss', item.tuss_codigo);
+                  localStorage.setItem('valor_convenio', item.valor);
+                  localStorage.setItem('valor_particular', item.valor_part);
                   setselecionaexame(0);
                   selector("lista de procedimentos para agenda", "btn_exame " + item.id, 100);
                 }}
               >
-                {item.nome_procedimento}
+                {item.tuss_rol_ans_descricao}
               </div>
             ))}
           </div>

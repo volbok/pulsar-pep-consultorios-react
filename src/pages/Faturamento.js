@@ -277,10 +277,10 @@ function Faturamento() {
             <div className="button" style={{ width: 50, backgroundColor: 'transparent' }}>{''}</div>
           </div>
         </div>
-        {operadoras.map(item => (
+        {operadoras.filter(item => item.id_cliente == cliente.id_cliente).map(item => (
           <div
             key={Math.random()}
-            className={selectedoperadora == item ? 'button-selected' : 'button'}
+            className='button pallete6'
             style={{
               display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
               borderRadius: 5,
@@ -289,10 +289,9 @@ function Faturamento() {
               setselectedoperadora(item);
             }}
           >
-            <div className="button"
+            <div className={selectedoperadora == item ? 'button-selected' : 'button'}
               style={{
                 width: '20vw',
-                backgroundColor: '#006666',
               }}>
               {item.nome_operadora}
             </div>
@@ -603,14 +602,14 @@ function Faturamento() {
         </div>
         {procedimentos.filter(item => item.id_operadora == selectedoperadora.id).map(item => (
           <div
-            className="button"
+            className="button pallete6"
             style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}
             onClick={() => {
               setselectedprocedimento(item);
               setformprocedimento(2);
             }}
           >
-            <div className="button" style={{ width: '10vw', backgroundColor: '#006666' }}>{item.nome_operadora}</div>
+            <div className="button" style={{ width: '10vw' }}>{item.nome_operadora}</div>
             <div className='text2' style={{ width: '10vw' }}>{item.tuss_codigo}</div>
             <div className='text2' style={{ width: '25vw' }}>{item.tuss_terminologia.toUpperCase()}</div>
             <div className='text2' style={{ width: '25vw' }}>{item.rol_ans_descricao}</div>
@@ -675,7 +674,7 @@ function Faturamento() {
           overflowY: 'hidden',
         }}
       >
-        {procedimentos.map(item => (
+        {procedimentos.filter(item => item.id_cliente == cliente.id_cliente).map(item => (
           <div
             key={'exame: ' + item.id}
             id={'btn procedimento faturamento ' + item.id}
@@ -719,7 +718,7 @@ function Faturamento() {
   function ViewProcedimentos() {
     return (
       <div style={{ display: viewprocedimentos == 1 ? 'flex' : 'none', flexDirection: 'column', justifyContent: 'center' }}>
-        <div className="text2">{'PROCEDIMENTOS PARA A OPERADORA ' + selectedoperadora.nome_operadora}</div>
+        <div className="text2" style={{ fontSize: 22, marginTop: 15 }}>{'PROCEDIMENTOS CADASTRADOS PARA A OPERADORA ' + selectedoperadora.nome_operadora}</div>
         <ListProcedimentos></ListProcedimentos>
         <FormProcedimentos></FormProcedimentos>
       </div>
@@ -1224,7 +1223,7 @@ function Faturamento() {
                 <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', width: '100%' }}>
                   <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
                     <div className="button-opaque" style={{
-                      display: 'flex', flexDirection: 'column', justifyContent: 'center', width: 200, minWidth: 200,
+                      display: 'flex', flexDirection: 'column', justifyContent: 'center', width: 300, minWidth: 300,
                       marginRight: 10, alignSelf: 'center',
                     }}>
                       <div style={{ fontSize: 16 }}>{'CONSULTA'}</div>
@@ -1338,13 +1337,13 @@ function Faturamento() {
           {
             procedimentos_mes.sort((a, b) => moment(a.data_exame, 'DD/MM/YYYY - HH:mm') > moment(b.data_exame, 'DD/MM/YYYY - HH:mm') ? 1 : -1).map(item => (
               <div className="button cor3" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', width: '90vw' }}>
-                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', alignSelf: 'flex-start' }}>
-                  <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start' }}>
+                <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between', alignSelf: 'flex-start', width: '100%' }}>
+                  <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', width: '100% ' }}>
                     <div className="button-opaque" style={{
-                      display: 'flex', flexDirection: 'column', justifyContent: 'center', width: 200, minWidth: 200,
-                      marginRight: 10, alignSelf: 'center',
+                      display: 'flex', flexDirection: 'column', justifyContent: 'center', width: 300, minWidth: 300,
+                      marginRight: 10, alignSelf: 'flex-start',
                     }}>
-                      <div style={{ fontSize: 16 }}>{item.nome_exame}</div>
+                      <div style={{ fontSize: 16 }}>{item.nome_exame.substring(0, 20) + '...'}</div>
                       <div>{item.data_exame}</div>
                       <div>{item.particular == 1 ? 'PARTICULAR' : 'CONVÊNIO'}</div>
                     </div>

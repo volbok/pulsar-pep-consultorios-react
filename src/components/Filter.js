@@ -2,6 +2,12 @@
 import React, { useState } from 'react';
 
 function Filter(input_id, setarraylist, list, parameter) {
+
+  const normalizer = (string) => {
+    let newstring = string.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+    return (newstring);
+  }
+
   // eslint-disable-next-line
   const [statefilter, setstatefilter] = useState();
   var timeout = null;
@@ -21,8 +27,9 @@ function Filter(input_id, setarraylist, list, parameter) {
       } else {
         setstatefilter(document.getElementById(input_id).value.toUpperCase());
         // eslint-disable-next-line
-        setarraylist(list.filter(item => eval(parameter).toUpperCase().includes(search.toUpperCase())));
+        setarraylist(list.filter(item => normalizer(eval(parameter)).toUpperCase().includes(normalizer(search).toUpperCase())));
         document.getElementById(input_id).value = search;
+        // normalize
         setTimeout(() => {
           document.getElementById(input_id).focus();
         }, 100);

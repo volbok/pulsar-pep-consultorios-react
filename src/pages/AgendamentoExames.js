@@ -99,7 +99,7 @@ function AgendamentoExames() {
               alignContent: 'flex-start',
             }}
           >
-            {allprocedimentos.map(item => (
+            {allprocedimentos.filter(item => item.id_cliente == cliente.id_cliente).map(item => (
               <div
                 key={'exame: ' + item.id}
                 className='button' style={{ width: 200, height: 120, paddingLeft: 20, paddingRight: 20 }}

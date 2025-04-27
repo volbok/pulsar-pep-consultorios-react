@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import Context from "../pages/Context";
 
 export default function Logo({ height, width, color1 }) {
@@ -7,12 +7,13 @@ export default function Logo({ height, width, color1 }) {
     logocor,
   } = useContext(Context);
 
-  var cor1 = '#008080';
+  // var cor1 = color1;
+  const [cor1, setcor1] = useState(color1);
   var cor2 = 'white';
 
   useEffect(() => {
     //eslint-disable-next-line
-    cor1 = logocor;
+    setcor1(logocor);
   }, [logocor]);
 
   return (

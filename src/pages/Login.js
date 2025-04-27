@@ -60,6 +60,7 @@ function Login() {
       setviewlistaunidades(0);
       loadOperadoras();
       localStorage.setItem('selectdate', moment().format('DD/MM/YYYY'))
+      setlogocor(window.getComputedStyle(document.getElementById('aplicacao')).getPropertyValue('--cor1opaque'));
       if (usuario.id != undefined) {
         setviewinputs(0);
         document.getElementById("login").className = "main login_color_2"
@@ -122,15 +123,17 @@ function Login() {
             } else if (localStorage.getItem('temacores') == 'grey') {
               updateTemaCor(cliente.id_cliente, 'pink');
             } else if (localStorage.getItem('temacores') == 'pink') {
+              updateTemaCor(cliente.id_cliente, 'reddy');
+            } else if (localStorage.getItem('temacores') == 'reddy') {
               updateTemaCor(cliente.id_cliente, 'teal');
             }
             setTimeout(() => {
-              setlogocor(window.getComputedStyle(document.getElementById('aplicacao')).getPropertyValue('--pallete2'));
+              setlogocor(window.getComputedStyle(document.getElementById('aplicacao')).getPropertyValue('--cor1opaque'));
             }, 100);
           }}
         >
         </div>
-      </div>
+      </div >
     )
   }
 
@@ -660,6 +663,7 @@ function Login() {
   const loadTemaCores = (tema) => {
     document.getElementById('aplicacao').className = tema;
     localStorage.setItem('temacores', tema);
+    setlogocor(window.getComputedStyle(document.getElementById('aplicacao')).getPropertyValue('--pallete2'));
   }
 
   function ClienteSelector() {
@@ -1014,7 +1018,8 @@ function Login() {
           src={cliente.logo}
           style={{
             display: cliente.logo != undefined ? "flex" : "none",
-            height: 0.3 * 539,
+            // height: 0.3 * 539,
+            width: 0.5 * mobilewidth,
             alignSelf: 'center',
             borderStyle: 'solid',
             borderWidth: 3,

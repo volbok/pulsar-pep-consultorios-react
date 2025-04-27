@@ -1134,14 +1134,6 @@ function Documentos() {
             zIndex: 10,
             height: 280,
           }}
-          onMouseOver={() => {
-            document.getElementById('menucolinha').style.backgroundColor = '#85c1e9';
-            document.getElementById('menucolinha').style.borderColor = '#85c1e9';
-          }}
-          onMouseLeave={() => {
-            document.getElementById('menucolinha').style.backgroundColor = '#a6cee8';
-            document.getElementById('menucolinha').style.borderColor = '#a6cee8';
-          }}
         >
           {putcolinha('HOJE', moment().format('DD/MM/YYYY'))}
           {putcolinha('PACIENTE', objpaciente != null ? objpaciente.nome_paciente : '')}

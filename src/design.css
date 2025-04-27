@@ -98,6 +98,35 @@ td {
   --placeholder: #a6acaf;
 }
 
+.reddy {
+  --pallete1: #ffffff;
+  --pallete2: #FDDADF;
+  --pallete3: #FEE9EC;
+  --pallete4: #FEE9EC;
+  --pallete5: #FEE9EC;
+  --pallete6: #F9909E;
+  --pallete7: #F3213C;
+  --pallete8: #F9909E;
+
+  --login2: #F3213C;
+  --login1: #F9909E;
+
+  --cor0: white !important;
+  --cor1: #F3213C !important;
+  --cor2: #FEE9EC;
+
+  --cor1hover: #F5465C !important;
+  --cor1opaque: #F9909E !important;
+
+  --cor3: var(--pallete8);
+  --cor5: var(--pallete5);
+
+  --texto1: #F3213C !important;
+  --texto2: #ffffff;
+  --texto3: #000000 !important;
+  --placeholder: #a6acaf;
+}
+
 .grey {
   --pallete1: white;
   --pallete2: #dbdddd;
@@ -878,7 +907,8 @@ body {
 .gadget {
   display: flex;
   opacity: 0.5;
-  background-color: var(--blue);
+  background-color: var(--pallete2);
+  border-color: var(--pallete2);
   border-radius: 5px;
   padding: 10px;
   color: white;
@@ -894,9 +924,9 @@ body {
 
 .menucolinha {
   display: flex;
-  opacity: 1;
-  background-color: #a6cee8 !important;
-  border-color: #a6cee8 !important;
+  opacity: 0.5;
+  background-color: var(--pallete2) !important;
+  border-color: var(--pallete2) !important;
   border-radius: 5px;
   font-weight: bold;
   transition: 300ms, 300ms ease-in-out;
@@ -905,8 +935,8 @@ body {
 .menucolinha:hover {
   display: flex;
   opacity: 1;
-  background-color: var(--blue) !important;
-  border-color: var(--blue) !important;
+  background-color: var(--pallete2);
+  border-color: var(--pallete2);
   border-radius: 5px;
   font-weight: bold;
   transition: 300ms, 300ms ease-in-out;
