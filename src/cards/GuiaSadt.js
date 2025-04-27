@@ -75,10 +75,12 @@ function GuiaSadt() {
   const [uf_solicitante, setuf_solicitante] = useState('');
   const [codigo_cbo, setcodigo_cbo] = useState('');
 
+  const [logos, setlogos] = useState([]);
   const loadOperadoras = () => {
     axios.get(html + 'all_operadoras').then((response) => {
       var y = [];
       var x = response.data.rows;
+      setlogos(x);
       y = x.filter(item => parseInt(item.id) == parseInt(objatendimento.convenio_id));
       let operadora = y.pop();
       setoperadora(operadora);
@@ -94,6 +96,48 @@ function GuiaSadt() {
         setcodigo_prestador(operadora.codigo_prestador);
       }
     })
+  }
+
+  const [selectlogo, setselectlogo] = useState(0);
+  function SelectLogo() {
+    return (
+      <div div className="fundo"
+        onClick={() => setselectlogo(0)}
+        style={{
+          display: selectlogo == 1 ? 'flex' : 'none',
+          flexDirection: 'column', justifyContent: 'center'
+        }}>
+        <div
+          className="janela scroll"
+          style={{ height: '80vh', width: '60vw' }}
+          onClick={(e) => e.stopPropagation()}>
+          {logos.map(item => (
+            <div className='button'
+              onClick={() => {
+                setlogo(item.logo_operadora);
+                setselectlogo(0);
+              }}
+              style={{
+                display: 'flex',
+                flexDirection: 'row',
+                width: 'calc(100% - 20px)',
+                justifyContent: 'space-between',
+                minHeight: 75, maxHeight: 75
+              }}>
+              <div style={{ marginLeft: 10 }}>{item.nome_operadora}</div>
+              <img alt="" src={item.logo_operadora}
+                style={{
+                  display: 'flex',
+                  height: 70,
+                  borderRadius: 5,
+                  marginRight: 2.5,
+                }}
+              ></img>
+            </div>
+          ))}
+        </div>
+      </div>
+    )
   }
 
   const loadExames = () => {
@@ -154,7 +198,56 @@ function GuiaSadt() {
       </div>
     )
   }
-  const editcampovalor = (titulo, valor, tamanho, grow) => {
+
+  const updateLaboratorio = (item) => {
+    let codigo = item.codigo_exame;
+    let descricao = item.nome_exame;
+
+    if (localStorage.getItem('campo_selecionado') == '25 - CÓDIGO DO PROCEDIMENTO OU ITEM ASSISTENCIAL') {
+      codigo = localStorage.getItem('novo_valor');
+      console.log('NOVO CÓDIGO: ' + codigo);
+    }
+
+    if (localStorage.getItem('campo_selecionado') == '26 - DESCRIÇÃO') {
+      descricao = localStorage.getItem('novo_valor');
+      console.log('NOVA DESCRIÇÃO: ' + descricao);
+    }
+
+    var obj = {
+      id_paciente: item.id_paciente,
+      id_atendimento: atendimento,
+      data_pedido: item.data_pedido,
+      data_resultado: null,
+      codigo_exame: codigo,
+      nome_exame: descricao,
+      material: null,
+      resultado: null,
+      status: null,
+      profissional: usuario.id,
+      unidade_medida: null,
+      vref_min: null,
+      vref_max: null,
+      obs: null,
+      random: item.random,
+      array_campos: null,
+      metodo: null,
+    }
+    console.log(obj);
+    axios.post(html + 'update_laboratorio/' + item.id, obj).then(() => {
+      console.log('REGISTRO ATUALIZADO COM SUCESSO');
+      loadLaboratorio(item.random);
+    });
+  }
+
+  const loadLaboratorio = (random) => {
+    axios.get(html + 'atendimento_laboratorio/' + atendimento).then((response) => {
+      var x = response.data.rows;
+      setlaboratorio(x.filter(item => item.random == random));
+    });
+  }
+
+  const editcampovalor = (titulo, valor, tamanho, grow, item) => {
+    let timeout = null;
     return (
       <div id="versão para edição"
         style={{
@@ -184,6 +277,22 @@ function GuiaSadt() {
           onFocus={(e) => (e.target.placeholder = "")}
           onBlur={(e) => (e.target.placeholder = { titulo })}
           defaultValue={valor != null && valor.length > 50 ? valor.toUpperCase().slice(0, 55) + '...' : valor != null && valor.length < 51 ? valor.toUpperCase() : ''}
+          onKeyUp={(e) => {
+            console.log(e.target.value);
+            let valor = e.target.value;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => {
+              // updatelaboratorio...
+              localStorage.setItem('campo_selecionado', titulo);
+              localStorage.setItem('novo_valor', valor);
+              console.log(localStorage.getItem('campo_selecionado'));
+              console.log(localStorage.getItem('novo_valor'));
+              if (item != null) {
+                updateLaboratorio(item);
+                console.log('ATUALIZANDO REGISTRO DE LABORATÓRIO.');
+              }
+            }, 1000);
+          }}
           style={{ backgroundColor: 'transparent', margin: 0, marginTop: 2, marginLeft: -2.5, padding: 0 }}
         >
         </input>
@@ -242,6 +351,7 @@ function GuiaSadt() {
             display: 'flex', flexDirection: 'row', justifyContent: 'space-between',
           }}>
           <img alt="" src={logo}
+            onClick={() => { setselectlogo(1); console.log('CLICA IMAGEM') }}
             style={{
               display: logo != '' ? 'flex' : 'none',
               height: 70,
@@ -642,7 +752,7 @@ function GuiaSadt() {
       iniciogrupo = iniciogrupo + 5;
       paginas = paginas - 1;
     }
-    console.log(grupolaboratorio.map(item => 'PÁGINA: ' + item.pagina + ' PROCEDIMENTOS: ' + item.procedimentos.length));
+    // console.log(grupolaboratorio.map(item => 'PÁGINA: ' + item.pagina + ' PROCEDIMENTOS: ' + item.procedimentos.length));
     setarrayguias(grupolaboratorio);
 
     setTimeout(() => {
@@ -848,6 +958,7 @@ function GuiaSadt() {
               backgroundColor: 'white', borderColor: 'white',
               overflowX: 'scroll', overflowY: 'scroll',
             }}>
+            <SelectLogo></SelectLogo>
             <div id="botões da guia"
               style={{
                 display: 'flex',
@@ -881,6 +992,7 @@ function GuiaSadt() {
                   alignSelf: "center",
                 }}
                 onClick={() => {
+
                   printDiv();
                   // printjsPdf();
                 }}
@@ -901,6 +1013,7 @@ function GuiaSadt() {
                 alignItems: 'center',
               }}>
                 <img alt="" src={logo}
+                  onClick={() => { setselectlogo(1); console.log('CLICA IMAGEM') }}
                   style={{
                     display: logo != '' ? 'flex' : 'none',
                     height: 70,
@@ -962,10 +1075,10 @@ function GuiaSadt() {
                   margin: 2.5,
                 }}>
                 {laboratorio.map(item => (
-                  <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', width: '100%' }}>
+                  <div key={'LABORATÓRIO ' + item.id} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', width: '100%' }}>
                     {editcampovalor('24 - TABELA', '21', 50, 0)}
-                    {editcampovalor('25 - CÓDIGO DO PROCEDIMENTO OU ITEM ASSISTENCIAL', item.codigo_exame, 130, 0)}
-                    {editcampovalor('26 - DESCRIÇÃO', item.nome_exame, '', 1)}
+                    {editcampovalor('25 - CÓDIGO DO PROCEDIMENTO OU ITEM ASSISTENCIAL', item.codigo_exame, 130, 0, item)}
+                    {editcampovalor('26 - DESCRIÇÃO', item.nome_exame, '', 1, item)}
 
                   </div>
                 ))}

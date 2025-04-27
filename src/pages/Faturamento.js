@@ -1282,7 +1282,7 @@ function Faturamento() {
                 </div>
                 <div id="elementos do faturamento convênio - atendimentos (consultas)"
                   className="grid"
-                  style={{ display: item.faturamento_codigo_procedimento == 'CONVÊNIO' ? 'grid' : 'none' }}>
+                  style={{ display: item.faturamento_codigo_procedimento == 'CONVÊNIO' ? 'grid' : 'none', width: '100%' }}>
                   {localfaturamento.filter(valor => valor.atendimento_id == item.id_atendimento).map(valor => (
                     <div
                       className={valor.status_pagamento == 'ABERTO' ? 'button yellow' : valor.status_pagamento == 'VENCIDO' ? 'button red' : 'button green'}
@@ -1845,6 +1845,15 @@ function Faturamento() {
   const printRelatorioFaturamento = () => {
     let tabledataconsultas = [];
     let tabledataprocedimentos = [];
+
+    let totais = {
+      columns: [
+        { text: 'TOTAL EM ABERTO: R$ ' + parseFloat(dadosdonutaberto), alignment: 'center', bold: true, margin: [0, 10, 0, 0] },
+        { text: 'TOTAL RECEBIDO: R$ ' + parseFloat(dadosdonutpago), alignment: 'center', bold: true, margin: [0, 10, 0, 0] },
+        { text: 'TOTAL VENCIDO: R$ ' + parseFloat(dadosdonutvencido), alignment: 'center', bold: true, margin: [0, 10, 0, 0] },
+      ]
+    }
+
     // eslint-disable-next-line
     atendimentos_mes.sort((a, b) => moment(a.data_inicio) > moment(b.data_inicio) ? 1 : -1).filter(item => item.nome_paciente != 'HORÁRIO BLOQUEADO!').map(item => {
       let tablefaturamentos = [];
@@ -2090,6 +2099,7 @@ function Faturamento() {
               ],
             },
           },
+          [totais],
         ],
       }
     } else if (tabledataconsultas.length > 0 && tabledataprocedimentos.length == 0) {
@@ -2193,8 +2203,8 @@ function Faturamento() {
                 ...tabledataconsultas
               ],
             },
-
           },
+          [totais],
         ],
       }
     } else if (tabledataconsultas.length == 0 && tabledataprocedimentos.length > 0) {
@@ -2299,6 +2309,7 @@ function Faturamento() {
               ],
             },
           },
+          [totais],
         ],
       }
     } else {
