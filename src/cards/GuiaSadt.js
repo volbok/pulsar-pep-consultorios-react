@@ -3,11 +3,15 @@ import React, { useContext, useState, useEffect } from 'react';
 import Context from '../pages/Context';
 import axios from 'axios';
 // import moment from "moment";
-
+import toast from '../functions/toast';
 // imagens.
 import back from '../images/back.png';
 import imprimir from '../images/imprimir.png';
 import html2pdf from 'html2pdf.js'
+
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
+pdfMake.addVirtualFileSystem(pdfFonts);
 
 function GuiaSadt() {
 
@@ -22,6 +26,7 @@ function GuiaSadt() {
     usuario,
     cliente,
     objpaciente,
+    settoast,
   } = useContext(Context);
 
   useEffect(() => {
@@ -752,28 +757,129 @@ function GuiaSadt() {
       iniciogrupo = iniciogrupo + 5;
       paginas = paginas - 1;
     }
-    // console.log(grupolaboratorio.map(item => 'PÁGINA: ' + item.pagina + ' PROCEDIMENTOS: ' + item.procedimentos.length));
-    setarrayguias(grupolaboratorio);
 
+    var nome_guia = 'GUIA SADT - ' + cliente.nome_cliente;
+    var opt = {
+      margin: 0.1,
+      filename: nome_guia,
+      image: { type: 'jpeg', quality: 1 },
+      html2canvas: { scale: 2 },
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' },
+      pagebreak: { mode: 'css' }
+    };
+
+    // intervalo para que a array grupolaboratorio seja montada.
     setTimeout(() => {
-
-      var nome_guia = 'GUIA SADT - ' + cliente.nome_cliente;
-      var opt = {
-        margin: 0.1,
-        filename: nome_guia,
-        image: { type: 'jpeg', quality: 1 },
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' },
-        pagebreak: { mode: 'css' }
-      };
-
-      grupolaboratorio.map(item => {
-        var element = document.getElementById('GUIA SADT ' + item.pagina).innerHTML;
-        html2pdf().set(opt).from(element).output('dataurlnewwindow');
-        return null;
-      })
-    }, 3000);
+      toast(settoast, 'PREPARANDO GUIAS PARA IMPRESSÃO, AGUARDE...', '#EC7063', 3000);
+      // criando as guias de impressão, que ficam ocultas via css. 
+      setarrayguias(grupolaboratorio);
+      // intervalo para que as guias para impressão sejam "renderizadas".
+      setTimeout(() => {
+        grupolaboratorio.map(item => {
+          setTimeout(() => {
+            console.log('PREPARANDO PÁGINA: ' + item.pagina);
+            toast(settoast, 'LANÇANDO PÁGINA ' + item.pagina + ' ...', '#EC7063', 3000);
+            // capturando cada guia para impressão como elemento HTML e lançando para PDF.
+            var element = document.getElementById('GUIA SADT ' + item.pagina).innerHTML;
+              html2pdf().set(opt).from(element).output('dataurlnewwindow');
+            // mountpdf(item);
+          }, 1000);
+          return null;
+        })
+      }, 1000 * paginas.length);
+    }, 1000 * paginas.length);
   }
+
+  // ALTERNATIVA: ## CRIAÇÃO DE DOCUMENTOS EM PDFMAKE E ASSINATURA DIGITAL ## //
+  // construção do pdf.
+  /*
+  const mountpdf = (item) => {
+    let arrayprocedimentos = item.procedimentos;
+
+    const campo = (header, valor, largura) => {
+      return (
+        {
+          table: {
+            headerRows: 1,
+            widths: [largura],
+            body: [
+              [
+                {
+                  stack: [
+                    { text: header, style: 'header' },
+                    { text: valor, style: 'row' }
+                  ]
+                }
+              ],
+            ],
+          },
+          width: largura,
+        }
+      )
+    }
+
+    const docDefinition = {
+      pageSize: 'A4',
+      pageOrientation: 'landscape',
+      pageMargins: 10,
+
+      // estilização CSS.
+      styles: {
+        header: {
+          fontSize: 4,
+          bold: true,
+          alignment: 'left',
+        },
+        row: {
+          fontSize: 6,
+          bold: false,
+          alignment: 'left'
+        }
+      },
+
+      content: [
+        {
+          // cabeçalho da guia SADT
+          columns: [
+            {
+              image: logo,
+              height: 20,
+              width: 50,
+              alignment: 'center',
+            },
+            {
+              text: 'GUIA DE SERVIÇO PROFISSIONAL / SERVIÇO AUXILIAR DE DIAGNÓSTICO E TERAPIA - SP/SADT',
+              width: '*',
+              fontSize: 12,
+              bold: true,
+              alignment: 'center',
+            },
+            campo('2 - Nº DA GUIA DO PRESTADOR', '______________________________', 100)
+          ],
+          columnGap: 10,
+          margin: [20, 10, 20, 20]
+        },
+        // colocar todos os procedimentos da guia.
+        arrayprocedimentos.map(item => (
+          {
+            columns: [
+              campo('24 - TABELA', item.codigo_exame, 50),
+              campo('25 - CÓDIGO DO PROCEDIMENTO OU ITEM ASSISTENCIAL', item.nome_exame, '*')
+            ],
+            columnGap: 12,
+          }
+        )),
+
+      ],
+    }
+    // utilizando a lib pdfmake para gerar o pdf e converter em base64.
+    setTimeout(() => {
+      const pdfDocGenerator = pdfMake.createPdf(docDefinition);
+      pdfDocGenerator.open();
+    }, 3000);
+
+  }
+  */
 
   function GrupoExamesExecutados(numero) {
     return (

@@ -673,20 +673,34 @@ function Exames() {
 
   return (
     <div id="tela para solicitação de exames complementares e liberação de guia TISS SADT."
+      className='card-aberto'
       style={{
         display: card == 'exames' || card == 'guia-sadt' ? 'flex' : 'none',
         flexDirection: 'row',
-        justifyContent: 'center',
-        height: '100%',
+        justifyContent: 'space-between',
+        position: 'relative',
+        padding: 0,
+        margin: 0,
         width: '100%',
+        height: window.innerHeight - 117.5,
+        alignContent: 'flex-end',
+        alignItems: 'flex-end',
       }}
     >
-      <ListaDeExames></ListaDeExames>
-      <PackExames></PackExames>
-      <FormInsertExame></FormInsertExame>
-      <GuiaSadt></GuiaSadt>
-      <InsertModeloExames></InsertModeloExames>
-      <ModelosPackExames></ModelosPackExames>
+      <div style={{
+        display: 'flex',
+        flexDirection: 'row',
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+      }}>
+        <ListaDeExames></ListaDeExames>
+        <PackExames></PackExames>
+        <FormInsertExame></FormInsertExame>
+        <GuiaSadt></GuiaSadt>
+        <InsertModeloExames></InsertModeloExames>
+        <ModelosPackExames></ModelosPackExames>
+      </div>
     </div>
   )
 }
