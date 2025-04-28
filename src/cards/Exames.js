@@ -436,7 +436,7 @@ function Exames() {
           borderRadius: 5,
           alignSelf: 'flex-end',
         }}>
-        {laboratorio.filter(item => item.random == localStorage.getItem('random')).map(item => (
+        {laboratorio.filter(item => item.random == localStorage.getItem('random')).sort((a, b) => a.nome_exame < b.nome_exame ? -1 : 1).map(item => (
           <div className='cor3'
             style={{
               display: 'flex', flexDirection: 'row',

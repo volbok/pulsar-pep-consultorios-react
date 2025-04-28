@@ -249,7 +249,7 @@ function GuiaSadt() {
   const loadLaboratorio = (random) => {
     axios.get(html + 'atendimento_laboratorio/' + atendimento).then((response) => {
       var x = response.data.rows;
-      setlaboratorio(x.filter(item => item.random == random));
+      setlaboratorio(x.filter(item => item.random == random).sort((a, b) => a.nome_exame < b.nome_exame ? -1 : 1));
     });
   }
 
@@ -1182,7 +1182,7 @@ function GuiaSadt() {
                   padding: 2.5,
                   margin: 2.5,
                 }}>
-                {laboratorio.map(item => (
+                {laboratorio.sort((a, b) => a.nome_exame < b.nome_exame ? -1 : 1).map(item => (
                   <div key={'LABORATÓRIO ' + item.id} style={{ display: 'flex', flexDirection: 'row', justifyContent: 'flex-start', width: '100%' }}>
                     {editcampovalor('24 - TABELA', '21', 50, 0)}
                     {editcampovalor('25 - CÓDIGO DO PROCEDIMENTO OU ITEM ASSISTENCIAL', item.codigo_exame, 130, 0, item)}
