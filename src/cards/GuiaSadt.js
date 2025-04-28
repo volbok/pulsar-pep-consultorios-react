@@ -83,9 +83,11 @@ function GuiaSadt() {
   const [logos, setlogos] = useState([]);
   const loadOperadoras = () => {
     axios.get(html + 'all_operadoras').then((response) => {
+      console.log(cliente.id_cliente);
       var y = [];
       var x = response.data.rows;
-      setlogos(x);
+      var z = x.filter(item => item.id_cliente == cliente.id_cliente);
+      setlogos(z);
       y = x.filter(item => parseInt(item.id) == parseInt(objatendimento.convenio_id));
       let operadora = y.pop();
       setoperadora(operadora);
@@ -781,7 +783,7 @@ function GuiaSadt() {
             toast(settoast, 'LANÇANDO PÁGINA ' + item.pagina + ' ...', '#EC7063', 3000);
             // capturando cada guia para impressão como elemento HTML e lançando para PDF.
             var element = document.getElementById('GUIA SADT ' + item.pagina).innerHTML;
-              html2pdf().set(opt).from(element).output('dataurlnewwindow');
+            html2pdf().set(opt).from(element).output('dataurlnewwindow');
             // mountpdf(item);
           }, 1000);
           return null;
