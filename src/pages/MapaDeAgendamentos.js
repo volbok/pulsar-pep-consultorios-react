@@ -310,22 +310,44 @@ function MapaDeAgendamentos() {
   }
 
   const insertAtendimento = (paciente, registro) => {
-    var obj = {
-      data_inicio: registro.data_inicio,
-      data_termino: registro.faturamento_codigo_procedimento == 'PARTICULAR' ? moment(registro.data_inicio).add(cliente.tempo_consulta_particular, 'minutes') : moment(registro.data_inicio).add(cliente.tempo_consulta_convenio, 'minutes'),
-      problemas: null,
-      id_paciente: paciente.id_paciente,
-      id_unidade: 5, // ATENÇÃO: 5 é o ID da unidade ambulatorial.
-      nome_paciente: paciente.nome_paciente,
-      leito: null,
-      situacao: 3, // 3 = atendimento ambulatorial (consulta).
-      id_cliente: cliente.id_cliente,
-      classificacao: null,
-      id_profissional: registro.id_profissional,
-      convenio_id: paciente.convenio_codigo,
-      convenio_carteira: paciente.convenio_carteira,
-      faturamento_codigo_procedimento: registro.faturamento_codigo_procedimento,
-    };
+    var obj = null;
+    console.log(localStorage.getItem('retorno'));
+    let retorno = localStorage.getItem('retorno'); 
+    if (retorno == 'SIM') {
+      obj = {
+        data_inicio: registro.data_inicio,
+        data_termino: moment(registro.data_inicio).add(15, 'minutes'),
+        problemas: null,
+        id_paciente: paciente.id_paciente,
+        id_unidade: 5, // ATENÇÃO: 5 é o ID da unidade ambulatorial.
+        nome_paciente: paciente.nome_paciente,
+        leito: null,
+        situacao: 3, // 3 = atendimento ambulatorial (consulta).
+        id_cliente: cliente.id_cliente,
+        classificacao: null,
+        id_profissional: registro.id_profissional,
+        convenio_id: paciente.convenio_codigo,
+        convenio_carteira: paciente.convenio_carteira,
+        faturamento_codigo_procedimento: registro.faturamento_codigo_procedimento,
+      };
+    } else {
+      obj = {
+        data_inicio: registro.data_inicio,
+        data_termino: registro.faturamento_codigo_procedimento == 'PARTICULAR' ? moment(registro.data_inicio).add(cliente.tempo_consulta_particular, 'minutes') : moment(registro.data_inicio).add(cliente.tempo_consulta_convenio, 'minutes'),
+        problemas: null,
+        id_paciente: paciente.id_paciente,
+        id_unidade: 5, // ATENÇÃO: 5 é o ID da unidade ambulatorial.
+        nome_paciente: paciente.nome_paciente,
+        leito: null,
+        situacao: 3, // 3 = atendimento ambulatorial (consulta).
+        id_cliente: cliente.id_cliente,
+        classificacao: null,
+        id_profissional: registro.id_profissional,
+        convenio_id: paciente.convenio_codigo,
+        convenio_carteira: paciente.convenio_carteira,
+        faturamento_codigo_procedimento: registro.faturamento_codigo_procedimento,
+      };
+    }
     axios
       .post(html + "insert_consulta", obj)
       .then(() => {
@@ -1104,9 +1126,26 @@ function MapaDeAgendamentos() {
                             onClick={() => {
                               setviewlistapacientes(1);
                               localStorage.setItem('horario_consulta', JSON.stringify(item));
+                              localStorage.setItem('retorno', 'NÃO');
                             }}
                           >
                             AGENDAR CONSULTA
+                          </div>
+                          <div className='button'
+                            style={{
+                              display: window.innerWidth < mobilewidth ? 'none' : 'flex',
+                              maxHeight: 30, minHeight: 30,
+                              alignSelf: 'center',
+                              padding: 2.5,
+                              paddingLeft: 10, paddingRight: 10,
+                            }}
+                            onClick={() => {
+                              setviewlistapacientes(1);
+                              localStorage.setItem('horario_consulta', JSON.stringify(item));
+                              localStorage.setItem('retorno', 'SIM');
+                            }}
+                          >
+                            AGENDAR RETORNO
                           </div>
                         </div>
                       </div>

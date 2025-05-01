@@ -181,7 +181,7 @@ function AgendamentoConsultas() {
   function geraWhatsapp(id, inicio, especialista) {
 
     let paciente = pacientes.filter(item => item.id_paciente == id).pop();
-    
+
     const gzappy_url_envia_mensagem = "https://api.gzappy.com/v1/message/send-message/";
     const instance_id = 'L05K3GC2YX03DGWYLDKZQW5L';
     const instance_token = '2d763c00-4b6d-4842-99d7-cb32ea357a80';
@@ -199,7 +199,7 @@ function AgendamentoConsultas() {
     cleanphone = cleanphone.replace("-", "");
     cleanphone = cleanphone.replace(" ", "");
     cleanphone = "55" + cleanphone;
-    
+
     fetch(gzappy_url_envia_mensagem, {
       method: 'POST',
       headers: {
@@ -271,7 +271,7 @@ function AgendamentoConsultas() {
   }
 
   const checkUpdateConsultas = (item, data_inicio) => {
-    
+
     let inicio = moment(data_inicio, 'DD/MM/YYYY - HH:mm');
     let termino = null;
     if (localStorage.getItem('PARTICULAR') == 'PARTICULAR') {
@@ -324,22 +324,44 @@ function AgendamentoConsultas() {
   }
 
   const insertAtendimento = (inicio) => {
-    var obj = {
-      data_inicio: moment(inicio, 'DD/MM/YYYY - HH:mm'),
-      data_termino: localStorage.getItem('PARTICULAR') == 'PARTICULAR' ? moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_particular, 'minutes') : moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_convenio, 'minutes'),
-      problemas: null,
-      id_paciente: paciente.id_paciente,
-      id_unidade: 5, // ATENÇÃO: 5 é o ID da unidade ambulatorial.
-      nome_paciente: paciente.nome_paciente,
-      leito: null,
-      situacao: 3, // 3 = atendimento ambulatorial (consulta).
-      id_cliente: hospital,
-      classificacao: null,
-      id_profissional: selectedespecialista.id_usuario,
-      convenio_id: paciente.convenio_codigo,
-      convenio_carteira: paciente.convenio_carteira,
-      faturamento_codigo_procedimento: localStorage.getItem('PARTICULAR'),
-    };
+    var obj = null;
+    console.log(localStorage.getItem('retorno'));
+    let retorno = localStorage.getItem('retorno');
+    if (retorno == 'SIM') {
+      obj = {
+        data_inicio: moment(inicio, 'DD/MM/YYYY - HH:mm'),
+        data_termino: moment(inicio, 'DD/MM/YYYY - HH:mm').add(15, 'minutes'),
+        problemas: null,
+        id_paciente: paciente.id_paciente,
+        id_unidade: 5, // ATENÇÃO: 5 é o ID da unidade ambulatorial.
+        nome_paciente: paciente.nome_paciente,
+        leito: null,
+        situacao: 3, // 3 = atendimento ambulatorial (consulta).
+        id_cliente: hospital,
+        classificacao: null,
+        id_profissional: selectedespecialista.id_usuario,
+        convenio_id: paciente.convenio_codigo,
+        convenio_carteira: paciente.convenio_carteira,
+        faturamento_codigo_procedimento: localStorage.getItem('PARTICULAR'),
+      };
+    } else {
+      obj = {
+        data_inicio: moment(inicio, 'DD/MM/YYYY - HH:mm'),
+        data_termino: localStorage.getItem('PARTICULAR') == 'PARTICULAR' ? moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_particular, 'minutes') : moment(inicio, 'DD/MM/YYYY - HH:mm').add(cliente.tempo_consulta_convenio, 'minutes'),
+        problemas: null,
+        id_paciente: paciente.id_paciente,
+        id_unidade: 5, // ATENÇÃO: 5 é o ID da unidade ambulatorial.
+        nome_paciente: paciente.nome_paciente,
+        leito: null,
+        situacao: 3, // 3 = atendimento ambulatorial (consulta).
+        id_cliente: hospital,
+        classificacao: null,
+        id_profissional: selectedespecialista.id_usuario,
+        convenio_id: paciente.convenio_codigo,
+        convenio_carteira: paciente.convenio_carteira,
+        faturamento_codigo_procedimento: localStorage.getItem('PARTICULAR'),
+      };
+    }
     axios
       .post(html + "insert_consulta", obj)
       .then(() => {

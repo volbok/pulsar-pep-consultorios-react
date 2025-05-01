@@ -1756,10 +1756,27 @@ function Cadastro() {
               // identificando o procedimento com o código TUSS para consulta médica.
               localStorage.setItem('codigo_procedimento', '10101012');
               localStorage.setItem("prevScreen", 'CADASTRO');
+              localStorage.setItem('retorno', 'NÃO');
               setviewopcoesconvenio(1);
             }}
           >
             AGENDAR CONSULTA
+          </div>
+          <div id="botão para agendar retorno"
+            className="button"
+            style={{
+              display: vieweditpaciente == 2 || window.innerWidth < mobilewidth ? 'none' : 'flex',
+              width: 100, height: 100, alignSelf: 'center'
+            }}
+            onClick={() => {
+              // identificando o procedimento com o código TUSS para consulta médica.
+              localStorage.setItem('codigo_procedimento', '10101012');
+              localStorage.setItem("prevScreen", 'CADASTRO');
+              localStorage.setItem("retorno", "SIM");
+              setviewopcoesconvenio(1);
+            }}
+          >
+            AGENDAR RETORNO
           </div>
           <div id="botão para agendar exame"
             className="button"
