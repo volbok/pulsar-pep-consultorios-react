@@ -133,10 +133,12 @@ function App() {
   const [laboratorio, setlaboratorio] = useState([]);
   const [listalaboratorio, setlistalaboratorio] = useState([]);
   const [arrayespecialidades, setarrayespecialidades] = useState([
+    'ALERGOLOGIA',
     'ANESTESIOLOGIA',
     'CARDIOLOGIA',
     'CLÍNICA MÉDICA',
     'CIRURGIA GERAL',
+    'ENDOCRINOLOGIA',
     'GENETICISTA',
     'PEDIATRA',
     'UROLOGIA',
