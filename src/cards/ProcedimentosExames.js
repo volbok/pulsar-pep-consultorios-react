@@ -65,10 +65,20 @@ function ProcedimentosExames() {
   // carregando registros de procedimentos realizados para o cliente.
   const [procedimentos_cliente, setprocedimentos_cliente] = useState([]);
   const loadFaturamentoClinicaProcedimentos = () => {
+    /*
     axios
       .get(html + "list_faturamento_clinicas_procedimentos/" + cliente.id_cliente)
       .then((response) => {
         setprocedimentos_cliente(response.data.rows);
+      });
+    */
+    axios
+      .get(html + "all_procedimentos")
+      .then((response) => {
+        var x = [];
+        x = response.data.rows;
+        setprocedimentos_cliente(response.data.rows);
+        console.log(x.length);
       });
   };
 
@@ -811,7 +821,7 @@ function ProcedimentosExames() {
           canvas.height = 0.7 * img.height;
         }
         document.getElementById('notionblock_canvas ' + random).getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
-        
+
         // criando o elemento imagem e transferindo a figura para o elemento imagem.
         element_image = document.createElement("img");
         element_image.id = 'notionblock_img ' + random;
@@ -1143,19 +1153,19 @@ function ProcedimentosExames() {
           <div className='grid'>
             {procedimentos_cliente.map(item => (
               <div
-                key={item.codiigo_tuss}
+                key={item.tuss_codigo}
                 className='button'
                 style={{
                   width: 200, minWidth: 200, maxWidth: 200,
                   height: 200, minHeight: 200, maxHeight: 200,
                 }}
                 onClick={() => {
-                  setselectedexame(item.nome_procedimento);
+                  setselectedexame(item.tuss_rol_ans_descricao);
                   loadExamesAgendados();
                   setviewseletorexame(0);
                 }}
               >
-                {item.nome_procedimento}
+                {item.tuss_rol_ans_descricao}
               </div>
             ))}
           </div>
