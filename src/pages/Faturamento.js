@@ -493,7 +493,7 @@ function Faturamento() {
             SELECIONE A LOGO
           </div>
           <canvas id="canvas"
-            style={{ backgroundColor: 'white', borderRadius: 5, margin: 10, marginTop: 5, alignSelf: 'center' }}>
+            style={{ backgroundColor: 'white', borderRadius: 5, margin: 10, marginTop: 5, alignSelf: 'center', maxWidth: '50vw' }}>
           </canvas>
           <div className="button green"
             onClick={() => {
@@ -518,7 +518,7 @@ function Faturamento() {
   }
 
   // FATURAMENTO - OPERADORAS DE SAÚDE //
-  // cadastro de operadoras de saúde.
+  // cadastro de procedimentos.
   const loadProcedimentos = () => {
     axios.get(html + 'all_procedimentos').then((response) => {
       setprocedimentos(response.data.rows);
@@ -544,7 +544,9 @@ function Faturamento() {
     }
     axios.post(html + 'insert_procedimento', obj).then(() => {
       console.log('PROCEDIMENTO REGISTRADO COM SUCESSO.');
-      loadProcedimentos();
+      setTimeout(() => {
+        loadProcedimentos();
+      }, 2000);
       setformprocedimento(0);
     })
   }
@@ -576,8 +578,8 @@ function Faturamento() {
   const deleteProcedimento = (item) => {
     axios.get(html + 'delete_procedimento/' + item.id).then(() => {
       console.log('PROCEDIMENTO EXCLUÍDO COM SUCESSO');
-      loadProcedimentos();
       setformprocedimento(0);
+      loadProcedimentos();
     })
   }
 
@@ -611,7 +613,9 @@ function Faturamento() {
           >
             <div className="button" style={{ width: '10vw' }}>{item.nome_operadora}</div>
             <div className='text2' style={{ width: '10vw' }}>{item.tuss_codigo}</div>
-            <div className='text2' style={{ width: '25vw' }}>{item.tuss_terminologia.toUpperCase()}</div>
+            <div style={{ display: 'flex', flexDirection: 'row', width: '25vw', justifyContent: 'flex-start' }}>
+              <div className='text2' style={{ justifyContent: 'flex-start', textAlign: 'left', }}>{item.tuss_terminologia.toUpperCase()}</div>
+            </div>
             <div className='text2' style={{ width: '25vw' }}>{item.rol_ans_descricao}</div>
             <div style={{ display: 'flex', flexDirection: 'row' }}>
               <div className="button green" style={{ width: 50 }}

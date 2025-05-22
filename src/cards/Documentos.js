@@ -172,7 +172,7 @@ function Documentos() {
                   { text: cliente.razao_social, alignment: 'left', fontSize: 10, width: 300 },
                   { text: 'ENDEREÇO: ' + cliente.endereco, alignment: 'left', fontSize: 6, width: 300 },
                   { text: 'TELEFONE: ' + cliente.telefone, alignment: 'left', fontSize: 6, width: 300 },
-                  { text: 'EMAIL: ' + cliente.email, alignment: 'left', fontSize: 6, width: 300 },
+                  { text: cliente.email !== '' ? 'EMAIL: ' + cliente.email : '', alignment: 'left', fontSize: 6, width: 300 },
                 ],
                 width: '*'
               },

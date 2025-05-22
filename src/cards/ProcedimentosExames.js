@@ -39,7 +39,8 @@ function ProcedimentosExames() {
   // context.
   const {
     html,
-    objpaciente,
+    pacientes, setpacientes,
+    setobjpaciente, objpaciente,
     usuario,
     tipodocumento, settipodocumento,
     selecteddocumento, setselecteddocumento,
@@ -53,6 +54,7 @@ function ProcedimentosExames() {
   useEffect(() => {
     if (pagina == 'PROCEDIMENTOS') {
       // loadExamesAgendados();
+      loadPacientes();
       loadModelos();
       loadFaturamentoClinicaProcedimentos();
     }
@@ -61,6 +63,15 @@ function ProcedimentosExames() {
 
   // history (router).
   let history = useHistory();
+
+  const loadPacientes = () => {
+    axios
+      .get(html + "list_pacientes")
+      .then((response) => {
+        setpacientes(response.data.rows);
+        console.log(response.data.rows);
+      })
+  };
 
   // carregando registros de procedimentos realizados para o cliente.
   const [procedimentos_cliente, setprocedimentos_cliente] = useState([]);
@@ -218,19 +229,14 @@ function ProcedimentosExames() {
         strike: { decoration: 'lineThrough' },
         p: { margin: 5, padding: 5 },
         ul: { marginBottom: 5, marginLeft: 5 },
-        table: {
-          // border: [false, false, false, false],
-          alignment: 'center',
-          padding: 5,
-          margin: 5,
-          // fillColor: '#EEEEEE',
-          textAlign: 'center',
-          widths: ['20%', '60%', '20%'],
-        }, // tentar centralizar tabela, aumentar width, arredondar bordas e retirar as bordas.
-        td: { color: 'white', border: [false, false, false, false] },
-        th: { bold: true, width: '100%', fillColor: '#b2bebe', border: [false, false, false, false], alignment: 'center', alignSelf: 'center', borderRadius: '5px', margin: [0, 0, 0, 0], padding: [10, 10, 10, 10] },
+
+        // tentar centralizar tabela, aumentar width, arredondar bordas e retirar as bordas.
+        th: { fillColor: '#ffffff', width: '400px', bold: true, border: [true, true, true, true], margin: [0, 0, 0, 0], padding: [10, 10, 10, 10] },
+        td: { fillColor: '#ffffff', width: '400px', bold: false, border: [true, true, true, true], margin: [0, 0, 0, 0], padding: [10, 10, 10, 10] },
         img: { alignment: 'center', alignSelf: 'center' }
       },
+      tableAutoSize: true,  // Enable automatic table sizing
+      window: window,  // Required for Node.js usage
     }
 
     const converted = htmlToPdfmake(document.getElementById('notionfieldexames').innerHTML, options);
@@ -252,7 +258,7 @@ function ProcedimentosExames() {
                   { text: cliente.razao_social, alignment: 'left', fontSize: 10, width: 300 },
                   { text: 'ENDEREÇO: ' + cliente.endereco, alignment: 'left', fontSize: 6, width: 300 },
                   { text: 'TELEFONE: ' + cliente.telefone, alignment: 'left', fontSize: 6, width: 300 },
-                  { text: 'EMAIL: ' + cliente.email, alignment: 'left', fontSize: 6, width: 300 },
+                  { text: cliente.email !== '' ? 'EMAIL: ' + cliente.email : '', alignment: 'left', fontSize: 6, width: 300 },
                 ],
                 width: '*'
               },
@@ -260,6 +266,9 @@ function ProcedimentosExames() {
             ],
             columnGap: 10,
           },
+          { text: JSON.parse(localStorage.getItem('paciente')).nome_paciente, alignment: 'left', fontSize: 14, margin: [0, 10, 0, 0] },
+          { text: JSON.parse(localStorage.getItem('paciente')).nome_mae_paciente != null && JSON.parse(localStorage.getItem('paciente')).nome_mae_paciente != '' ? 'NOME DA MÃE: ' + JSON.parse(localStorage.getItem('paciente')).nome_mae_paciente : '', alignment: 'left', fontSize: 10, margin: [0, 5, 0, 5] },
+          { text: JSON.parse(localStorage.getItem('paciente')).dn_paciente != null && JSON.parse(localStorage.getItem('paciente')).dn_paciente != '' ? 'DN: ' + moment(JSON.parse(localStorage.getItem('paciente')).dn_paciente).format('DD/MM/YYYY') : '', alignment: 'left', fontSize: 10, margin: [0, 0, 0, 10] },
           {
             "canvas": [{
               "lineColor": "gray",
@@ -578,7 +587,7 @@ function ProcedimentosExames() {
       </div>
     )
     // eslint-disable-next-line
-  }, [documentos]);
+  }, [documentos, pacientes]);
 
   // função que adiciona elementos ao NotionField.
   const appendElement = (tipo) => {
@@ -588,6 +597,8 @@ function ProcedimentosExames() {
       insereFirstP();
     } else if (tipo == 'imagem') {
       insereImagem();
+    } else if (tipo == 'tabela') {
+      insereTabela();
     }
   }
 
@@ -856,6 +867,104 @@ function ProcedimentosExames() {
     })
   }
 
+  const insereTabela = () => {
+    console.log('insere tabela');
+    let random = Math.random();
+
+    // criando a tabela.
+    let table = document.createElement("table");
+    table.id = 'notionblock_tabela ' + random;
+    // table.style.marginLeft = 'auto';
+    // table.style.marginRight = 'auto';
+    table.style.outline = 'none';
+
+    // criando o cabeçalho.
+    const thead = document.createElement('thead');
+    table.appendChild(thead);
+
+    const headerRow = document.createElement('tr');
+    thead.appendChild(headerRow);
+
+    const header1 = document.createElement('th');
+    header1.style.width = '40%';
+    header1.style.borderStyle = 'solid';
+    header1.style.borderRadius = '0px';
+    header1.style.borderWidth = '1px';
+    header1.style.borderColor = 'black';
+    header1.style.color = 'black';
+    header1.style.backgroundColor = 'white';
+    header1.textContent = 'ASPECTO';
+    headerRow.appendChild(header1);
+
+    const header2 = document.createElement('th');
+    header2.style.width = '20%';
+    header2.style.borderStyle = 'solid';
+    header2.style.borderRadius = '0px';
+    header2.style.borderWidth = '1px';
+    header2.style.borderColor = 'black';
+    header2.style.color = 'black';
+    header2.style.backgroundColor = 'white';
+    header2.textContent = 'VALOR';
+    headerRow.appendChild(header2);
+
+    const header3 = document.createElement('th');
+    header3.style.width = '40%';
+    header3.style.borderStyle = 'solid';
+    header3.style.borderRadius = '0px';
+    header3.style.borderWidth = '1px';
+    header3.style.borderColor = 'black';
+    header3.style.color = 'black';
+    header3.style.backgroundColor = 'white';
+    header3.textContent = 'REF';
+    headerRow.appendChild(header3);
+
+    // criando as linhas.
+    const tbody = document.createElement('tbody');
+    table.appendChild(tbody);
+
+    const row1 = document.createElement('tr');
+    tbody.appendChild(row1);
+
+    const cell1 = document.createElement('td');
+    cell1.style.width = '40%';
+    cell1.style.borderStyle = 'solid';
+    cell1.style.borderWidth = '1px';
+    cell1.style.borderColor = 'black';
+    cell1.style.color = 'black';
+    cell1.style.backgroundColor = 'white';
+    cell1.textContent = 'AE';
+    row1.appendChild(cell1);
+
+    const cell2 = document.createElement('td');
+    cell1.style.width = '20%';
+    cell2.style.borderStyle = 'solid';
+    cell2.style.borderWidth = '1px';
+    cell2.style.borderColor = 'black';
+    cell2.style.color = 'black';
+    cell2.style.backgroundColor = 'white';
+    cell2.textContent = '?';
+    row1.appendChild(cell2);
+
+    const cell3 = document.createElement('td');
+    cell1.style.width = '40%';
+    cell3.style.borderStyle = 'solid';
+    cell3.style.borderWidth = '1px';
+    cell3.style.borderColor = 'black';
+    cell3.style.color = 'black';
+    cell3.style.backgroundColor = 'white';
+    cell3.textContent = '30 A 40';
+    row1.appendChild(cell3);
+
+    table.setAttribute('contenteditable', "true");
+
+    if (document.getElementById('notionfieldexames').nextElementSibling != null) {
+      document.getElementById("notionfieldexames").insertBefore(table, document.activeElement.nextSibling);
+    } else {
+      document.getElementById("notionfieldexames").appendChild(table);
+    }
+
+  }
+
   // menu de atalho, com informações importantes para inserção no texto.
   const [viewmenucolinha, setviewmenucolinha] = useState(0);
   const putcolinha = (tag, dado) => {
@@ -1016,6 +1125,12 @@ function ProcedimentosExames() {
           >
             IMAGEM
           </div>
+          <div className='button' for="uploader"
+            onClick={() => appendElement('tabela')}
+            style={{ width: 100, height: 25, minHeight: 25, maxHeight: 25 }}
+          >
+            TABELA
+          </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
           <div className='button'
@@ -1137,7 +1252,7 @@ function ProcedimentosExames() {
     axios.get(html + 'list_exames_clinicas/' + cliente.id_cliente).then((response) => {
       var x = [];
       x = response.data.rows;
-      // console.log(x);
+      console.log(x);
       setlistexamesagendados(x);
     })
   }
@@ -1151,7 +1266,7 @@ function ProcedimentosExames() {
         className='fundo' onClick={() => setviewseletorexame(0)}>
         <div className='janela scroll'>
           <div className='grid'>
-            {procedimentos_cliente.map(item => (
+            {procedimentos_cliente.filter(item => item.id_cliente == cliente.id_cliente).map(item => (
               <div
                 key={item.tuss_codigo}
                 className='button'
@@ -1284,6 +1399,10 @@ function ProcedimentosExames() {
                   localStorage.setItem('id_exame_selecionado', item.id);
                   setdocumentos(x.filter(documento => documento.tipo_documento == 'PROCEDIMENTO ' + item.nome_exame + '-' + item.id_paciente).sort((a, b) => moment(a.data) < moment(b.data) ? 1 : -1));
                   selector('lista de exames agendados para laudar', 'botão exame agendado ' + item.id, 100);
+                  let pct = pacientes.filter(valor => valor.id_paciente == item.id_paciente).pop();
+                  setobjpaciente(pct);
+                  localStorage.setItem('paciente', JSON.stringify(pct));
+                  console.log(pacientes.filter(valor => valor.id_paciente == item.id_paciente).pop());
                 })
               }}
             >
@@ -1414,7 +1533,7 @@ function ProcedimentosExames() {
       </div>
     )
     // eslint-disable-next-line
-  }, [listexamesagendados, setdocumentos, settipodocumento, selectedexame]);
+  }, [listexamesagendados, setdocumentos, settipodocumento, selectedexame, pacientes]);
 
   const [viewselectmodelos, setviewselectmodelos] = useState(0);
   function ViewSelectModelos() {

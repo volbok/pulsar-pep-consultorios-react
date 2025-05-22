@@ -121,7 +121,7 @@ td {
   --cor3: var(--pallete8);
   --cor5: var(--pallete5);
 
-  --texto1: #F3213C !important;
+  --texto1: #000000 !important;
   --texto2: #ffffff;
   --texto3: #000000 !important;
   --placeholder: #a6acaf;
@@ -482,6 +482,25 @@ td {
 .erase {
   display: none !important;
   visibility: hidden !important;
+}
+
+.notion_table {
+  display: inline-block;
+  flex-direction: row;
+  justify-content: center;
+  align-self: center;
+  margin: 2.5px !important;
+  margin-top: 5px !important;
+  margin-bottom: 5px !important;
+  padding: 2.5px !important;
+  border-radius: 2.5px;
+  transition: 500ms, 500ms ease-in-out;
+  font-weight: bolder !important;
+  text-align: center !important;
+  text-wrap: wrap !important;
+  line-break: normal !important;
+  word-wrap: break-word;
+  vertical-align: top;
 }
 
 /* GUIAS TISS */
