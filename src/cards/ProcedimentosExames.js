@@ -216,7 +216,7 @@ function ProcedimentosExames() {
     const options = {
       defaultStyles: {
         // Override default element styles that are defined below
-        div: { margin: 2.5, padding: 2.5, fillColor: '#a4bcbc', alignment: 'left', fontSize: 10 },
+        div: { margin: 2.5, marginTop: 2.5, marginBottom: 2.5, padding: 2.5, fillColor: '#a4bcbc', fontSize: 10 },
         b: { bold: true },
         strong: { bold: true },
         u: {
@@ -226,11 +226,11 @@ function ProcedimentosExames() {
         s: { decoration: 'lineThrough' },
         em: { italics: true },
         i: { italics: true },
-        h1: { bold: true, margin: 10 },
+        h1: { bold: true, margin: 10, fontSize: 12, alignment: 'center' },
         h2: { bold: true, margin: 10, paddin: 10, fillColor: '#EEEEEE', alignment: 'center' },
         a: { color: 'blue', decoration: 'underline' },
         strike: { decoration: 'lineThrough' },
-        p: { margin: 0, padding: 0, fontSize: 12, bold: true },
+        p: { margin: 2.5, marginTop: 2.5, marginBottom: 2.5, padding: 2.5, fontSize: 10, bold: false },
         ul: { marginBottom: 5, marginLeft: 5 },
 
         // tentar centralizar tabela, aumentar width, arredondar bordas e retirar as bordas.
@@ -662,6 +662,7 @@ function ProcedimentosExames() {
     document.getElementById(element.id).focus();
     localStorage.setItem('element', element.id);
   };
+  /*
   const insereP = () => {
     let random = Math.random();
     if (document.activeElement.nextSibling != null && !document.activeElement.id.includes('notionblock')) {
@@ -682,10 +683,11 @@ function ProcedimentosExames() {
       localStorage.setItem('element', element.id);
     }
   }
+  */
   const insereTitulo = () => {
     console.log('insere título');
     let random = Math.random();
-    let element = document.createElement("p");
+    let element = document.createElement("h1");
     element.id = 'notionblock ' + random;
     element.className = 'notion_titulo';
     element.style.textAlign = 'center';
@@ -1175,11 +1177,15 @@ function ProcedimentosExames() {
     rowconstructor(tbody, row10);
 
     deletetabela(tabela, tbody, 3);
+    document.getElementById("notionfieldexames").insertBefore(tabela, document.getElementById("notionfieldexames").firstChild)
+    /*
     if (document.getElementById('notionfieldexames').nextElementSibling != null) {
       document.getElementById("notionfieldexames").insertBefore(tabela, document.activeElement.nextSibling);
     } else {
       document.getElementById("notionfieldexames").appendChild(tabela);
     }
+    */
+
   }
 
   // menu de atalho, com informações importantes para inserção no texto.
@@ -1247,8 +1253,8 @@ function ProcedimentosExames() {
     console.log(document.activeElement.parentElement.id);
     localStorage.setItem('element', document.activeElement.id);
     if (e.keyCode == 13) { // tecla enter
-      e.preventDefault();
-      insereP();
+      // e.preventDefault();
+      // insereP();
     } else if (e.keyCode == 8) { // tecla backspace
       // verificando se o conteúdo do elemento é vazio, para realizar sua exclusão.
       if (document.activeElement.textContent.length == 0) {
@@ -1269,23 +1275,29 @@ function ProcedimentosExames() {
         }
       }
     } else if (e.keyCode == 38) { // tecla seta para cima
+      /*
       if (document.activeElement.previousSibling != null) {
         let id = document.getElementById(document.activeElement.id).previousSibling.id;
         document.getElementById(id).focus();
         localStorage.setItem('element', id);
       }
+      */
     } else if (e.keyCode == 40) { // tecla seta para baixo
+      /*
       if (document.activeElement.nextSibling != null) {
         let id = document.getElementById(document.activeElement.id).nextSibling.id;
         document.getElementById(id).focus();
         localStorage.setItem('element', id);
       }
+      */
     } else if (e.keyCode == 226) { // tecla de barra invertida >> "\" (para o menucolinhas!).
+      /*
       e.preventDefault();
       let caret = new VanillaCaret(document.getElementById(document.activeElement.id));
       // console.log(caret.getPos());
       localStorage.setItem('caret', caret.getPos());
       setviewmenucolinha(1);
+      */
     } else if (e.keyCode == 46) { // tecla delete
       // verificando se o conteúdo do elemento é vazio, para realizar sua exclusão.
       if (document.activeElement.textContent.length == 0) {

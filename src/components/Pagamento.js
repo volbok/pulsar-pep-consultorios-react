@@ -30,6 +30,10 @@ function Pagamento() {
 
   let arrayformaspagamento = [
     {
+      forma: 'DINHEIRO',
+      lancamentos: 1,
+    },
+    {
       forma: 'PIX',
       lancamentos: 1,
     },

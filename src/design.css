@@ -45,6 +45,16 @@ td {
   max-width: '20%' !important;
 }
 
+p {
+  margin: 2.5px;
+  font-size: 12px;
+}
+
+h1 {
+  margin: 5px;
+  font-size: 14px;
+}
+
 .teal {
   --pallete1: #b2d8d8;
   --pallete2: #66b2b2;
@@ -219,9 +229,9 @@ td {
   display: inline-block;
   flex-direction: row;
   justify-content: left;
-  margin: 2.5px !important;
-  margin-top: 2.5px !important;
-  margin-bottom: 2.5px !important;
+  margin: 5px !important;
+  margin-top: 5px !important;
+  margin-bottom: 5px !important;
   padding: 2.5px !important;
   border-radius: 2.5px;
   white-space: nowrap;

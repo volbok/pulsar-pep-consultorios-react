@@ -214,14 +214,15 @@ function Faturamento() {
     })
   };
 
-  const insertOperadora = () => {
+  const insertOperadora = (imagem) => {
     let obj = {
       nome_operadora: document.getElementById("inputNomeOperadora").value.toUpperCase(),
       registro_ans: document.getElementById("inputRegistroAns").value,
       telefone: document.getElementById("inputTelefone").value.toUpperCase(),
       email: document.getElementById("inputEmail").value,
       codigo_prestador: document.getElementById("inputCodigoPrestador").value,
-      logo_operadora: null,
+      logo_operadora: imagem,
+      id_cliente: cliente.id_cliente,
     }
     axios.post(html + 'insert_operadora', obj).then(() => {
       console.log('OPERADORA REGISTRADA COM SUCESSO.');
@@ -239,6 +240,7 @@ function Faturamento() {
       email: document.getElementById("inputEmail").value.toUpperCase(),
       codigo_prestador: document.getElementById("inputCodigoPrestador").value.toUpperCase(),
       logo_operadora: imagem,
+      id_cliente: cliente.id_cliente
     }
     axios.post(html + 'update_operadora/' + item.id, obj).then(() => {
       console.log('OPERADORA ATUALIZADA COM SUCESSO.');
@@ -498,7 +500,8 @@ function Faturamento() {
           <div className="button green"
             onClick={() => {
               if (formoperadora == 1) {
-                insertOperadora();
+                let imagem = document.getElementById('canvas').toDataURL('image/jpeg');
+                insertOperadora(imagem);
               } else {
                 let imagem = document.getElementById('canvas').toDataURL('image/jpeg');
                 updateOperadora(selectedoperadora, imagem);
