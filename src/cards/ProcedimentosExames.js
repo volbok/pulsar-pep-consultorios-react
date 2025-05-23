@@ -42,7 +42,8 @@ function ProcedimentosExames() {
     pacientes, setpacientes,
     setobjpaciente, objpaciente,
     usuario,
-    tipodocumento, settipodocumento,
+    // tipodocumento,
+    settipodocumento,
     selecteddocumento, setselecteddocumento,
     documentos, setdocumentos,
     setdialogo,
@@ -135,7 +136,9 @@ function ProcedimentosExames() {
       texto: item.texto,
       status: 0,
       tipo_documento: item.tipo_documento,
-      profissional: usuario.nome_usuario + '\n' + usuario.conselho + '\n' + usuario.n_conselho
+      profissional: usuario.nome_usuario,
+      conselho: usuario.conselho + ': ' + usuario.n_conselho,
+      id_profissional: usuario.id,
     }
     axios.post(html + 'insert_documento', obj).then(() => {
       let exame = JSON.parse(localStorage.getItem('exame_selecionado'));
@@ -213,7 +216,7 @@ function ProcedimentosExames() {
     const options = {
       defaultStyles: {
         // Override default element styles that are defined below
-        div: { margin: 10, padding: 10, fillColor: '#a4bcbc', alignment: 'left' },
+        div: { margin: 2.5, padding: 2.5, fillColor: '#a4bcbc', alignment: 'left', fontSize: 10 },
         b: { bold: true },
         strong: { bold: true },
         u: {
@@ -227,7 +230,7 @@ function ProcedimentosExames() {
         h2: { bold: true, margin: 10, paddin: 10, fillColor: '#EEEEEE', alignment: 'center' },
         a: { color: 'blue', decoration: 'underline' },
         strike: { decoration: 'lineThrough' },
-        p: { margin: 5, padding: 5 },
+        p: { margin: 0, padding: 0, fontSize: 12, bold: true },
         ul: { marginBottom: 5, marginLeft: 5 },
 
         // tentar centralizar tabela, aumentar width, arredondar bordas e retirar as bordas.
@@ -303,7 +306,7 @@ function ProcedimentosExames() {
                 {
                   stack: [
                     { text: '________________________________', alignment: 'center', width: 400 },
-                    { text: localStorage.getItem("dono_documento"), width: '*', alignment: 'center', fontSize: 8 },
+                    { text: JSON.parse(localStorage.getItem("dono_documento")).profissional + ' - ' + JSON.parse(localStorage.getItem("dono_documento")).conselho, width: '*', alignment: 'center', fontSize: 8 },
                   ], with: '30%',
                 },
                 { text: 'PÁGINA ' + currentPage.toString() + ' DE ' + pageCount, fontSize: 8 },
@@ -453,6 +456,7 @@ function ProcedimentosExames() {
               onClick={() => {
                 localStorage.setItem("documento_notion", item.id);
                 setselecteddocumento(item);
+                localStorage.setItem('dono_documento', JSON.stringify(item));
                 document.getElementById('notionfieldexames').innerHTML = item.texto;
                 selector("lista de documentos exames", 'documento exames ' + item.id, 100);
                 setTimeout(() => {
@@ -463,7 +467,7 @@ function ProcedimentosExames() {
                   }
                 }, 100);
               }}
-              style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: 180 }}
+              style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', minHeight: 180, padding: 20 }}
             >
               <div id="botões"
                 style={{
@@ -577,10 +581,11 @@ function ProcedimentosExames() {
                   ></img>
                 </div>
               </div>
-              <div>{tipodocumento}</div>
-              <div>{moment(item.data).format('DD/MM/YY')}</div>
+              <div title={item.tipo_documento}>{item.tipo_documento.replace('-', '').replace(/[0-9]/g, '')}</div>
+              <div style={{ marginTop: 10 }}>{moment(item.data).format('DD/MM/YY')}</div>
               <div>{moment(item.data).format('HH:mm')}</div>
               <div style={{ fontSize: 12, marginTop: 10, whiteSpace: 'pre-wrap', marginBottom: 5 }}>{'DR(A) ' + item.profissional}</div>
+              <div style={{ fontSize: 12, marginTop: 0, whiteSpace: 'pre-wrap', marginBottom: 5 }}>{item.conselho}</div>
             </div>
           ))}
         </div>
@@ -597,8 +602,8 @@ function ProcedimentosExames() {
       insereFirstP();
     } else if (tipo == 'imagem') {
       insereImagem();
-    } else if (tipo == 'tabela') {
-      insereTabela();
+    } else if (tipo == 'tabelaEco') {
+      insereTabelaEco();
     }
   }
 
@@ -680,7 +685,7 @@ function ProcedimentosExames() {
   const insereTitulo = () => {
     console.log('insere título');
     let random = Math.random();
-    let element = document.createElement("div");
+    let element = document.createElement("p");
     element.id = 'notionblock ' + random;
     element.className = 'notion_titulo';
     element.style.textAlign = 'center';
@@ -867,102 +872,314 @@ function ProcedimentosExames() {
     })
   }
 
-  const insereTabela = () => {
+  // ## TABELAS ##
+  // construtor de tabela.
+  const tableconstructor = (table, tbody) => {
+    // criando tabela.
     console.log('insere tabela');
     let random = Math.random();
-
-    // criando a tabela.
-    let table = document.createElement("table");
     table.id = 'notionblock_tabela ' + random;
-    // table.style.marginLeft = 'auto';
-    // table.style.marginRight = 'auto';
     table.style.outline = 'none';
-
-    // criando o cabeçalho.
-    const thead = document.createElement('thead');
-    table.appendChild(thead);
-
-    const headerRow = document.createElement('tr');
-    thead.appendChild(headerRow);
-
-    const header1 = document.createElement('th');
-    header1.style.width = '40%';
-    header1.style.borderStyle = 'solid';
-    header1.style.borderRadius = '0px';
-    header1.style.borderWidth = '1px';
-    header1.style.borderColor = 'black';
-    header1.style.color = 'black';
-    header1.style.backgroundColor = 'white';
-    header1.textContent = 'ASPECTO';
-    headerRow.appendChild(header1);
-
-    const header2 = document.createElement('th');
-    header2.style.width = '20%';
-    header2.style.borderStyle = 'solid';
-    header2.style.borderRadius = '0px';
-    header2.style.borderWidth = '1px';
-    header2.style.borderColor = 'black';
-    header2.style.color = 'black';
-    header2.style.backgroundColor = 'white';
-    header2.textContent = 'VALOR';
-    headerRow.appendChild(header2);
-
-    const header3 = document.createElement('th');
-    header3.style.width = '40%';
-    header3.style.borderStyle = 'solid';
-    header3.style.borderRadius = '0px';
-    header3.style.borderWidth = '1px';
-    header3.style.borderColor = 'black';
-    header3.style.color = 'black';
-    header3.style.backgroundColor = 'white';
-    header3.textContent = 'REF';
-    headerRow.appendChild(header3);
-
-    // criando as linhas.
-    const tbody = document.createElement('tbody');
     table.appendChild(tbody);
+  }
+  // construtor de título.
+  const titleconstructor = (tbody, colspam, valor, fontsize) => {
+    let row = document.createElement('tr');
+    let cell = document.createElement('td');
+    cell.colSpan = colspam;
+    cell.style.width = '100%';
+    cell.style.borderStyle = 'solid';
+    cell.style.borderRadius = '0px';
+    cell.style.borderWidth = '1px';
+    cell.style.borderColor = 'black';
+    cell.style.color = 'black';
+    cell.style.backgroundColor = 'white';
+    cell.textContent = valor;
+    cell.style.fontSize = fontsize;
+    cell.style.fontWeight = 'bold';
+    cell.style.textAlign = 'center';
+    cell.style.padding = '5px';
+    tbody.appendChild(row);
+    row.appendChild(cell);
+  }
+  // construtor de linhas.
+  const rowconstructor = (tbody, arrayvalues) => {
+    let row = document.createElement('tr');
+    tbody.appendChild(row);
+    arrayvalues.map(item => {
+      const cell = document.createElement('td');
+      cell.style.width = item.width;
+      cell.style.borderStyle = 'solid';
+      cell.style.borderWidth = '1px';
+      cell.style.borderColor = 'black';
+      cell.style.color = 'black';
+      cell.style.backgroundColor = 'white';
+      cell.textContent = item.value;
+      cell.style.fontSize = '12px';
+      if (item.colspan > 0) {
+        cell.colSpan = item.colspan;
+      }
+      row.appendChild(cell);
+      return null;
+    });
+  }
+  // botão para excluir tabela.
+  const deletetabela = (table, tbody, colspam) => {
+    let row = document.createElement('tr');
+    let cell = document.createElement('td');
+    cell.style.width = '100%';
+    cell.style.borderStyle = 'transparent';
+    cell.style.backgroundColor = 'white';
+    cell.colSpan = colspam;
 
-    const row1 = document.createElement('tr');
-    tbody.appendChild(row1);
+    // inserindo botão para deletar a tabela.
+    let element_delete = document.createElement("div");
+    element_delete.className = 'notion_img_button_red';
+    element_delete.style.alignSelf = 'center';
+    let image_delete = document.createElement('img');
+    image_delete.src = deletar;
+    image_delete.width = 25;
+    image_delete.height = 25;
+    image_delete.alt = "";
+    element_delete.appendChild(image_delete);
 
-    const cell1 = document.createElement('td');
-    cell1.style.width = '40%';
-    cell1.style.borderStyle = 'solid';
-    cell1.style.borderWidth = '1px';
-    cell1.style.borderColor = 'black';
-    cell1.style.color = 'black';
-    cell1.style.backgroundColor = 'white';
-    cell1.textContent = 'AE';
-    row1.appendChild(cell1);
+    // função que permite excluir a tabela.
+    element_delete.addEventListener('click', function () {
+      table.remove();
+    })
 
-    const cell2 = document.createElement('td');
-    cell1.style.width = '20%';
-    cell2.style.borderStyle = 'solid';
-    cell2.style.borderWidth = '1px';
-    cell2.style.borderColor = 'black';
-    cell2.style.color = 'black';
-    cell2.style.backgroundColor = 'white';
-    cell2.textContent = '?';
-    row1.appendChild(cell2);
+    tbody.appendChild(row);
+    row.appendChild(cell);
+    cell.appendChild(element_delete);
+    cell.contentEditable = 'false';
+  }
 
-    const cell3 = document.createElement('td');
-    cell1.style.width = '40%';
-    cell3.style.borderStyle = 'solid';
-    cell3.style.borderWidth = '1px';
-    cell3.style.borderColor = 'black';
-    cell3.style.color = 'black';
-    cell3.style.backgroundColor = 'white';
-    cell3.textContent = '30 A 40';
-    row1.appendChild(cell3);
+  // TABELA PARA ECOCARDIOGRAMA.
+  // edite para a preferência de cada cliente, e depois crie um modelo definitivo para o cliente.
+  const insereTabelaEco = () => {
+    let row1 = [
+      {
+        item: 1,
+        width: '50%',
+        value: 'MÉDICO SOLICITANTE:',
+        colspan: 2,
+      },
+      {
+        item: 3,
+        width: '25%',
+        value: 'DATA DO EXAME: ' + moment().format('DD/MM/YYYY'),
+        colspan: 0,
+      }
+    ];
+    let row2 = [
+      {
+        item: 1,
+        width: '50%',
+        value: 'PACIENTE: ' + JSON.parse(localStorage.getItem('paciente')).nome_paciente,
+        colspan: 0,
+      },
+      {
+        item: 2,
+        width: '25%',
+        value: JSON.parse(localStorage.getItem('paciente')).sexo != '' ? 'SEXO: ' + JSON.parse(localStorage.getItem('paciente')).sexo : '',
+        colspan: 0,
+      },
+      {
+        item: 3,
+        width: '25%',
+        value: JSON.parse(localStorage.getItem('paciente')).dn_paciente != '' ? 'DN: ' + moment(JSON.parse(localStorage.getItem('paciente')).dn_paciente).format('DD/MM/YYYY') : '',
+        colspan: 0,
+      }
+    ];
+    let row3 = [
+      {
+        item: 1,
+        width: '50%',
+        value: 'DIÂMETRO DIASTÓLICO',
+        colspan: 0,
+      },
+      {
+        item: 2,
+        width: '25%',
+        value: '',
+        colspan: 0,
+      },
+      {
+        item: 3,
+        width: '25%',
+        value: '35 a 56 mm',
+        colspan: 0,
+      }
+    ];
+    let row4 = [
+      {
+        item: 1,
+        width: '50%',
+        value: 'DIÂMETRO SISTÓLICO',
+        colspan: 0,
+      },
+      {
+        item: 2,
+        width: '25%',
+        value: '',
+        colspan: 0,
+      },
+      {
+        item: 3,
+        width: '25%',
+        value: '20 a 35 mm',
+        colspan: 0,
+      }
+    ];
+    let row5 = [
+      {
+        item: 1,
+        width: '50%',
+        value: 'FRAÇÃO DE EJEÇÃO',
+        colspan: 0,
+      },
+      {
+        item: 2,
+        width: '25%',
+        value: '',
+        colspan: 0,
+      },
+      {
+        item: 3,
+        width: '25%',
+        value: '> 55%',
+        colspan: 0,
+      }
+    ];
+    let row6 = [
+      {
+        item: 1,
+        width: '50%',
+        value: 'ESPESSURA DO SEPTO INTERVENTRICULAR',
+        colspan: 0,
+      },
+      {
+        item: 2,
+        width: '25%',
+        value: '',
+        colspan: 0,
+      },
+      {
+        item: 3,
+        width: '25%',
+        value: '7 a 11 mm',
+        colspan: 0,
+      }
+    ];
+    let row7 = [
+      {
+        item: 1,
+        width: '50%',
+        value: 'ESPESSURA DA PAREDE POSTERIOR',
+        colspan: 0,
+      },
+      {
+        item: 2,
+        width: '25%',
+        value: '',
+        colspan: 0,
+      },
+      {
+        item: 3,
+        width: '25%',
+        value: '7 a 11 mm',
+        colspan: 0,
+      }
+    ];
+    let row8 = [
+      {
+        item: 1,
+        width: '50%',
+        value: 'MASSA INDEXADA',
+        colspan: 0,
+      },
+      {
+        item: 2,
+        width: '25%',
+        value: '',
+        colspan: 0,
+      },
+      {
+        item: 3,
+        width: '25%',
+        value: '',
+        colspan: 0,
+      }
+    ];
+    let row9 = [
+      {
+        item: 1,
+        width: '50%',
+        value: 'DIÂMETRO',
+        colspan: 0,
+      },
+      {
+        item: 2,
+        width: '25%',
+        value: '',
+        colspan: 0,
+      },
+      {
+        item: 3,
+        width: '25%',
+        value: 'até 40 mm',
+        colspan: 0,
+      }
+    ];
+    let row10 = [
+      {
+        item: 1,
+        width: '50%',
+        value: 'RAIZ AÓRTICA',
+        colspan: 0,
+      },
+      {
+        item: 2,
+        width: '25%',
+        value: '',
+        colspan: 0,
+      },
+      {
+        item: 3,
+        width: '25%',
+        value: 'até 37 mm',
+        colspan: 0,
+      }
+    ];
 
-    table.setAttribute('contenteditable', "true");
 
+    let tabela = document.createElement('table');
+    let tbody = document.createElement('tbody');
+    tabela.setAttribute('contenteditable', "true");
+
+    tableconstructor(tabela, tbody);
+    titleconstructor(tbody, 3, 'ECODOPPLERCARDIOGRAFIA COM MAPEAMENTO EM CORES', '14px');
+    rowconstructor(tbody, row1);
+    rowconstructor(tbody, row2);
+    titleconstructor(tbody, 3, 'MEDIDAS', '13px');
+    titleconstructor(tbody, 3, 'VENTRÍCULO ESQUERDO', '12px');
+    rowconstructor(tbody, row3);
+    rowconstructor(tbody, row4);
+    rowconstructor(tbody, row5);
+    rowconstructor(tbody, row6);
+    rowconstructor(tbody, row7);
+    rowconstructor(tbody, row8);
+    titleconstructor(tbody, 3, 'ÁTRIO ESQUERDO', '12px');
+    rowconstructor(tbody, row9);
+    titleconstructor(tbody, 3, 'AORTA', '12px');
+    rowconstructor(tbody, row10);
+
+    deletetabela(tabela, tbody, 3);
     if (document.getElementById('notionfieldexames').nextElementSibling != null) {
-      document.getElementById("notionfieldexames").insertBefore(table, document.activeElement.nextSibling);
+      document.getElementById("notionfieldexames").insertBefore(tabela, document.activeElement.nextSibling);
     } else {
-      document.getElementById("notionfieldexames").appendChild(table);
+      document.getElementById("notionfieldexames").appendChild(tabela);
     }
-
   }
 
   // menu de atalho, com informações importantes para inserção no texto.
@@ -1126,10 +1343,10 @@ function ProcedimentosExames() {
             IMAGEM
           </div>
           <div className='button' for="uploader"
-            onClick={() => appendElement('tabela')}
+            onClick={() => appendElement('tabelaEco')}
             style={{ width: 100, height: 25, minHeight: 25, maxHeight: 25 }}
           >
-            TABELA
+            TABELA ECO
           </div>
         </div>
         <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'center' }}>
@@ -1275,6 +1492,7 @@ function ProcedimentosExames() {
                   height: 200, minHeight: 200, maxHeight: 200,
                 }}
                 onClick={() => {
+                  setdocumentos([]);
                   setselectedexame(item.tuss_rol_ans_descricao);
                   loadExamesAgendados();
                   setviewseletorexame(0);

@@ -233,6 +233,7 @@ td {
   word-wrap: break-word;
   overflow-wrap: break-word;
   vertical-align: top;
+  font-size: 12px;
 }
 
 .notion_p:focus {
@@ -590,6 +591,27 @@ td {
     line-break: normal !important;
     word-wrap: break-word;
     vertical-align: top;
+  }
+
+  .notion_p {
+    display: inline-block;
+    flex-direction: row;
+    justify-content: left;
+    margin: 0.5px !important;
+    margin-top: 0.5px !important;
+    margin-bottom: 0.5px !important;
+    padding: 0.5px !important;
+    border-radius: 0px;
+    white-space: nowrap;
+    word-break: normal;
+    transition: 500ms, 500ms ease-in-out;
+    text-align: left;
+    text-wrap: wrap !important;
+    line-break: normal !important;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+    vertical-align: top;
+    font-size: 12px;
   }
 
 }
