@@ -208,6 +208,7 @@ function ProcedimentosExames() {
       setviewselectmodelos(0);
       loadModelos();
       loadNotionDocs(exame);
+      console.log(exame.nome_exame);
     })
   }
 
@@ -246,7 +247,7 @@ function ProcedimentosExames() {
     const docDefinition = {
       pageSize: 'A4',
       pageOrientation: 'portrait',
-      pageMargins: [40, 200, 40, 120],
+      pageMargins: [40, 150, 40, 120],
       header: {
         stack: [
           {
@@ -269,23 +270,20 @@ function ProcedimentosExames() {
             ],
             columnGap: 10,
           },
-          { text: JSON.parse(localStorage.getItem('paciente')).nome_paciente, alignment: 'left', fontSize: 14, margin: [0, 10, 0, 0] },
-          { text: JSON.parse(localStorage.getItem('paciente')).nome_mae_paciente != null && JSON.parse(localStorage.getItem('paciente')).nome_mae_paciente != '' ? 'NOME DA MÃE: ' + JSON.parse(localStorage.getItem('paciente')).nome_mae_paciente : '', alignment: 'left', fontSize: 10, margin: [0, 5, 0, 5] },
-          { text: JSON.parse(localStorage.getItem('paciente')).dn_paciente != null && JSON.parse(localStorage.getItem('paciente')).dn_paciente != '' ? 'DN: ' + moment(JSON.parse(localStorage.getItem('paciente')).dn_paciente).format('DD/MM/YYYY') : '', alignment: 'left', fontSize: 10, margin: [0, 0, 0, 10] },
           {
-            "canvas": [{
-              "lineColor": "gray",
-              "type": "line",
-              "x1": 0,
-              "y1": 0,
-              "x2": 524,
-              "y2": 0,
-              "lineWidth": 1
-            }], margin: [0, 10, 0, 0], alignment: 'center',
+            table: {
+              widths: ['*', '20%', '20%'],
+              body: [
+                [
+                  { text: 'PACIENTE: ' + JSON.parse(localStorage.getItem('paciente')).nome_paciente, alignment: 'left', fontSize: 10 },
+                  { text: JSON.parse(localStorage.getItem('paciente')).sexo != null ? 'SEXO: ' + JSON.parse(localStorage.getItem('paciente')).sexo : '', fontSize: 10 },
+                  { text: JSON.parse(localStorage.getItem('paciente')).dn_paciente != null && JSON.parse(localStorage.getItem('paciente')).dn_paciente != '' ? 'DN: ' + moment(JSON.parse(localStorage.getItem('paciente')).dn_paciente).format('DD/MM/YYYY') : '', alignment: 'left', fontSize: 10 },
+                ]
+              ]
+            }, margin: [0, 10, 0, 0]
           },
-
         ],
-        margin: [40, 40, 40, 40],
+        margin: [40, 40, 40, 0],
       },
       footer: function (currentPage, pageCount) {
         return {
@@ -973,6 +971,8 @@ function ProcedimentosExames() {
         colspan: 0,
       }
     ];
+
+    /*
     let row2 = [
       {
         item: 1,
@@ -993,6 +993,8 @@ function ProcedimentosExames() {
         colspan: 0,
       }
     ];
+    */
+
     let row3 = [
       {
         item: 1,
@@ -1162,8 +1164,7 @@ function ProcedimentosExames() {
     tableconstructor(tabela, tbody);
     titleconstructor(tbody, 3, 'ECODOPPLERCARDIOGRAFIA COM MAPEAMENTO EM CORES', '14px');
     rowconstructor(tbody, row1);
-    rowconstructor(tbody, row2);
-    titleconstructor(tbody, 3, 'MEDIDAS', '13px');
+    titleconstructor(tbody, 3, 'MEDIDAS E CÁLCULOS', '13px');
     titleconstructor(tbody, 3, 'VENTRÍCULO ESQUERDO', '12px');
     rowconstructor(tbody, row3);
     rowconstructor(tbody, row4);
